@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-zotero",
+  "name": "Obsidian Zotero",
+  "version": "0.0.0",
+  "minAppVersion": "0.9.12",
+  "description": "ztdesc",
+  "author": "AidenLx",
+  "authorUrl": "https://github.com/aidenlx",
+  "isDesktopOnly": true
+}

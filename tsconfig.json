@@ -1,0 +1,4 @@
+{
+  "extends": "@aidenlx/ts-config/tsconfig.json",
+  "include": ["src/**/*.ts"],
+}
