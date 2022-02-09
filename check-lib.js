@@ -14,12 +14,13 @@ const { Modal, Notice } = require("obsidian"),
   { join } = require("path");
 
 class GoToDownloadModal extends Modal {
-  constructor() {
+  constructor(LIB_FILENAME) {
     super(app);
-    this.linkToLib = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/node-sqlite3/napi-v3-${oPlatfrom}-${oArch}.tar.gz?raw=true`;
+    this.LIB_FILENAME = LIB_FILENAME;
+    this.linkToLib = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${oPlatfrom}-${oArch}.zip?raw=true`;
   }
   onOpen() {
-    this.contentEl.createEl("h1", { text: "Install node-sqlite3" });
+    this.contentEl.createEl("h1", { text: "Install better-sqlite3" });
     this.contentEl.createDiv({}, (div) => {
       div.appendText(
         "Obsidian Zotero Plugin requires node-sqlite3 to be installed. " +
@@ -27,14 +28,14 @@ class GoToDownloadModal extends Modal {
       );
       div.createEl("ol", {}, (ol) => {
         ol.createEl("li", {}, (li) => {
-          li.appendText("Download zipped node-sqlite3 from ");
+          li.appendText("Download zip file from ");
           li.createEl("a", { href: this.linkToLib, text: "GitHub" });
           li.appendText(".");
         });
         ol.createEl("li", {}, (li) => {
-          li.appendText("Create a folder named ");
-          li.createEl("code", { text: "node-sqlite3" });
-          li.appendText(" under ");
+          li.appendText("Extract the ");
+          li.createEl("code", { text: this.LIB_FILENAME });
+          li.appendText(" file and place it under ");
           li.createEl(
             "a",
             { text: "Obsidian Config Folder (Click to open)" },
@@ -43,16 +44,11 @@ class GoToDownloadModal extends Modal {
                 app.openWithDefaultApp(app.vault.configDir),
               ),
           );
-        });
-        ol.createEl("li", {}, (li) => {
-          li.appendText("Extract the zipped file into the ");
-          li.createEl("code", { text: "node-sqlite3" });
-          li.appendText(" folder.");
           li.createEl("br");
           li.appendText(" The folder structure should be something like this:");
           li.createEl("br");
           li.createEl("code", {
-            text: ".obsidian/node-sqlite3/napi-v3-darwin-x64/node_sqlite3.node",
+            text: ".obsidian/better_sqlite3.node",
           });
         });
         ol.createEl("li", {}, (li) => {
@@ -66,32 +62,27 @@ class GoToDownloadModal extends Modal {
   }
 }
 
-module.exports = (PATH_TO_CONFIG, LIB_ROOT) => {
+module.exports = (PATH_TO_CONFIG, LIB_FILENAME) => {
   if (
     supported.some(
       ([platform, arch]) => oArch === arch && oPlatfrom === platform,
     )
   ) {
-    const LIB_PATH = join(
-      PATH_TO_CONFIG,
-      LIB_ROOT,
-      `napi-v3-${oArch}-${oPlatfrom}`,
-      "node_sqlite3.node",
-    );
+    const LIB_FILE = join(PATH_TO_CONFIG, LIB_FILENAME);
     try {
-      if (!statSync(LIB_PATH)?.isFile()) {
-        new GoToDownloadModal().open();
+      if (!statSync(LIB_FILE)?.isFile()) {
+        new GoToDownloadModal(LIB_FILENAME).open();
       }
     } catch (error) {
       if (error.code === "ENOENT") {
-        new GoToDownloadModal().open();
+        new GoToDownloadModal(LIB_FILENAME).open();
       } else {
         new Notice(error.toString());
       }
     }
   } else {
     new Notice(
-      `Your device ${oArch}-${oPlatfrom} is not supported by obsidian-zotero-plugin`,
+      `Your device (${oArch}-${oPlatfrom}) is not supported by obsidian-zotero-plugin`,
     );
   }
 };

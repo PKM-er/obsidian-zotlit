@@ -1,8 +1,9 @@
 import assertNever from "assert-never";
+import type { Database as DBType, SqliteError } from "better-sqlite3";
+import Database from "better-sqlite3";
 import { constants as fsConst, promises as fs } from "fs";
+import { Notice } from "obsidian";
 import path from "path";
-import { Database, open } from "sqlite";
-import sqlite3 from "sqlite3";
 
 import ZoteroPlugin from "./zt-main";
 
@@ -10,7 +11,7 @@ export default class ZoteroDb {
   constructor(private plugin: ZoteroPlugin) {}
 
   mode: "main" | "temp" = "main";
-  private dbInstance: Database | null = null;
+  private dbInstance: DBType | null = null;
 
   get srcDbPath(): string {
     return this.plugin.settings.zoteroDbPath;
@@ -22,7 +23,7 @@ export default class ZoteroDb {
 
   async open(mode = this.mode): Promise<this> {
     if (this.dbInstance && this.mode === mode) return this;
-    else if (this.dbInstance) await this.dbInstance.close();
+    else if (this.dbInstance) this.dbInstance.close();
     let filename;
     switch (mode) {
       case "main":
@@ -34,7 +35,10 @@ export default class ZoteroDb {
       default:
         assertNever(mode);
     }
-    const db = await open({ filename, driver: sqlite3.Database });
+    const db = new Database(filename, {
+      readonly: true,
+      timeout: 1e3,
+    });
     this.mode = mode;
     this.dbInstance = db;
     return this;
@@ -72,41 +76,48 @@ export default class ZoteroDb {
    * @param readAction a function that takes a database to perform database reads
    * @returns
    */
-  async read<T>(readAction: (db: Database) => Promise<T>): Promise<T> {
-    const action = async () => {
-        if (!this.dbInstance) throw new Error("No database currently opened");
-        return await readAction(this.dbInstance);
+  async read<T>(readAction: (db: DBType) => T): Promise<T> {
+    const action = () => {
+        if (!this.dbInstance || !this.dbInstance.open)
+          throw new Error("No database currently opened");
+        return readAction(this.dbInstance);
       },
-      tempDbBusy = () =>
-        Promise.reject(`Temp database is busy: ${this.getTempDbPath()}`);
+      tempDbBusy = `Temp database is busy: ${this.getTempDbPath()}`;
 
-    return action()
-      .catch(async (err) => {
-        if (err.code === "SQLITE_BUSY") {
-          if (this.mode === "main") {
-            // create a copy of the main database and open it
-            await this.tryUpdateTempDb();
-            await this.open("temp");
-            return action();
-          } else if (this.mode === "temp") {
-            return tempDbBusy();
-          } else {
-            assertNever(this.mode);
-          }
-        } else return Promise.reject(err);
-      })
-      .catch((err) =>
-        err.code === "SQLITE_BUSY" && this.mode === "temp"
-          ? tempDbBusy()
-          : Promise.reject(err),
-      );
+    let count = 0;
+
+    do {
+      try {
+        return action();
+      } catch (err) {
+        if (!((err as InstanceType<SqliteError>).code === "SQLITE_BUSY")) {
+          throw err;
+        }
+        if (this.mode === "main") {
+          new Notice(
+            "Seems like Zotero database is occuiped by Zotero, trying to switch to temp database...",
+          );
+          // create a copy of the main database and open it
+          await this.tryUpdateTempDb();
+          await this.open("temp");
+        } else if (this.mode === "temp") {
+          throw new Error(tempDbBusy);
+        } else {
+          assertNever(this.mode);
+        }
+      }
+      count++;
+    } while (count <= 1);
+    throw new Error(
+      "Failed to switch to temp database when main database was occuiped",
+    );
   }
 
   /** check if zotero is running and its database is busy
    * and update mode accordingly */
   async refresh() {
     (await this.open("main")).read((db) =>
-      db.run("SELECT groupID FROM groups"),
+      db.prepare("SELECT groupID FROM groups"),
     );
   }
 }

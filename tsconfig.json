@@ -1,4 +1,7 @@
 {
   "extends": "@aidenlx/ts-config/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2018",
+  },
   "include": ["src/**/*.ts"],
 }

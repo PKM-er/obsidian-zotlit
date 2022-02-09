@@ -41,65 +41,27 @@ const obPlugin = {
   },
 };
 
-const NODE_SQLITE3 = `"__NODE_SQLITE3_NATIVE_PATCH__"`;
 const PATH_TO_CONFIG = `app.vault.adapter.getFullPath(app.vault.configDir)`;
-const LIB_ROOT = "node-sqlite3";
+const LIB_FILENAME = `better_sqlite3.node`;
 
 /** @type import("esbuild").Plugin */
-const patchNodePreGypForSQL = {
-  name: "patch-node-pre-gyp",
+const patchBindings = {
+  name: "patch-bindings",
   setup: (build) => {
     build.onLoad(
       {
-        filter: /node_modules\/node-pre-gyp\/lib\/pre-binding\.js$/,
+        filter: /node_modules\/bindings\/bindings\.js$/,
       },
       async (args) => {
         let original = await readFile(args.path, "utf8");
-        original = original
-          .replace(
-            `   if (!existsSync(package_json_path)) {
-        throw new Error("package.json does not exist at " + package_json_path);
-   }`,
-            "",
-          )
-          .replace(
-            "require(package_json_path)",
-            `package_json_path === ${NODE_SQLITE3} ? require("../../sqlite3/package.json") : {}`,
-          )
-          .replace(
-            `opts.module_root = path.dirname(package_json_path)`,
-            `opts.module_root = ${PATH_TO_CONFIG}`,
-          );
-        return { contents: original };
-      },
-    );
-    build.onLoad(
-      {
-        filter: /node_modules\/sqlite3\/lib\/sqlite3-binding\.js$/,
-      },
-      async (args) => {
-        // run check and show dialog before calling binding
-        // and throw error if lib not installed
-        const checkLib = `require("${process.cwd()}/check-lib")(${PATH_TO_CONFIG}, "${LIB_ROOT}");`;
-        let original = await readFile(args.path, "utf8");
+        const checkLib = `require("${process.cwd()}/check-lib")(${PATH_TO_CONFIG}, "${LIB_FILENAME}");`;
         original = original.replace(
-          `path.resolve(path.join(__dirname,'../package.json'))`,
-          NODE_SQLITE3,
+          `// Get the module root`,
+          checkLib +
+            `var b, p = require("path").join(${PATH_TO_CONFIG},"${LIB_FILENAME}");` +
+            `return (b = require(p), b.path = p, b);`,
         );
-        return { contents: checkLib + original };
-      },
-    );
-    build.onLoad(
-      {
-        filter: /sqlite3\/package\.json$/,
-      },
-      async (args) => {
-        let original = JSON.parse(await readFile(args.path, "utf8"));
-        original.binary.module_path = original.binary.module_path.replace(
-          "lib/binding",
-          LIB_ROOT,
-        );
-        return { contents: JSON.stringify(original), loader: "json" };
+        return { contents: original };
       },
     );
   },
@@ -123,7 +85,7 @@ try {
       "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
     },
     outfile: "build/main.js",
-    plugins: [lessLoader(), obPlugin, patchNodePreGypForSQL],
+    plugins: [lessLoader(), obPlugin, patchBindings],
   });
 } catch (err) {
   console.error(err);
