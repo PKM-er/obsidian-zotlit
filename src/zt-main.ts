@@ -1,26 +1,26 @@
 import "./main.less";
 
-import { Plugin } from "obsidian";
+import { normalizePath, Plugin } from "obsidian";
 
-import {
-  ZoteroSettings,
-  ZoteroSettingTab,
-  DEFAULT_SETTINGS,
-} from "./settings";
+import { DEFAULT_SETTINGS, ZoteroSettings, ZoteroSettingTab } from "./settings";
+import ZoteroDb from "./zotero-db";
 
-export default class Zotero extends Plugin {
+export default class ZoteroPlugin extends Plugin {
   settings: ZoteroSettings = DEFAULT_SETTINGS;
+  db = new ZoteroDb(this);
 
   async onload() {
-    console.log("loading Obsidian Zotero");
+    console.log("loading Obsidian Zotero Plugin");
 
     await this.loadSettings();
+
+    this.db.open();
 
     this.addSettingTab(new ZoteroSettingTab(this));
   }
 
   onunload() {
-    // console.log("unloading Obsidian Zotero");
+    // console.log("unloading Obsidian Zotero Plugin");
   }
 
   async loadSettings() {
