@@ -12,45 +12,49 @@ export default class ZoteroDb {
 
   mode: "main" | "temp" = "main";
   private dbInstance: DBType | null = null;
+  version: number = -1;
 
   get srcDbPath(): string {
     return this.plugin.settings.zoteroDbPath;
   }
   async getTempDbPath() {
     const srcDbMtime = (await fs.stat(this.srcDbPath)).mtimeMs;
-    return `${this.srcDbPath}.${srcDbMtime}.temp`;
+    return {
+      path: `${this.srcDbPath}.${srcDbMtime}.temp`,
+      time: srcDbMtime,
+    };
   }
 
   async open(mode = this.mode): Promise<this> {
     if (this.dbInstance && this.mode === mode) return this;
     else if (this.dbInstance) this.dbInstance.close();
-    let filename;
+    let { path, time } = await this.getTempDbPath();
     switch (mode) {
       case "main":
-        filename = this.srcDbPath;
+        path = this.srcDbPath;
         break;
       case "temp":
-        filename = await this.getTempDbPath();
         break;
       default:
         assertNever(mode);
     }
-    const db = new Database(filename, {
+    const db = new Database(path, {
       readonly: true,
       timeout: 1e3,
     });
     this.mode = mode;
     this.dbInstance = db;
+    this.version = time;
     return this;
   }
 
   /**
    * try to keep temp databse up to date with main database
-   * remove out-of-date temp database
+   * create new copy and remove out-of-date temp database
    * @returns true if temp database was updated
    */
   async tryUpdateTempDb(): Promise<boolean> {
-    const newTempDbPath = await this.getTempDbPath();
+    const { path: newTempDbPath } = await this.getTempDbPath();
     try {
       await fs.copyFile(this.srcDbPath, newTempDbPath, fsConst.COPYFILE_EXCL);
       const dir = path.dirname(this.srcDbPath);
@@ -119,5 +123,11 @@ export default class ZoteroDb {
     (await this.open("main")).read((db) =>
       db.prepare("SELECT groupID FROM groups"),
     );
+  }
+
+  close() {
+    if (this.dbInstance) this.dbInstance.close();
+    this.dbInstance = null;
+    this.version = -1;
   }
 }

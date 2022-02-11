@@ -5,3 +5,4 @@ yarn.lock
 
 # build
 build
+src/zotero-types/fields.ts
