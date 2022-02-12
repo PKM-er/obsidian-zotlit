@@ -29,4 +29,13 @@ export const Helpers: HelperDeclareSpec = {
       return "annot";
     } else return "empty";
   },
+  coalesce: function () {
+    for (var i = 0; i < arguments.length - 1; i++) {
+      // - 1 because last should be handlebars options var
+      if (arguments[i]) {
+        return arguments[i];
+      }
+    }
+    return null;
+  },
 };

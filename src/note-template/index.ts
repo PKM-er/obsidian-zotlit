@@ -107,7 +107,7 @@ export default class NoteTemplate {
     title: true,
     citekey: true,
   };
-  private filename: string = "{{key}}.md";
+  private filename: string = "{{coalesce citekey DOI title key}}.md";
   private content: string = dedent`
   # {{title}}
 
