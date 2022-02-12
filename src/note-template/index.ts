@@ -5,6 +5,7 @@ import Handlebars, { TemplateDelegate } from "handlebars";
 
 import { RegularItem } from "../zotero-types";
 import { AnnotationItem, ItemFields } from "../zotero-types/fields";
+import { Helpers, Partial } from "./helper";
 
 export type ItemWithAnnos<I extends RegularItem = RegularItem> = I & {
   annotations?: AnnotationItem[];
@@ -55,6 +56,8 @@ export default class NoteTemplate {
     }
   }
   constructor() {
+    Handlebars.registerPartial(Partial as any);
+    Handlebars.registerHelper(Helpers);
     this.complieAll();
   }
 
@@ -76,9 +79,6 @@ export default class NoteTemplate {
     return renderWith(obj);
   }
 
-  frontmatter: FieldsInFrontmatter = {
-    title: true,
-  };
   private renderFrontmatter<T extends RegularItem>(target: T) {
     let data: Record<string, any> = {};
     let notEmpty = false;
@@ -103,9 +103,15 @@ export default class NoteTemplate {
   }
 
   //#region default templates
+  frontmatter: FieldsInFrontmatter = {
+    title: true,
+    citekey: true,
+  };
   private filename: string = "{{key}}.md";
   private content: string = dedent`
   # {{title}}
+
+  [Zotero]({{> (link)}})
   
   {{> annots}}
   `;
@@ -117,6 +123,8 @@ export default class NoteTemplate {
   private annotation: string = dedent`
 
   ## Annotation ^{{key}}
+
+  [Zotero]({{> (link)}})
 
   {{#if annotationText}}> {{annotationText}}{{/if}}
   `;

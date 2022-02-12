@@ -103,8 +103,9 @@ await fs.writeFile(
     dedent`
     ${typeDef}
 
-    const Fields = ${json}
-    export default Fields;`,
+    export const Fields = ${json};
+    export const ItemTypes = ${JSON.stringify(Object.keys(ItemTypeFieldsMap))};
+`,
     { ...config, parser: "typescript" },
   ),
 );

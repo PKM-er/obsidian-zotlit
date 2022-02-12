@@ -1,5 +1,5 @@
 //#region Type fields exports
-import Fields from "./fields";
+import { Fields, ItemTypes } from "./fields";
 
 // From Zotero.ItemTypes
 const primaryTypeNames = [
@@ -14,7 +14,12 @@ export const PrimaryTypeFields = primaryTypeNames.reduce(
   (map, type) => ((map[type] = Fields[type]), map),
   {} as Pick<typeof Fields, typeof primaryTypeNames[number]>,
 );
-export { Fields as AllTypeFields };
+export const NonRegularItemTypes = [
+  "attachment",
+  "note",
+  "annotation",
+] as const;
+export { Fields as AllFields, ItemTypes as AllItemTypes };
 
 //#endregion
 
@@ -23,10 +28,12 @@ import {
   AnnotationItem as Annotation,
   AttachmentItem as Attachment,
   NoteItem as Note,
-  RegularItem,
+  RegularItem as RegularItemSrc,
 } from "./fields";
 
-export { RegularItem };
+export type RegularItem = RegularItemSrc & {
+  citekey?: string;
+};
 
 export type Item = RegularItem | NoteItem | AnnotationItem | AttachmentItem;
 
@@ -38,7 +45,7 @@ enum AnnotationType {
   ink = 4,
 }
 export type AnnotationItem = Annotation & {
-  parentItem?: string;
+  parentItem: string;
   annotationType: keyof typeof AnnotationType;
   annotationText: string;
   annotationComment: string;
@@ -46,7 +53,10 @@ export type AnnotationItem = Annotation & {
   annotationPageLabel: string;
   annotationSortIndex: string;
   /** json string */
-  annotationPosition: string;
+  annotationPosition: {
+    pageIndex: number;
+    rects: [number, number, number, number][];
+  };
 };
 
 // Zotero.Attachments.linkModeToName

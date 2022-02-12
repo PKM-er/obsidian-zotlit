@@ -76,18 +76,22 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
 export default getZoteroLinkHandlers;
 
 const DateFields = ["accessDate", "dateAdded", "dateModified"] as const;
+const JSONStrFields = ["annotationPosition"] as const;
 
 type KeysMatching<T extends object, V> = {
   [K in keyof T]-?: T[K] extends V ? K : never;
 }[keyof T];
 const fromJSON = <T extends Item>(item: T): T => {
+  const json = item as any;
   // make sure all date fields are converted to Date objects
-  const json = item as Partial<
-    Record<KeysMatching<RegularItem, Date | undefined>, any>
-  >;
   for (const field of DateFields) {
     if (field in json) {
       json[field] = new Date(json[field]);
+    }
+  }
+  for (const field of JSONStrFields) {
+    if (field in json) {
+      json[field] = JSON.parse(json[field]);
     }
   }
   return json as T;

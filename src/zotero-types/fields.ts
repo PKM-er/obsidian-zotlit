@@ -1038,7 +1038,7 @@ export type WebpageItem = ItemBase &
 
 export type AnnotationItem = ItemBase & Record<"itemType", "annotation">;
 
-const Fields = {
+export const Fields = {
   artwork: [
     "abstractNote",
     "accessDate",
@@ -1690,4 +1690,42 @@ const Fields = {
   ],
   annotation: [],
 };
-export default Fields;
+export const ItemTypes = [
+  "artwork",
+  "attachment",
+  "audioRecording",
+  "bill",
+  "blogPost",
+  "book",
+  "bookSection",
+  "case",
+  "computerProgram",
+  "conferencePaper",
+  "dictionaryEntry",
+  "document",
+  "email",
+  "encyclopediaArticle",
+  "film",
+  "forumPost",
+  "hearing",
+  "instantMessage",
+  "interview",
+  "journalArticle",
+  "letter",
+  "magazineArticle",
+  "manuscript",
+  "map",
+  "newspaperArticle",
+  "note",
+  "patent",
+  "podcast",
+  "presentation",
+  "radioBroadcast",
+  "report",
+  "statute",
+  "thesis",
+  "tvBroadcast",
+  "videoRecording",
+  "webpage",
+  "annotation",
+];
