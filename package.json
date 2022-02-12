@@ -1,7 +1,7 @@
 {
   "name": "obsidian-zotero-plugin",
   "version": "0.0.0",
-  "description": "ztdesc",
+  "description": "Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
   "main": "main.js",
   "scripts": {
     "dev": "cross-env BUILD=dev node esbuild.config.mjs",
