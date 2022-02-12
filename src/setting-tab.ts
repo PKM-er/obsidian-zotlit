@@ -63,11 +63,12 @@ export class ZoteroSettingTab extends PluginSettingTab {
           const noteFolder = this.plugin.settings.literatureNoteFolder;
           noteFolder.path = value;
           if (noteFolder.path !== value) text.setValue(noteFolder.path);
+          this.plugin.zoteroItems.noteFolder = noteFolder.path;
           await this.plugin.saveSettings();
         };
         text
           .setValue(this.plugin.settings.literatureNoteFolder.path)
-          .onChange(debounce(onChange, 500, true));
+          .onChange(debounce(onChange, 1e3, true));
       });
   }
 }

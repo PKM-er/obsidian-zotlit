@@ -6,6 +6,7 @@ import { AnnotationItem, Item, RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import { importAnnoItems } from "./import-annot";
 import { importInfoItems } from "./import-info";
+import openItemNote from "./open";
 
 type ZoteroLinkParams = ObsidianProtocolData & {
   type: "annotation" | "info";
@@ -28,13 +29,8 @@ const getHandlers = (
   handlers.map(({ action, handler }) => ["zotero/" + action, handler as any]);
 
 const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
-  const openHandler: ZoteroLinkHandler = ({
-    type,
-    doi,
-    ["info-key"]: infoKey,
-    ["library-id"]: libraryId,
-    ["annot-key"]: annotKey,
-  }) => {
+  const openHandler: ZoteroLinkHandler = (params) => {
+    const { type, ["annot-key"]: annotKey } = params;
     if (type === "annotation") {
       if (!annotKey) {
         console.error(
@@ -42,7 +38,9 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
         );
         return;
       }
+      openItemNote(plugin, params);
     } else if (type === "info") {
+      openItemNote(plugin, params);
     } else assertNever(type);
   };
 

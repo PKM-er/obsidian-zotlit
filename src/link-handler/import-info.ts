@@ -46,5 +46,5 @@ export const importInfoItems = async (
     }
   }
   if (createdNotes.length === 1)
-    workspace.openLinkText(createdNotes[0].path, "", true);
+    workspace.openLinkText(createdNotes[0].path, "", false);
 };

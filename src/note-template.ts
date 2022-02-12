@@ -16,7 +16,7 @@ interface TemplateItemTypeMap {
   annots: AnnotationItem[];
 }
 type FieldsInFrontmatter = {
-  [K in ItemFields | keyof RegularItem]?: true | string;
+  [K in ItemFields | keyof RegularItem]?: true | string[];
 };
 
 type TemplateInstances = {
@@ -30,6 +30,8 @@ const CompileOptions: Parameters<typeof Handlebars.compile>[1] = {
     noEscape: true,
   },
   grayMatterOptions = {};
+
+export const ZOTERO_KEY_FIELDNAME = "zotero-key";
 
 export default class NoteTemplate {
   private templateInstances: TemplateInstances = {
@@ -58,32 +60,38 @@ export default class NoteTemplate {
     target: Target,
     obj: TemplateItemTypeMap[Target],
   ): string {
-    const main = this.templateInstances[target](obj as any);
+    const renderWith = (obj: any) => this.templateInstances[target](obj);
     if (target === "content") {
+      const content = renderWith(obj);
       const frontmatterData = this.renderFrontmatter(
         obj as TemplateItemTypeMap["content"],
       );
       if (frontmatterData)
-        return stringify(main, frontmatterData, grayMatterOptions);
+        return stringify(content, frontmatterData, grayMatterOptions);
+    } else if (target === "annots") {
+      return renderWith({ annotations: obj });
     }
-    return main;
+    return renderWith(obj);
   }
 
   frontmatter: FieldsInFrontmatter = {
-    key: true,
     title: true,
   };
   private renderFrontmatter<T extends RegularItem>(target: T) {
     let data: Record<string, any> = {};
     let notEmpty = false;
-    for (const [k, config] of Object.entries<string | true>(this.frontmatter)) {
+    // zotero-key required
+    data[ZOTERO_KEY_FIELDNAME] = target.key;
+    for (const [k, config] of Object.entries<string[] | true>(
+      this.frontmatter,
+    )) {
       if (!(k in target)) continue;
       const value = target[k as keyof T];
       if (config === true) {
         data[k] = value;
-      } else if (typeof config === "string") {
+      } else if (Array.isArray(config)) {
         // map value to an alias name
-        data[config] = value;
+        new Set(config).forEach((alias) => (data[alias] = value));
       } else {
         assertNever(config);
       }

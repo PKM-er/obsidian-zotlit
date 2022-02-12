@@ -6,4 +6,8 @@ declare module "obsidian" {
       sourcePath: string,
     ): TFile;
   }
+  interface MetadataCache {
+    on(name: "finished", callback: () => any, ctx?: any): EventRef;
+    initialized: boolean;
+  }
 }

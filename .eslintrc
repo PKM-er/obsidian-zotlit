@@ -1,0 +1,4 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "rules": { "import/no-unresolved": [2, { "ignore": [".worker.ts$"] }] }
+}

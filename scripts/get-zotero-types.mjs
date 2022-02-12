@@ -39,9 +39,9 @@ const { json } = db
               f.fieldName
             FROM
               itemTypeFields tf -- type fields
-              INNER JOIN fields f on f.fieldID = tf.fieldID
+              INNER JOIN fields f USING (fieldID)
           ) tfn -- type-fieldnames
-          ON t.itemTypeID = tfn.itemTypeID
+          USING (itemTypeID)
         GROUP BY
           t.itemTypeID
       )

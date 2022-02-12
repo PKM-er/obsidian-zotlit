@@ -1,5 +1,6 @@
 import builtins from "builtin-modules";
 import { build } from "esbuild";
+import inlineWorker from "esbuild-plugin-inline-worker";
 import { lessLoader } from "esbuild-plugin-less";
 import { promises } from "fs";
 const { copyFile, rename, writeFile, readFile } = promises;
@@ -69,23 +70,32 @@ const patchBindings = {
 
 const isProd = process.env.BUILD === "production";
 
+/** @type import("esbuild").BuildOptions */
+const opts = {
+  bundle: true,
+  watch: !isProd,
+  platform: "browser",
+  external: ["obsidian", "electron", ...builtins],
+  format: "cjs",
+  mainFields: ["browser", "module", "main"],
+  sourcemap: isProd ? false : "inline",
+  minify: isProd,
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
+  },
+};
 try {
   await build({
+    ...opts,
     entryPoints: ["src/zt-main.ts"],
-    bundle: true,
-    watch: !isProd,
-    platform: "browser",
-    external: ["obsidian", "electron", ...builtins],
-    format: "cjs",
-    mainFields: ["browser", "module", "main"],
     banner: { js: banner },
-    sourcemap: isProd ? false : "inline",
-    minify: isProd,
-    define: {
-      "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
-    },
     outfile: "build/main.js",
-    plugins: [lessLoader(), obPlugin, patchBindings],
+    plugins: [
+      lessLoader(),
+      inlineWorker({ ...opts, format: "esm" }),
+      obPlugin,
+      patchBindings,
+    ],
   });
 } catch (err) {
   console.error(err);
