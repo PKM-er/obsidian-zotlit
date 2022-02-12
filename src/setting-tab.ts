@@ -60,13 +60,13 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .setName("Literature Note Folder")
       .addText((text) => {
         const onChange = async (value: string) => {
-          const normalized = normalizePath(value);
-          if (normalized !== value) text.setValue(normalized);
-          this.plugin.settings.literatureNoteFolder = normalized;
+          const noteFolder = this.plugin.settings.literatureNoteFolder;
+          noteFolder.path = value;
+          if (noteFolder.path !== value) text.setValue(noteFolder.path);
           await this.plugin.saveSettings();
         };
         text
-          .setValue(this.plugin.settings.literatureNoteFolder)
+          .setValue(this.plugin.settings.literatureNoteFolder.path)
           .onChange(debounce(onChange, 500, true));
       });
   }

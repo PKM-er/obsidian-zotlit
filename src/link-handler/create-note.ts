@@ -23,7 +23,7 @@ const createNote = async (
     { literatureNoteFolder: folder, literatureNoteTemplate: template } =
       plugin.settings;
 
-  const filepath = path.join(folder, template.render("filename", info));
+  const filepath = path.join(folder.path, template.render("filename", info));
   if (vault.getAbstractFileByPath(filepath)) {
     throw new NoteExistsError(filepath);
   }
