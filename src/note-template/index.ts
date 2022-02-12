@@ -103,6 +103,7 @@ export default class NoteTemplate {
   }
 
   //#region default templates
+  // zotero-key is an required field
   frontmatter: FieldsInFrontmatter = {
     title: true,
     citekey: true,
@@ -111,7 +112,7 @@ export default class NoteTemplate {
   private content: string = dedent`
   # {{title}}
 
-  [Zotero]({{> (link)}})
+  [Zotero]({{backlink}})
   
   {{> annots}}
   `;
@@ -124,7 +125,7 @@ export default class NoteTemplate {
 
   ## Annotation ^{{key}}
 
-  [Zotero]({{> (link)}})
+  [Zotero]({{backlink}})
 
   {{#if annotationText}}> {{annotationText}}{{/if}}
   `;

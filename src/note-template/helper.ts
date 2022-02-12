@@ -10,24 +10,26 @@ const isRegularItem = (item: any): item is RegularItem =>
 const isAnnotationItem = (item: any): item is AnnotationItem =>
   (item as Item).itemType === "annotation" &&
   typeof (item as AnnotationItem).parentItem === "string" &&
-  typeof (item as AnnotationItem).annotationPosition?.pageIndex === "number";
+  (!!(item as AnnotationItem).key ||
+    typeof (item as AnnotationItem).annotationPosition?.pageIndex === "number");
 
-export const Partial = {
-  annot:
-    "zotero://open-pdf/library/items/{{parentItem}}?page={{annotationPosition.pageIndex}}&annotation={{key}}",
-  regular: "zotero://select/library/items/{{key}}",
-  empty: "",
-} as const;
+export const Partial = {} as const;
 
 export const Helpers: HelperDeclareSpec = {
-  link: function (
-    this: RegularItem | AnnotationItem | any,
-  ): keyof typeof Partial {
+  backlink: function (this: RegularItem | AnnotationItem | any): string {
+    let url: URL;
     if (isRegularItem(this)) {
-      return "regular";
+      url = new URL("zotero://select/library/items/" + this.key);
     } else if (isAnnotationItem(this)) {
-      return "annot";
-    } else return "empty";
+      url = new URL("zotero://open-pdf/library/items/" + this.parentItem);
+      if (typeof this.annotationPosition?.pageIndex === "number")
+        url.searchParams.append(
+          "page",
+          this.annotationPosition.pageIndex.toString(),
+        );
+      if (this.key) url.searchParams.append("annotation", this.key);
+    } else return "";
+    return url.toString();
   },
   coalesce: function () {
     for (var i = 0; i < arguments.length - 1; i++) {
