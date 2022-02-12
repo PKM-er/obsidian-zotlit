@@ -1,3 +1,4 @@
+import log, { LogLevelNumbers } from "loglevel";
 import { normalizePath, TAbstractFile, Vault } from "obsidian";
 import { homedir } from "os";
 import path from "path";
@@ -9,13 +10,20 @@ export interface ZoteroSettings {
   zoteroDbPath: string;
   literatureNoteFolder: InVaultPath;
   literatureNoteTemplate: NoteTemplate;
+  logLevel: LogLevelNumbers;
 }
 
-export const getDefaultSettings: () => ZoteroSettings = () => ({
-  zoteroDbPath: path.join(homedir(), "Zotero", "zotero.sqlite"),
-  literatureNoteFolder: new InVaultPath(),
-  literatureNoteTemplate: new NoteTemplate(),
-});
+const DEFAULT_LOG_LEVEL = 4;
+
+export const getDefaultSettings = (): ZoteroSettings => {
+  log.setDefaultLevel(DEFAULT_LOG_LEVEL);
+  return {
+    zoteroDbPath: path.join(homedir(), "Zotero", "zotero.sqlite"),
+    literatureNoteFolder: new InVaultPath(),
+    literatureNoteTemplate: new NoteTemplate(),
+    logLevel: DEFAULT_LOG_LEVEL,
+  };
+};
 
 type RequireConvert = {
   [K in keyof ZoteroSettings]: ZoteroSettings[K] extends ClassInSettings<any>
@@ -38,6 +46,7 @@ export async function loadSettings(this: ZoteroPlugin) {
     json,
     updateFromJSON("literatureNoteFolder", "literatureNoteTemplate"),
   );
+  log.setLevel(this.settings.logLevel);
 }
 
 export async function saveSettings(this: ZoteroPlugin) {

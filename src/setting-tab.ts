@@ -1,5 +1,6 @@
 import assertNever from "assert-never";
 import { promises as fs } from "fs";
+import log, { LogLevelNumbers } from "loglevel";
 import {
   debounce,
   Notice,
@@ -9,6 +10,7 @@ import {
 } from "obsidian";
 import path from "path";
 
+import { promptOpenLog } from "./utils";
 import ZoteroPlugin from "./zt-main";
 
 export class ZoteroSettingTab extends PluginSettingTab {
@@ -20,6 +22,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     this.containerEl.empty();
     this.general();
     this.templates();
+    this.logLevel();
   }
   general(): void {
     let pathBox: TextAreaComponent;
@@ -104,6 +107,35 @@ export class ZoteroSettingTab extends PluginSettingTab {
       if (desc) setting.setDesc(desc);
     }
   }
+  logLevel = () => {
+    new Setting(this.containerEl).setHeading().setName("Debug");
+    new Setting(this.containerEl)
+      .setName("Log Level")
+      .setDesc(
+        createFragment((frag) => {
+          frag.appendText("Change level of logs output to the console.");
+          frag.createEl("br");
+          frag.appendText("Set to DEBUG if debug is required");
+          frag.createEl("br");
+          frag.appendText("To check console, " + promptOpenLog());
+        }),
+      )
+      .addDropdown((dp) =>
+        dp
+          .then((dp) =>
+            Object.entries(log.levels).forEach(([key, val]) =>
+              dp.addOption(val.toString(), key),
+            ),
+          )
+          .setValue(log.getLevel().toString())
+          .onChange(async (val) => {
+            const level = +val as LogLevelNumbers;
+            log.setLevel(level);
+            this.plugin.settings.logLevel = level;
+            await this.plugin.saveSettings();
+          }),
+      );
+  };
 
   addTextField(
     addTo: HTMLElement,

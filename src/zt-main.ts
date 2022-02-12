@@ -1,5 +1,6 @@
 import "./main.less";
 
+import log from "loglevel";
 import { Notice, Plugin, TFolder } from "obsidian";
 
 import ZoteroItems from "./item-index.ts";
@@ -22,7 +23,7 @@ export default class ZoteroPlugin extends Plugin {
   zoteroItems: ZoteroItems = new ZoteroItems(this);
 
   async onload() {
-    console.log("loading Obsidian Zotero Plugin");
+    log.info("loading Obsidian Zotero Plugin");
 
     await this.loadSettings();
 
@@ -36,7 +37,7 @@ export default class ZoteroPlugin extends Plugin {
   }
 
   onunload() {
-    console.log("unloading Obsidian Zotero Plugin");
+    log.info("unloading Obsidian Zotero Plugin");
     this.db.close();
   }
 

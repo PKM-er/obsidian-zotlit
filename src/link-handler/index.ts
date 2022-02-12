@@ -1,5 +1,6 @@
 import assertNever from "assert-never";
 import { decode } from "js-base64";
+import log from "loglevel";
 import { ObsidianProtocolData, ObsidianProtocolHandler } from "obsidian";
 
 import { AnnotationItem, Item, RegularItem } from "../zotero-types";
@@ -33,7 +34,7 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
     const { type, ["annot-key"]: annotKey } = params;
     if (type === "annotation") {
       if (!annotKey) {
-        console.error(
+        log.error(
           'Invalid link from zotero: missing annotaion key in "open" url',
         );
         return;
@@ -50,10 +51,12 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
       const data = parsed as SendData_AnnoExport;
       data.annotations = fromJSONArray(data.annotations);
       data.info = fromJSON(data.info);
+      log.debug("parsed zotero link: ", type, parsed);
       importAnnoItems(plugin, data);
     } else if (type === "info") {
       const data = parsed as SendData_InfoExport;
       data.info = fromJSONArray(data.info);
+      log.debug("parsed zotero link: ", type, parsed);
       importInfoItems(plugin, data);
     } else assertNever(type);
   };

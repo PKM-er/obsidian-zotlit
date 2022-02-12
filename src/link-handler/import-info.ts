@@ -1,5 +1,7 @@
+import log from "loglevel";
 import { Notice, TFile } from "obsidian";
 
+import { promptOpenLog } from "../utils";
 import ZoteroPlugin from "../zt-main";
 import createNote, { NoteExistsError } from "./create-note";
 import { SendData_InfoExport } from "./index";
@@ -28,21 +30,19 @@ export const importInfoItems = async (
 
   if (createdNotes.length > 0) {
     new Notice(`Successful imported ${createdNotes.length} items.`);
-    console.log("imported zotero item: ", createdNotes);
+    log.info("imported zotero item: ", createdNotes);
   }
   if (existingNotes.length > 0 || failedToCreate.length > 0) {
     new Notice(
       `Failed to import ${
         existingNotes.length + failedToCreate.length
-      } items, check log for details`,
+      } items, for details, ${promptOpenLog()}`,
     );
     if (existingNotes.length > 0)
-      console.error("note already exists: ", existingNotes);
+      log.warn("note already exists: ", existingNotes);
     if (failedToCreate.length > 0) {
-      console.group();
-      console.error("Error while creating note: ");
-      failedToCreate.forEach((err) => console.error(err));
-      console.groupEnd();
+      log.error("Error while creating note: ");
+      failedToCreate.forEach((err) => log.warn(err));
     }
   }
   if (createdNotes.length === 1)
