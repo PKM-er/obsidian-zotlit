@@ -3,8 +3,8 @@ import dedent from "dedent";
 import { stringify } from "gray-matter";
 import Handlebars, { TemplateDelegate } from "handlebars";
 
-import { RegularItem } from "./zotero-types";
-import { AnnotationItem, ItemFields } from "./zotero-types/fields";
+import { RegularItem } from "../zotero-types";
+import { AnnotationItem, ItemFields } from "../zotero-types/fields";
 
 export type ItemWithAnnos<I extends RegularItem = RegularItem> = I & {
   annotations?: AnnotationItem[];
