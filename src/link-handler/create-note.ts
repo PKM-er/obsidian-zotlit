@@ -2,14 +2,14 @@ import makeError, { BaseError } from "make-error";
 import { Notice, TFile } from "obsidian";
 import { posix as path } from "path";
 
-import { ItemWithAnnos } from "../note-template";
+import { ItemWithAnnos, ZOTERO_KEY_FIELDNAME } from "../note-template";
 import { RegularItem } from "../zotero-types";
 import { AnnotationItem } from "../zotero-types/fields";
 import ZoteroPlugin from "../zt-main";
 
 export class NoteExistsError extends BaseError {
-  constructor(public target: string) {
-    super("Note already exists: " + target);
+  constructor(public target: string, public key: string) {
+    super(`Note linked to ${key} already exists: ${target}`);
     this.name = "NoteExistsError";
   }
 }
@@ -19,13 +19,21 @@ const createNote = async (
   info: RegularItem,
   annots?: AnnotationItem[],
 ): Promise<TFile> => {
-  const { vault, fileManager } = plugin.app,
+  const { vault, fileManager, metadataCache: meta } = plugin.app,
     { literatureNoteFolder: folder, literatureNoteTemplate: template } =
       plugin.settings;
 
   const filepath = path.join(folder.path, template.render("filename", info));
-  if (vault.getAbstractFileByPath(filepath)) {
-    throw new NoteExistsError(filepath);
+  let existingFile = vault.getAbstractFileByPath(filepath);
+  if (existingFile) {
+    let metadata = meta.getCache(existingFile.path);
+    if (
+      metadata?.frontmatter &&
+      metadata.frontmatter[ZOTERO_KEY_FIELDNAME] === info.key
+    ) {
+      // only throw error if the note is linked to the same zotero item
+      throw new NoteExistsError(filepath, info.key);
+    }
   }
   let infoWithAnnos = info as ItemWithAnnos;
   if (annots) infoWithAnnos.annotations = annots;
