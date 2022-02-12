@@ -1,6 +1,6 @@
 {
   "id": "obsidian-zotero-plugin",
-  "name": "Obsidian Zotero",
+  "name": "Zotero Plugin",
   "version": "0.0.0",
   "minAppVersion": "0.13.24",
   "description": "Plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",

@@ -1,4 +1,4 @@
-# Obsidian Zotero
+# Obsidian Zotero Plugin
 
 Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.
 
