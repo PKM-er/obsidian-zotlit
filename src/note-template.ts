@@ -40,6 +40,9 @@ export default class NoteTemplate {
     annotation: undefined as any,
     annots: undefined as any,
   };
+  getAllTemplatePropNames(): (keyof TemplateItemTypeMap)[] {
+    return Object.keys(this.templateInstances) as any;
+  }
   private compile(name: keyof NoteTemplateJSON, template: string) {
     const tpl = Handlebars.compile(template, CompileOptions);
     this.templateInstances[name] = tpl as any;
@@ -47,8 +50,7 @@ export default class NoteTemplate {
       Handlebars.registerPartial(name, tpl);
   }
   public complieAll(): void {
-    for (const k in this.templateInstances) {
-      const key = k as keyof TemplateInstances;
+    for (const key of this.getAllTemplatePropNames()) {
       this.compile(key, this[key]);
     }
   }

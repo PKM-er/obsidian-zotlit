@@ -1,7 +1,7 @@
+import assertNever from "assert-never";
 import { promises as fs } from "fs";
 import {
   debounce,
-  normalizePath,
   Notice,
   PluginSettingTab,
   Setting,
@@ -17,11 +17,14 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
 
   display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-
+    this.containerEl.empty();
+    this.general();
+    this.templates();
+  }
+  general(): void {
     let pathBox: TextAreaComponent;
-    new Setting(containerEl)
+    new Setting(this.containerEl).setHeading().setName("General");
+    new Setting(this.containerEl)
       .setName("Zotero Database Path")
       .addTextArea(
         (txt) => (
@@ -56,7 +59,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
               }
           }),
       );
-    new Setting(containerEl)
+    new Setting(this.containerEl)
       .setName("Literature Note Folder")
       .addText((text) => {
         const onChange = async (value: string) => {
@@ -70,5 +73,52 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.literatureNoteFolder.path)
           .onChange(debounce(onChange, 1e3, true));
       });
+  }
+  templates(): void {
+    new Setting(this.containerEl).setHeading().setName("Templates");
+    const template = this.plugin.settings.literatureNoteTemplate;
+    for (const key of template.getAllTemplatePropNames()) {
+      let title: string,
+        desc: string | DocumentFragment = "";
+      switch (key) {
+        case "content":
+          title = "Note Content";
+          break;
+        case "filename":
+          title = "Note Filename";
+          break;
+        case "annotation":
+          title = "Annotation";
+          break;
+        case "annots":
+          title = "Annotations";
+          break;
+        default:
+          assertNever(key);
+      }
+      const setting = this.addTextField(
+        this.containerEl,
+        () => template[key],
+        (value) => (template[key] = value),
+      ).setName(title);
+      if (desc) setting.setDesc(desc);
+    }
+  }
+
+  addTextField(
+    addTo: HTMLElement,
+    get: () => string,
+    set: (value: string) => void,
+    timeout = 500,
+  ): Setting {
+    return new Setting(addTo).addTextArea((text) => {
+      const onChange = async (value: string) => {
+        set(value);
+        await this.plugin.saveSettings();
+      };
+      text.setValue(get()).onChange(debounce(onChange, timeout, true));
+      text.inputEl.cols = 30;
+      text.inputEl.rows = 5;
+    });
   }
 }
