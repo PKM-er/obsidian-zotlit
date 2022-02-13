@@ -27,18 +27,23 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
     creators: any[] = await db.read((db) =>
       db.prepare(creatorsSql).all(libraryID),
     );
-  let entries = new Map();
-  for (const { itemID, fieldName, value } of general) {
-    if (entries.has(itemID)) {
-      entries.get(itemID)[fieldName] = value;
+  let entries = {} as any;
+  for (const { itemID, fieldName, value, ...props } of general) {
+    if (itemID in entries) {
+      entries[itemID][fieldName] = value;
     } else {
-      entries.set(itemID, { itemID, [fieldName]: value, creators: [] });
+      entries[itemID] = {
+        itemID,
+        ...props,
+        [fieldName]: value,
+        creators: [],
+      };
     }
   }
   for (const { itemID, ...creator } of creators) {
-    entries.get(itemID)?.creators.push(creator);
+    entries[itemID]?.creators.push(creator);
   }
-  const items = Array.from(entries.values()) as RegularItem[];
+  const items = Object.values(entries) as RegularItem[];
 
   const index = Fuse.createIndex(fuseOptions.keys!, items);
   db.close();

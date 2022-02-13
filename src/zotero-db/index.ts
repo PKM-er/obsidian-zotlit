@@ -9,6 +9,8 @@ import indexCitation from "./index-citation.worker.ts";
 
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;
+  items: Record<string, RegularItem> = {};
+
   indexCitationWorker: PromiseWorker<Input, Output> | null = null;
 
   constructor(private plugin: ZoteroPlugin) {}
@@ -19,14 +21,22 @@ export default class ZoteroDb {
   };
 
   async init() {
-    const args = await getIndex(this.props);
-    this.fuse = new Fuse(...args);
+    this.initIndexAndFuse(await getIndex(this.props));
   }
   async initWithWorker() {
     this.indexCitationWorker = new PromiseWorker<Input, Output>(indexCitation);
     this.plugin.register(() => this.indexCitationWorker?.terminate());
 
-    const args = await this.indexCitationWorker.postMessage(this.props);
+    this.initIndexAndFuse(
+      await this.indexCitationWorker.postMessage(this.props),
+    );
+  }
+
+  initIndexAndFuse(args: Output) {
+    this.items = args[0].reduce(
+      (record, item) => ((record[item.key] = item), record),
+      {} as Record<string, RegularItem>,
+    );
     this.fuse = new Fuse(...args);
   }
 }
