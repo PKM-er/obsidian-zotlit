@@ -5,8 +5,12 @@ import { ZOTERO_KEY_FIELDNAME } from "../note-template";
 export type FileMapInfo = { file: string; blockId?: string };
 type KeyFileMap = [key: string, info: FileMapInfo];
 
-/** `n` as a seperator between merged */
-const ANNOT_BLOCKID_PATTERN = /^(?:[A-Z0-9]+(?:p\d+)?n?)+$/;
+/**
+ * from https://github.com/zotero/utilities/blob/37e33ba87a47905441baaafb90999abbb4ab6b1e/utilities.js#L1589-L1594
+ * `n` as a seperator between merged
+ */
+const ANNOT_BLOCKID_PATTERN =
+  /^(?:[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}(?:p\d+)?n?)+$/;
 
 export function* getZoteroKeyFileMap(
   file: string,
