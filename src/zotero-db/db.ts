@@ -5,17 +5,15 @@ import { constants as fsConst, promises as fs } from "fs";
 import { Notice } from "obsidian";
 import path from "path";
 
-import ZoteroPlugin from "./zt-main";
-
 export default class ZoteroDb {
-  constructor(private plugin: ZoteroPlugin) {}
+  constructor(private dbPath: string) {}
 
   mode: "main" | "temp" = "main";
   private dbInstance: DBType | null = null;
   version: number = -1;
 
   get srcDbPath(): string {
-    return this.plugin.settings.zoteroDbPath;
+    return this.dbPath;
   }
   async getTempDbPath() {
     const srcDbMtime = (await fs.stat(this.srcDbPath)).mtimeMs;

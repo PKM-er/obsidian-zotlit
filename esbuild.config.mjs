@@ -83,6 +83,9 @@ const opts = {
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
   },
+  loader: {
+    ".sql": "text",
+  },
 };
 try {
   await build({
@@ -92,7 +95,7 @@ try {
     outfile: "build/main.js",
     plugins: [
       lessLoader(),
-      inlineWorker({ ...opts, format: "esm" }),
+      inlineWorker({ ...opts, format: "cjs" }),
       obPlugin,
       patchBindings,
     ],

@@ -31,14 +31,13 @@ export default class ZoteroPlugin extends Plugin {
       this.registerObsidianProtocolHandler(...args),
     );
 
-    this.db.open();
+    this.db.init();
 
     this.addSettingTab(new ZoteroSettingTab(this));
   }
 
   onunload() {
     log.info("unloading Obsidian Zotero Plugin");
-    this.db.close();
   }
 
   async getLiteratureNoteFolder(): Promise<TFolder> {
