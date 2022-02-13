@@ -16,6 +16,9 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   keys: ["title", "creators"],
 };
 const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
+  dbPath =
+    "/Users/aidenlx/Library/Application Support/Zotero/Profiles/0mfu0e9q.ZoteroDEBUG/zotero/zotero.sqlite";
+  libraryID = 2;
   const db = new ZoteroDb(dbPath);
   await db.open();
   const general: any[] = await db.read((db) =>
