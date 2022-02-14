@@ -1,10 +1,10 @@
-import makeError, { BaseError } from "make-error";
-import { Notice, TFile } from "obsidian";
+import { BaseError } from "make-error";
+import { TFile } from "obsidian";
 import { posix as path } from "path";
 
 import { ItemWithAnnos, ZOTERO_KEY_FIELDNAME } from "../note-template";
 import { RegularItem } from "../zotero-types";
-import { AnnotationItem } from "../zotero-types/fields";
+import { AnnotationItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 
 export class NoteExistsError extends BaseError {

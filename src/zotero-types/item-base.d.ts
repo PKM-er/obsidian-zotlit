@@ -12,6 +12,10 @@ export interface ItemBase {
   creators?: Creator[];
 }
 
+export interface RegularItemBase extends ItemBase {
+  citekey?: string;
+}
+
 interface Tag {
   tag: string;
   /**
