@@ -1,0 +1,49 @@
+.prompt.zt-citations {
+  .title {
+    font-weight: 500;
+    .suggestion-highlight {
+      color: var(--text-accent);
+    }
+  }
+  .meta {
+    color: var(--text-faint);
+    .commas-between();
+    .author-year {
+      .space-between();
+      .date {
+        .parentheses();
+      }
+    }
+    .publication {
+      font-style: italic;
+    }
+    .issue {
+      .parentheses();
+    }
+    .dot-end();
+  }
+}
+
+.parentheses {
+  &::before {
+    content: "(";
+  }
+  &::after {
+    content: ")";
+  }
+}
+.dot-end {
+  &::after {
+    content: ".";
+  }
+}
+.space-between {
+  & > :not(:last-child):after {
+    content: " ";
+  }
+}
+.commas-between {
+  & > :not(:last-child):after {
+    content: ", ";
+  }
+}

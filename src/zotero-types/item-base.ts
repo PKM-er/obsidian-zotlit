@@ -16,7 +16,7 @@ export interface RegularItemBase extends ItemBase {
   citekey?: string;
 }
 
-interface Tag {
+export interface Tag {
   tag: string;
   /**
    * 0 or missing indicates a manually added tag
@@ -24,6 +24,9 @@ interface Tag {
    */
   type?: 0 | 1;
 }
-type Creator =
-  | Record<"firstName" | "lastName" | "creatorType", string>
-  | Record<"name" | "creatorType", string>;
+export type Creator = CreatorFullName | CreatorName;
+export type CreatorFullName = Record<
+  "firstName" | "lastName" | "creatorType",
+  string
+>;
+export type CreatorName = Record<"name" | "creatorType", string>;

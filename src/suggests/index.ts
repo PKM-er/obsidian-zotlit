@@ -1,3 +1,5 @@
+import "./style.less";
+
 import Fuse from "fuse.js";
 import {
   Editor,
@@ -9,11 +11,16 @@ import {
 } from "obsidian";
 
 import ZoteroDb from "../zotero-db";
-import { RegularItem } from "../zotero-types/fields";
+import {
+  Creator,
+  isFullName,
+  JournalArticleItem,
+  RegularItem,
+} from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import UnionRanges from "./union";
 
-const CLASS_ID = "zt";
+const CLASS_ID = "zt-citations";
 type FuzzyMatch<T> = Fuse.FuseResult<T>;
 
 const PRIMARY_MATCH_FIELD = "title";
@@ -30,9 +37,10 @@ const getSuggestions = (
     return db.search(
       input.replace(/^\+|\+$/g, "").split(/[+]/g),
       PRIMARY_MATCH_FIELD,
+      50,
     );
   } else {
-    return db.getAll();
+    return db.getAll(50);
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -41,13 +49,14 @@ function renderSuggestion(
   suggestion: FuzzyMatch<RegularItem>,
   el: HTMLElement,
 ): void {
-  const title = (suggestion.item as any)[PRIMARY_MATCH_FIELD],
+  const item = suggestion.item as JournalArticleItem;
+  const title = item[PRIMARY_MATCH_FIELD],
     { matches } = suggestion;
+
+  const titleEl = el.createDiv({ cls: "title" });
   if (!title) {
-    el.setText("no title");
-    return;
-  }
-  if (matches) {
+    titleEl.setText("Title missing");
+  } else if (matches) {
     const indices =
       matches.length === 1
         ? matches[0].key === PRIMARY_MATCH_FIELD
@@ -58,11 +67,50 @@ function renderSuggestion(
               m.key === PRIMARY_MATCH_FIELD ? m.indices : [],
             ),
           );
-    renderMatches(el, title, indices);
+    renderMatches(titleEl, title, indices);
   } else {
-    el.setText(title);
+    titleEl.setText(title);
   }
+  el.append(getArticleMeta(item));
 }
+
+const getArticleMeta = (item: JournalArticleItem) => {
+  const { creators, date, publicationTitle, volume, issue, pages } = item;
+  const meta = {
+    creators: creatorToString(creators),
+    date,
+    publication: publicationTitle,
+    volume,
+    issue,
+    pages,
+  };
+  const newSpan = (to: HTMLElement, key: keyof typeof meta, cls?: string) =>
+    meta[key] && to.createSpan({ cls: cls ?? key, text: meta[key] });
+  return createDiv({ cls: "meta" }, (main) => {
+    if (meta.creators || meta.date)
+      main.createSpan({ cls: "author-year" }, (ay) => {
+        newSpan(ay, "creators");
+        newSpan(ay, "date");
+      });
+
+    newSpan(main, "publication");
+    if (meta.volume || meta.issue)
+      main.createSpan({ cls: "vol-issue" }, (vi) => {
+        newSpan(vi, "volume");
+        newSpan(vi, "issue");
+      });
+    newSpan(main, "pages");
+  });
+};
+const creatorToString = (creators: Creator[] | undefined) => {
+  if (!creators || !creators[0]) return "";
+  let firstCreator = creators[0];
+  let str = isFullName(firstCreator)
+    ? firstCreator.lastName
+    : firstCreator.name;
+  if (creators.length > 1) str = str.trim() + " et al.";
+  return str;
+};
 
 export class CitationSuggesterModal
   extends SuggestModal<FuzzyMatch<RegularItem>>

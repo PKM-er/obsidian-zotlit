@@ -1,5 +1,6 @@
 import Fuse from "fuse.js";
 
+import { multipartToSQL } from "../date";
 import { RegularItem } from "../zotero-types";
 import creatorsSql from "./creators.sql";
 import Database from "./db";
@@ -30,7 +31,8 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
       db.prepare(creatorsSql).all(libraryID),
     );
   let entries = {} as any;
-  for (const { itemID, fieldName, value, ...props } of general) {
+  for (let { itemID, fieldName, value, ...props } of general) {
+    if (fieldName === "date") value = multipartToSQL(value).split("-")[0];
     if (itemID in entries) {
       entries[itemID][fieldName] = value;
     } else {

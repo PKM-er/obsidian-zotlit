@@ -1,5 +1,5 @@
 //#region Type fields exports
-import { AllFields, AllTypes } from "./fields";
+import { AllFields } from "./fields";
 
 // From Zotero.ItemTypes
 const primaryTypeNames = [
@@ -32,6 +32,7 @@ import {
 import { RegularItem } from "./regular";
 
 export type Item = RegularItem | NoteItem | AnnotationItem | AttachmentItem;
+export type { Creator, Tag } from "./item-base";
 export * from "./regular";
 
 // Zotero.Items._loadAnnotations
@@ -78,3 +79,11 @@ export type NoteItem = Note & {
 };
 
 //#endregion
+
+import { Creator, CreatorFullName } from "./item-base";
+export const isFullName = (creator: Creator): creator is CreatorFullName => {
+  return (
+    (creator as CreatorFullName).firstName !== undefined ||
+    (creator as CreatorFullName).lastName !== undefined
+  );
+};
