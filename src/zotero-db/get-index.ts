@@ -2,7 +2,7 @@ import Fuse from "fuse.js";
 
 import { RegularItem } from "../zotero-types";
 import creatorsSql from "./creators.sql";
-import ZoteroDb from "./db";
+import Database from "./db";
 import generalSql from "./general.sql";
 
 export type Input = { dbPath: string; libraryID: number };
@@ -19,7 +19,7 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
   dbPath =
     "/Users/aidenlx/Library/Application Support/Zotero/Profiles/0mfu0e9q.ZoteroDEBUG/zotero/zotero.sqlite";
   libraryID = 2;
-  const db = new ZoteroDb(dbPath);
+  const db = new Database(dbPath);
   await db.open();
   const general: any[] = await db.read((db) =>
       db.prepare(generalSql).all(libraryID),

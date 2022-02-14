@@ -1,11 +1,11 @@
 import assertNever from "assert-never";
 import type { Database as DBType, SqliteError } from "better-sqlite3";
-import Database from "better-sqlite3";
+import db from "better-sqlite3";
 import { constants as fsConst, promises as fs } from "fs";
 import { Notice } from "obsidian";
 import path from "path";
 
-export default class ZoteroDb {
+export default class Database {
   constructor(private dbPath: string) {}
 
   mode: "main" | "temp" = "main";
@@ -36,12 +36,12 @@ export default class ZoteroDb {
       default:
         assertNever(mode);
     }
-    const db = new Database(path, {
+    const database = new db(path, {
       readonly: true,
       timeout: 1e3,
     });
     this.mode = mode;
-    this.dbInstance = db;
+    this.dbInstance = database;
     this.version = time;
     return this;
   }
