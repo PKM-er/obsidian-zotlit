@@ -15,21 +15,37 @@ export default class ZoteroDb {
 
   constructor(private plugin: ZoteroPlugin) {}
 
-  private props = {
-    dbPath: this.plugin.settings.zoteroDbPath,
-    libraryID: 1,
-  };
+  private get props() {
+    return {
+      dbPath: this.plugin.settings.zoteroDbPath,
+      libraryID: 1,
+    };
+  }
 
   async init() {
-    this.initIndexAndFuse(await getIndex(this.props));
+    if (this.indexCitationWorker) {
+      this.indexCitationWorker.terminate();
+      this.indexCitationWorker = null;
+    }
+    await this.refresh();
   }
   async initWithWorker() {
-    this.indexCitationWorker = new PromiseWorker<Input, Output>(indexCitation);
-    this.plugin.register(() => this.indexCitationWorker?.terminate());
-
-    this.initIndexAndFuse(
-      await this.indexCitationWorker.postMessage(this.props),
-    );
+    if (!this.indexCitationWorker) {
+      this.indexCitationWorker = new PromiseWorker<Input, Output>(
+        indexCitation,
+      );
+      this.plugin.register(() => this.indexCitationWorker?.terminate());
+    }
+    await this.refresh();
+  }
+  async refresh() {
+    if (this.indexCitationWorker) {
+      this.initIndexAndFuse(
+        await this.indexCitationWorker.postMessage(this.props),
+      );
+    } else {
+      this.initIndexAndFuse(await getIndex(this.props));
+    }
   }
 
   initIndexAndFuse(args: Output) {
