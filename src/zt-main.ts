@@ -12,6 +12,7 @@ import {
   saveSettings,
   ZoteroSettings,
 } from "./settings";
+import { CitationSuggesterModal } from "./suggests";
 import ZoteroDb from "./zotero-db";
 
 export default class ZoteroPlugin extends Plugin {
@@ -24,6 +25,12 @@ export default class ZoteroPlugin extends Plugin {
 
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
+
+    this.addCommand({
+      id: "zotero-search",
+      name: "Search Zotero",
+      callback: () => new CitationSuggesterModal(this).open(),
+    });
 
     await this.loadSettings();
 

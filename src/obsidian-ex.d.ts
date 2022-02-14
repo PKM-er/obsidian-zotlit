@@ -10,4 +10,8 @@ declare module "obsidian" {
     on(name: "finished", callback: () => any, ctx?: any): EventRef;
     initialized: boolean;
   }
+
+  interface EditorSuggest<T> {
+    suggestEl: HTMLElement;
+  }
 }

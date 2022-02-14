@@ -8,74 +8,82 @@ import {
   SuggestModal,
 } from "obsidian";
 
-import PackManager from "../icon-packs/pack-manager";
-import { FuzzyMatch, IconInfo } from "../icon-packs/types";
-import IconSC from "../isc-main";
+import ZoteroDb from "../zotero-db";
+import { RegularItem } from "../zotero-types/fields";
+import ZoteroPlugin from "../zt-main";
 import UnionRanges from "./union";
 
-const CLASS_ID = "isc";
+const CLASS_ID = "zt";
+type FuzzyMatch<T> = Fuse.FuseResult<T>;
+
+const PRIMARY_MATCH_FIELD = "title";
 
 interface SuggesterBase {
-  packManager: PackManager;
+  db: ZoteroDb;
 }
-const getSuggestions = (input: string, packManager: PackManager) => {
+const getSuggestions = (
+  input: string,
+  db: ZoteroDb,
+): Fuse.FuseResult<RegularItem>[] => {
+  if (!db.fuse) return [];
   if (typeof input === "string" && input.trim().length > 0) {
-    return packManager.search(input.replace(/^\+|\+$/g, "").split(/[+]/g));
+    return db.search(
+      input.replace(/^\+|\+$/g, "").split(/[+]/g),
+      PRIMARY_MATCH_FIELD,
+    );
   } else {
-    return packManager.getAllIds();
+    return db.getAll();
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 function renderSuggestion(
   this: SuggesterBase,
-  suggestion: FuzzyMatch<IconInfo>,
+  suggestion: FuzzyMatch<RegularItem>,
   el: HTMLElement,
 ): void {
-  const { id, name } = suggestion.item,
-    { matches } = suggestion,
-    result = this.packManager.getIcon(id);
-  if (!result) throw new TypeError("Failed to get icon for key: " + id);
-
-  const icon = result;
-  const shortcode = el;
+  const title = (suggestion.item as any)[PRIMARY_MATCH_FIELD],
+    { matches } = suggestion;
+  if (!title) {
+    el.setText("no title");
+    return;
+  }
   if (matches) {
     const indices =
       matches.length === 1
-        ? matches[0].key === "name"
+        ? matches[0].key === PRIMARY_MATCH_FIELD
           ? matches[0].indices
           : []
         : UnionRanges(
-            matches.flatMap((m) => (m.key === "name" ? m.indices : [])),
+            matches.flatMap((m) =>
+              m.key === PRIMARY_MATCH_FIELD ? m.indices : [],
+            ),
           );
-    renderMatches(shortcode, name.replace(/[_-]/g, " "), indices);
+    renderMatches(el, title, indices);
   } else {
-    shortcode.setText(name.replace(/[_-]/g, " "));
+    el.setText(title);
   }
-  el.createSpan({ cls: `suggestion-flair` }, (el) =>
-    typeof icon === "string" ? (el.textContent = icon) : el.appendChild(icon),
-  );
 }
 
-export class EmojiSuggesterModal
-  extends SuggestModal<FuzzyMatch<IconInfo>>
+export class CitationSuggesterModal
+  extends SuggestModal<FuzzyMatch<RegularItem>>
   implements SuggesterBase
 {
-  constructor(public plugin: IconSC) {
+  constructor(public plugin: ZoteroPlugin) {
     super(plugin.app);
     this.modalEl.addClass(CLASS_ID);
   }
-  get packManager() {
-    return this.plugin.packManager;
+  get db() {
+    return this.plugin.db;
   }
 
   getSuggestions(input: string) {
-    return getSuggestions(input, this.packManager);
+    return getSuggestions(input, this.db);
   }
-  renderSuggestion = renderSuggestion;
+  renderSuggestion = renderSuggestion.bind(this);
 
   // Promisify the modal
-  resolve: ((value: IconInfo | null) => void) | null = null;
-  open(): Promise<IconInfo | null> {
+  resolve: ((value: RegularItem | null) => void) | null = null;
+  open(): Promise<RegularItem | null> {
     super.open();
     return new Promise((resolve) => {
       this.resolve = resolve;
@@ -88,11 +96,11 @@ export class EmojiSuggesterModal
     }
   }
 
-  onChooseSuggestion(suggestion: FuzzyMatch<IconInfo>): void {
+  onChooseSuggestion(suggestion: FuzzyMatch<RegularItem>): void {
     // console.log(suggestion);
   }
   selectSuggestion(
-    value: FuzzyMatch<IconInfo> | null,
+    value: FuzzyMatch<RegularItem> | null,
     evt: MouseEvent | KeyboardEvent,
   ): void {
     if (this.resolve) {
@@ -108,56 +116,58 @@ export class EmojiSuggesterModal
   }
 }
 
-export class EmojiSuggester
-  extends EditorSuggest<FuzzyMatch<IconInfo>>
+export class CitationSuggester
+  extends EditorSuggest<FuzzyMatch<RegularItem>>
   implements SuggesterBase
 {
-  constructor(public plugin: IconSC) {
+  constructor(public plugin: ZoteroPlugin) {
     super(plugin.app);
     this.suggestEl.addClass(CLASS_ID);
   }
 
-  get packManager() {
-    return this.plugin.packManager;
+  get db() {
+    return this.plugin.db;
   }
 
   onTrigger(
     cursor: EditorPosition,
     editor: Editor,
   ): EditorSuggestTriggerInfo | null {
-    if (!this.plugin.settings.suggester) return null;
-    const sub = editor.getLine(cursor.line).substring(0, cursor.ch);
-    const match = sub.match(/(?::|：：)([^:\s]+$)/);
-    if (!match) return null;
-    const prevSC = (match.input as string)
-      .substring(0, match.index)
-      .match(/:([^\s:]+$)/);
-    if (prevSC && this.packManager.hasIcon(prevSC[1])) return null;
-    return {
-      end: cursor,
-      start: {
-        ch: match.index as number,
-        line: cursor.line,
-      },
-      query: match[1],
-    };
+    throw new Error("Method not implemented.");
+    // if (!this.plugin.settings.suggester) return null;
+    // const sub = editor.getLine(cursor.line).substring(0, cursor.ch);
+    // const match = sub.match(/(?::|：：)([^:\s]+$)/);
+    // if (!match) return null;
+    // const prevSC = (match.input as string)
+    //   .substring(0, match.index)
+    //   .match(/:([^\s:]+$)/);
+    // if (prevSC && this.db.hasIcon(prevSC[1])) return null;
+    // return {
+    //   end: cursor,
+    //   start: {
+    //     ch: match.index as number,
+    //     line: cursor.line,
+    //   },
+    //   query: match[1],
+    // };
   }
 
   getSuggestions(context: EditorSuggestContext) {
-    return getSuggestions(context.query, this.packManager);
+    return getSuggestions(context.query, this.db);
   }
 
-  renderSuggestion = renderSuggestion;
-  selectSuggestion(suggestion: FuzzyMatch<IconInfo>): void {
-    if (!this.context) return;
-    const { id, pack } = suggestion.item;
-    this.context.editor.replaceRange(
-      this.plugin.settings.code2emoji && pack === "emoji"
-        ? (this.packManager.getIcon(id) as string)
-        : `:${id}:` + (this.plugin.settings.spaceAfterSC ? " " : ""),
-      this.context.start,
-      this.context.end,
-    );
+  renderSuggestion = renderSuggestion.bind(this);
+  selectSuggestion(suggestion: FuzzyMatch<RegularItem>): void {
+    throw new Error("Method not implemented.");
+    // if (!this.context) return;
+    // const { id, pack } = suggestion.item;
+    // this.context.editor.replaceRange(
+    //   this.plugin.settings.code2emoji && pack === "emoji"
+    //     ? (this.db.getIcon(id) as string)
+    //     : `:${id}:` + (this.plugin.settings.spaceAfterSC ? " " : ""),
+    //   this.context.start,
+    //   this.context.end,
+    // );
   }
 }
 

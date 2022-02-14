@@ -39,4 +39,20 @@ export default class ZoteroDb {
     );
     this.fuse = new Fuse(...args);
   }
+
+  search(query: string[], matchField: string, limit = 20) {
+    if (!this.fuse) return [];
+    let exp = query.map<Fuse.Expression>((s) => ({ [matchField]: s }));
+    return this.fuse.search({ $and: exp }, { limit: limit ?? 20 });
+  }
+  getAll(): Fuse.FuseResult<RegularItem>[] {
+    return (
+      ((this.fuse?.getIndex() as any).docs as RegularItem[]).map(
+        (item, index) => ({
+          item,
+          refIndex: index,
+        }),
+      ) ?? []
+    );
+  }
 }

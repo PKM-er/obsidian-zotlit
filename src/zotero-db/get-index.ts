@@ -14,6 +14,8 @@ export type Output = [
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   keys: ["title", "creators"],
+  includeMatches: true,
+  shouldSort: true,
 };
 const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
   dbPath =
