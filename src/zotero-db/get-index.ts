@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 
-import { multipartToSQL } from "../date";
+import { multipartToSQL } from "../utils";
 import { RegularItem } from "../zotero-types";
 import creatorsSql from "./creators.sql";
 import Database from "./db";

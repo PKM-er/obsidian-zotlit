@@ -5,3 +5,6 @@ export const promptOpenLog = () => dedent`
 Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
   Platform.isMacOS ? "⌥ Option" : "Shift"
 } + I, then go to the "Console" tab to see the log.`;
+
+export * from "./promise-worker";
+export * from "./zotero-date";

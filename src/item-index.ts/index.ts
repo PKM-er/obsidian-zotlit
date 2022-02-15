@@ -8,7 +8,7 @@ import {
   Vault,
 } from "obsidian";
 
-// import { PromiseWorker } from "../promise-worker";
+// import { PromiseWorker } from "../utils";
 import ZoteroPlugin from "../zt-main";
 // import type { Input, Output } from "./build-filemap.worker";
 // import buildFilemap from "./build-filemap.worker.ts";

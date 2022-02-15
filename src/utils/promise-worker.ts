@@ -85,22 +85,6 @@ export class PromiseWorker<TInput, TResult> {
   }
 }
 
-const isPromise = (obj: any): obj is Promise<any> => {
-  // via https://unpkg.com/is-promise@2.1.0/index.js
-  return (
-    !!obj &&
-    (typeof obj === "object" || typeof obj === "function") &&
-    typeof obj.then === "function"
-  );
-};
-// const tryCatchFunc = <T>(callback:T=>, message) => {
-//   try {
-//     return { res: callback(message) };
-//   } catch (e) {
-//     return { err: e };
-//   }
-// };
-
 /**
  * Make this worker a promise-worker
  * @param callback Callback function for processing the inbound data

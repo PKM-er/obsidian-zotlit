@@ -2,7 +2,7 @@ import Fuse from "fuse.js";
 import { FileSystemAdapter } from "obsidian";
 import indexCitation from "web-worker:./index-citation";
 
-import { PromiseWorker } from "../promise-worker";
+import { PromiseWorker } from "../utils";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import type { Input, Output } from "./get-index";

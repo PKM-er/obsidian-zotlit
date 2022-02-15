@@ -1,4 +1,4 @@
-import { registerPromiseWorker } from "../promise-worker";
+import { registerPromiseWorker } from "../utils";
 import type { Input, Output } from "./get-index";
 import getIndex from "./get-index";
 
