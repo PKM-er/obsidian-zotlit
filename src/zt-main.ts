@@ -1,6 +1,5 @@
 import "./main.less";
 
-import log from "loglevel";
 import { Notice, Plugin, TFolder } from "obsidian";
 
 import ZoteroItems from "./item-index.ts";
@@ -13,6 +12,7 @@ import {
   ZoteroSettings,
 } from "./settings";
 import { CitationSuggesterModal } from "./suggests";
+import log from "./utils/logger";
 import ZoteroDb from "./zotero-db";
 
 export default class ZoteroPlugin extends Plugin {

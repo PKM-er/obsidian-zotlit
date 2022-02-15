@@ -1,6 +1,6 @@
 import assertNever from "assert-never";
 import { promises as fs } from "fs";
-import log, { LogLevelNumbers } from "loglevel";
+import { LogLevelNumbers } from "loglevel";
 import {
   debounce,
   Notice,
@@ -11,6 +11,7 @@ import {
 import path from "path";
 
 import { promptOpenLog } from "./utils";
+import log from "./utils/logger";
 import ZoteroPlugin from "./zt-main";
 
 export class ZoteroSettingTab extends PluginSettingTab {

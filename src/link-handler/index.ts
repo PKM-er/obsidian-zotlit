@@ -1,8 +1,8 @@
 import assertNever from "assert-never";
 import { decode } from "js-base64";
-import log from "loglevel";
 import { ObsidianProtocolData, ObsidianProtocolHandler } from "obsidian";
 
+import log from "../utils/logger";
 import { AnnotationItem, Item, RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import { importAnnoItems } from "./import-annot";

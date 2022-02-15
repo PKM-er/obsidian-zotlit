@@ -1,9 +1,10 @@
-import log, { LogLevelNumbers } from "loglevel";
+import { LogLevelNumbers } from "loglevel";
 import { normalizePath, TAbstractFile, Vault } from "obsidian";
 import { homedir } from "os";
 import path from "path";
 
 import NoteTemplate from "./note-template";
+import log from "./utils/logger";
 import ZoteroPlugin from "./zt-main";
 
 export interface ZoteroSettings {

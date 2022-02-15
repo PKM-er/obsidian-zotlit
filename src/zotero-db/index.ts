@@ -1,9 +1,9 @@
 import Fuse from "fuse.js";
-import log from "loglevel";
 import { FileSystemAdapter, Notice } from "obsidian";
 import indexCitation from "web-worker:./index-citation";
 
 import { PromiseWebWorker, PromiseWorker } from "../promise-worker";
+import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import type { Input, Output } from "./get-index";

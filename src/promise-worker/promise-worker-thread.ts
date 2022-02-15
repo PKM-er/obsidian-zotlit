@@ -1,9 +1,9 @@
 // derived https://github.com/nolanlawson/promise-worker
 
 import assertNever from "assert-never";
-import log from "loglevel";
 import { Worker as WorkerThread } from "worker_threads";
 
+import log from "../utils/logger";
 import { PromiseWorker, registerPromiseWorker } from ".";
 import {
   isWorkerMessage,

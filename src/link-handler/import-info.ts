@@ -1,6 +1,6 @@
-import log from "loglevel";
 import { Notice, TFile } from "obsidian";
 
+import log from "../utils/logger";
 import { promptOpenLog } from "../utils";
 import ZoteroPlugin from "../zt-main";
 import createNote, { NoteExistsError } from "./create-note";
