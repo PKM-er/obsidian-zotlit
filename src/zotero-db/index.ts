@@ -1,8 +1,10 @@
 import Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
+import prettyHrtime from "pretty-hrtime";
 import indexCitation from "web-worker:./index-citation";
 
 import { PromiseWebWorker, PromiseWorker } from "../promise-worker";
+import { checkNodeInWorker } from "../utils";
 import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
@@ -34,25 +36,35 @@ export default class ZoteroDb {
   }
 
   async init() {
+    const start = process.hrtime();
+    if (await checkNodeInWorker()) {
+      await this.initAsync();
+    } else {
+      await this.initSync();
+    }
+    new Notice("ZoteroDB Initialization complete.");
+    log.debug(
+      `ZoteroDB Initialization complete. Took ${prettyHrtime(
+        process.hrtime(start),
+      )}`,
+    );
+  }
+
+  async initSync() {
     if (this.indexCitationWorker) {
       this.indexCitationWorker.terminate();
       this.indexCitationWorker = null;
     }
     await this.refresh();
   }
-  async initWithWorker() {
+  async initAsync() {
     new Notice("Initializing ZoteroDB with worker...");
-    let start = Date.now();
     if (!this.indexCitationWorker) {
       this.indexCitationWorker = new PromiseWebWorker<Input, Output>(
         indexCitation(this.ConfigPath),
       );
     }
     await this.refresh();
-    new Notice("ZoteroDB Initialization complete.");
-    log.debug(
-      `ZoteroDB Initialization complete. Took ${(Date.now() - start) / 1e3}s`,
-    );
   }
   async refresh() {
     if (this.indexCitationWorker) {
