@@ -12,6 +12,7 @@ export interface ZoteroSettings {
   literatureNoteFolder: InVaultPath;
   literatureNoteTemplate: NoteTemplate;
   logLevel: LogLevelNumbers;
+  citationLibrary: number;
 }
 
 const DEFAULT_LOG_LEVEL = 4;
@@ -23,6 +24,7 @@ export const getDefaultSettings = (): ZoteroSettings => {
     literatureNoteFolder: new InVaultPath(),
     literatureNoteTemplate: new NoteTemplate(),
     logLevel: DEFAULT_LOG_LEVEL,
+    citationLibrary: 1,
   };
 };
 

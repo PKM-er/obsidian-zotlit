@@ -1,5 +1,6 @@
 import Fuse from "fuse.js";
 
+import type { getPromiseWorker } from "../promise-worker";
 import { multipartToSQL } from "../utils/zotero-date";
 import type { RegularItem } from "../zotero-types";
 import creatorsSql from "./creators.sql";
@@ -52,3 +53,5 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
 };
 
 export default getIndex;
+
+export type indexCitationWorkerGetter = getPromiseWorker<Input, Output>;

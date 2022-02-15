@@ -1,21 +1,44 @@
 import Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
-import indexCitation from "web-worker:./index-citation";
+import getLibsWorker from "web-worker:./workers/get-libs";
+import indexCitationWorker from "web-worker:./workers/index-citation";
 
-import { PromiseWebWorker, PromiseWorker } from "../promise-worker";
+import { PromiseWebWorker } from "../promise-worker";
 import { checkNodeInWorker } from "../utils";
 import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
-import type { Input, Output } from "./get-index";
-import getIndex from "./get-index";
+import type { Output as IndexOutput } from "./get-index";
+import type { indexCitationWorkerGetter } from "./get-index";
+import getIndexFunc from "./get-index";
+import type { getLibsWorkerGetter, Output as LibsOutput } from "./get-libs";
+import getLibsFunc from "./get-libs";
 
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;
   items: Record<string, RegularItem> = {};
 
-  indexCitationWorker: PromiseWorker<Input, Output> | null = null;
+  workers: {
+    indexCitation: ReturnType<indexCitationWorkerGetter>;
+    getLibs: ReturnType<getLibsWorkerGetter>;
+  } | null = null;
+  fallbackSyncMethods = {
+    indexCitation: getIndexFunc,
+    getLibs: getLibsFunc,
+  };
+  do<K extends keyof ZoteroDb["fallbackSyncMethods"]>(
+    method: K,
+    ...args: Parameters<ZoteroDb["fallbackSyncMethods"][K]>
+  ): ReturnType<ZoteroDb["fallbackSyncMethods"][K]> {
+    if (this.workers) {
+      // @ts-ignore
+      return this.workers[method].postMessage(...args);
+    } else {
+      // @ts-ignore
+      return this.fallbackSyncMethods[method](...args);
+    }
+  }
 
   constructor(private plugin: ZoteroPlugin) {
     plugin.register(this.close.bind(this));
@@ -24,11 +47,11 @@ export default class ZoteroDb {
   private get props() {
     return {
       dbPath: this.plugin.settings.zoteroDbPath,
-      libraryID: 1,
+      libraryID: this.plugin.settings.citationLibrary,
     };
   }
 
-  private get ConfigPath() {
+  get ConfigPath() {
     const { adapter, configDir } = this.plugin.app.vault;
     if (adapter instanceof FileSystemAdapter) {
       return adapter.getFullPath(configDir);
@@ -38,10 +61,13 @@ export default class ZoteroDb {
   async init() {
     const start = process.hrtime();
     if (await checkNodeInWorker()) {
+      new Notice("Initializing ZoteroDB with worker...");
       await this.initAsync();
     } else {
-      await this.initSync();
+      this.initSync();
     }
+    await this.refreshIndex();
+    await this.getLibs();
     new Notice("ZoteroDB Initialization complete.");
     log.debug(
       `ZoteroDB Initialization complete. Took ${prettyHrtime(
@@ -50,33 +76,27 @@ export default class ZoteroDb {
     );
   }
 
-  async initSync() {
-    if (this.indexCitationWorker) {
-      this.indexCitationWorker.terminate();
-      this.indexCitationWorker = null;
+  private initSync() {
+    if (this.workers) {
+      this.closeWorkers();
     }
-    await this.refresh();
   }
-  async initAsync() {
-    new Notice("Initializing ZoteroDB with worker...");
-    if (!this.indexCitationWorker) {
-      this.indexCitationWorker = new PromiseWebWorker<Input, Output>(
-        indexCitation(this.ConfigPath),
-      );
-    }
-    await this.refresh();
-  }
-  async refresh() {
-    if (this.indexCitationWorker) {
-      this.initIndexAndFuse(
-        await this.indexCitationWorker.postMessage(this.props),
-      );
-    } else {
-      this.initIndexAndFuse(await getIndex(this.props));
+  private async initAsync() {
+    if (!this.workers) {
+      this.workers = {
+        getLibs: new PromiseWebWorker(getLibsWorker(this.ConfigPath)),
+        indexCitation: new PromiseWebWorker(
+          indexCitationWorker(this.ConfigPath),
+        ),
+      };
     }
   }
 
-  initIndexAndFuse(args: Output) {
+  async refreshIndex() {
+    this.initIndexAndFuse(await this.do("indexCitation", this.props));
+  }
+
+  private initIndexAndFuse(args: IndexOutput) {
     const [items, fuseOptions, index] = args;
     this.items = items.reduce(
       (record, item) => ((record[item.key] = item), record),
@@ -100,8 +120,26 @@ export default class ZoteroDb {
     }));
   }
 
+  private libs: LibsOutput | null = null;
+  async getLibs(refresh = false) {
+    try {
+      if (refresh || !this.libs) {
+        this.libs = await this.do("getLibs", this.props);
+      }
+    } catch (error) {
+      if (!this.libs) this.libs = [{ libraryID: 1, name: "My Library" }];
+      log.error(error);
+    }
+    return this.libs;
+  }
+
   close() {
-    this.indexCitationWorker?.terminate();
-    this.indexCitationWorker = null;
+    this.closeWorkers();
+  }
+  closeWorkers() {
+    for (const worker of Object.values(this.workers ?? {})) {
+      worker.terminate();
+    }
+    this.workers = null;
   }
 }

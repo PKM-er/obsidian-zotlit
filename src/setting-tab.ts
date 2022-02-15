@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import { LogLevelNumbers } from "loglevel";
 import {
   debounce,
+  DropdownComponent,
   Notice,
   PluginSettingTab,
   Setting,
@@ -55,7 +56,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
                 } else {
                   this.plugin.settings.zoteroDbPath = newPath;
                   await this.plugin.saveSettings();
-                  await this.plugin.db.refresh();
+                  await this.plugin.db.refreshIndex();
                   new Notice("Zotero database path updated.");
                 }
               } catch (error) {
@@ -77,6 +78,36 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.literatureNoteFolder.path)
           .onChange(debounce(onChange, 1e3, true));
       });
+    this.librarySelect();
+  }
+  librarySelect() {
+    let dropdown: DropdownComponent | null = null;
+    const renderDropdown = async (s: Setting, refresh = false) => {
+      dropdown && dropdown.selectEl.remove();
+      const libs = await this.plugin.db.getLibs(refresh);
+      s.addDropdown((dd) => {
+        dropdown = dd;
+        for (const { libraryID, name } of libs) {
+          dd.addOption(libraryID.toString(), name);
+        }
+        dd.setValue(this.plugin.settings.citationLibrary.toString()).onChange(
+          async (val) => {
+            const level = +val;
+            this.plugin.settings.citationLibrary = level;
+            await this.plugin.saveSettings();
+          },
+        );
+      });
+    };
+    const setting: Setting = new Setting(this.containerEl)
+      .setName("Citation Library")
+      .addButton((cb) =>
+        cb
+          .setIcon("switch")
+          .setTooltip("Refresh")
+          .onClick(() => renderDropdown(setting, true)),
+      )
+      .then(renderDropdown);
   }
   templates(): void {
     new Setting(this.containerEl).setHeading().setName("Templates");

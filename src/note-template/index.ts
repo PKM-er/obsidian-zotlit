@@ -3,6 +3,7 @@ import dedent from "dedent";
 import { stringify } from "gray-matter";
 import Handlebars, { TemplateDelegate } from "handlebars";
 
+import { getItemKeyLibID } from "../utils";
 import { AnnotationItem, ItemField, RegularItem } from "../zotero-types";
 import { Helpers, Partial } from "./helper";
 
@@ -82,7 +83,7 @@ export default class NoteTemplate {
     let data: Record<string, any> = {};
     let notEmpty = false;
     // zotero-key required
-    data[ZOTERO_KEY_FIELDNAME] = target.key;
+    data[ZOTERO_KEY_FIELDNAME] = getItemKeyLibID(target);
     for (const [k, config] of Object.entries<string[] | true>(
       this.frontmatter,
     )) {

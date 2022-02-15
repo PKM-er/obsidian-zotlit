@@ -14,7 +14,7 @@ export const importAnnoItems = async (
   const open = (file: TFile, newLeaf = false) =>
     workspace.openLinkText(file.path, "", newLeaf);
 
-  const info = plugin.zoteroItems.getNoteFromKey(data.info.key);
+  const info = plugin.zoteroItems.getNoteFromKey(data.info);
   let noteFile = info && plugin.app.vault.getAbstractFileByPath(info.file);
   if (noteFile && noteFile instanceof TFile) {
     const annots = template.render("annots", data.annotations),

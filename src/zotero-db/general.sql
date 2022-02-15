@@ -1,8 +1,9 @@
 SELECT
+  libraryID,
   key,
   itemID,
-  fieldName,
   typeName itemType,
+  fieldName,
   value
 FROM
   items
