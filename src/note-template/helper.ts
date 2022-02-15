@@ -18,10 +18,12 @@ export const Partial = {} as const;
 export const Helpers: HelperDeclareSpec = {
   backlink: function (this: RegularItem | AnnotationItem | any): string {
     let url: URL;
+    const target =
+      typeof this.groupID === "number" ? `groups/${this.groupID}` : "library";
     if (isRegularItem(this)) {
-      url = new URL("zotero://select/library/items/" + this.key);
+      url = new URL(`zotero://select/${target}/items/${this.key}`);
     } else if (isAnnotationItem(this)) {
-      url = new URL("zotero://open-pdf/library/items/" + this.parentItem);
+      url = new URL(`zotero://open-pdf/${target}/items/${this.parentItem}`);
       if (typeof this.annotationPosition?.pageIndex === "number")
         url.searchParams.append(
           "page",

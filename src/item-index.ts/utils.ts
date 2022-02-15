@@ -11,25 +11,25 @@ type KeyFileMap = [key: string, info: FileMapInfo];
  */
 const itemKeyPatternBase = "[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}",
   /**
-   * 9DCRTRSC  l   1
+   * 9DCRTRSC  g  123    OR  9DCRTRSC
    *
-   * ^^^^^^^^      ^
+   * ^^^^^^^^     ^^^        ^^^^^^^^
    *
-   * item-key   lib-id
+   * item-key   group-id     item-key (no suffix=>lib-id=1)
    */
-  itemKeyLibIdPatternBase = itemKeyPatternBase + "l\\d+";
+  itemKeyGroupIdPatternBase = itemKeyPatternBase + "(?:g\\d+)?";
 
 const itemKeyPattern = new RegExp("^" + itemKeyPatternBase + "$"),
-  itemKeyLibIdPattern = new RegExp("^" + itemKeyLibIdPatternBase + "$"),
+  itemKeyGroupIdPattern = new RegExp("^" + itemKeyGroupIdPatternBase + "$"),
   /**
-   * 9DCRTRSC  l   1   p 131  n  9DCRT...
+   * 9DCRTRSC  g  123   p 131  n  9DCRT...
    *
-   * ^^^^^^^^      ^     ^^^     ^^^^^^^
+   * ^^^^^^^^     ^^^     ^^^     ^^^^^^^
    *
-   * item-key   lib-id   page   next-item
+   * item-key group-id   page   next-item
    */
   multipleAnnotKeyPagePattern = new RegExp(
-    "^(?:" + itemKeyLibIdPatternBase + "(?:p\\d+)?n?)+$",
+    "^(?:" + itemKeyGroupIdPatternBase + "(?:p\\d+)?n?)+$",
   );
 
 export function* getZoteroKeyFileMap(
@@ -41,7 +41,7 @@ export function* getZoteroKeyFileMap(
   }
   const itemKey = cache.frontmatter[ZOTERO_KEY_FIELDNAME];
 
-  if (!itemKeyLibIdPattern.test(itemKey)) {
+  if (!itemKeyGroupIdPattern.test(itemKey)) {
     return;
   }
 

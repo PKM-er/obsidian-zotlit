@@ -8,7 +8,7 @@ import {
   Vault,
 } from "obsidian";
 
-import { getItemKeyLibID } from "../utils";
+import { getItemKeyGroupID } from "../utils";
 import type { Item } from "../zotero-types";
 // import { PromiseWorker } from "../utils";
 import ZoteroPlugin from "../zt-main";
@@ -29,9 +29,9 @@ export default class ZoteroItems extends Events {
 
   fileMap: Map<string, FileMapInfo> = new Map();
   getNoteFromKey(
-    ...args: [item: Item] | [key: string, libId: string]
+    ...args: [item: Item] | [key: string, groupId: number | undefined]
   ): FileMapInfo | undefined {
-    return this.fileMap.get(getItemKeyLibID(...args));
+    return this.fileMap.get(getItemKeyGroupID(...args));
   }
 
   // buildFilemapWorker: PromiseWorker<Input, Output>;

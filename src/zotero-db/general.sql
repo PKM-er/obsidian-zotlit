@@ -1,5 +1,6 @@
 SELECT
   libraryID,
+  groupID,
   key,
   itemID,
   typeName itemType,
@@ -11,6 +12,7 @@ FROM
   JOIN itemDataValues USING (valueID)
   JOIN fields USING (fieldID)
   JOIN itemTypes USING (itemTypeID)
+  LEFT JOIN groups USING (libraryID)
 WHERE
   libraryID = ?
   AND itemType NOT IN ('annotation', 'attachment', 'note')

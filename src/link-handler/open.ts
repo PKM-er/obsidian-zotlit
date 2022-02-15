@@ -8,13 +8,14 @@ const openItemNote = (plugin: ZoteroPlugin, params: ObsidianProtocolData) => {
     // type,
     // doi,
     ["info-key"]: infoKey,
-    ["library-id"]: libraryId,
+    // ["library-id"]: libraryId,
     ["annot-key"]: annotKey,
+    ["group-id"]: groupId,
   } = params;
 
   const info = plugin.zoteroItems.getNoteFromKey(
     annotKey ?? infoKey,
-    libraryId,
+    groupId && Number.isInteger(+groupId) ? +groupId : undefined,
   );
   if (!info) {
     new Notice(`No literature note found for zotero item with key ${infoKey}`);
