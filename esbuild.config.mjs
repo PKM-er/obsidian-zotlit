@@ -96,7 +96,9 @@ try {
     outfile: "build/main.js",
     plugins: [
       lessLoader(),
-      inlineWorker({ ...opts, format: "cjs" }),
+      inlineWorker({ ...opts, plugins: [patchBindings], format: "cjs" }, [
+        [new RegExp(PATH_TO_CONFIG, "g"), 0],
+      ]),
       obPlugin,
       patchBindings,
     ],

@@ -3,11 +3,12 @@ import esbuild from "esbuild";
 import path from "path";
 
 const inlineWorkerModulePrefix = "__inline-";
+const extraArgsName = "extraArgs";
 
 /**
  *
  * @param {Partial<import("esbuild").BuildOptions>} extraConfig
- * @param {[searchValue: string | RegExp, replaceValue: string][]|undefined} replace
+ * @param {[searchValue: string | RegExp, extraArgIndex: number][]|undefined} replace
  * @returns {import("esbuild").Plugin}
  */
 const inlineWorkerPlugin = (extraConfig, replace = []) => ({
@@ -50,8 +51,11 @@ const inlineWorkerPlugin = (extraConfig, replace = []) => ({
             contents = getWorkerCode(
               await buildWorker(workerPath, extraConfig),
             );
-            for (const args of replace) {
-              contents = contents.replace(...args);
+            for (const [pattern, extraArgIndex] of replace) {
+              contents = contents.replace(
+                pattern,
+                `${extraArgsName}[${extraArgIndex}]`,
+              );
             }
           }
           return { contents, loader: "js" };
@@ -77,10 +81,14 @@ export default Worker;
     } else throw new Error("Unknown worker type: " + type);
   };
 
+  const extraArgsDef = `
+  scriptText = \`var ${extraArgsName} = \${JSON.stringify(${extraArgsName})};\` + scriptText;
+  `;
   let inlineWorkerCode;
   if (type === "web-worker") {
     inlineWorkerCode = `
-    const inlineWorker = (scriptText, ...extraArgs) => {
+    const inlineWorker = (scriptText, ...${extraArgsName}) => {
+      ${extraArgsDef}
       const url = URL.createObjectURL(
           new Blob([scriptText], { type: "text/javascript" })
         ),
@@ -91,14 +99,14 @@ export default Worker;
   `;
   } else if (type === "worker-thread") {
     inlineWorkerCode = `
-    const inlineWorker = (scriptText, workerOptions, ...extraArgs) => {
+    const inlineWorker = (scriptText, workerOptions, ...${extraArgsName}) => {
+      ${extraArgsDef}
       return new require("worker_threads").Worker(scriptText, {
         ...workerOptions,
         eval: true,
       });
     };
     export default inlineWorker;
-    
   `;
   } else throw new Error("Unknown worker type: " + type);
   return { inlineWorkerCode, getWorkerCode };

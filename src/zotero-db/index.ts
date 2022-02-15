@@ -1,4 +1,5 @@
 import Fuse from "fuse.js";
+import { FileSystemAdapter } from "obsidian";
 import indexCitation from "web-worker:./index-citation";
 
 import { PromiseWorker } from "../promise-worker";
@@ -22,6 +23,13 @@ export default class ZoteroDb {
     };
   }
 
+  private get ConfigPath() {
+    const { adapter, configDir } = this.plugin.app.vault;
+    if (adapter instanceof FileSystemAdapter) {
+      return adapter.getFullPath(configDir);
+    } else throw new Error("Unsupported adapter");
+  }
+
   async init() {
     if (this.indexCitationWorker) {
       this.indexCitationWorker.terminate();
@@ -32,7 +40,7 @@ export default class ZoteroDb {
   async initWithWorker() {
     if (!this.indexCitationWorker) {
       this.indexCitationWorker = new PromiseWorker<Input, Output>(
-        indexCitation,
+        indexCitation(this.ConfigPath),
       );
       this.plugin.register(() => this.indexCitationWorker?.terminate());
     }
