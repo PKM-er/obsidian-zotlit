@@ -2,7 +2,6 @@ import assertNever from "assert-never";
 import type { Database as DBType, SqliteError } from "better-sqlite3";
 import db from "better-sqlite3";
 import { constants as fsConst, promises as fs } from "fs";
-import { Notice } from "obsidian";
 import path from "path";
 
 export default class Database {
@@ -96,7 +95,7 @@ export default class Database {
           throw err;
         }
         if (this.mode === "main") {
-          new Notice(
+          console.log(
             "Seems like Zotero database is occuiped by Zotero, trying to switch to temp database...",
           );
           // create a copy of the main database and open it

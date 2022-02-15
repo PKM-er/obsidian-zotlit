@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 
-import { multipartToSQL } from "../utils";
-import { RegularItem } from "../zotero-types";
+import { multipartToSQL } from "../utils/zotero-date";
+import type { RegularItem } from "../zotero-types";
 import creatorsSql from "./creators.sql";
 import Database from "./db";
 import generalSql from "./general.sql";
@@ -10,7 +10,7 @@ export type Input = { dbPath: string; libraryID: number };
 export type Output = [
   items: RegularItem[],
   options: Fuse.IFuseOptions<RegularItem>,
-  index: Fuse.FuseIndex<RegularItem>,
+  index: ReturnType<Fuse.FuseIndex<RegularItem>["toJSON"]>,
 ];
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
@@ -19,9 +19,6 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   shouldSort: true,
 };
 const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
-  dbPath =
-    "/Users/aidenlx/Library/Application Support/Zotero/Profiles/0mfu0e9q.ZoteroDEBUG/zotero/zotero.sqlite";
-  libraryID = 2;
   const db = new Database(dbPath);
   await db.open();
   const general: any[] = await db.read((db) =>
@@ -49,7 +46,7 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
   }
   const items = Object.values(entries) as RegularItem[];
 
-  const index = Fuse.createIndex(fuseOptions.keys!, items);
+  const index = Fuse.createIndex(fuseOptions.keys!, items).toJSON();
   db.close();
   return [items, fuseOptions, index];
 };

@@ -101,7 +101,8 @@ export default Worker;
     inlineWorkerCode = `
     const inlineWorker = (scriptText, workerOptions, ...${extraArgsName}) => {
       ${extraArgsDef}
-      return new require("worker_threads").Worker(scriptText, {
+      const { Worker } = require("worker_threads");
+      return new Worker(scriptText, {
         ...workerOptions,
         eval: true,
       });

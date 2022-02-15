@@ -2,21 +2,19 @@
 
 import assertNever from "assert-never";
 
-type WorkerMessage<T> = Record<"messageId", number> &
-  WorkerMessageCallbackArg<T>;
-type WorkerMessageCallbackArg<T> =
-  | { type: "error"; result: any }
-  | { type: "result"; result: T };
-type MainMessage<T> = [messageId: number, message: T];
-
-const props = ["messageId", "type", "result"] as const;
-const isWorkerMessage = <T>(msg: any): msg is WorkerMessage<T> =>
-  Object.keys(msg).every((key) => props.includes(key as any));
-
+import { PromiseWorker, registerPromiseWorker } from ".";
+import {
+  isWorkerMessage,
+  MainMessage,
+  WorkerMessage,
+  WorkerMessageCallbackArg,
+} from "./misc";
 /**
  * A wrapper class to promisify web workers
  */
-export class PromiseWorker<TInput, TResult> {
+export class PromiseWebWorker<TInput, TResult>
+  implements PromiseWorker<TInput, TResult>
+{
   private _worker: Worker;
   private _callbacks = new Map<
     number,
@@ -69,17 +67,6 @@ export class PromiseWorker<TInput, TResult> {
         } else assertNever(msg);
       });
 
-      /* istanbul ignore if */
-      // if (typeof this._worker.controller !== "undefined") {
-      //   // service worker, use MessageChannels because e.source is broken in Chrome < 51:
-      //   // https://bugs.chromium.org/p/chromium/issues/detail?id=543198
-      //   let channel = new MessageChannel();
-      //   channel.port1.onmessage = function (e) {
-      //     onMessage(self, e);
-      //   };
-      //   this._worker.controller.postMessage(messageToSend, [channel.port2]);
-      // } else
-      // web worker
       this._worker.postMessage(messageToSend);
     });
   }
@@ -89,7 +76,10 @@ export class PromiseWorker<TInput, TResult> {
  * Make this worker a promise-worker
  * @param callback Callback function for processing the inbound data
  */
-export const registerPromiseWorker = <TMessageIn, TMessageOut>(
+export const registerPromiseWebWorker: registerPromiseWorker = <
+  TMessageIn,
+  TMessageOut,
+>(
   callback: (message: TMessageIn) => Promise<TMessageOut> | TMessageOut,
 ): void => {
   const postOutgoingMessage = (data: WorkerMessage<TMessageOut>) => {
@@ -101,12 +91,6 @@ export const registerPromiseWorker = <TMessageIn, TMessageOut>(
         console.error("Worker caught an error:", data.result);
       }
     }
-    /* istanbul ignore if */
-    // if (typeof self.postMessage !== "function") {
-    //   // service worker
-    //   e.ports[0].postMessage(msg);
-    // } else
-    // web worker
     self.postMessage(data);
   };
 

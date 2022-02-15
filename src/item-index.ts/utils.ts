@@ -1,4 +1,4 @@
-import { CachedMetadata } from "obsidian";
+import type { CachedMetadata } from "obsidian";
 
 import { ZOTERO_KEY_FIELDNAME } from "../note-template";
 

@@ -1,8 +1,7 @@
-import { Worker as WorkerThread, WorkerOptions } from "worker_threads";
 declare module "worker-thread:*" {
   const WorkerFactory: (
-    options: WorkerOptions,
+    options: import("worker_threads").WorkerOptions | undefined,
     configDirPathFull: string,
-  ) => WorkerThread;
+  ) => import("worker_threads").Worker;
   export default WorkerFactory;
 }

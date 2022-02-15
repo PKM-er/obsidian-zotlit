@@ -1,6 +1,7 @@
 import builtins from "builtin-modules";
 import { build } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
+import escape from "escape-string-regexp";
 import { promises } from "fs";
 
 import inlineWorker from "./scripts/inline-worker.mjs";
@@ -46,8 +47,11 @@ const obPlugin = {
 const PATH_TO_CONFIG = `app.vault.adapter.getFullPath(app.vault.configDir)`;
 const LIB_FILENAME = `better_sqlite3.node`;
 
-/** @type import("esbuild").Plugin */
-const patchBindings = {
+/**
+ * @param {boolean} worker
+ * @returns {import("esbuild").Plugin}
+ */
+const patchBindings = (worker = false) => ({
   name: "patch-bindings",
   setup: (build) => {
     build.onLoad(
@@ -56,7 +60,9 @@ const patchBindings = {
       },
       async (args) => {
         let original = await readFile(args.path, "utf8");
-        const checkLib = `require("${process.cwd()}/check-lib")(${PATH_TO_CONFIG}, "${LIB_FILENAME}");`;
+        const checkLib = worker
+          ? ""
+          : `require("${process.cwd()}/check-lib")(${PATH_TO_CONFIG}, "${LIB_FILENAME}");`;
         original = original.replace(
           `// Get the module root`,
           checkLib +
@@ -67,7 +73,7 @@ const patchBindings = {
       },
     );
   },
-};
+});
 
 const isProd = process.env.BUILD === "production";
 
@@ -96,11 +102,17 @@ try {
     outfile: "build/main.js",
     plugins: [
       lessLoader(),
-      inlineWorker({ ...opts, plugins: [patchBindings], format: "cjs" }, [
-        [new RegExp(PATH_TO_CONFIG, "g"), 0],
-      ]),
+      inlineWorker(
+        {
+          ...opts,
+          external: [...builtins],
+          plugins: [patchBindings(true)],
+          format: "cjs",
+        },
+        [[new RegExp(escape(PATH_TO_CONFIG), "g"), 0]],
+      ),
       obPlugin,
-      patchBindings,
+      patchBindings(),
     ],
   });
 } catch (err) {

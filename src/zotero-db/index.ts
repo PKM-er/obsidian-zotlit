@@ -1,8 +1,9 @@
 import Fuse from "fuse.js";
-import { FileSystemAdapter } from "obsidian";
+import log from "loglevel";
+import { FileSystemAdapter, Notice } from "obsidian";
 import indexCitation from "web-worker:./index-citation";
 
-import { PromiseWorker } from "../utils";
+import { PromiseWebWorker, PromiseWorker } from "../promise-worker";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import type { Input, Output } from "./get-index";
@@ -14,7 +15,9 @@ export default class ZoteroDb {
 
   indexCitationWorker: PromiseWorker<Input, Output> | null = null;
 
-  constructor(private plugin: ZoteroPlugin) {}
+  constructor(private plugin: ZoteroPlugin) {
+    plugin.register(this.close.bind(this));
+  }
 
   private get props() {
     return {
@@ -38,13 +41,18 @@ export default class ZoteroDb {
     await this.refresh();
   }
   async initWithWorker() {
+    new Notice("Initializing ZoteroDB with worker...");
+    let start = Date.now();
     if (!this.indexCitationWorker) {
-      this.indexCitationWorker = new PromiseWorker<Input, Output>(
+      this.indexCitationWorker = new PromiseWebWorker<Input, Output>(
         indexCitation(this.ConfigPath),
       );
-      this.plugin.register(() => this.indexCitationWorker?.terminate());
     }
     await this.refresh();
+    new Notice("ZoteroDB Initialization complete.");
+    log.debug(
+      `ZoteroDB Initialization complete. Took ${(Date.now() - start) / 1e3}s`,
+    );
   }
   async refresh() {
     if (this.indexCitationWorker) {
@@ -57,11 +65,12 @@ export default class ZoteroDb {
   }
 
   initIndexAndFuse(args: Output) {
-    this.items = args[0].reduce(
+    const [items, fuseOptions, index] = args;
+    this.items = items.reduce(
       (record, item) => ((record[item.key] = item), record),
       {} as Record<string, RegularItem>,
     );
-    this.fuse = new Fuse(...args);
+    this.fuse = new Fuse(items, fuseOptions, Fuse.parseIndex(index));
   }
 
   search(query: string[], matchField: string, limit = 20) {
@@ -77,5 +86,10 @@ export default class ZoteroDb {
       item,
       refIndex: index,
     }));
+  }
+
+  close() {
+    this.indexCitationWorker?.terminate();
+    this.indexCitationWorker = null;
   }
 }
