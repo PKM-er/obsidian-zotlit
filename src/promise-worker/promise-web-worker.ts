@@ -38,6 +38,14 @@ export class PromiseWebWorker<TInput, TResult>
       this._callbacks.get(msg.messageId)!(msg);
       this._callbacks.delete(msg.messageId);
     });
+    w.addEventListener("messageerror", (evt) => {
+      this._callbacks.forEach((cb) => cb({ type: "error", result: evt }));
+      this._callbacks.clear();
+    });
+    w.addEventListener("error", (err) => {
+      this._callbacks.forEach((cb) => cb({ type: "error", result: err }));
+      this._callbacks.clear();
+    });
   }
 
   public terminate(): void {
