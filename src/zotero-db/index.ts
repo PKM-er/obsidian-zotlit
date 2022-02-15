@@ -1,11 +1,11 @@
 import Fuse from "fuse.js";
+import indexCitation from "web-worker:./index-citation";
 
 import { PromiseWorker } from "../promise-worker";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 import type { Input, Output } from "./get-index";
 import getIndex from "./get-index";
-import indexCitation from "./index-citation.worker.ts";
 
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;

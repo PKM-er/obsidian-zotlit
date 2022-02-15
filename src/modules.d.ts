@@ -1,5 +1,5 @@
-declare module "*.worker.ts" {
-  const WorkerFactory: new () => Worker;
+declare module "web-worker:*" {
+  const WorkerFactory: (configDirPathFull: string) => Worker;
   export default WorkerFactory;
 }
 declare module "*.sql" {

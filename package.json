@@ -36,7 +36,6 @@
     "cz-conventional-changelog": "^3.3.0",
     "dedent": "^0.7.0",
     "esbuild": "^0.14.21",
-    "esbuild-plugin-inline-worker": "^0.1.1",
     "esbuild-plugin-less": "^1.1.6",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",

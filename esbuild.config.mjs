@@ -1,8 +1,9 @@
 import builtins from "builtin-modules";
 import { build } from "esbuild";
-import inlineWorker from "esbuild-plugin-inline-worker";
 import { lessLoader } from "esbuild-plugin-less";
 import { promises } from "fs";
+
+import inlineWorker from "./scripts/inline-worker.mjs";
 const { copyFile, rename, writeFile, readFile } = promises;
 
 const banner = `/*
