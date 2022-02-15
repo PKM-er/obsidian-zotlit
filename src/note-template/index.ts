@@ -123,7 +123,7 @@ export default class NoteTemplate {
   `;
   private annotation: string = dedent`
 
-  ## Annotation ^{{key}}
+  ## Annotation ^{{blockID}}
 
   [Zotero]({{backlink}})
 

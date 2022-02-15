@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import type { HelperDeclareSpec, TemplateDelegate } from "handlebars";
 
+import { getItemKeyGroupID } from "../utils";
 import type { AnnotationItem, Item, RegularItem } from "../zotero-types";
 import { NonRegularItemTypes } from "../zotero-types";
 
@@ -41,5 +42,13 @@ export const Helpers: HelperDeclareSpec = {
       }
     }
     return null;
+  },
+  blockID: function (this: AnnotationItem | any): string {
+    if (isAnnotationItem(this)) {
+      let id = getItemKeyGroupID(this);
+      if (typeof this.annotationPosition.pageIndex === "number")
+        id += `p${this.annotationPosition.pageIndex}`;
+      return id;
+    } else return "";
   },
 };
