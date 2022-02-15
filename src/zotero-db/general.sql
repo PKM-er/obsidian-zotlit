@@ -12,7 +12,7 @@ FROM
   JOIN itemTypes USING (itemTypeID)
 WHERE
   libraryID = ?
-  AND itemTypeID NOT IN (1, 3, 27) -- annotation, attachment, note
+  AND itemType NOT IN ('annotation', 'attachment', 'note')
   AND itemID NOT IN (
     SELECT
       itemID

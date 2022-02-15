@@ -91,7 +91,7 @@ export default class ZoteroDb {
     return this.fuse.search({ $and: exp }, { limit });
   }
   getAll(limit = 20): Fuse.FuseResult<RegularItem>[] {
-    let docs = (this.fuse?.getIndex() as any).docs as RegularItem[] | undefined;
+    let docs = (this.fuse as any)?._docs as RegularItem[] | undefined;
     if (!docs) return [];
     docs = docs.slice(0, limit);
     return docs.map((item, index) => ({
