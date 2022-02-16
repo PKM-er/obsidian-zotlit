@@ -1,16 +1,40 @@
 import type { CachedMetadata } from "obsidian";
 
 import { ZOTERO_KEY_FIELDNAME } from "../note-template";
-import type { Item } from "../zotero-types";
+import type { Item, ItemType } from "../zotero-types";
 
 export type FileMapInfo = { file: string; blockId?: string };
 type KeyFileMap = [key: string, info: FileMapInfo];
 
 /**
+ * @param getValFromExp get string to fill the template from expression
+ * @returns Tag functions that returns string
+ */
+const spread =
+    <TIn, TOut = string>(
+      getValFromExp: (input: TIn) => string,
+      getOutput: (newStr: string) => TOut,
+      raw = true,
+    ) =>
+    (strings: TemplateStringsArray, ...exps: TIn[]): TOut => {
+      let newStr = "";
+      for (let i = 0; i < strings.length; i++) {
+        if (i > 0) newStr += getValFromExp(exps[i - 1]);
+        newStr += (raw ? strings.raw : strings)[i];
+      }
+      return getOutput(newStr);
+    },
+  getRegExp = (exact = true, flag?: string) =>
+    spread(
+      (str: string) => str,
+      (str) => new RegExp(exact ? "^" + str + "$" : str, flag),
+      true,
+    );
+/**
  * from https://github.com/zotero/utilities/blob/37e33ba87a47905441baaafb90999abbb4ab6b1e/utilities.js#L1589-L1594
  * `n` as a seperator between merged
  */
-const itemKeyPatternBase = "[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}",
+const itemKeyBase = String.raw`[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}`,
   /**
    * 9DCRTRSC  g  123    OR  9DCRTRSC
    *
@@ -18,20 +42,37 @@ const itemKeyPatternBase = "[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}",
    *
    * item-key   group-id     item-key (no suffix=>lib-id=1)
    */
-  itemKeyGroupIdPatternBase = itemKeyPatternBase + "(?:g\\d+)?";
+  idBase = String.raw`\d+`,
+  annotKeyPageBase = (cache: boolean) => {
+    let parts = {
+      annotKey: itemKeyBase,
+      parentKey: itemKeyBase,
+      groupID: idBase,
+      page: idBase,
+    };
+    if (cache) {
+      for (const key in parts) {
+        // @ts-ignore
+        parts[key] = `(${parts[key]})`;
+      }
+    }
+    return spread(
+      (key: keyof typeof parts) => parts[key],
+      (str) => str,
+    )`${"annotKey"}a${"parentKey"}(?:g${"groupID"})?(?:p${"page"})?`;
+  };
 
-const itemKeyPattern = new RegExp("^" + itemKeyPatternBase + "$"),
-  itemKeyGroupIdPattern = new RegExp("^" + itemKeyGroupIdPatternBase + "$"),
+const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
+  itemKeyGroupIdPattern = getRegExp()`${itemKeyBase}(?:g${idBase})?`,
+  annotKeyPagePattern = getRegExp()`${annotKeyPageBase(true)}`,
   /**
-   * 9DCRTRSC  g  123   p 131  n  9DCRT...
+   * 9DCRTRSC     9DCRTRSC     g  123   p 131  n  9DCRT...
    *
-   * ^^^^^^^^     ^^^     ^^^     ^^^^^^^
+   * ^^^^^^^^     ^^^^^^^^        ^^^     ^^^     ^^^^^^^
    *
-   * item-key group-id   page   next-item
+   * annot-key  attachment-key  group-id  page   next-item
    */
-  multipleAnnotKeyPagePattern = new RegExp(
-    "^(?:" + itemKeyGroupIdPatternBase + "(?:p\\d+)?n?)+$",
-  );
+  multipleAnnotKeyPagePattern = getRegExp()`(?:${annotKeyPageBase(false)}n?)+`;
 
 export function* getZoteroKeyFileMap(
   file: string,
@@ -56,17 +97,41 @@ export function* getZoteroKeyFileMap(
       section.id?.match(multipleAnnotKeyPagePattern)
     )
       for (const annotKeyWithPage of section.id.split("n")) {
-        const annotKey = annotKeyWithPage.split("p")[0];
-        yield [annotKey, { file: file, blockId: section.id }];
+        const [, annotKey, , groupID] = annotKeyWithPage
+          .split("p")[0]
+          .match(annotKeyPagePattern)!;
+        yield [
+          groupID ? `${annotKey}g${groupID}` : annotKey,
+          { file: file, blockId: section.id },
+        ];
       }
   }
 }
 
+/**
+ * @param index set to true to generate key without praentItem to be used for indexing
+ * @returns ITEMKEY(gGROUPID) / ANNOT_KEYaATTACHMENT_KEY(gGROUPID)
+ */
 export const getItemKeyGroupID = (
-  ...args: [item: Item] | [key: string, groupID: number | undefined]
+  {
+    key,
+    groupID,
+    parentItem,
+    itemType = "journalArticle",
+  }: {
+    key: string;
+    groupID?: number;
+    parentItem?: string;
+    itemType?: ItemType;
+  },
+  index = false,
 ) => {
-  const key = args.length === 1 ? args[0].key : args[0],
-    groupID = args.length === 1 ? args[0].groupID : args[1],
-    suffix = typeof groupID === "number" ? `g${groupID}` : "";
-  return key + suffix;
+  const suffix = typeof groupID === "number" ? `g${groupID}` : "";
+  if (!index && itemType === "annotation") {
+    if (!parentItem)
+      throw new Error(
+        "parentItem is required for creating annotation zotero key",
+      );
+    return `${key}a${parentItem}${suffix}`;
+  } else return key + suffix;
 };
