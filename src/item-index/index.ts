@@ -8,14 +8,15 @@ import {
   Vault,
 } from "obsidian";
 
-import { getItemKeyGroupID } from "../utils";
 import type { Item } from "../zotero-types";
 // import { PromiseWorker } from "../utils";
 import ZoteroPlugin from "../zt-main";
+import { getItemKeyGroupID } from "./utils";
 // import type { Input, Output } from "./build-filemap.worker";
 // import buildFilemap from "./build-filemap.worker.ts";
 import { FileMapInfo, getZoteroKeyFileMap } from "./utils";
 
+export { getItemKeyGroupID };
 export default class ZoteroItems extends Events {
   get meta(): MetadataCache {
     return this.plugin.app.metadataCache;

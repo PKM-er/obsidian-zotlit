@@ -1,6 +1,7 @@
 import type { CachedMetadata } from "obsidian";
 
 import { ZOTERO_KEY_FIELDNAME } from "../note-template";
+import type { Item } from "../zotero-types";
 
 export type FileMapInfo = { file: string; blockId?: string };
 type KeyFileMap = [key: string, info: FileMapInfo];
@@ -60,3 +61,12 @@ export function* getZoteroKeyFileMap(
       }
   }
 }
+
+export const getItemKeyGroupID = (
+  ...args: [item: Item] | [key: string, groupID: number | undefined]
+) => {
+  const key = args.length === 1 ? args[0].key : args[0],
+    groupID = args.length === 1 ? args[0].groupID : args[1],
+    suffix = typeof groupID === "number" ? `g${groupID}` : "";
+  return key + suffix;
+};

@@ -2,8 +2,8 @@ import { BaseError } from "make-error";
 import { TFile } from "obsidian";
 import { posix as path } from "path";
 
+import { getItemKeyGroupID } from "../item-index";
 import { ItemWithAnnos, ZOTERO_KEY_FIELDNAME } from "../note-template";
-import { getItemKeyGroupID } from "../utils";
 import { RegularItem } from "../zotero-types";
 import { AnnotationItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";

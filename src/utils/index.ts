@@ -1,8 +1,6 @@
 import dedent from "dedent";
 import { Platform } from "obsidian";
 
-import type { Item } from "../zotero-types";
-
 export const promptOpenLog = () => dedent`
 Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
   Platform.isMacOS ? "⌥ Option" : "Shift"
@@ -29,13 +27,4 @@ export const checkNodeInWorker = () => {
       resolve(false), console.error(e), worker.terminate();
     };
   });
-};
-
-export const getItemKeyGroupID = (
-  ...args: [item: Item] | [key: string, groupID: number | undefined]
-) => {
-  const key = args.length === 1 ? args[0].key : args[0],
-    groupID = args.length === 1 ? args[0].groupID : args[1],
-    suffix = typeof groupID === "number" ? `g${groupID}` : "";
-  return key + suffix;
 };

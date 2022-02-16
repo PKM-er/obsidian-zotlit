@@ -2,7 +2,7 @@ import "./main.less";
 
 import { Notice, Plugin, TFolder } from "obsidian";
 
-import ZoteroItems from "./item-index.ts";
+import ZoteroItems from "./item-index";
 import getZoteroLinkHandlers from "./link-handler";
 import { ZoteroSettingTab } from "./setting-tab";
 import {

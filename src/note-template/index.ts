@@ -3,7 +3,7 @@ import dedent from "dedent";
 import { stringify } from "gray-matter";
 import Handlebars, { TemplateDelegate } from "handlebars";
 
-import { getItemKeyGroupID } from "../utils";
+import { getItemKeyGroupID } from "../item-index";
 import { AnnotationItem, ItemField, RegularItem } from "../zotero-types";
 import { Helpers, Partial } from "./helper";
 
