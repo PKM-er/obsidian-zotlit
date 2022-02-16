@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import type { HelperDeclareSpec, TemplateDelegate } from "handlebars";
 
-import { getItemKeyGroupID } from "../item-index";
+import { getItemKeyGroupID } from "../note-index/index";
 import type { AnnotationItem, Item, RegularItem } from "../zotero-types";
 import { NonRegularItemTypes } from "../zotero-types";
 

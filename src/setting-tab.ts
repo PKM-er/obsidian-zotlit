@@ -27,60 +27,59 @@ export class ZoteroSettingTab extends PluginSettingTab {
     this.logLevel();
   }
   general(): void {
-    let pathBox: TextAreaComponent;
     new Setting(this.containerEl).setHeading().setName("General");
-    new Setting(this.containerEl)
-      .setName("Zotero Database Path")
-      .addTextArea(
-        (txt) => (
-          (pathBox = txt), txt.setValue(this.plugin.settings.zoteroDbPath)
-        ),
-      )
-      .addButton((btn) =>
-        btn
-          .setIcon("checkmark")
-          .setTooltip("Apply")
-          .onClick(async () => {
-            const newPath = pathBox.getValue();
-            if (newPath === this.plugin.settings.zoteroDbPath) {
-              new Notice("Zotero database path not changed");
-            } else
-              try {
-                const stats = await fs.stat(newPath);
-                if (!stats.isFile()) {
-                  new Notice("Exception: Given path must be a file.");
-                } else if (path.extname(newPath) !== ".sqlite") {
-                  new Notice(
-                    "Exception: Given path must be a .sqlite database.",
-                  );
-                } else {
-                  this.plugin.settings.zoteroDbPath = newPath;
-                  await this.plugin.saveSettings();
-                  await this.plugin.db.refreshIndex();
-                  new Notice("Zotero database path updated.");
-                }
-              } catch (error) {
-                new Notice((error as NodeJS.ErrnoException).toString());
-              }
-          }),
-      );
-    new Setting(this.containerEl)
-      .setName("Literature Note Folder")
-      .addText((text) => {
-        const onChange = async (value: string) => {
-          const noteFolder = this.plugin.settings.literatureNoteFolder;
-          noteFolder.path = value;
-          if (noteFolder.path !== value) text.setValue(noteFolder.path);
-          this.plugin.zoteroItems.noteFolder = noteFolder.path;
-          await this.plugin.saveSettings();
-        };
-        text
-          .setValue(this.plugin.settings.literatureNoteFolder.path)
-          .onChange(debounce(onChange, 1e3, true));
-      });
-    this.librarySelect();
+
+    this.setZoteroDbPath();
+    this.setLiteratureNoteFolder();
+    this.setCitationLibrary();
   }
-  librarySelect() {
+  setLiteratureNoteFolder() {
+    const setter = async (value: string, text: TextAreaComponent) => {
+      const { literatureNoteFolder: noteFolder } = this.plugin.settings;
+      noteFolder.path = value;
+      // correct with normalized path
+      if (noteFolder.path !== value) text.setValue(noteFolder.path);
+      // update note index
+      this.plugin.noteIndex.noteFolder = noteFolder.path;
+      await this.plugin.saveSettings();
+    };
+    this.addTextComfirm(
+      this.containerEl,
+      () => this.plugin.settings.literatureNoteFolder.path,
+      setter,
+      { rows: 1 },
+    ).setName("Literature Note Folder");
+  }
+  setZoteroDbPath() {
+    const setter = async (value: string) => {
+      const newPath = value;
+      if (newPath === this.plugin.settings.zoteroDbPath) {
+        new Notice("Zotero database path not changed");
+      } else
+        try {
+          const stats = await fs.stat(newPath);
+          if (!stats.isFile()) {
+            new Notice("Exception: Given path must be a file.");
+          } else if (path.extname(newPath) !== ".sqlite") {
+            new Notice("Exception: Given path must be a .sqlite database.");
+          } else {
+            this.plugin.settings.zoteroDbPath = newPath;
+            await this.plugin.saveSettings();
+            await this.plugin.db.refreshIndex();
+            new Notice("Zotero database path updated.");
+          }
+        } catch (error) {
+          new Notice((error as NodeJS.ErrnoException).toString());
+        }
+    };
+    this.addTextComfirm(
+      this.containerEl,
+      () => this.plugin.settings.zoteroDbPath,
+      setter,
+      { cols: 30 },
+    ).setName("Zotero Database Path");
+  }
+  setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;
     const renderDropdown = async (s: Setting, refresh = false) => {
       dropdown && dropdown.selectEl.remove();
@@ -94,6 +93,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
           async (val) => {
             const level = +val;
             this.plugin.settings.citationLibrary = level;
+            await this.plugin.db.refreshIndex();
+            new Notice("Zotero database updated.");
             await this.plugin.saveSettings();
           },
         );
@@ -184,5 +185,25 @@ export class ZoteroSettingTab extends PluginSettingTab {
       text.inputEl.cols = 30;
       text.inputEl.rows = 5;
     });
+  }
+  addTextComfirm(
+    addTo: HTMLElement,
+    get: () => string,
+    set: (value: string, text: TextAreaComponent) => any,
+    size: Partial<Record<"cols" | "rows", number>> = {},
+  ) {
+    let component: TextAreaComponent;
+    return new Setting(addTo)
+      .addTextArea((txt) => {
+        component = txt;
+        txt.setValue(get());
+        Object.assign(txt.inputEl, size);
+      })
+      .addButton((btn) =>
+        btn
+          .setIcon("checkmark")
+          .setTooltip("Apply")
+          .onClick(() => set(component.getValue(), component)),
+      );
   }
 }

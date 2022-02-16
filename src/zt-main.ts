@@ -2,8 +2,8 @@ import "./main.less";
 
 import { Notice, Plugin, TFolder } from "obsidian";
 
-import ZoteroItems from "./item-index";
 import getZoteroLinkHandlers from "./link-handler";
+import NoteIndex from "./note-index/index";
 import { ZoteroSettingTab } from "./setting-tab";
 import {
   getDefaultSettings,
@@ -21,7 +21,7 @@ export default class ZoteroPlugin extends Plugin {
   saveSettings = saveSettings.bind(this);
 
   db = new ZoteroDb(this);
-  zoteroItems: ZoteroItems = new ZoteroItems(this);
+  noteIndex: NoteIndex = new NoteIndex(this);
 
   async onload() {
     log.info("loading Obsidian Zotero Plugin");

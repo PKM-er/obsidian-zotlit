@@ -2,7 +2,7 @@ import { BaseError } from "make-error";
 import { TFile } from "obsidian";
 import { posix as path } from "path";
 
-import { getItemKeyGroupID } from "../item-index";
+import { getItemKeyGroupID } from "../note-index/index";
 import { ItemWithAnnos, ZOTERO_KEY_FIELDNAME } from "../note-template";
 import { RegularItem } from "../zotero-types";
 import { AnnotationItem } from "../zotero-types";

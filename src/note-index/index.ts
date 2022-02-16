@@ -17,7 +17,7 @@ import { getItemKeyGroupID } from "./utils";
 import { FileMapInfo, getZoteroKeyFileMap } from "./utils";
 
 export { getItemKeyGroupID };
-export default class ZoteroItems extends Events {
+export default class NoteIndex extends Events {
   get meta(): MetadataCache {
     return this.plugin.app.metadataCache;
   }

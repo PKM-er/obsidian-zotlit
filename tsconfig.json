@@ -4,5 +4,5 @@
     "target": "ES2018",
     "isolatedModules": true,
   },
-  "include": ["src/**/*.ts", "src/item-index"],
+  "include": ["src/**/*.ts", "src/note-index"],
 }

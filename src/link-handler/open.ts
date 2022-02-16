@@ -13,7 +13,7 @@ const openItemNote = (plugin: ZoteroPlugin, params: ObsidianProtocolData) => {
     ["group-id"]: groupId,
   } = params;
 
-  const info = plugin.zoteroItems.getNoteFromKey({
+  const info = plugin.noteIndex.getNoteFromKey({
     itemType: annotKey ? "annotation" : undefined,
     groupID: groupId && Number.isInteger(+groupId) ? +groupId : undefined,
     key: annotKey ?? infoKey,
