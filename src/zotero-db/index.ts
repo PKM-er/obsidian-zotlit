@@ -95,9 +95,11 @@ export default class ZoteroDb {
   private async initAsync() {
     if (!this.workers) {
       this.workers = {
-        getLibs: new PromiseWebWorker(getLibsWorker(this.ConfigPath)),
+        getLibs: new PromiseWebWorker(
+          getLibsWorker("Get Zotero Library Info Worker", this.ConfigPath),
+        ),
         indexCitation: new PromiseWebWorker(
-          indexCitationWorker(this.ConfigPath),
+          indexCitationWorker("Index Zotero Citation Worker", this.ConfigPath),
         ),
       };
     }

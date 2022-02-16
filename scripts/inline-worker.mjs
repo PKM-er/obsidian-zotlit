@@ -87,12 +87,12 @@ export default Worker;
   let inlineWorkerCode;
   if (type === "web-worker") {
     inlineWorkerCode = `
-    const inlineWorker = (scriptText, ...${extraArgsName}) => {
+    const inlineWorker = (scriptText, name, ...${extraArgsName}) => {
       ${extraArgsDef}
       const url = URL.createObjectURL(
           new Blob([scriptText], { type: "text/javascript" })
         ),
-        worker = new Worker(url);
+        worker = new Worker(url, { name });
       return (URL.revokeObjectURL(url), worker);
     };
     export default inlineWorker;
