@@ -29,19 +29,18 @@ const PRIMARY_MATCH_FIELD = "title";
 interface SuggesterBase {
   db: ZoteroDb;
 }
-const getSuggestions = (
+const getSuggestions = async (
   input: string,
   db: ZoteroDb,
-): Fuse.FuseResult<RegularItem>[] => {
-  if (!db.fuse) return [];
+): Promise<Fuse.FuseResult<RegularItem>[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
-    return db.search(
+    return await db.search(
       input.replace(/^\+|\+$/g, "").split(/[+]/g),
       PRIMARY_MATCH_FIELD,
       50,
     );
   } else {
-    return db.getAll(50);
+    return await db.getAll(50);
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -125,13 +124,31 @@ export class CitationSuggesterModal
     return this.plugin.db;
   }
 
-  suggestCache: ReturnType<typeof getSuggestions>[] = [];
+  // @ts-ignore
   getSuggestions(input: string) {
     return getSuggestions(input, this.db);
   }
-  debouncedGetSuggestions = debounce((input: string) => {
-    this.suggestCache = this.getSuggestions(input);
-  }, 500, true);
+
+  initial = true;
+  async _updateSuggestions() {
+    let input = this.inputEl.value,
+      suggestions = await this.getSuggestions(input);
+    if (0 !== suggestions.length) {
+      let n = this.limit;
+      n && n > 0 && (suggestions = suggestions.slice(0, n)),
+        (this as any).chooser.setSuggestions(suggestions);
+    } else
+      input
+        ? this.onNoSuggestion()
+        : (this as any).chooser.setSuggestions(null);
+  }
+  debouncedUpdate = debounce(this._updateSuggestions, 250, true);
+  updateSuggestions() {
+    if (this.initial) {
+      this._updateSuggestions();
+      this.initial = false;
+    } else this.debouncedUpdate();
+  }
 
   renderSuggestion = renderSuggestion.bind(this);
 

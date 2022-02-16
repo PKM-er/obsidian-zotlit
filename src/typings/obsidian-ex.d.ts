@@ -14,4 +14,8 @@ declare module "obsidian" {
   interface EditorSuggest<T> {
     suggestEl: HTMLElement;
   }
+
+  interface SuggestModal<T> {
+    updateSuggestions(): void;
+  }
 }

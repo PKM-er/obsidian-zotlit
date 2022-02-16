@@ -1,5 +1,3 @@
-import { LogLevelDesc } from "loglevel";
-
 import type { getPromiseWorker } from "../promise-worker";
 import log from "../utils/logger";
 import Database from "./db";

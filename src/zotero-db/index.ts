@@ -1,4 +1,4 @@
-import Fuse from "fuse.js";
+import type Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import getLibsWorker from "web-worker:./workers/get-libs";
@@ -9,7 +9,7 @@ import { checkNodeInWorker } from "../utils";
 import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
-import type { Output as IndexOutput } from "./get-index";
+import type { InitOut, Output as IndexOutput, QueryOut } from "./get-index";
 import type { indexCitationWorkerGetter } from "./get-index";
 import getIndexFunc from "./get-index";
 import type { getLibsWorkerGetter, Output as LibsOutput } from "./get-libs";
@@ -17,7 +17,6 @@ import getLibsFunc from "./get-libs";
 import type { dbState, InputBase } from "./type";
 
 export default class ZoteroDb {
-  fuse: Fuse<RegularItem> | null = null;
   itemMap: Record<string, RegularItem> = {};
 
   workers: {
@@ -97,7 +96,7 @@ export default class ZoteroDb {
           getLibsWorker("Get Zotero Library Info Worker", this.ConfigPath),
         ),
         indexCitation: new PromiseWebWorker(
-          indexCitationWorker("Index Zotero Citation Worker", this.ConfigPath),
+          indexCitationWorker("Zotero Citations Worker", this.ConfigPath),
         ),
       };
     }
@@ -111,33 +110,44 @@ export default class ZoteroDb {
         bbt: "main",
       };
     }
-    this.initIndexAndFuse(await this.do("indexCitation", this.props));
+    this.initIndexAndFuse(
+      (await this.do("indexCitation", {
+        action: "init",
+        ...this.props,
+      })) as InitOut,
+    );
   }
 
-  private initIndexAndFuse(args: IndexOutput) {
-    const { itemMap, options, index, dbState } = args;
+  private initIndexAndFuse(args: InitOut) {
+    const { itemMap, dbState } = args;
     this.itemMap = itemMap;
-    this.fuse = new Fuse(
-      Object.values(itemMap),
-      options,
-      Fuse.parseIndex(index),
-    );
     this.dbState = dbState;
   }
 
-  search(query: string[], matchField: string, limit = 20) {
-    if (!this.fuse) return [];
+  async search(
+    query: string[],
+    matchField: string,
+    limit = 20,
+  ): Promise<Fuse.FuseResult<RegularItem>[]> {
     let exp = query.map<Fuse.Expression>((s) => ({ [matchField]: s }));
-    return this.fuse.search({ $and: exp }, { limit });
+    return (
+      (await this.do("indexCitation", {
+        action: "query",
+        pattern: { $and: exp },
+        options: { limit },
+        ...this.props,
+      })) as QueryOut
+    ).result;
   }
-  getAll(limit = 20): Fuse.FuseResult<RegularItem>[] {
-    let docs = (this.fuse as any)?._docs as RegularItem[] | undefined;
-    if (!docs) return [];
-    docs = docs.slice(0, limit);
-    return docs.map((item, index) => ({
-      item,
-      refIndex: index,
-    }));
+  async getAll(limit = 20): Promise<Fuse.FuseResult<RegularItem>[]> {
+    return (
+      (await this.do("indexCitation", {
+        action: "query",
+        pattern: null,
+        options: { limit },
+        ...this.props,
+      })) as QueryOut
+    ).result;
   }
 
   private libs: LibsOutput["result"] | null = null;
