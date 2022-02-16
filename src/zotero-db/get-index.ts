@@ -6,26 +6,19 @@ import type { getPromiseWorker } from "../promise-worker";
 import log from "../utils/logger";
 import { multipartToSQL } from "../utils/zotero-date";
 import type { RegularItem } from "../zotero-types";
-import type { dbState } from ".";
 import betterBibTexSql from "./better-bibtex.sql";
 import creatorsSql from "./creators.sql";
 import Database from "./db";
 import generalSql from "./general.sql";
+import type { dbState, InputBase, OutputBase } from "./type";
 import isWorker from "./workers/is-worker";
 
-export type Input = {
-  dbPath: string;
-  bbtDbPath: string;
-  libraryID: number;
-  dbState: dbState;
-  logLevel: LogLevelDesc;
-};
-export type Output = {
+export type Input = InputBase;
+export interface Output extends OutputBase {
   itemMap: Record<string, RegularItem>;
   options: Fuse.IFuseOptions<RegularItem>;
   index: ReturnType<Fuse.FuseIndex<RegularItem>["toJSON"]>;
-  dbState: dbState;
-};
+}
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   keys: ["title", "creators"],
@@ -33,8 +26,11 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   shouldSort: true,
 };
 
+let mainDb: Database | null = null,
+  bbtDb: Database | null = null;
+
 const getIndex = async ({
-  dbPath,
+  mainDbPath,
   bbtDbPath,
   libraryID,
   dbState,
@@ -43,26 +39,35 @@ const getIndex = async ({
   isWorker() && log.setLevel(logLevel);
   const readMain = async () => {
       log.info("Reading main Zotero database for index");
-      const db = new Database(dbPath);
-      await db.open(dbState.main);
+      if (!mainDb || mainDb.srcDbPath !== mainDbPath) {
+        mainDb?.close();
+        mainDb = new Database(mainDbPath);
+      }
+      await mainDb.open(dbState.main);
       const result = {
-        general: await db.read((db) => db.prepare(generalSql).all(libraryID)),
-        creators: await db.read((db) => db.prepare(creatorsSql).all(libraryID)),
-        mode: db.mode,
+        general: await mainDb.read((db) =>
+          db.prepare(generalSql).all(libraryID),
+        ),
+        creators: await mainDb.read((db) =>
+          db.prepare(creatorsSql).all(libraryID),
+        ),
+        mode: mainDb.mode,
       };
-      db.close();
       log.info("Reading main Zotero database for index done");
       return result;
     },
     readBbt = async () => {
       log.info("Reading Better BibTex database");
-      const db = new Database(bbtDbPath);
-      await db.open(dbState.bbt);
+      if (!bbtDb || bbtDb.srcDbPath !== bbtDbPath) {
+        bbtDb?.close();
+        bbtDb = new Database(bbtDbPath);
+      }
+      await bbtDb.open(dbState.bbt);
       const result = {
-        citekeyMap: await db.read((db) => db.prepare(betterBibTexSql).all()),
-        mode: db.mode,
+        citekeyMap: await bbtDb.read((db) => db.prepare(betterBibTexSql).all()),
+        mode: bbtDb.mode,
       };
-      db.close();
+      bbtDb.close();
       log.info("Reading Better BibTex done");
       return result;
     };

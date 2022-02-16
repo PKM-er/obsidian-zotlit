@@ -2,20 +2,15 @@ import { LogLevelDesc } from "loglevel";
 
 import type { getPromiseWorker } from "../promise-worker";
 import log from "../utils/logger";
-import type { dbState } from ".";
 import Database from "./db";
 import libsSql from "./libraries.sql";
+import type { InputBase, OutputBase } from "./type";
 import isWorker from "./workers/is-worker";
 
-export type Input = {
-  dbPath: string;
-  dbState: dbState;
-  logLevel: LogLevelDesc;
-};
-export type Output = {
-  dbState: dbState;
+export type Input = InputBase;
+export interface Output extends OutputBase {
   result: LibsResult;
-};
+}
 
 type LibsResult = {
   libraryID: number;
@@ -23,13 +18,13 @@ type LibsResult = {
 }[];
 
 const getIndex = async ({
-  dbPath,
+  mainDbPath,
   dbState,
   logLevel,
 }: Input): Promise<Output> => {
   isWorker() && log.setLevel(logLevel);
   log.info("Reading Zotero database for libraries");
-  const db = new Database(dbPath);
+  const db = new Database(mainDbPath);
   await db.open(dbState.main);
   const libs: LibsResult = await db.read((db) => db.prepare(libsSql).all());
   db.close();

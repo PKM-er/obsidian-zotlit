@@ -29,7 +29,24 @@ export default class ZoteroPlugin extends Plugin {
     this.addCommand({
       id: "zotero-search",
       name: "Search Zotero",
-      callback: () => new CitationSuggesterModal(this).open(),
+      callback: async () =>
+        console.log(await new CitationSuggesterModal(this).open()),
+    });
+    this.addCommand({
+      id: "refresh-zotero-index",
+      name: "Refresh Zotero Index",
+      callback: async () => {
+        await this.db.refreshIndex(true);
+        new Notice("Zotero index is now up-to-date");
+      },
+    });
+    this.addCommand({
+      id: "refresh-note-index",
+      name: "Refresh Literature Notes Index",
+      callback: () => {
+        this.noteIndex.reload();
+        new Notice("Literature notes re-indexed");
+      },
     });
 
     await this.loadSettings();

@@ -9,14 +9,12 @@ import { checkNodeInWorker } from "../utils";
 import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
-import type Database from "./db";
 import type { Output as IndexOutput } from "./get-index";
 import type { indexCitationWorkerGetter } from "./get-index";
 import getIndexFunc from "./get-index";
 import type { getLibsWorkerGetter, Output as LibsOutput } from "./get-libs";
 import getLibsFunc from "./get-libs";
-
-export type dbState = Record<"main" | "bbt", Database["mode"]>;
+import type { dbState, InputBase } from "./type";
 
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;
@@ -51,10 +49,10 @@ export default class ZoteroDb {
     main: "main",
     bbt: "main",
   };
-  private get props() {
+  private get props(): InputBase {
     const { settings } = this.plugin;
     return {
-      dbPath: settings.zoteroDbPath,
+      mainDbPath: settings.zoteroDbPath,
       bbtDbPath: settings.betterBibTexDbPath,
       libraryID: settings.citationLibrary,
       dbState: this.dbState,
@@ -105,7 +103,14 @@ export default class ZoteroDb {
     }
   }
 
-  async refreshIndex() {
+  async refreshIndex(force = false) {
+    if (force) {
+      // force fetching data from main database
+      this.dbState = {
+        main: "main",
+        bbt: "main",
+      };
+    }
     this.initIndexAndFuse(await this.do("indexCitation", this.props));
   }
 

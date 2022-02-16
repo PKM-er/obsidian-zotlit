@@ -25,8 +25,9 @@ export default class Database {
   }
 
   async open(mode = this.mode): Promise<this> {
-    if (this.dbInstance && this.mode === mode) return this;
-    else if (this.dbInstance) this.dbInstance.close();
+    if (this.dbInstance && this.mode === mode && this.dbInstance.open) {
+      return this;
+    } else if (this.dbInstance?.open) this.dbInstance.close();
     let { path, time } = await this.getTempDbPath();
     switch (mode) {
       case "main":
