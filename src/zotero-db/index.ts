@@ -20,7 +20,7 @@ export type dbState = Record<"main" | "bbt", Database["mode"]>;
 
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;
-  items: Record<string, RegularItem> = {};
+  itemMap: Record<string, RegularItem> = {};
 
   workers: {
     indexCitation: ReturnType<indexCitationWorkerGetter>;
@@ -108,12 +108,13 @@ export default class ZoteroDb {
   }
 
   private initIndexAndFuse(args: IndexOutput) {
-    const [items, fuseOptions, index, dbState] = args;
-    this.items = items.reduce(
-      (record, item) => ((record[item.key] = item), record),
-      {} as Record<string, RegularItem>,
+    const { itemMap, options, index, dbState } = args;
+    this.itemMap = itemMap;
+    this.fuse = new Fuse(
+      Object.values(itemMap),
+      options,
+      Fuse.parseIndex(index),
     );
-    this.fuse = new Fuse(items, fuseOptions, Fuse.parseIndex(index));
     this.dbState = dbState;
   }
 

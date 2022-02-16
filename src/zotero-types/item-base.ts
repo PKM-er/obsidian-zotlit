@@ -1,6 +1,7 @@
 import { ItemType } from "./fields";
 
 export interface ItemBase {
+  itemID: number;
   libraryID: number;
   groupID?: number;
   version: number;

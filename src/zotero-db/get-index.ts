@@ -1,6 +1,7 @@
 import Fuse from "fuse.js";
 import { LogLevelDesc } from "loglevel";
 
+import { getItemKeyGroupID } from "../note-index/utils";
 import type { getPromiseWorker } from "../promise-worker";
 import log from "../utils/logger";
 import { multipartToSQL } from "../utils/zotero-date";
@@ -19,12 +20,12 @@ export type Input = {
   dbState: dbState;
   logLevel: LogLevelDesc;
 };
-export type Output = [
-  items: RegularItem[],
-  options: Fuse.IFuseOptions<RegularItem>,
-  index: ReturnType<Fuse.FuseIndex<RegularItem>["toJSON"]>,
-  dbState: dbState,
-];
+export type Output = {
+  itemMap: Record<string, RegularItem>;
+  options: Fuse.IFuseOptions<RegularItem>;
+  index: ReturnType<Fuse.FuseIndex<RegularItem>["toJSON"]>;
+  dbState: dbState;
+};
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   keys: ["title", "creators"],
@@ -104,7 +105,15 @@ const getIndex = async ({
   const items = Object.values(entries) as RegularItem[];
 
   const index = Fuse.createIndex(fuseOptions.keys!, items).toJSON();
-  return [items, fuseOptions, index, { main: main.value.mode, bbt: bbtMode }];
+  return {
+    itemMap: items.reduce(
+      (record, item) => ((record[getItemKeyGroupID(item)] = item), record),
+      {} as Record<string, RegularItem>,
+    ),
+    options: fuseOptions,
+    index,
+    dbState: { main: main.value.mode, bbt: bbtMode },
+  };
 };
 export default getIndex;
 
