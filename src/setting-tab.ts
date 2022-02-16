@@ -29,7 +29,9 @@ export class ZoteroSettingTab extends PluginSettingTab {
   general(): void {
     new Setting(this.containerEl).setHeading().setName("General");
 
-    this.setZoteroDbPath();
+    this.setDatabasePath("Zotero Database", "zoteroDbPath");
+    this.setDatabasePath("BetterBibTex Database", "betterBibTexDbPath");
+
     this.setLiteratureNoteFolder();
     this.setCitationLibrary();
   }
@@ -50,10 +52,10 @@ export class ZoteroSettingTab extends PluginSettingTab {
       { rows: 1 },
     ).setName("Literature Note Folder");
   }
-  setZoteroDbPath() {
+  setDatabasePath(name: string, key: "zoteroDbPath" | "betterBibTexDbPath") {
     const setter = async (value: string) => {
       const newPath = value;
-      if (newPath === this.plugin.settings.zoteroDbPath) {
+      if (newPath === this.plugin.settings[key]) {
         new Notice("Zotero database path not changed");
       } else
         try {
@@ -63,7 +65,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           } else if (path.extname(newPath) !== ".sqlite") {
             new Notice("Exception: Given path must be a .sqlite database.");
           } else {
-            this.plugin.settings.zoteroDbPath = newPath;
+            this.plugin.settings[key] = newPath;
             await this.plugin.saveSettings();
             await this.plugin.db.refreshIndex();
             new Notice("Zotero database path updated.");
@@ -74,10 +76,10 @@ export class ZoteroSettingTab extends PluginSettingTab {
     };
     this.addTextComfirm(
       this.containerEl,
-      () => this.plugin.settings.zoteroDbPath,
+      () => this.plugin.settings[key],
       setter,
       { cols: 30 },
-    ).setName("Zotero Database Path");
+    ).setName(name);
   }
   setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;

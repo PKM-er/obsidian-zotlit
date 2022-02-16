@@ -16,6 +16,8 @@ import getIndexFunc from "./get-index";
 import type { getLibsWorkerGetter, Output as LibsOutput } from "./get-libs";
 import getLibsFunc from "./get-libs";
 
+export type dbState = Record<"main" | "bbt", Database["mode"]>;
+
 export default class ZoteroDb {
   fuse: Fuse<RegularItem> | null = null;
   items: Record<string, RegularItem> = {};
@@ -45,10 +47,14 @@ export default class ZoteroDb {
     plugin.register(this.close.bind(this));
   }
 
-  dbState: Database["mode"] = "main";
+  dbState: dbState = {
+    main: "main",
+    bbt: "main",
+  };
   private get props() {
     return {
       dbPath: this.plugin.settings.zoteroDbPath,
+      bbtDbPath: this.plugin.settings.betterBibTexDbPath,
       libraryID: this.plugin.settings.citationLibrary,
       dbState: this.dbState,
     };

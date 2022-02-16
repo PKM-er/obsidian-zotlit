@@ -1,10 +1,11 @@
 import type { getPromiseWorker } from "../promise-worker";
+import type { dbState } from ".";
 import Database from "./db";
 import libsSql from "./libraries.sql";
 
-export type Input = { dbPath: string; dbState: Database["mode"] };
+export type Input = { dbPath: string; dbState: dbState };
 export type Output = {
-  dbState: Database["mode"];
+  dbState: dbState;
   result: LibsResult;
 };
 
@@ -14,13 +15,15 @@ type LibsResult = {
 }[];
 
 const getIndex = async ({ dbPath, dbState }: Input): Promise<Output> => {
+  console.info("Reading Zotero database for libraries");
   const db = new Database(dbPath);
-  await db.open(dbState);
+  await db.open(dbState.main);
   const libs: LibsResult = await db.read((db) => db.prepare(libsSql).all());
   db.close();
+  console.info("Reading Zotero database for libraries done");
   return {
     result: libs,
-    dbState: db.mode,
+    dbState: { ...dbState, main: db.mode },
   };
 };
 

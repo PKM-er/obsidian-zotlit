@@ -80,7 +80,7 @@ export default class Database {
   async read<T>(readAction: (db: DBType) => T): Promise<T> {
     const action = () => {
         if (!this.dbInstance || !this.dbInstance.open)
-          throw new Error("No database currently opened");
+          throw new Error("No database currently opened: " + this.dbPath);
         return readAction(this.dbInstance);
       },
       tempDbBusy = `Temp database is busy: ${this.getTempDbPath()}`;
@@ -95,8 +95,8 @@ export default class Database {
           throw err;
         }
         if (this.mode === "main") {
-          console.log(
-            "Seems like Zotero database is occupied by Zotero, trying to switch to temp database...",
+          console.info(
+            `Seems like ${this.dbPath} database is occupied, trying to switch to temp database...`,
           );
           // create a copy of the main database and open it
           await this.tryUpdateTempDb();
@@ -110,7 +110,8 @@ export default class Database {
       count++;
     } while (count <= 1);
     throw new Error(
-      "Failed to switch to temp database when main database was occupied",
+      "Failed to switch to temp database when main database was occupied: " +
+        this.dbPath,
     );
   }
 
