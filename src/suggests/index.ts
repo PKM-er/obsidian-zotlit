@@ -2,6 +2,7 @@ import "./style.less";
 
 import Fuse from "fuse.js";
 import {
+  debounce,
   Editor,
   EditorPosition,
   EditorSuggest,
@@ -124,9 +125,14 @@ export class CitationSuggesterModal
     return this.plugin.db;
   }
 
+  suggestCache: ReturnType<typeof getSuggestions>[] = [];
   getSuggestions(input: string) {
     return getSuggestions(input, this.db);
   }
+  debouncedGetSuggestions = debounce((input: string) => {
+    this.suggestCache = this.getSuggestions(input);
+  }, 500, true);
+
   renderSuggestion = renderSuggestion.bind(this);
 
   // Promisify the modal
