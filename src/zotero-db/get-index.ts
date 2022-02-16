@@ -7,11 +7,16 @@ import creatorsSql from "./creators.sql";
 import Database from "./db";
 import generalSql from "./general.sql";
 
-export type Input = { dbPath: string; libraryID: number };
+export type Input = {
+  dbPath: string;
+  libraryID: number;
+  dbState: Database["mode"];
+};
 export type Output = [
   items: RegularItem[],
   options: Fuse.IFuseOptions<RegularItem>,
   index: ReturnType<Fuse.FuseIndex<RegularItem>["toJSON"]>,
+  dbState: Database["mode"],
 ];
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
@@ -19,9 +24,13 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   includeMatches: true,
   shouldSort: true,
 };
-const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
+const getIndex = async ({
+  dbPath,
+  libraryID,
+  dbState,
+}: Input): Promise<Output> => {
   const db = new Database(dbPath);
-  await db.open();
+  await db.open(dbState);
   const general: any[] = await db.read((db) =>
       db.prepare(generalSql).all(libraryID),
     ),
@@ -49,7 +58,7 @@ const getIndex = async ({ dbPath, libraryID }: Input): Promise<Output> => {
 
   const index = Fuse.createIndex(fuseOptions.keys!, items).toJSON();
   db.close();
-  return [items, fuseOptions, index];
+  return [items, fuseOptions, index, db.mode];
 };
 
 export default getIndex;

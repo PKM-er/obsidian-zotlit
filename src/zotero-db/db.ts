@@ -96,7 +96,7 @@ export default class Database {
         }
         if (this.mode === "main") {
           console.log(
-            "Seems like Zotero database is occuiped by Zotero, trying to switch to temp database...",
+            "Seems like Zotero database is occupied by Zotero, trying to switch to temp database...",
           );
           // create a copy of the main database and open it
           await this.tryUpdateTempDb();
@@ -110,7 +110,7 @@ export default class Database {
       count++;
     } while (count <= 1);
     throw new Error(
-      "Failed to switch to temp database when main database was occuiped",
+      "Failed to switch to temp database when main database was occupied",
     );
   }
 

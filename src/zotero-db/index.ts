@@ -9,6 +9,7 @@ import { checkNodeInWorker } from "../utils";
 import log from "../utils/logger";
 import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
+import type Database from "./db";
 import type { Output as IndexOutput } from "./get-index";
 import type { indexCitationWorkerGetter } from "./get-index";
 import getIndexFunc from "./get-index";
@@ -44,10 +45,12 @@ export default class ZoteroDb {
     plugin.register(this.close.bind(this));
   }
 
+  dbState: Database["mode"] = "main";
   private get props() {
     return {
       dbPath: this.plugin.settings.zoteroDbPath,
       libraryID: this.plugin.settings.citationLibrary,
+      dbState: this.dbState,
     };
   }
 
@@ -97,12 +100,13 @@ export default class ZoteroDb {
   }
 
   private initIndexAndFuse(args: IndexOutput) {
-    const [items, fuseOptions, index] = args;
+    const [items, fuseOptions, index, dbState] = args;
     this.items = items.reduce(
       (record, item) => ((record[item.key] = item), record),
       {} as Record<string, RegularItem>,
     );
     this.fuse = new Fuse(items, fuseOptions, Fuse.parseIndex(index));
+    this.dbState = dbState;
   }
 
   search(query: string[], matchField: string, limit = 20) {
@@ -120,11 +124,13 @@ export default class ZoteroDb {
     }));
   }
 
-  private libs: LibsOutput | null = null;
+  private libs: LibsOutput["result"] | null = null;
   async getLibs(refresh = false) {
     try {
       if (refresh || !this.libs) {
-        this.libs = await this.do("getLibs", this.props);
+        const { result, dbState } = await this.do("getLibs", this.props);
+        this.libs = result;
+        this.dbState = dbState;
       }
     } catch (error) {
       if (!this.libs) this.libs = [{ libraryID: 1, name: "My Library" }];
