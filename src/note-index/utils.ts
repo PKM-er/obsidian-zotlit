@@ -1,6 +1,6 @@
 import type { CachedMetadata } from "obsidian";
 
-import { ZOTERO_KEY_FIELDNAME } from "../note-template";
+import { ZOTERO_KEY_FIELDNAME } from "../note-template/const";
 import type { Item, ItemType } from "../zotero-types";
 
 export type FileMapInfo = { file: string; blockId?: string };

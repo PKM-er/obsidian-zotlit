@@ -1,38 +1,24 @@
 import assertNever from "assert-never";
-import dedent from "dedent";
 import { stringify } from "gray-matter";
-import Handlebars, { TemplateDelegate } from "handlebars";
+import Handlebars from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index";
-import { AnnotationItem, ItemField, RegularItem } from "../zotero-types";
+import type { RegularItem } from "../zotero-types";
+import {
+  DEFAULT_FRONTMATTER_FIELD,
+  DEFAULT_TEMPLATE,
+  FieldsInFrontmatter,
+  NoteTemplateJSON,
+  TemplateInstances,
+  TemplateItemTypeMap,
+  ZOTERO_KEY_FIELDNAME,
+} from "./const";
 import { Helpers, Partial } from "./helper";
-
-export type ItemWithAnnos<I extends RegularItem = RegularItem> = I & {
-  annotations?: AnnotationItem[];
-};
-interface TemplateItemTypeMap {
-  content: ItemWithAnnos;
-  filename: RegularItem;
-  annotation: AnnotationItem;
-  annots: AnnotationItem[];
-}
-type FieldsInFrontmatter = {
-  [K in ItemField | keyof RegularItem]?: true | string[];
-};
-
-type TemplateInstances = {
-  [key in keyof TemplateItemTypeMap]: TemplateDelegate<
-    TemplateItemTypeMap[key]
-  >;
-};
-type NoteTemplateJSON = Record<keyof TemplateItemTypeMap, string>;
 
 const CompileOptions: Parameters<typeof Handlebars.compile>[1] = {
     noEscape: true,
   },
   grayMatterOptions = {};
-
-export const ZOTERO_KEY_FIELDNAME = "zotero-key";
 
 export default class NoteTemplate {
   private templateInstances: TemplateInstances = {
@@ -56,6 +42,8 @@ export default class NoteTemplate {
     }
   }
   constructor() {
+    Object.assign(this, DEFAULT_TEMPLATE);
+    this.frontmatter = { ...DEFAULT_FRONTMATTER_FIELD };
     Handlebars.registerPartial(Partial as any);
     Handlebars.registerHelper(Helpers);
     this.complieAll();
@@ -104,31 +92,11 @@ export default class NoteTemplate {
 
   //#region default templates
   // zotero-key is an required field
-  frontmatter: FieldsInFrontmatter = {
-    title: true,
-    citekey: true,
-  };
-  private filename: string = "{{coalesce citekey DOI title key}}.md";
-  private content: string = dedent`
-  # {{title}}
-
-  [Zotero]({{backlink}})
-  
-  {{> annots}}
-  `;
-  private annots: string = dedent`
-  {{#each annotations}}
-  {{> annotation}}
-  {{/each}}
-  `;
-  private annotation: string = dedent`
-
-  ## Annotation ^{{blockID}}
-
-  [Zotero]({{backlink}})
-
-  {{#if annotationText}}> {{annotationText}}{{/if}}
-  `;
+  frontmatter: FieldsInFrontmatter;
+  private filename!: string;
+  private content!: string;
+  private annots!: string;
+  private annotation!: string;
   //#endregion
 
   //#region define properties
