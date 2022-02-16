@@ -1,6 +1,8 @@
 import Fuse from "fuse.js";
+import { LogLevelDesc } from "loglevel";
 
 import type { getPromiseWorker } from "../promise-worker";
+import log from "../utils/logger";
 import { multipartToSQL } from "../utils/zotero-date";
 import type { RegularItem } from "../zotero-types";
 import type { dbState } from ".";
@@ -8,12 +10,14 @@ import betterBibTexSql from "./better-bibtex.sql";
 import creatorsSql from "./creators.sql";
 import Database from "./db";
 import generalSql from "./general.sql";
+import isWorker from "./workers/is-worker";
 
 export type Input = {
   dbPath: string;
   bbtDbPath: string;
   libraryID: number;
   dbState: dbState;
+  logLevel: LogLevelDesc;
 };
 export type Output = [
   items: RegularItem[],
@@ -33,9 +37,11 @@ const getIndex = async ({
   bbtDbPath,
   libraryID,
   dbState,
+  logLevel,
 }: Input): Promise<Output> => {
+  isWorker() && log.setLevel(logLevel);
   const readMain = async () => {
-      console.info("Reading main Zotero database for index");
+      log.info("Reading main Zotero database for index");
       const db = new Database(dbPath);
       await db.open(dbState.main);
       const result = {
@@ -44,11 +50,11 @@ const getIndex = async ({
         mode: db.mode,
       };
       db.close();
-      console.info("Reading main Zotero database for index done");
+      log.info("Reading main Zotero database for index done");
       return result;
     },
     readBbt = async () => {
-      console.info("Reading Better BibTex database");
+      log.info("Reading Better BibTex database");
       const db = new Database(bbtDbPath);
       await db.open(dbState.bbt);
       const result = {
@@ -56,7 +62,7 @@ const getIndex = async ({
         mode: db.mode,
       };
       db.close();
-      console.info("Reading Better BibTex done");
+      log.info("Reading Better BibTex done");
       return result;
     };
 

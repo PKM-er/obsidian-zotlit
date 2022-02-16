@@ -52,11 +52,13 @@ export default class ZoteroDb {
     bbt: "main",
   };
   private get props() {
+    const { settings } = this.plugin;
     return {
-      dbPath: this.plugin.settings.zoteroDbPath,
-      bbtDbPath: this.plugin.settings.betterBibTexDbPath,
-      libraryID: this.plugin.settings.citationLibrary,
+      dbPath: settings.zoteroDbPath,
+      bbtDbPath: settings.betterBibTexDbPath,
+      libraryID: settings.citationLibrary,
       dbState: this.dbState,
+      logLevel: settings.logLevel,
     };
   }
 

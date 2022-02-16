@@ -4,6 +4,8 @@ import db from "better-sqlite3";
 import { constants as fsConst, promises as fs } from "fs";
 import path from "path";
 
+import log from "../utils/logger";
+
 export default class Database {
   constructor(private dbPath: string) {}
 
@@ -95,7 +97,7 @@ export default class Database {
           throw err;
         }
         if (this.mode === "main") {
-          console.info(
+          log.info(
             `Seems like ${this.dbPath} database is occupied, trying to switch to temp database...`,
           );
           // create a copy of the main database and open it
