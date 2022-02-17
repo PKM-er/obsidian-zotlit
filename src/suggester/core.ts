@@ -2,34 +2,35 @@ import "./style.less";
 
 import type Fuse from "fuse.js";
 
-import ZoteroDb from "../zotero-db";
 import {
   Creator,
   isFullName,
   JournalArticleItem,
   RegularItem,
 } from "../zotero-types";
+import type ZoteroPlugin from "../zt-main";
 import UnionRanges from "./union";
 
 export type FuzzyMatch<T> = Fuse.FuseResult<T>;
 
 const PRIMARY_MATCH_FIELD = "title";
+export const CLASS_ID = "zt-citations";
 
 export interface SuggesterBase {
-  db: ZoteroDb;
+  plugin: ZoteroPlugin;
 }
 export const getSuggestions = async (
   input: string,
-  db: ZoteroDb,
+  plugin: ZoteroPlugin,
 ): Promise<FuzzyMatch<RegularItem>[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
-    return await db.search(
+    return await plugin.db.search(
       input.replace(/^\+|\+$/g, "").split(/[+]/g),
       PRIMARY_MATCH_FIELD,
       50,
     );
   } else {
-    return await db.getAll(50);
+    return await plugin.db.getAll(50);
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
@@ -134,3 +135,5 @@ const renderMatches = (
     textIndex < text.length && el.appendText(text.substring(textIndex));
   } else el.appendText(text);
 };
+
+export const isAlternative = (evt: KeyboardEvent | MouseEvent) => evt.shiftKey;

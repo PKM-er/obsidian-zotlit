@@ -11,7 +11,7 @@ import {
   saveSettings,
   ZoteroSettings,
 } from "./settings";
-import { CitationSuggester, insertCitation } from "./suggests";
+import { CitationSuggester, insertCitation } from "./suggester";
 import log from "./utils/logger";
 import ZoteroDb from "./zotero-db";
 
