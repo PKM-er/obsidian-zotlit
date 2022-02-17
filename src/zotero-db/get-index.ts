@@ -32,7 +32,10 @@ export type Input = InitIn | QueryIn;
 export type Output = InitOut | QueryOut;
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
-  keys: ["title", "creators"],
+  keys: ["title"],
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
   includeMatches: true,
   shouldSort: true,
 };
