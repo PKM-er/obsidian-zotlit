@@ -1,5 +1,5 @@
 import dedent from "dedent";
-import type { Template, TemplateDelegate } from "handlebars";
+import type { TemplateDelegate } from "handlebars";
 
 import type { AnnotationItem, ItemField, RegularItem } from "../zotero-types";
 
@@ -13,6 +13,8 @@ export interface TemplateItemTypeMap {
   filename: RegularItem;
   annotation: AnnotationItem;
   annots: AnnotationItem[];
+  mdCite: RegularItem;
+  altMdCite: RegularItem;
 }
 export type FieldsInFrontmatter = {
   [K in ItemField | keyof RegularItem]?: true | string[];
@@ -50,6 +52,8 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 
             {{#if annotationText}}> {{annotationText}}{{/if}}
             `,
+  mdCite: `[@{{citekey}}]`,
+  altMdCite: `@{{citekey}}`,
 };
 
 export const DEFAULT_FRONTMATTER_FIELD: FieldsInFrontmatter = {

@@ -1,124 +1,40 @@
 import "./style.less";
 
-import Fuse from "fuse.js";
 import {
   debounce,
   Editor,
   EditorPosition,
+  EditorRange,
   EditorSuggest,
   EditorSuggestContext,
   EditorSuggestTriggerInfo,
   SuggestModal,
 } from "obsidian";
 
-import ZoteroDb from "../zotero-db";
-import {
-  Creator,
-  isFullName,
-  JournalArticleItem,
-  RegularItem,
-} from "../zotero-types";
+import NoteTemplate from "../note-template";
+import { RegularItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
-import UnionRanges from "./union";
+import {
+  FuzzyMatch,
+  getSuggestions,
+  renderSuggestion,
+  SuggesterBase,
+} from "./core";
 
 const CLASS_ID = "zt-citations";
-type FuzzyMatch<T> = Fuse.FuseResult<T>;
 
-const PRIMARY_MATCH_FIELD = "title";
+export const insertCitation = (plugin: ZoteroPlugin) => (editor: Editor) =>
+  new CitationSuggesterModal(plugin).insertTo(editor);
 
-interface SuggesterBase {
-  db: ZoteroDb;
-}
-const getSuggestions = async (
-  input: string,
-  db: ZoteroDb,
-): Promise<Fuse.FuseResult<RegularItem>[]> => {
-  if (typeof input === "string" && input.trim().length > 0) {
-    return await db.search(
-      input.replace(/^\+|\+$/g, "").split(/[+]/g),
-      PRIMARY_MATCH_FIELD,
-      50,
-    );
-  } else {
-    return await db.getAll(50);
-  }
-};
-// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-function renderSuggestion(
-  this: SuggesterBase,
-  suggestion: FuzzyMatch<RegularItem>,
-  el: HTMLElement,
-): void {
-  const item = suggestion.item as JournalArticleItem;
-  const title = item[PRIMARY_MATCH_FIELD],
-    { matches } = suggestion;
-
-  const titleEl = el.createDiv({ cls: "title" });
-  if (!title) {
-    titleEl.setText("Title missing");
-  } else if (matches) {
-    const indices =
-      matches.length === 1
-        ? matches[0].key === PRIMARY_MATCH_FIELD
-          ? matches[0].indices
-          : []
-        : UnionRanges(
-            matches.flatMap((m) =>
-              m.key === PRIMARY_MATCH_FIELD ? m.indices : [],
-            ),
-          );
-    renderMatches(titleEl, title, indices);
-  } else {
-    titleEl.setText(title);
-  }
-  el.append(getArticleMeta(item));
-}
-
-const getArticleMeta = (item: JournalArticleItem) => {
-  const { creators, date, publicationTitle, volume, issue, pages } = item;
-  const meta = {
-    creators: creatorToString(creators),
-    date,
-    publication: publicationTitle,
-    volume,
-    issue,
-    pages,
-  };
-  const newSpan = (to: HTMLElement, key: keyof typeof meta, cls?: string) =>
-    meta[key] && to.createSpan({ cls: cls ?? key, text: meta[key] });
-  return createDiv({ cls: "meta" }, (main) => {
-    if (meta.creators || meta.date)
-      main.createSpan({ cls: "author-year" }, (ay) => {
-        newSpan(ay, "creators");
-        newSpan(ay, "date");
-      });
-
-    newSpan(main, "publication");
-    if (meta.volume || meta.issue)
-      main.createSpan({ cls: "vol-issue" }, (vi) => {
-        newSpan(vi, "volume");
-        newSpan(vi, "issue");
-      });
-    newSpan(main, "pages");
-  });
-};
-const creatorToString = (creators: Creator[] | undefined) => {
-  if (!creators || !creators[0]) return "";
-  let firstCreator = creators[0];
-  let str = isFullName(firstCreator)
-    ? firstCreator.lastName
-    : firstCreator.name;
-  if (creators.length > 1) str = str.trim() + " et al.";
-  return str;
-};
-
-export class CitationSuggesterModal
+type ModalResult = { item: RegularItem; alt: boolean };
+class CitationSuggesterModal
   extends SuggestModal<FuzzyMatch<RegularItem>>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {
     super(plugin.app);
     this.modalEl.addClass(CLASS_ID);
+    this.setInstructions(Instructions);
   }
   get db() {
     return this.plugin.db;
@@ -153,12 +69,25 @@ export class CitationSuggesterModal
   renderSuggestion = renderSuggestion.bind(this);
 
   // Promisify the modal
-  resolve: ((value: RegularItem | null) => void) | null = null;
-  open(): Promise<RegularItem | null> {
+  resolve: ((value: ModalResult | null) => void) | null = null;
+  promise: Promise<ModalResult | null> | null = null;
+  open(): Promise<ModalResult | null> {
     super.open();
-    return new Promise((resolve) => {
+    this.promise = new Promise((resolve) => {
       this.resolve = resolve;
     });
+    return this.promise;
+  }
+  async insertTo(editor: Editor): Promise<boolean> {
+    const result = await (this.promise ?? this.open());
+    if (!result) return false;
+    insertCitationTo(
+      result,
+      undefined,
+      editor,
+      this.plugin.settings.literatureNoteTemplate,
+    );
+    return true;
   }
   onClose() {
     if (this.resolve) {
@@ -167,7 +96,7 @@ export class CitationSuggesterModal
     }
   }
 
-  onChooseSuggestion(suggestion: FuzzyMatch<RegularItem>): void {
+  onChooseSuggestion(): void {
     // console.log(suggestion);
   }
   selectSuggestion(
@@ -176,7 +105,7 @@ export class CitationSuggesterModal
   ): void {
     if (this.resolve) {
       if (value?.item) {
-        this.resolve(value.item);
+        this.resolve({ item: value.item, alt: isAlternative(evt) });
       } else {
         this.resolve(null);
       }
@@ -194,6 +123,7 @@ export class CitationSuggester
   constructor(public plugin: ZoteroPlugin) {
     super(plugin.app);
     this.suggestEl.addClass(CLASS_ID);
+    this.setInstructions(Instructions);
   }
 
   get db() {
@@ -204,23 +134,22 @@ export class CitationSuggester
     cursor: EditorPosition,
     editor: Editor,
   ): EditorSuggestTriggerInfo | null {
-    throw new Error("Method not implemented.");
-    // if (!this.plugin.settings.suggester) return null;
-    // const sub = editor.getLine(cursor.line).substring(0, cursor.ch);
-    // const match = sub.match(/(?::|：：)([^:\s]+$)/);
-    // if (!match) return null;
-    // const prevSC = (match.input as string)
-    //   .substring(0, match.index)
-    //   .match(/:([^\s:]+$)/);
-    // if (prevSC && this.db.hasIcon(prevSC[1])) return null;
-    // return {
-    //   end: cursor,
-    //   start: {
-    //     ch: match.index as number,
-    //     line: cursor.line,
-    //   },
-    //   query: match[1],
-    // };
+    if (!this.plugin.settings.citationEditorSuggester) return null;
+    const line = editor.getLine(cursor.line),
+      sub = line.substring(0, cursor.ch);
+    const match = sub.match(/(?:\[@)([\w ]*)$/);
+    if (!match) return null;
+    let end = { ...cursor };
+    // if `]` is next to cursor (auto-complete), include it to replace range as well
+    if (line[cursor.ch] === "]") end.ch += 1;
+    return {
+      end,
+      start: {
+        ch: match.index as number,
+        line: cursor.line,
+      },
+      query: match[1],
+    };
   }
 
   getSuggestions(context: EditorSuggestContext) {
@@ -228,49 +157,38 @@ export class CitationSuggester
   }
 
   renderSuggestion = renderSuggestion.bind(this);
-  selectSuggestion(suggestion: FuzzyMatch<RegularItem>): void {
-    throw new Error("Method not implemented.");
-    // if (!this.context) return;
-    // const { id, pack } = suggestion.item;
-    // this.context.editor.replaceRange(
-    //   this.plugin.settings.code2emoji && pack === "emoji"
-    //     ? (this.db.getIcon(id) as string)
-    //     : `:${id}:` + (this.plugin.settings.spaceAfterSC ? " " : ""),
-    //   this.context.start,
-    //   this.context.end,
-    // );
+  selectSuggestion(
+    suggestion: FuzzyMatch<RegularItem>,
+    evt: MouseEvent | KeyboardEvent,
+  ): void {
+    if (!this.context) return;
+    const { item } = suggestion;
+    insertCitationTo(
+      { item, alt: isAlternative(evt) },
+      this.context,
+      this.context.editor,
+      this.plugin.settings.literatureNoteTemplate,
+    );
   }
 }
 
-const renderMatches = (
-  el: HTMLElement,
-  text: string,
-  indices?: readonly Fuse.RangeTuple[],
-  offset?: number,
+const insertCitationTo = (
+  { alt, item }: ModalResult,
+  range: Record<"start" | "end", EditorPosition> | undefined,
+  editor: Editor,
+  template: NoteTemplate,
 ) => {
-  if (indices) {
-    if (offset === undefined) offset = 0;
-    let textIndex = 0;
-    for (
-      let rangeIndex = 0;
-      rangeIndex < indices.length && textIndex < text.length;
-      rangeIndex++
-    ) {
-      let range = indices[rangeIndex],
-        start = range[0] + offset,
-        end = range[1] + offset + 1; // patch for Fuse.RangeTuple
-      if (!(end <= 0)) {
-        if (start >= text.length) break;
-        if (start < 0) start = 0;
-        if (start !== textIndex)
-          el.appendText(text.substring(textIndex, start));
-        el.createSpan({
-          cls: "suggestion-highlight",
-          text: text.substring(start, end),
-        });
-        textIndex = end;
-      }
-    }
-    textIndex < text.length && el.appendText(text.substring(textIndex));
-  } else el.appendText(text);
+  const cursor = editor.getCursor();
+  range = range ?? { start: cursor, end: cursor };
+  const citation = template.render(alt ? "altMdCite" : "mdCite", item);
+  editor.replaceRange(citation, range.start, range.end);
+  editor.setCursor(editor.posToOffset(range.start) + citation.length);
 };
+
+const isAlternative = (evt: KeyboardEvent | MouseEvent) => evt.shiftKey;
+const Instructions = [
+  { command: "↑↓", purpose: "to navigate" },
+  { command: "↵", purpose: "to insert Markdown citation" },
+  { command: "shift ↵", purpose: "to insert secondary Markdown citation" },
+  { command: "esc", purpose: "to dismiss" },
+];

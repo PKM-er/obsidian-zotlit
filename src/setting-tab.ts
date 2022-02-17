@@ -11,9 +11,12 @@ import {
 } from "obsidian";
 import path from "path";
 
+import type { SettingKeyWithType } from "./settings";
 import { promptOpenLog } from "./utils";
 import log from "./utils/logger";
 import ZoteroPlugin from "./zt-main";
+
+type TextAreaSize = Partial<Record<"cols" | "rows", number>>;
 
 export class ZoteroSettingTab extends PluginSettingTab {
   constructor(public plugin: ZoteroPlugin) {
@@ -31,9 +34,15 @@ export class ZoteroSettingTab extends PluginSettingTab {
 
     this.setDatabasePath("Zotero Database", "zoteroDbPath");
     this.setDatabasePath("BetterBibTex Database", "betterBibTexDbPath");
+    this.setEditorSuggest();
 
     this.setLiteratureNoteFolder();
     this.setCitationLibrary();
+  }
+  setEditorSuggest() {
+    this.addToggle(this.containerEl, "citationEditorSuggester").setName(
+      "Citation Editor Suggester",
+    );
   }
   setLiteratureNoteFolder() {
     const setter = async (value: string, text: TextAreaComponent) => {
@@ -117,19 +126,29 @@ export class ZoteroSettingTab extends PluginSettingTab {
     const template = this.plugin.settings.literatureNoteTemplate;
     for (const key of template.getAllTemplatePropNames()) {
       let title: string,
-        desc: string | DocumentFragment = "";
+        desc: string | DocumentFragment = "",
+        size: TextAreaSize | undefined = undefined;
       switch (key) {
         case "content":
           title = "Note Content";
           break;
         case "filename":
           title = "Note Filename";
+          size = { rows: 2 };
           break;
         case "annotation":
           title = "Annotation";
           break;
         case "annots":
           title = "Annotations";
+          break;
+        case "mdCite":
+          title = "Markdown primary citation template";
+          size = { rows: 2 };
+          break;
+        case "altMdCite":
+          title = "Markdown secondary citation template";
+          size = { rows: 2 };
           break;
         default:
           assertNever(key);
@@ -138,6 +157,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         this.containerEl,
         () => template[key],
         (value) => (template[key] = value),
+        size,
       ).setName(title);
       if (desc) setting.setDesc(desc);
     }
@@ -172,10 +192,22 @@ export class ZoteroSettingTab extends PluginSettingTab {
       );
   };
 
+  addToggle(addTo: HTMLElement, key: SettingKeyWithType<boolean>): Setting {
+    return new Setting(addTo).addToggle((toggle) => {
+      toggle
+        .setValue(this.plugin.settings[key])
+        .onChange(
+          (value) => (
+            (this.plugin.settings[key] = value), this.plugin.saveSettings()
+          ),
+        );
+    });
+  }
   addTextField(
     addTo: HTMLElement,
     get: () => string,
     set: (value: string) => void,
+    size: TextAreaSize = {},
     timeout = 500,
   ): Setting {
     return new Setting(addTo).addTextArea((text) => {
@@ -184,15 +216,14 @@ export class ZoteroSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
       };
       text.setValue(get()).onChange(debounce(onChange, timeout, true));
-      text.inputEl.cols = 30;
-      text.inputEl.rows = 5;
+      Object.assign(text.inputEl, { cols: 30, rows: 5, ...size });
     });
   }
   addTextComfirm(
     addTo: HTMLElement,
     get: () => string,
     set: (value: string, text: TextAreaComponent) => any,
-    size: Partial<Record<"cols" | "rows", number>> = {},
+    size: TextAreaSize = {},
   ) {
     let component: TextAreaComponent;
     return new Setting(addTo)

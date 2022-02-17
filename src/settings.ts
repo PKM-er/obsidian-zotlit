@@ -14,6 +14,7 @@ export interface ZoteroSettings {
   literatureNoteTemplate: NoteTemplate;
   logLevel: LogLevelNumbers;
   citationLibrary: number;
+  citationEditorSuggester: boolean;
 }
 
 const DEFAULT_LOG_LEVEL = 4;
@@ -28,14 +29,13 @@ export const getDefaultSettings = (): ZoteroSettings => {
     literatureNoteTemplate: new NoteTemplate(),
     logLevel: DEFAULT_LOG_LEVEL,
     citationLibrary: 1,
+    citationEditorSuggester: true,
   };
 };
-
-type RequireConvert = {
-  [K in keyof ZoteroSettings]: ZoteroSettings[K] extends ClassInSettings<any>
-    ? K
-    : never;
+export type SettingKeyWithType<T> = {
+  [K in keyof ZoteroSettings]: ZoteroSettings[K] extends T ? K : never;
 }[keyof ZoteroSettings];
+type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
 
 export async function loadSettings(this: ZoteroPlugin) {
   const json = await this.loadData();

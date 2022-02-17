@@ -20,13 +20,19 @@ const CompileOptions: Parameters<typeof Handlebars.compile>[1] = {
   },
   grayMatterOptions = {};
 
+const EmptyTemplateInstances: Record<keyof TemplateInstances, null> = {
+  content: null,
+  filename: null,
+  annotation: null,
+  annots: null,
+  mdCite: null,
+  altMdCite: null,
+};
+
 export default class NoteTemplate {
   private templateInstances: TemplateInstances = {
-    content: undefined as any,
-    filename: undefined as any,
-    annotation: undefined as any,
-    annots: undefined as any,
-  };
+    ...EmptyTemplateInstances,
+  } as any;
   getAllTemplatePropNames(): (keyof TemplateItemTypeMap)[] {
     return Object.keys(this.templateInstances) as any;
   }
@@ -97,45 +103,19 @@ export default class NoteTemplate {
   private content!: string;
   private annots!: string;
   private annotation!: string;
+  private mdCite!: string;
+  private altMdCite!: string;
   //#endregion
 
   //#region define properties
-  private setTplField(name: keyof NoteTemplateJSON, template: string) {
+  public setTemplateField(name: keyof NoteTemplateJSON, template: string) {
     if (template !== this[name]) {
       this.compile(name, template);
       this[name] = template;
     }
   }
-
-  public get contentTpl() {
-    return this.content;
-  }
-  public set contentTpl(template: string) {
-    this.setTplField("content", template);
-  }
-
-  public get filenameTpl() {
-    return this.filename;
-  }
-  /**
-   * pass normalized path
-   */
-  public set filenameTpl(normalizedPath: string) {
-    this.setTplField("filename", normalizedPath);
-  }
-
-  public get annotationTpl() {
-    return this.annotation;
-  }
-  public set annotationTpl(template: string) {
-    this.setTplField("annotation", template);
-  }
-
-  public get annotsTpl() {
-    return this.annots;
-  }
-  public set annotsTpl(template: string) {
-    this.setTplField("annots", template);
+  public getTemplateField(name: keyof NoteTemplateJSON) {
+    return this[name];
   }
   //#endregion
 
@@ -145,6 +125,8 @@ export default class NoteTemplate {
       filename: this.filename,
       annotation: this.annotation,
       annots: this.annots,
+      mdCite: this.mdCite,
+      altMdCite: this.altMdCite,
     };
   }
   updateFromJSON(json: NoteTemplateJSON | undefined): this {

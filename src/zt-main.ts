@@ -11,7 +11,7 @@ import {
   saveSettings,
   ZoteroSettings,
 } from "./settings";
-import { CitationSuggesterModal } from "./suggests";
+import { CitationSuggester, insertCitation } from "./suggests";
 import log from "./utils/logger";
 import ZoteroDb from "./zotero-db";
 
@@ -27,11 +27,11 @@ export default class ZoteroPlugin extends Plugin {
     log.info("loading Obsidian Zotero Plugin");
 
     this.addCommand({
-      id: "zotero-search",
-      name: "Search Zotero",
-      callback: async () =>
-        console.log(await new CitationSuggesterModal(this).open()),
+      id: "insert-markdown-citation",
+      name: "Insert Markdown citation",
+      editorCallback: insertCitation(this),
     });
+    this.registerEditorSuggest(new CitationSuggester(this));
     this.addCommand({
       id: "refresh-zotero-index",
       name: "Refresh Zotero Index",
