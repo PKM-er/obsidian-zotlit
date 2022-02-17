@@ -2,7 +2,11 @@ import { Notice, ObsidianProtocolData } from "obsidian";
 
 import ZoteroPlugin from "../zt-main";
 
-const openItemNote = (plugin: ZoteroPlugin, params: ObsidianProtocolData) => {
+const openItemNote = (
+  plugin: ZoteroPlugin,
+  params: ObsidianProtocolData,
+  slience = false,
+): boolean => {
   const { workspace } = plugin.app;
   const {
     // type,
@@ -19,8 +23,11 @@ const openItemNote = (plugin: ZoteroPlugin, params: ObsidianProtocolData) => {
     key: annotKey ?? infoKey,
   });
   if (!info) {
-    new Notice(`No literature note found for zotero item with key ${infoKey}`);
-    return;
+    !slience &&
+      new Notice(
+        `No literature note found for zotero item with key ${infoKey}`,
+      );
+    return false;
   }
 
   let linktext = info.file;
@@ -29,5 +36,6 @@ const openItemNote = (plugin: ZoteroPlugin, params: ObsidianProtocolData) => {
   }
 
   workspace.openLinkText(linktext, "", false);
+  return true;
 };
 export default openItemNote;

@@ -45,8 +45,9 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
     } else assertNever(type);
   };
 
-  const importHandler: ZoteroLinkHandler = ({ type, data: raw }) => {
-    const parsed = JSON.parse(decode(raw));
+  const importHandler: ZoteroLinkHandler = (params) => {
+    const { type, data: raw } = params,
+      parsed = JSON.parse(decode(raw));
     if (type === "annotation") {
       const data = parsed as SendData_AnnoExport;
       data.annotations = fromJSONArray(data.annotations);
@@ -54,6 +55,11 @@ const getZoteroLinkHandlers = (plugin: ZoteroPlugin) => {
       log.debug("parsed zotero link: ", type, parsed);
       importAnnoItems(plugin, data);
     } else if (type === "info") {
+      let shouldImport = true;
+      if ("info-key" in params) {
+        shouldImport = !openItemNote(plugin, params, true);
+      }
+      if (!shouldImport) return;
       const data = parsed as SendData_InfoExport;
       data.info = fromJSONArray(data.info);
       log.debug("parsed zotero link: ", type, parsed);
