@@ -1,7 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import type { HelperDeclareSpec, TemplateDelegate } from "handlebars";
+import type { HelperDeclareSpec, HelperOptions } from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index";
+import filenamify from "../utils/filenamify";
 import type { AnnotationItem, Item, RegularItem } from "../zotero-types";
 import { NonRegularItemTypes } from "../zotero-types";
 
@@ -17,7 +18,7 @@ const isAnnotationItem = (item: any): item is AnnotationItem =>
 export const Partial = {} as const;
 
 export const Helpers: HelperDeclareSpec = {
-  backlink: function (this: RegularItem | AnnotationItem | any): string {
+  backlink(this: RegularItem | AnnotationItem | any): string {
     let url: URL;
     const target =
       typeof this.groupID === "number" ? `groups/${this.groupID}` : "library";
@@ -34,7 +35,7 @@ export const Helpers: HelperDeclareSpec = {
     } else return "";
     return url.toString();
   },
-  coalesce: function () {
+  coalesce() {
     for (var i = 0; i < arguments.length - 1; i++) {
       // - 1 because last should be handlebars options var
       if (arguments[i]) {
@@ -43,7 +44,10 @@ export const Helpers: HelperDeclareSpec = {
     }
     return null;
   },
-  blockID: function (this: AnnotationItem | any): string {
+  filename(options: HelperOptions): string {
+    return filenamify(options.fn(this), { replacement: "_" });
+  },
+  blockID(this: AnnotationItem | any): string {
     if (isAnnotationItem(this)) {
       let id = getItemKeyGroupID(this);
       if (typeof this.annotationPosition.pageIndex === "number")
