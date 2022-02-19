@@ -1,8 +1,8 @@
 {
   "extends": "@aidenlx/ts-config/tsconfig.json",
   "compilerOptions": {
+    "outDir": "./dist/",
     "target": "ES2018",
-    "isolatedModules": true,
   },
   "include": ["src/**/*.ts", "src/note-index", "src/utils/filenamify.js"],
 }
