@@ -19,8 +19,11 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@aidenlx/esbuild-plugin-obsidian": "^0.1.4",
     "@aidenlx/eslint-config": "^0.1.2",
+    "@aidenlx/obsidian-plugin-bumper": "^0.1.3",
     "@aidenlx/prettier-config": "^0.1.0",
+    "@aidenlx/release-it-config": "^0.1.3",
     "@aidenlx/ts-config": "^0.1.2",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^4.1.0",
@@ -65,48 +68,6 @@
     "trim-repeated": "^2.0.0",
     "tslib": "^2.3.1",
     "typescript": "^4.5.5"
-  },
-  "release-it": {
-    "hooks": {
-      "before:init": [
-        "npm run prettier",
-        "npm run eslint"
-      ],
-      "after:bump": [
-        "npm run build"
-      ],
-      "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
-    },
-    "git": {
-      "commitMessage": "chore: release v${version}",
-      "tagName": "${version}",
-      "tagAnnotation": "Release v${version}"
-    },
-    "npm": {
-      "publish": false
-    },
-    "github": {
-      "release": true,
-      "assets": [
-        "build/main.js",
-        "build/manifest.json",
-        "build/styles.css"
-      ],
-      "proxy": "http://127.0.0.1:7890",
-      "releaseName": "${version}"
-    },
-    "plugins": {
-      "@release-it/bumper": {
-        "out": "manifest.json"
-      },
-      "@release-it/conventional-changelog": {
-        "preset": "angular",
-        "infile": "CHANGELOG.md"
-      },
-      "./scripts/version-bump.js": {
-        "indent": 2
-      }
-    }
   },
   "config": {
     "commitizen": {

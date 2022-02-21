@@ -5,6 +5,15 @@ __metadata:
   version: 5
   cacheKey: 8
 
+"@aidenlx/esbuild-plugin-obsidian@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "@aidenlx/esbuild-plugin-obsidian@npm:0.1.4"
+  peerDependencies:
+    esbuild: ^0.13.0
+  checksum: a1672506fd0d0dd6bce3e6061c11656945228f59542fd8d0c967492661af04b71e87a01c98220e62cb1d0d459018d4dcf5e1d6fc3ed443adbd28e5504e28b892
+  languageName: node
+  linkType: hard
+
 "@aidenlx/eslint-config@npm:^0.1.2":
   version: 0.1.2
   resolution: "@aidenlx/eslint-config@npm:0.1.2::__archiveUrl=https%3A%2F%2Fregistry.npmmirror.com%2F%40aidenlx%2Feslint-config%2F-%2Feslint-config-0.1.2.tgz"
@@ -23,12 +32,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aidenlx/obsidian-plugin-bumper@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "@aidenlx/obsidian-plugin-bumper@npm:0.1.3"
+  peerDependencies:
+    release-it: ^14.0.0
+  checksum: 857c6c8c941fb0885f310d7139d71e8d4fc92b362be957bf6aa8b6bef55805d671e89e6e4fc30b1d41da9cca1ec85ac2fc02e7ada30e6da80b3ff9507b5b0fac
+  languageName: node
+  linkType: hard
+
 "@aidenlx/prettier-config@npm:^0.1.0":
   version: 0.1.0
   resolution: "@aidenlx/prettier-config@npm:0.1.0"
   peerDependencies:
     prettier: ^2.5.1
   checksum: 8d01599791f76be7349c679f1b61e5302351a51b539388bad60126d8e142c02ae284f440bfb02b0f3e3d6659d8caab3e67d9276d6975322c81fdb0b9f7a62a45
+  languageName: node
+  linkType: hard
+
+"@aidenlx/release-it-config@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "@aidenlx/release-it-config@npm:0.1.3"
+  peerDependencies:
+    "@aidenlx/obsidian-plugin-bumper": ^0.1.3
+    release-it: ^14.0.0
+  checksum: f31e744bc76a00e5fbea557c45b4539cd374a381c6ceb15ba93c36cf90334774dad3038be27eaad02ce09d6da1452e6ca5d3c92128c08a2aa33c6b6eb3fd59dc
   languageName: node
   linkType: hard
 
@@ -5117,8 +5145,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "obsidian-zotero-plugin@workspace:."
   dependencies:
+    "@aidenlx/esbuild-plugin-obsidian": ^0.1.4
     "@aidenlx/eslint-config": ^0.1.2
+    "@aidenlx/obsidian-plugin-bumper": ^0.1.3
     "@aidenlx/prettier-config": ^0.1.0
+    "@aidenlx/release-it-config": ^0.1.3
     "@aidenlx/ts-config": ^0.1.2
     "@release-it/bumper": ^3.0.1
     "@release-it/conventional-changelog": ^4.1.0
