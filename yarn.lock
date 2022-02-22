@@ -2961,6 +2961,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-select-dialog@npm:^1.5.4":
+  version: 1.5.4
+  resolution: "file-select-dialog@npm:1.5.4"
+  checksum: 378448cbd4653fe27946692e1cf98f651f6c1ef8325a3a417fafc4520344305418dc9c58221ca7270c119b5216b898dc68d9386181d88ec1a408d73562ad850a
+  languageName: node
+  linkType: hard
+
 "file-uri-to-path@npm:1.0.0":
   version: 1.0.0
   resolution: "file-uri-to-path@npm:1.0.0"
@@ -5178,6 +5185,7 @@ __metadata:
     eslint-plugin-prefer-arrow: ^1.2.3
     eslint-plugin-prettier: ^4.0.0
     eslint-plugin-simple-import-sort: ^7.0.0
+    file-select-dialog: ^1.5.4
     filename-reserved-regex: ^3.0.0
     fuse.js: ^6.5.3
     gray-matter: ^4.0.3

@@ -52,6 +52,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "file-select-dialog": "^1.5.4",
     "filename-reserved-regex": "^3.0.0",
     "fuse.js": "^6.5.3",
     "gray-matter": "^4.0.3",

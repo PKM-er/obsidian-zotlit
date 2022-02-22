@@ -2,6 +2,7 @@ import "./main.less";
 
 import { Notice, Plugin, TFolder } from "obsidian";
 
+import { checkLib } from "./install-guide";
 import getZoteroLinkHandlers from "./link-handler";
 import NoteIndex from "./note-index/index";
 import { ZoteroSettingTab } from "./setting-tab";
@@ -16,6 +17,8 @@ import log from "./utils/logger";
 import ZoteroDb from "./zotero-db";
 
 export default class ZoteroPlugin extends Plugin {
+  /** check if better-sqlite exists */
+  check = (checkLib(), undefined);
   settings: ZoteroSettings = getDefaultSettings();
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
