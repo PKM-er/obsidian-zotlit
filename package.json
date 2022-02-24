@@ -23,7 +23,7 @@
     "@aidenlx/eslint-config": "^0.1.2",
     "@aidenlx/obsidian-plugin-bumper": "^0.1.3",
     "@aidenlx/prettier-config": "^0.1.0",
-    "@aidenlx/release-it-config": "^0.1.3",
+    "@aidenlx/release-it-config": "^0.1.7",
     "@aidenlx/ts-config": "^0.1.2",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^4.1.0",

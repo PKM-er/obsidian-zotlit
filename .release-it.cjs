@@ -1,1 +1,1 @@
-module.exports = require("@aidenlx/release-it-config").full;
+module.exports = require("@aidenlx/release-it-config").obOnly;

@@ -50,13 +50,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aidenlx/release-it-config@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "@aidenlx/release-it-config@npm:0.1.3"
+"@aidenlx/release-it-config@npm:^0.1.7":
+  version: 0.1.7
+  resolution: "@aidenlx/release-it-config@npm:0.1.7"
   peerDependencies:
     "@aidenlx/obsidian-plugin-bumper": ^0.1.3
     release-it: ^14.0.0
-  checksum: f31e744bc76a00e5fbea557c45b4539cd374a381c6ceb15ba93c36cf90334774dad3038be27eaad02ce09d6da1452e6ca5d3c92128c08a2aa33c6b6eb3fd59dc
+  checksum: a4cc8e357031e5c80039b62f04ebb0b7eb9b30a94a5e1f3bb89f5812ef4e684fa7e226155ab2ffa4452137f097a0a422db181d8323875e36361e81a2d139e6ad
   languageName: node
   linkType: hard
 
@@ -5156,7 +5156,7 @@ __metadata:
     "@aidenlx/eslint-config": ^0.1.2
     "@aidenlx/obsidian-plugin-bumper": ^0.1.3
     "@aidenlx/prettier-config": ^0.1.0
-    "@aidenlx/release-it-config": ^0.1.3
+    "@aidenlx/release-it-config": ^0.1.7
     "@aidenlx/ts-config": ^0.1.2
     "@release-it/bumper": ^3.0.1
     "@release-it/conventional-changelog": ^4.1.0
