@@ -8,7 +8,7 @@ import { join } from "path";
 
 import { getConfigDirFunc, libName } from "./const";
 
-const PLUGIN_ID = "obsidian-zotero-plugin";
+//#region check if compatible lib exists
 
 const { arch, platform } = process;
 
@@ -46,18 +46,20 @@ const showInstallGuide = () => {
     );
   }
 };
-export default showInstallGuide;
-
-export const checkLib = () => {
+const checkLib = () => {
   try {
     require(join(getConfigDirFunc(), libName));
   } catch (err) {
-    (err as NodeJS.ErrnoException).code === "MODULE_NOT_FOUND" &&
+    if ((err as NodeJS.ErrnoException)?.code === "MODULE_NOT_FOUND") {
       showInstallGuide();
+    }
     throw err;
   }
 };
+export default checkLib;
+//#endregion
 
+//#region Install Guide Modal
 import { el, mount, unmount } from "redom";
 declare global {
   namespace JSX {
@@ -103,6 +105,7 @@ const getGuideContent = ({
 declare global {
   const app: App & { openWithDefaultApp(path: string): void };
 }
+const PLUGIN_ID = "obsidian-zotero-plugin";
 
 class GoToDownloadModal extends Modal {
   selectBtn: HTMLButtonElement;
@@ -157,3 +160,4 @@ class GoToDownloadModal extends Modal {
     await this.app.plugins.enablePlugin(PLUGIN_ID);
   }
 }
+//#endregion

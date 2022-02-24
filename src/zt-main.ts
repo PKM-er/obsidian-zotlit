@@ -2,7 +2,7 @@ import "./main.less";
 
 import { Notice, Plugin, TFolder } from "obsidian";
 
-import { checkLib } from "./install-guide";
+import checkLib from "./install-guide";
 import getZoteroLinkHandlers from "./link-handler";
 import NoteIndex from "./note-index/index";
 import { ZoteroSettingTab } from "./setting-tab";
