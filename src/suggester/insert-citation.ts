@@ -89,5 +89,7 @@ const insertCitationTo = (
   range = range ?? { start: cursor, end: cursor };
   const citation = template.render(alt ? "altMdCite" : "mdCite", item);
   editor.replaceRange(citation, range.start, range.end);
-  editor.setCursor(editor.posToOffset(range.start) + citation.length);
+  editor.setCursor(
+    editor.offsetToPos(editor.posToOffset(range.start) + citation.length),
+  );
 };
