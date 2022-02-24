@@ -15,6 +15,7 @@ export interface ZoteroSettings {
   logLevel: LogLevelNumbers;
   citationLibrary: number;
   citationEditorSuggester: boolean;
+  showCitekeyInSuggester: boolean;
 }
 
 const DEFAULT_LOG_LEVEL = 4;
@@ -30,6 +31,7 @@ export const getDefaultSettings = (): ZoteroSettings => {
     logLevel: DEFAULT_LOG_LEVEL,
     citationLibrary: 1,
     citationEditorSuggester: true,
+    showCitekeyInSuggester: false,
   };
 };
 export type SettingKeyWithType<T> = {

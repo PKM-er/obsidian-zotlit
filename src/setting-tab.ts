@@ -26,6 +26,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
   display(): void {
     this.containerEl.empty();
     this.general();
+    this.suggester();
     this.templates();
     this.logLevel();
   }
@@ -34,14 +35,17 @@ export class ZoteroSettingTab extends PluginSettingTab {
 
     this.setDatabasePath("Zotero Database", "zoteroDbPath");
     this.setDatabasePath("BetterBibTex Database", "betterBibTexDbPath");
-    this.setEditorSuggest();
 
     this.setLiteratureNoteFolder();
     this.setCitationLibrary();
   }
-  setEditorSuggest() {
+  suggester(): void {
+    new Setting(this.containerEl).setHeading().setName("Suggester");
     this.addToggle(this.containerEl, "citationEditorSuggester").setName(
       "Citation Editor Suggester",
+    );
+    this.addToggle(this.containerEl, "showCitekeyInSuggester").setName(
+      "Show BibTex Citekey in Suggester",
     );
   }
   setLiteratureNoteFolder() {
