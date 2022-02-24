@@ -5196,6 +5196,7 @@ __metadata:
     obsidian: "github:obsidianmd/obsidian-api"
     prettier: ^2.5.1
     pretty-hrtime: ^1.0.3
+    redom: ^3.27.1
     release-it: ^14.12.3
     semver: ^7.3.5
     strip-outer: ^2.0.0
@@ -5830,6 +5831,13 @@ __metadata:
     indent-string: ^4.0.0
     strip-indent: ^3.0.0
   checksum: fa1ef20404a2d399235e83cc80bd55a956642e37dd197b4b612ba7327bf87fa32745aeb4a1634b2bab25467164ab4ed9c15be2c307923dd08b0fe7c52431ae6b
+  languageName: node
+  linkType: hard
+
+"redom@npm:^3.27.1":
+  version: 3.27.1
+  resolution: "redom@npm:3.27.1"
+  checksum: e1b01ad2711fd29f71b9824ee456ae581caa26fee26ae22ed6a88d24d215cbad95eba32791de422adeae903fc6fce2030e44ec25643c9fd7e00eadcc326e2619
   languageName: node
   linkType: hard
 

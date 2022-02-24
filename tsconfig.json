@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "target": "ES2018",
+    "jsx": "react"
   },
   "include": ["src/**/*.ts", "src/note-index", "src/utils/filenamify.js"],
 }

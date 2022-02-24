@@ -63,6 +63,7 @@
     "obsidian": "github:obsidianmd/obsidian-api",
     "prettier": "^2.5.1",
     "pretty-hrtime": "^1.0.3",
+    "redom": "^3.27.1",
     "release-it": "^14.12.3",
     "semver": "^7.3.5",
     "strip-outer": "^2.0.0",

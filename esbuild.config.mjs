@@ -6,7 +6,7 @@ import escape from "escape-string-regexp";
 import { promises } from "fs";
 
 import inlineWorker from "./scripts/inline-worker.mjs";
-import { getConfigDirExec, libName } from "./src/const.js";
+import { getConfigDirCode, libName } from "./src/const.js";
 const { readFile } = promises;
 
 const banner = `/*
@@ -18,7 +18,7 @@ const pathToInstallGuide = `${process.cwd()}/src/install-guide`;
 
 const getPatchedBindingCode = (showGuide) => `
 try {
-  var path = require("path").join(${getConfigDirExec},"${libName}"),
+  var path = require("path").join(${getConfigDirCode},"${libName}"),
     binding = require(path);
   binding.path = path;
   return binding;
@@ -85,7 +85,7 @@ try {
           plugins: [patchBindings(true)],
           format: "cjs",
         },
-        [[new RegExp(escape(getConfigDirExec), "g"), 0]],
+        [[new RegExp(escape(getConfigDirCode), "g"), 0]],
       ),
       obPlugin(),
       patchBindings(),
