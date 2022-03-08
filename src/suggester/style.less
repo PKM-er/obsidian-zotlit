@@ -37,7 +37,7 @@
   }
 }
 
-.parentheses {
+.parentheses() {
   &::before {
     content: "(";
   }
@@ -45,17 +45,17 @@
     content: ")";
   }
 }
-.dot-end {
+.dot-end() {
   &::after {
     content: ".";
   }
 }
-.space-between {
+.space-between() {
   & > :not(:last-child):after {
     content: " ";
   }
 }
-.commas-between {
+.commas-between() {
   & > :not(:last-child):after {
     content: ", ";
   }
