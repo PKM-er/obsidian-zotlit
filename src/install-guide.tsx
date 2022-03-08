@@ -10,8 +10,10 @@ import { getConfigDirFunc, libName } from "./const";
 
 //#region check if compatible lib exists
 
-const { arch, platform } = process;
+const { arch, platform, versions } = process,
+  electronVersion = versions.electron?.split(".")[0];
 
+const electronSupported = ["13", "16"];
 const PlatformSupported = [
   ["darwin", "arm64"],
   ["darwin", "x64"],
@@ -20,8 +22,14 @@ const PlatformSupported = [
   ["win32", "ia32"],
 ] as [platform: string, arch: string][];
 const showInstallGuide = () => {
-  // if platform is supported
+  if (!electronVersion || !electronSupported.includes(electronVersion)) {
+    new Notice(
+      `The electron (${versions.electron}) in current version of obsidian is not supported by obsidian-zotero-plugin,` +
+        ` please reinstall using latest obsidian installer from official website`,
+    );
+  }
   if (PlatformSupported.some(([p, a]) => arch === a && platform === p)) {
+    // if platform is supported
     const LibPath = join(getConfigDirFunc(), libName);
     try {
       if (!statSync(LibPath).isFile()) {
@@ -79,7 +87,7 @@ const getGuideContent = ({
   selectBtn: HTMLButtonElement;
   reloadBtn: HTMLButtonElement;
 }): HTMLElement => {
-  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}.zip?raw=true`,
+  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${electronVersion}-${platform}-${arch}.zip?raw=true`,
     moduleFilename = <code>{libName}</code>;
   return (
     <div>
