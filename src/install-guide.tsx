@@ -13,7 +13,7 @@ import { getConfigDirFunc, libName } from "./const";
 const { arch, platform, versions } = process,
   electronVersion = versions.electron?.split(".")[0];
 
-const electronSupported = ["13", "16"];
+const electronSupported = ["13", "16", "17"];
 const PlatformSupported = [
   ["darwin", "arm64"],
   ["darwin", "x64"],
