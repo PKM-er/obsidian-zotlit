@@ -15,12 +15,21 @@ const { arch, platform, versions } = process,
 
 const electronSupported = ["13", "16", "17"];
 const PlatformSupported = [
-  ["darwin", "arm64"],
-  ["darwin", "x64"],
-  ["linux", "x64"],
-  ["win32", "x64"],
-  ["win32", "ia32"],
-] as [platform: string, arch: string][];
+  ["darwin", "arm64", "13"],
+  ["darwin", "x64", "13"],
+  ["linux", "x64", "13"],
+  ["win32", "x64", "13"],
+  ["win32", "ia32", "13"],
+  ["darwin", "arm64", "16"],
+  ["darwin", "x64", "16"],
+  ["linux", "x64", "16"],
+  ["win32", "x64", "16"],
+  ["win32", "ia32", "16"],
+  ["darwin", "arm64", "17"],
+  ["darwin", "x64", "17"],
+  ["win32", "x64", "17"],
+  ["win32", "ia32", "17"],
+] as [platform: string, arch: string, version: string][];
 const showInstallGuide = () => {
   if (!electronVersion || !electronSupported.includes(electronVersion)) {
     new Notice(
@@ -28,7 +37,11 @@ const showInstallGuide = () => {
         ` please reinstall using latest obsidian installer from official website`,
     );
   }
-  if (PlatformSupported.some(([p, a]) => arch === a && platform === p)) {
+  if (
+    PlatformSupported.some(
+      ([p, a, v]) => arch === a && platform === p && electronVersion === v,
+    )
+  ) {
     // if platform is supported
     const LibPath = join(getConfigDirFunc(), libName);
     try {
