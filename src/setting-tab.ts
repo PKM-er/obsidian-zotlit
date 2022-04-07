@@ -1,5 +1,5 @@
+import { dialog } from "@electron/remote";
 import assertNever from "assert-never";
-import { promises as fs } from "fs";
 import { LogLevelNumbers } from "loglevel";
 import {
   debounce,
@@ -9,7 +9,6 @@ import {
   Setting,
   TextAreaComponent,
 } from "obsidian";
-import path from "path";
 
 import type { SettingKeyWithType } from "./settings";
 import { promptOpenLog } from "./utils";
@@ -66,33 +65,30 @@ export class ZoteroSettingTab extends PluginSettingTab {
     ).setName("Literature Note Folder");
   }
   setDatabasePath(name: string, key: "zoteroDbPath" | "betterBibTexDbPath") {
-    const setter = async (value: string) => {
-      const newPath = value;
-      if (newPath === this.plugin.settings[key]) {
-        new Notice("Zotero database path not changed");
-      } else
-        try {
-          const stats = await fs.stat(newPath);
-          if (!stats.isFile()) {
-            new Notice("Exception: Given path must be a file.");
-          } else if (path.extname(newPath) !== ".sqlite") {
-            new Notice("Exception: Given path must be a .sqlite database.");
-          } else {
-            this.plugin.settings[key] = newPath;
+    let pathEl: HTMLDivElement | null = null;
+    new Setting(this.containerEl)
+      .setName(name)
+      .then((setting) => {
+        pathEl = setting.controlEl.createDiv({
+          text: this.plugin.settings[key],
+        });
+      })
+      .addButton((btn) =>
+        btn.setButtonText("select").onClick(async () => {
+          const { filePaths } = await dialog.showOpenDialog({
+            defaultPath: this.plugin.settings[key],
+            filters: [{ name: "database", extensions: ["sqlite"] }],
+            properties: ["openFile"],
+          });
+          if (filePaths[0]) {
+            this.plugin.settings[key] = filePaths[0];
             await this.plugin.saveSettings();
             await this.plugin.db.refreshIndex();
+            pathEl?.setText(filePaths[0]);
             new Notice("Zotero database path updated.");
           }
-        } catch (error) {
-          new Notice((error as NodeJS.ErrnoException).toString());
-        }
-    };
-    this.addTextComfirm(
-      this.containerEl,
-      () => this.plugin.settings[key],
-      setter,
-      { cols: 30 },
-    ).setName(name);
+        }),
+      );
   }
   setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;

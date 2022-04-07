@@ -3,7 +3,14 @@
   "rules": {
     "import/no-unresolved": [
       2,
-      { "ignore": ["web-worker:", "worker-thread:", "\\.less$"] }
+      {
+        "ignore": [
+          "web-worker:",
+          "worker-thread:",
+          "\\.less$",
+          "@electron/remote"
+        ]
+      }
     ]
   }
 }

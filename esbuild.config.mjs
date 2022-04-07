@@ -58,7 +58,7 @@ const opts = {
   bundle: true,
   watch: !isProd,
   platform: "browser",
-  external: ["obsidian", "electron", ...builtins],
+  external: ["obsidian", "electron", "@electron/remote", ...builtins],
   format: "cjs",
   mainFields: ["browser", "module", "main"],
   sourcemap: isProd ? false : "inline",
