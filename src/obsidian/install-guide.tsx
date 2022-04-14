@@ -6,7 +6,7 @@ import type { App } from "obsidian";
 import { Modal, Notice } from "obsidian";
 import { join } from "path";
 
-import { getConfigDirFunc, libName } from "./const";
+import { getConfigDirFunc, libName } from "../const";
 
 //#region check if compatible lib exists
 

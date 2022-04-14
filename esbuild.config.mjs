@@ -73,7 +73,7 @@ const opts = {
 try {
   await build({
     ...opts,
-    entryPoints: ["src/zt-main.ts"],
+    entryPoints: ["src/obsidian/zt-main.ts"],
     banner: { js: banner },
     outfile: "build/main.js",
     plugins: [
