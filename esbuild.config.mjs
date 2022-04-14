@@ -65,17 +65,26 @@ const opts = {
   },
 };
 try {
-  await build({
+  const main = await build({
     ...opts,
     entryPoints: ["src/obsidian/zt-main.ts"],
     banner: { js: banner },
     outfile: "build/main.js",
     tsconfig: "src/obsidian/tsconfig.json",
+    incremental: true,
     plugins: [
       lessLoader(),
       inlineWorker(
         {
           ...opts,
+          watch: !isProd
+            ? {
+                onRebuild: (error) => {
+                  if (error) console.error("watch build failed:", error);
+                  else main.rebuild();
+                },
+              }
+            : false,
           tsconfig: "src/db-worker/tsconfig.json",
           external: [...builtins],
           plugins: [patchBindings(true)],
