@@ -10,7 +10,10 @@ type MsgSentWithData = {
 
 interface MsgInvoked {
   // open new database, return true if successful
-  openDb: [[mainDbPath: string, bbtDbPath: string], [result: boolean]];
+  openDb: [
+    [mainDbPath: string, bbtDbPath: string | null],
+    [mainDbResult: boolean, bbtDbResult: boolean],
+  ];
   // start index for library, need to be called before query and after openDb
   initIndex: [[libraryID: number, refresh?: boolean], []];
   query: [

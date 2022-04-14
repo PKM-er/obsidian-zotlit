@@ -9,6 +9,7 @@ import prettyHrtime from "pretty-hrtime";
 import dbWorker from "web-worker:../../db-worker";
 
 import type ZoteroPlugin from "../zt-main";
+import NoticeBBTStatus from "./notice-bbt";
 
 export default class ZoteroDb {
   // itemMap: Record<string, RegularItem> = {};
@@ -40,7 +41,13 @@ export default class ZoteroDb {
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
-    if (await this.openDatabase()) {
+    const [mainOpened, bbtOpened] = await this.openDatabase();
+    if (this.bbtDbPath && !bbtOpened) {
+      log.warn("Better BibTex database not found");
+      new NoticeBBTStatus(this.plugin);
+      return;
+    }
+    if (mainOpened) {
       await this.initIndex(this.defaultLibId);
       await this.getLibs();
     } else {
@@ -58,9 +65,11 @@ export default class ZoteroDb {
   }
 
   private async openDatabase() {
-    return (
-      await this.emitter.invoke("cb:openDb", this.mainDbPath, this.bbtDbPath)
-    )[0];
+    return await this.emitter.invoke(
+      "cb:openDb",
+      this.mainDbPath,
+      this.bbtDbPath,
+    );
   }
   private async initIndex(lib: number, refresh = false) {
     await this.emitter.invoke("cb:initIndex", lib, refresh);

@@ -11,7 +11,7 @@ import { registerInitIndex } from "./modules/init-index/index";
 import { registerQuery } from "./modules/query";
 declare global {
   var Comms: EventEmitter<MsgFromObsidian, MsgFromDbWorker>;
-  var Databases: { main: Database; bbt: Database };
+  var Databases: { main: Database; bbt: Database | null };
   var Index: Record<number, Fuse<RegularItem>>;
 }
 
@@ -20,13 +20,17 @@ Databases = { main: new Database(), bbt: new Database() };
 Index = {};
 
 /**
- * @returns true if error occurred
+ * @returns true if opened successfully
  */
 const logError = (
   name: "main" | "bbt",
-  path: string,
-  result: PromiseSettledResult<boolean>,
-) => {
+  path: string | null,
+  result: PromiseSettledResult<boolean | undefined> | undefined,
+): boolean => {
+  if (!result || !path) return false;
+  if (result.status === "fulfilled" && result.value === true) {
+    return true;
+  }
   if (result.status === "rejected" || result.value === false) {
     log.error(
       `Failed to open ${name} database`,
@@ -34,18 +38,22 @@ const logError = (
         ? result.reason
         : "no database found at " + path,
     );
-    return true;
   }
   return false;
 };
 
 Comms.handle("cb:openDb", async (mainDb, bbtDb) => {
-  const [main, bbt] = await Promise.allSettled([
+  const tasks: [main: Promise<boolean>, bbt?: Promise<boolean>] = [
     Databases.main.openDatabase(mainDb),
-    Databases.bbt.openDatabase(bbtDb),
-  ]);
-  logError("bbt", bbtDb, bbt);
-  return [[!logError("main", mainDb, main)]];
+  ];
+  if (bbtDb) {
+    if (!Databases.bbt) Databases.bbt = new Database();
+    tasks[1] = Databases.bbt.openDatabase(bbtDb);
+  } else {
+    Databases.bbt = null;
+  }
+  const [main, bbt] = await Promise.allSettled(tasks);
+  return [[logError("main", mainDb, main), logError("bbt", bbtDb, bbt)]];
 });
 registerInitIndex();
 registerGetLibs();

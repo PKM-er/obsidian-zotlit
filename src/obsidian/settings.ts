@@ -9,7 +9,7 @@ import ZoteroPlugin from "./zt-main";
 
 export interface ZoteroSettings {
   zoteroDbPath: string;
-  betterBibTexDbPath: string;
+  betterBibTexDbPath: string | null;
   literatureNoteFolder: InVaultPath;
   literatureNoteTemplate: NoteTemplate;
   logLevel: LogLevelNumbers;
@@ -20,7 +20,10 @@ export interface ZoteroSettings {
 
 const DEFAULT_LOG_LEVEL = 4;
 
-export const getDefaultSettings = (): ZoteroSettings => {
+export const getDefaultSettings = (): Omit<
+  ZoteroSettings,
+  "betterBibTexDbPath"
+> & { betterBibTexDbPath: string } => {
   log.setDefaultLevel(DEFAULT_LOG_LEVEL);
   const defaultRoot = path.join(homedir(), "Zotero");
   return {

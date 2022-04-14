@@ -11,7 +11,7 @@ import {
   TextAreaComponent,
 } from "obsidian";
 
-import type { SettingKeyWithType } from "./settings";
+import { getDefaultSettings, SettingKeyWithType } from "./settings";
 import { promptOpenLog } from "./utils";
 import ZoteroPlugin from "./zt-main";
 
@@ -70,13 +70,13 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .setName(name)
       .then((setting) => {
         pathEl = setting.controlEl.createDiv({
-          text: this.plugin.settings[key],
+          text: this.plugin.settings[key] ?? "Disabled",
         });
       })
       .addButton((btn) =>
         btn.setButtonText("select").onClick(async () => {
           const { filePaths } = await dialog.showOpenDialog({
-            defaultPath: this.plugin.settings[key],
+            defaultPath: this.plugin.settings[key] ?? getDefaultSettings()[key],
             filters: [{ name: "database", extensions: ["sqlite"] }],
             properties: ["openFile"],
           });

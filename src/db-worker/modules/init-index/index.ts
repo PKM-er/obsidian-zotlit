@@ -20,7 +20,7 @@ export const registerInitIndex = () => {
     if (refresh) {
       await Promise.all([
         Databases.main.refreshDatabase(),
-        Databases.bbt.refreshDatabase(),
+        Databases.bbt?.refreshDatabase(),
       ]);
     }
 
@@ -80,13 +80,15 @@ const readMainDb = (libraryID: number) => {
 };
 const readBbtDb = () => {
   log.info("Reading Better BibTex database");
+  if (!Databases.bbt) {
+    log.info("Better BibTex database not enabled, skipping...");
+    return [];
+  }
   const db = Databases.bbt.db;
   if (!db) {
-    log.info("no Better BibTex database opened, using empty array");
-    return [];
-  } else {
-    const result = db.prepare(betterBibTexSql).all();
-    log.info("Reading Better BibTex done");
-    return result;
+    throw new Error("failed to init index: no Better BibTex database opened");
   }
+  const result = db.prepare(betterBibTexSql).all();
+  log.info("Reading Better BibTex done");
+  return result;
 };
