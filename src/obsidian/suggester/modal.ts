@@ -1,8 +1,8 @@
 import "./style.less";
 
+import { RegularItem } from "@zt-types";
 import { debounce, Editor, SuggestModal } from "obsidian";
 
-import { RegularItem } from "@zt-types";
 import ZoteroPlugin from "../zt-main";
 import {
   CLASS_ID,

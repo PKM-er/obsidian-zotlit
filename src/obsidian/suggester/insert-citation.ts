@@ -1,9 +1,9 @@
 import "./style.less";
 
+import { RegularItem } from "@zt-types";
 import { Editor, EditorPosition, EditorSuggestTriggerInfo } from "obsidian";
 
 import NoteTemplate from "../note-template";
-import { RegularItem } from "@zt-types";
 import ZoteroPlugin from "../zt-main";
 import { FuzzyMatch, isAlternative } from "./core";
 import ZoteroItemSuggester from "./editor-suggest";

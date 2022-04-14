@@ -1,9 +1,9 @@
+import type { RegularItem } from "@zt-types";
 import assertNever from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index";
-import type { RegularItem } from "@zt-types";
 import {
   DEFAULT_FRONTMATTER_FIELD,
   DEFAULT_TEMPLATE,

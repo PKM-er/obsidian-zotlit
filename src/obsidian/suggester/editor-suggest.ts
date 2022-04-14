@@ -1,5 +1,6 @@
 import "./style.less";
 
+import { RegularItem } from "@zt-types";
 import {
   Editor,
   EditorPosition,
@@ -8,7 +9,6 @@ import {
   EditorSuggestTriggerInfo,
 } from "obsidian";
 
-import { RegularItem } from "@zt-types";
 import ZoteroPlugin from "../zt-main";
 import {
   CLASS_ID,

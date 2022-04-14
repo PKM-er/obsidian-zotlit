@@ -1,13 +1,13 @@
 import "./style.less";
 
-import type Fuse from "fuse.js";
-
 import {
   Creator,
   isFullName,
   JournalArticleItem,
   RegularItem,
 } from "@zt-types";
+import type Fuse from "fuse.js";
+
 import type ZoteroPlugin from "../zt-main";
 import UnionRanges from "./union";
 

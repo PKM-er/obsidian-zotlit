@@ -1,7 +1,7 @@
+import log from "@log";
 import { Notice, TFile } from "obsidian";
 
 import { promptOpenLog } from "../utils";
-import log from "@log";
 import ZoteroPlugin from "../zt-main";
 import createNote, { NoteExistsError } from "./create-note";
 import { SendData_InfoExport } from "./index";

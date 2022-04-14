@@ -1,4 +1,5 @@
 import { dialog } from "@electron/remote";
+import log from "@log";
 import assertNever from "assert-never";
 import { LogLevelNumbers } from "loglevel";
 import {
@@ -12,7 +13,6 @@ import {
 
 import type { SettingKeyWithType } from "./settings";
 import { promptOpenLog } from "./utils";
-import log from "@log";
 import ZoteroPlugin from "./zt-main";
 
 type TextAreaSize = Partial<Record<"cols" | "rows", number>>;
