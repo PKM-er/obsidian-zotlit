@@ -12,7 +12,7 @@ import {
 
 import type { SettingKeyWithType } from "./settings";
 import { promptOpenLog } from "./utils";
-import log from "./utils/logger";
+import log from "@log";
 import ZoteroPlugin from "./zt-main";
 
 type TextAreaSize = Partial<Record<"cols" | "rows", number>>;

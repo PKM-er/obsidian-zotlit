@@ -4,7 +4,7 @@ import { homedir } from "os";
 import path from "path";
 
 import NoteTemplate from "./note-template";
-import log from "./utils/logger";
+import log from "@log";
 import ZoteroPlugin from "./zt-main";
 
 export interface ZoteroSettings {

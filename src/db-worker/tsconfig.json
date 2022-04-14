@@ -1,18 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@log": ["../logger"],
       "@zt-types/*": ["../zotero-types/*"],
       "@zt-types": ["../zotero-types"],
       "@utils/*": ["../utils/*"],
       "@utils": ["../utils"],
+      "@db-worker": ["../db-worker"],
       "@ipc/*": ["../ipc/*"]
     },
-    "lib": ["dom", "ES2018"],
-    "baseUrl": ".",
-    "outDir": "./dist/",
-    "jsx": "react"
+    "lib": ["WebWorker", "es2018"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "../db-worker/sql.d.ts"]
+  "include": ["**/*.ts"]
 }

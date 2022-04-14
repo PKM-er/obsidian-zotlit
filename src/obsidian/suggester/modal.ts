@@ -2,7 +2,7 @@ import "./style.less";
 
 import { debounce, Editor, SuggestModal } from "obsidian";
 
-import { RegularItem } from "../zotero-types";
+import { RegularItem } from "@zt-types";
 import ZoteroPlugin from "../zt-main";
 import {
   CLASS_ID,

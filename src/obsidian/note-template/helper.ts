@@ -3,8 +3,8 @@ import type { HelperDeclareSpec, HelperOptions } from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index";
 import filenamify from "../utils/filenamify";
-import type { AnnotationItem, Item, RegularItem } from "../zotero-types";
-import { NonRegularItemTypes } from "../zotero-types";
+import type { AnnotationItem, Item, RegularItem } from "@zt-types";
+import { NonRegularItemTypes } from "@zt-types";
 
 const isRegularItem = (item: any): item is RegularItem =>
   !NonRegularItemTypes.includes((item as Item).itemType as any) &&

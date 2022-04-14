@@ -1,7 +1,7 @@
 import dedent from "dedent";
 import type { TemplateDelegate } from "handlebars";
 
-import type { AnnotationItem, ItemField, RegularItem } from "../zotero-types";
+import type { AnnotationItem, ItemField, RegularItem } from "@zt-types";
 
 //#region type defs
 

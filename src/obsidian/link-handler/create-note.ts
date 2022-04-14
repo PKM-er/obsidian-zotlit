@@ -1,11 +1,11 @@
+import { RegularItem } from "@zt-types";
+import { AnnotationItem } from "@zt-types";
 import { BaseError } from "make-error";
 import { TFile } from "obsidian";
 import { posix as path } from "path";
 
 import { getItemKeyGroupID } from "../note-index/index";
 import { ItemWithAnnos, ZOTERO_KEY_FIELDNAME } from "../note-template/const";
-import { RegularItem } from "../zotero-types";
-import { AnnotationItem } from "../zotero-types";
 import ZoteroPlugin from "../zt-main";
 
 export class NoteExistsError extends BaseError {

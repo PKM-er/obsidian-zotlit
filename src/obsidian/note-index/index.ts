@@ -1,3 +1,5 @@
+import log from "@log";
+import { getItemKeyGroupID } from "@utils";
 import {
   CachedMetadata,
   Events,
@@ -8,10 +10,8 @@ import {
   Vault,
 } from "obsidian";
 
-import log from "../utils/logger";
 // import { PromiseWorker } from "../utils";
 import ZoteroPlugin from "../zt-main";
-import { getItemKeyGroupID } from "./utils";
 // import type { Input, Output } from "./build-filemap.worker";
 // import buildFilemap from "./build-filemap.worker.ts";
 import { FileMapInfo, getZoteroKeyFileMap } from "./utils";

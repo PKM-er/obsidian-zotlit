@@ -1,5 +1,6 @@
 import "./main.less";
 
+import log from "@log";
 import { Notice, Plugin, TFolder } from "obsidian";
 
 import checkLib from "./install-guide";
@@ -13,7 +14,6 @@ import {
   ZoteroSettings,
 } from "./settings";
 import { CitationSuggester, insertCitation } from "./suggester";
-import log from "./utils/logger";
 import ZoteroDb from "./zotero-db";
 
 export default class ZoteroPlugin extends Plugin {

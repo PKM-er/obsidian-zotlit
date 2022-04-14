@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env BUILD=dev node esbuild.config.mjs",
     "build": "cross-env BUILD=production node esbuild.config.mjs",
-    "check": "tsc --noEmit",
+    "check": "tsc -p src/obsidian/tsconfig.json --noEmit",
     "prettier": "prettier --write 'src/**/*.+(ts|tsx|json|html|css)'",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "release": "release-it"

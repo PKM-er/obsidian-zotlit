@@ -8,7 +8,11 @@
           "web-worker:",
           "worker-thread:",
           "\\.less$",
-          "@electron/remote"
+          "@electron/remote",
+          "@log",
+          "@utils",
+          "@zt-types",
+          "@ipc"
         ]
       }
     ]

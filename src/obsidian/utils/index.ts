@@ -6,8 +6,6 @@ Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
   Platform.isMacOS ? "⌥ Option" : "Shift"
 } + I, then go to the "Console" tab to see the log.`;
 
-export * from "./zotero-date";
-
 export const checkNodeInWorker = () => {
   const url = URL.createObjectURL(
     new Blob(['self.postMessage("require" in self); self.close()'], {

@@ -7,7 +7,7 @@ import {
   isFullName,
   JournalArticleItem,
   RegularItem,
-} from "../zotero-types";
+} from "@zt-types";
 import type ZoteroPlugin from "../zt-main";
 import UnionRanges from "./union";
 

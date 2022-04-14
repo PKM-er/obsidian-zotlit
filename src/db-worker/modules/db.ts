@@ -1,26 +1,33 @@
+import log from "@log";
 import assertNever from "assert-never";
 import type { Database as DBType, SqliteError } from "better-sqlite3";
 import db from "better-sqlite3";
 import { constants as fsConst, promises as fs } from "fs";
 import path from "path";
 
-import log from "../utils/logger";
+const enum DbMode {
+  /** reading from database directly */
+  source,
+  /** reading from a copy of the source database */
+  copy,
+}
 
 export default class Database {
   constructor(private dbPath: string) {}
 
-  mode: "main" | "temp" = "main";
+  /**
+   * source: reading directly from database;
+   * copy: reading from a copy of the source database to prevent locking issue
+   */
+  mode: DbMode = DbMode.source;
   private dbInstance: DBType | null = null;
   version: number = -1;
 
-  get srcDbPath(): string {
-    return this.dbPath;
-  }
-  async getTempDbPath() {
-    const srcDbMtime = (await fs.stat(this.srcDbPath)).mtimeMs;
+  async getDbCopyPath() {
+    const mtime = (await fs.stat(this.dbPath)).mtimeMs;
     return {
-      path: `${this.srcDbPath}.${srcDbMtime}.temp`,
-      time: srcDbMtime,
+      path: `${this.dbPath}.${mtime}.temp`,
+      time: mtime,
     };
   }
 
@@ -28,41 +35,34 @@ export default class Database {
     if (this.dbInstance && this.mode === mode && this.dbInstance.open) {
       return this;
     } else if (this.dbInstance?.open) this.dbInstance.close();
-    let { path, time } = await this.getTempDbPath();
-    switch (mode) {
-      case "main":
-        path = this.srcDbPath;
-        break;
-      case "temp":
-        break;
-      default:
-        assertNever(mode);
+    let { path, time } = await this.getDbCopyPath();
+    if (mode === DbMode.source) {
+      path = this.dbPath;
     }
-    const database = new db(path, {
+    this.mode = mode;
+    this.dbInstance = new db(path, {
       readonly: true,
       timeout: 1e3,
     });
-    this.mode = mode;
-    this.dbInstance = database;
     this.version = time;
     return this;
   }
 
   /**
-   * try to keep temp databse up to date with main database
-   * create new copy and remove out-of-date temp database
+   * try to keep databse copy up to date with main database
+   * create new copy and remove out-of-date copies
    * @returns true if temp database was updated
    */
-  async tryUpdateTempDb(): Promise<boolean> {
-    const { path: newTempDbPath } = await this.getTempDbPath();
+  async tryUpdateDbCopy(): Promise<boolean> {
+    const { path: newCopy } = await this.getDbCopyPath();
     try {
-      await fs.copyFile(this.srcDbPath, newTempDbPath, fsConst.COPYFILE_EXCL);
-      const dir = path.dirname(this.srcDbPath);
+      await fs.copyFile(this.dbPath, newCopy, fsConst.COPYFILE_EXCL);
+      const dir = path.dirname(this.dbPath);
       for (const relatviePath of await fs.readdir(dir)) {
         const file = path.join(dir, relatviePath);
         if (
-          file !== newTempDbPath &&
-          file.startsWith(this.srcDbPath) &&
+          file !== newCopy &&
+          file.startsWith(this.dbPath) &&
           file.endsWith(".temp")
         ) {
           fs.rm(file, { force: true });
@@ -86,7 +86,7 @@ export default class Database {
           throw new Error("No database currently opened: " + this.dbPath);
         return readAction(this.dbInstance);
       },
-      tempDbBusy = `Temp database is busy: ${this.getTempDbPath()}`;
+      tempDbBusy = `Temp database is busy: ${this.getDbCopyPath()}`;
 
     let count = 0;
 
@@ -97,14 +97,14 @@ export default class Database {
         if (!((err as InstanceType<SqliteError>).code === "SQLITE_BUSY")) {
           throw err;
         }
-        if (this.mode === "main") {
+        if (this.mode === DbMode.source) {
           log.info(
             `Seems like ${this.dbPath} database is occupied, trying to switch to temp database...`,
           );
           // create a copy of the main database and open it
-          await this.tryUpdateTempDb();
-          await this.open("temp");
-        } else if (this.mode === "temp") {
+          await this.tryUpdateDbCopy();
+          await this.open(DbMode.copy);
+        } else if (this.mode === DbMode.copy) {
           throw new Error(tempDbBusy);
         } else {
           assertNever(this.mode);
@@ -121,13 +121,13 @@ export default class Database {
   /** check if zotero is running and its database is busy
    * and update mode accordingly */
   async refresh() {
-    (await this.open("main")).read((db) =>
+    (await this.open(DbMode.source)).read((db) =>
       db.prepare("SELECT groupID FROM groups"),
     );
   }
 
   close() {
-    if (this.dbInstance) this.dbInstance.close();
+    this.dbInstance?.close();
     this.dbInstance = null;
     this.version = -1;
   }
