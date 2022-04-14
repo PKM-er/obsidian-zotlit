@@ -39,7 +39,7 @@ export default class ZoteroPlugin extends Plugin {
       id: "refresh-zotero-index",
       name: "Refresh Zotero Index",
       callback: async () => {
-        await this.db.refreshIndex(true);
+        await this.db.refreshIndex();
         new Notice("Zotero index is now up-to-date");
       },
     });

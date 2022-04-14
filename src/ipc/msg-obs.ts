@@ -9,8 +9,10 @@ type MsgSentWithData = {
 // type MsgSent = "dosomthing";
 
 interface MsgInvoked {
-  initDb: [[mainDbPath: string, bbtDbPath: string], [result: boolean]];
-  initIndex: [[libraryID: number], [itemMap: Record<string, RegularItem>]];
+  // open new database, return true if successful
+  openDb: [[mainDbPath: string, bbtDbPath: string], [result: boolean]];
+  // start index for library, need to be called before query and after openDb
+  initIndex: [[libraryID: number, refresh?: boolean], []];
   query: [
     [
       libraryID: number,
@@ -19,6 +21,7 @@ interface MsgInvoked {
     ],
     [result: Fuse.FuseResult<RegularItem>[]],
   ];
+  // need to be called after openDb
   getLibs: [[], [libs: { libraryID: number; name: string }[]]];
 }
 

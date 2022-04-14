@@ -16,26 +16,16 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
 };
 
 export const registerInitIndex = () => {
-  Comms.handle("cb:initIndex", async (libraryID) => {
-    if (!Databases.main || !Databases.bbt) {
-      return "failed to init index: database not initialized";
+  Comms.handle("cb:initIndex", async (libraryID, refresh = false) => {
+    if (refresh) {
+      await Promise.all([
+        Databases.main.refreshDatabase(),
+        Databases.bbt.refreshDatabase(),
+      ]);
     }
-    const [main, bbt] = await Promise.allSettled([
-      readMainDb(libraryID),
-      readBbtDb(),
-    ]);
-    if (main.status !== "fulfilled") {
-      log.error(main.reason);
-      return main.reason;
-    }
-    const { general, creators } = main.value;
-    let citekeyMap: any[];
-    if (bbt.status === "fulfilled") {
-      citekeyMap = bbt.value.citekeyMap;
-    } else {
-      citekeyMap = [];
-      log.warn("failed to get better bibtex data: ", bbt.reason);
-    }
+
+    const { general, creators } = readMainDb(libraryID);
+    const citekeyMap = readBbtDb();
 
     // prepare for fuse index
     let entries = {} as any;
@@ -65,44 +55,38 @@ export const registerInitIndex = () => {
     Index[libraryID] = new Fuse(items, fuseOptions);
     log.info("fuse initialized");
 
-    const itemMap = items.reduce(
-      (record, item) => ((record[getItemKeyGroupID(item)] = item), record),
-      {} as Record<string, RegularItem>,
-    );
-    return [[itemMap]];
+    return [[]];
+
+    // const itemMap = items.reduce(
+    //   (record, item) => ((record[getItemKeyGroupID(item)] = item), record),
+    //   {} as Record<string, RegularItem>,
+    // );
+    // return [[itemMap]];
   });
 };
 
-const readMainDb = async (libraryID: number) => {
+const readMainDb = (libraryID: number) => {
   log.info("Reading main Zotero database for index");
-
-  if (!Databases.main) {
-    throw new Error("no main database inited");
+  const db = Databases.main.db;
+  if (!db) {
+    throw new Error("failed to init index: no main database opened");
   }
-  await Databases.main.open();
   const result = {
-    general: await Databases.main.read((db) =>
-      db.prepare(generalSql).all(libraryID),
-    ),
-    creators: await Databases.main.read((db) =>
-      db.prepare(creatorsSql).all(libraryID),
-    ),
+    general: db.prepare(generalSql).all(libraryID),
+    creators: db.prepare(creatorsSql).all(libraryID),
   };
   log.info("Reading main Zotero database for index done");
   return result;
 };
-const readBbtDb = async () => {
+const readBbtDb = () => {
   log.info("Reading Better BibTex database");
-  if (!Databases.bbt) {
-    throw new Error("no Better BibTex database inited");
+  const db = Databases.bbt.db;
+  if (!db) {
+    log.info("no Better BibTex database opened, using empty array");
+    return [];
+  } else {
+    const result = db.prepare(betterBibTexSql).all();
+    log.info("Reading Better BibTex done");
+    return result;
   }
-  await Databases.bbt.open();
-  const result = {
-    citekeyMap: await Databases.bbt.read((db) =>
-      db.prepare(betterBibTexSql).all(),
-    ),
-    mode: Databases.bbt.mode,
-  };
-  log.info("Reading Better BibTex done");
-  return result;
 };

@@ -83,7 +83,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           if (filePaths[0]) {
             this.plugin.settings[key] = filePaths[0];
             await this.plugin.saveSettings();
-            await this.plugin.db.refreshIndex();
+            await this.plugin.db.init();
             pathEl?.setText(filePaths[0]);
             new Notice("Zotero database path updated.");
           }

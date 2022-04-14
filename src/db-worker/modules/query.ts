@@ -6,9 +6,7 @@ export const registerQuery = () => {
   Comms.handle("cb:query", async (libId, pattern, options) => {
     const fuse = Index[libId];
     if (!fuse) {
-      const error = "Query before init";
-      log.error(error);
-      return error;
+      throw new Error("Query before init");
     }
     let result: Fuse.FuseResult<RegularItem>[];
     if (pattern === null) {

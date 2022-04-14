@@ -11,7 +11,7 @@ import dbWorker from "web-worker:../../db-worker";
 import type ZoteroPlugin from "../zt-main";
 
 export default class ZoteroDb {
-  itemMap: Record<string, RegularItem> = {};
+  // itemMap: Record<string, RegularItem> = {};
 
   private emitter = new EventEmitter<MsgFromDbWorker, MsgFromObsidian>(
     dbWorker("Zotero Database Worker", this.ConfigPath),
@@ -37,10 +37,11 @@ export default class ZoteroDb {
     return this.plugin.settings.betterBibTexDbPath;
   }
 
+  /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
-    if (await this.initDb()) {
-      await this.initIndex();
+    if (await this.openDatabase()) {
+      await this.initIndex(this.defaultLibId);
       await this.getLibs();
     } else {
       log.error("Failed to init ZoteroDB");
@@ -52,19 +53,17 @@ export default class ZoteroDb {
       )}`,
     );
   }
+  public refreshIndex() {
+    return this.initIndex(this.defaultLibId, true);
+  }
 
-  public async initDb() {
+  private async openDatabase() {
     return (
-      await this.emitter.invoke("cb:initDb", this.mainDbPath, this.bbtDbPath)
+      await this.emitter.invoke("cb:openDb", this.mainDbPath, this.bbtDbPath)
     )[0];
   }
-  public async refreshIndex(force?: boolean) {
-    return this.initIndex();
-  }
-
-  private async initIndex(lib = this.defaultLibId) {
-    const [itemMap] = await this.emitter.invoke("cb:initIndex", lib);
-    this.itemMap = itemMap;
+  private async initIndex(lib: number, refresh = false) {
+    await this.emitter.invoke("cb:initIndex", lib, refresh);
   }
 
   async search(

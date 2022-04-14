@@ -34,7 +34,7 @@ type Listener<M extends MessageMap, E extends SentMsgNames<M>> = (
 type CallbackHandler<
   M extends MessageMap,
   E extends InvokeMsgNames<M>,
-  R = [resData: M[E][1], transfer?: Transferable[]] | string,
+  R = [resData: M[E][1], transfer?: Transferable[]],
 > = (...data: M[E][0]) => Promise<R> | R;
 //#endregion
 
@@ -114,11 +114,16 @@ export class EventEmitter<
         let handler = this.cbHandler[event];
         let resData: typeof res["data"], transfer: Transferable[] | undefined;
         if (handler) {
-          const result = await handler(...data);
-          if (typeof result === "string") {
-            resData = `${id}: failed to exec ${event}, ${result}`;
-          } else {
+          try {
+            const result = await handler(...data);
             [resData, transfer] = result;
+          } catch (err) {
+            console.error(err);
+            resData = `${id}: failed to exec ${event}, ${
+              err instanceof Error
+                ? err.name + ":" + err.message
+                : (err as any)?.toString()
+            }`;
           }
         } else {
           resData = `${id}: no handler for ${event}`;
