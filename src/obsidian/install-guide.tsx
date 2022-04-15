@@ -13,7 +13,7 @@ import { getConfigDirFunc, libName } from "../const";
 const { arch, platform, versions } = process,
   electronVersion = versions.electron?.split(".")[0];
 
-const electronSupported = ["13", "16", "17"];
+const electronSupported = ["13", "16", "17", "18"];
 const PlatformSupported = [
   ["darwin", "arm64", "13"],
   ["darwin", "x64", "13"],
@@ -27,8 +27,14 @@ const PlatformSupported = [
   ["win32", "ia32", "16"],
   ["darwin", "arm64", "17"],
   ["darwin", "x64", "17"],
+  ["linux", "x64", "17"],
   ["win32", "x64", "17"],
   ["win32", "ia32", "17"],
+  ["darwin", "arm64", "18"],
+  ["darwin", "x64", "18"],
+  ["linux", "x64", "18"],
+  ["win32", "x64", "18"],
+  ["win32", "ia32", "18"],
 ] as [platform: string, arch: string, version: string][];
 const showInstallGuide = () => {
   if (!electronVersion || !electronSupported.includes(electronVersion)) {
