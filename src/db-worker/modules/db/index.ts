@@ -1,10 +1,19 @@
 import log from "@log";
 import { Database as DBType } from "better-sqlite3";
 import DB from "better-sqlite3";
-import path from "path";
+import path, { join } from "path";
 
 import { createDbCopy, getLatestDbCopyPath, updateDbCopy } from "./manage-copy";
 import { DatabaseNotSetError, DBInfo } from "./misc";
+
+declare global {
+  var __ob_cfg_dir: string;
+}
+const DatabaseOptions: DB.Options & { nativeBinding: string } = {
+  readonly: true,
+  timeout: 1e3,
+  nativeBinding: join(__ob_cfg_dir, "better_sqlite3.node"),
+};
 
 export default class Database {
   private _dbInfo: DBInfo | null = null;
@@ -62,10 +71,7 @@ export default class Database {
       this._database.close();
     }
     try {
-      this._database = new DB(info.copyPath, {
-        readonly: true,
-        timeout: 1e3,
-      });
+      this._database = new DB(info.copyPath, DatabaseOptions);
       log.info("Database opened: ", path);
       return true;
     } catch (error) {
