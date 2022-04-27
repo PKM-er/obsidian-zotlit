@@ -10,43 +10,50 @@ import { getConfigDirFunc, libName } from "../const";
 
 //#region check if compatible lib exists
 
-const { arch, platform, versions } = process,
-  electronVersion = versions.electron?.split(".")[0];
+const {
+  arch,
+  platform,
+  versions: { modules, electron },
+} = process;
 
-const electronSupported = ["13", "16", "17", "18"];
-const PlatformSupported = [
-  ["darwin", "arm64", "13"],
-  ["darwin", "x64", "13"],
-  ["linux", "x64", "13"],
-  ["win32", "x64", "13"],
-  ["win32", "ia32", "13"],
-  ["darwin", "arm64", "16"],
-  ["darwin", "x64", "16"],
-  ["linux", "x64", "16"],
-  ["win32", "x64", "16"],
-  ["win32", "ia32", "16"],
-  ["darwin", "arm64", "17"],
-  ["darwin", "x64", "17"],
-  ["linux", "x64", "17"],
-  ["win32", "x64", "17"],
-  ["win32", "ia32", "17"],
-  ["darwin", "arm64", "18"],
-  ["darwin", "x64", "18"],
-  ["linux", "x64", "18"],
-  ["win32", "x64", "18"],
-  ["win32", "ia32", "18"],
-] as [platform: string, arch: string, version: string][];
+type ModuleVersions = typeof moduleVersions[number];
+const moduleVersions = ["89", "99", "101", "103"] as const;
+const PlatformSupported = {
+  "89": {
+    darwin: ["arm64", "x64"],
+    linux: ["x64"],
+    win32: ["x64", "ia32"],
+  },
+  "99": {
+    darwin: ["arm64", "x64"],
+    linux: ["x64"],
+    win32: ["x64", "ia32"],
+  },
+  "101": {
+    darwin: ["arm64", "x64"],
+    linux: ["x64"],
+    win32: ["x64", "ia32"],
+  },
+  "103": {
+    darwin: ["arm64", "x64"],
+    linux: ["x64"],
+    win32: ["x64", "ia32"],
+  },
+} as {
+  [moduleVersion in ModuleVersions]: {
+    [platform: string]: string[];
+  };
+};
 const showInstallGuide = () => {
-  if (!electronVersion || !electronSupported.includes(electronVersion)) {
+  if (!modules || !moduleVersions.includes(modules as any)) {
     new Notice(
-      `The electron (${versions.electron}) in current version of obsidian is not supported by obsidian-zotero-plugin,` +
+      `The electron (electron: ${electron}, module version: ${modules}) ` +
+        `in current version of obsidian is not supported by obsidian-zotero-plugin,` +
         ` please reinstall using latest obsidian installer from official website`,
     );
   }
   if (
-    PlatformSupported.some(
-      ([p, a, v]) => arch === a && platform === p && electronVersion === v,
-    )
+    PlatformSupported[modules as ModuleVersions]?.[platform]?.includes(arch)
   ) {
     // if platform is supported
     const LibPath = join(getConfigDirFunc(), libName);
@@ -106,7 +113,7 @@ const getGuideContent = ({
   selectBtn: HTMLButtonElement;
   reloadBtn: HTMLButtonElement;
 }): HTMLElement => {
-  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${electronVersion}-${platform}-${arch}.zip?raw=true`,
+  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${modules}-${platform}-${arch}.zip?raw=true`,
     moduleFilename = <code>{libName}</code>;
   return (
     <div>
