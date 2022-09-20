@@ -48,7 +48,7 @@ ORDER BY
   orderIndex
 `;
 
-import Database from "better-sqlite3";
+import Database from "@aidenlx/better-sqlite3";
 
 const db = new Database(filename);
 

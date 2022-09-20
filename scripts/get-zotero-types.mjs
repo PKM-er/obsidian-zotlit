@@ -1,4 +1,4 @@
-import Database from "better-sqlite3";
+import Database from "@aidenlx/better-sqlite3";
 import dedent from "dedent";
 import { promises as fs } from "fs";
 import { homedir } from "os";

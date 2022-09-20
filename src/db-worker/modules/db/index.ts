@@ -1,6 +1,6 @@
+import { Database as DBType } from "@aidenlx/better-sqlite3";
+import DB from "@aidenlx/better-sqlite3";
 import log from "@log";
-import { Database as DBType } from "better-sqlite3";
-import DB from "better-sqlite3";
 import path, { join } from "path";
 
 import { createDbCopy, getLatestDbCopyPath, updateDbCopy } from "./manage-copy";
