@@ -19,8 +19,8 @@ export const registerInitIndex = () => {
   Comms.handle("cb:initIndex", async (libraryID, refresh = false) => {
     if (refresh) {
       await Promise.all([
-        Databases.main.refreshDatabase(),
-        Databases.bbt?.refreshDatabase(),
+        Databases.main.refresh(),
+        Databases.bbt?.refresh(),
       ]);
     }
 

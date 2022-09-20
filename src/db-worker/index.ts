@@ -44,15 +44,16 @@ const logError = (
 
 Comms.handle("cb:openDb", async (mainDb, bbtDb) => {
   const tasks: [main: Promise<boolean>, bbt?: Promise<boolean>] = [
-    Databases.main.openDatabase(mainDb),
+    Databases.main.open(mainDb),
   ];
   if (bbtDb) {
     if (!Databases.bbt) Databases.bbt = new Database();
-    tasks[1] = Databases.bbt.openDatabase(bbtDb);
+    tasks[1] = Databases.bbt.open(bbtDb);
   } else {
     Databases.bbt = null;
   }
   const [main, bbt] = await Promise.allSettled(tasks);
+  // @ts-ignore
   return [[logError("main", mainDb, main), logError("bbt", bbtDb, bbt)]];
 });
 registerInitIndex();
