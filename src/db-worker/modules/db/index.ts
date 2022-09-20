@@ -3,6 +3,7 @@ import DB from "@aidenlx/better-sqlite3";
 import log from "@log";
 import path, { join } from "path";
 
+import { libName } from "../../../const.js";
 // import { DatabaseNotSetError } from "./misc";
 // import { createDbCopy, getLatestDbCopyPath, updateDbCopy } from "./manage-copy";
 import { DatabaseNotSetError } from "./misc";
@@ -10,14 +11,11 @@ import { DatabaseNotSetError } from "./misc";
 declare global {
   var __ob_cfg_dir: string;
 }
-const DatabaseOptions: DB.Options & {
-  nativeBinding: string;
-  uriPath: boolean;
-} = {
+const DatabaseOptions: DB.Options = {
   readonly: true,
   timeout: 1e3,
   uriPath: true,
-  nativeBinding: join(__ob_cfg_dir, "better_sqlite3.node"),
+  nativeBinding: join(__ob_cfg_dir, libName),
 };
 
 export default class Database {
