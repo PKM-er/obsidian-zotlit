@@ -1,9 +1,8 @@
-import { Database as DBType } from "@aidenlx/better-sqlite3";
-import DB from "@aidenlx/better-sqlite3";
 import log from "@log";
-import path, { join } from "path";
+import { join } from "path";
 
 import { libName } from "../../../const.mjs";
+import knex, { getKnexOptions, Knex } from "./knex.config.js";
 // import { DatabaseNotSetError } from "./misc";
 // import { createDbCopy, getLatestDbCopyPath, updateDbCopy } from "./manage-copy";
 import { DatabaseNotSetError } from "./misc";
@@ -11,16 +10,18 @@ import { DatabaseNotSetError } from "./misc";
 declare global {
   var __ob_cfg_dir: string;
 }
-const DatabaseOptions: DB.Options = {
-  readonly: true,
-  timeout: 1e3,
-  uriPath: true,
-  nativeBinding: join(__ob_cfg_dir, libName),
-};
+// const DatabaseOptions: DB.Options = {
+//   readonly: true,
+//   timeout: 1e3,
+//   uriPath: true,
+//   nativeBinding: join(__ob_cfg_dir, libName),
+// };
+
+const nativeBinding = join(__ob_cfg_dir, libName);
 
 export default class Database {
   // private _dbInfo: DBInfo | null = null;
-  private _database: DBType | null = null;
+  private _database: Knex | null = null;
   public get db() {
     return this._database;
   }
@@ -32,17 +33,16 @@ export default class Database {
    * @returns false if no file found on given path
    */
   public async open(path: string): Promise<boolean> {
-    if (this._database?.open) {
-      log.info("Database opened before, closing: ", this._database.name);
-      this._database.close();
-    }
     try {
-      this.#path = path;
-      this._database = new DB(
-        `file:${path}?mode=ro&immutable=1`,
-        DatabaseOptions,
-      );
+      if (this._database) {
+        log.info("Database opened before, closing: ", this._database.name);
+        await this._database.destroy();
+        this._database.initialize(getKnexOptions(path, nativeBinding));
+      } else {
+        this._database = knex(path, nativeBinding);
+      }
       log.info("Database opened: ", path);
+      this.#path = path;
       return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
@@ -54,8 +54,7 @@ export default class Database {
     return this.open(this.#path);
   }
 
-  public close() {
-    this._database?.close();
-    // this._dbInfo = null;
+  public async close() {
+    await this._database?.destroy();
   }
 }

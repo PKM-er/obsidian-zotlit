@@ -53,8 +53,9 @@ try {
               }
             : false,
           tsconfig: "src/db-worker/tsconfig.json",
-          external: [...builtins],
+          external: [...builtins, "sqlite3"],
           format: "cjs",
+          platform: "node",
           define: {
             "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
           },

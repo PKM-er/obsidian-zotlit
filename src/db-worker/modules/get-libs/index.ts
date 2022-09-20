@@ -1,6 +1,6 @@
 import log from "@log";
 
-import libsSql from "./libraries.sql";
+import libsSql from "./libraries";
 
 export const registerGetLibs = () => {
   Comms.handle("cb:getLibs", async () => {
@@ -9,9 +9,7 @@ export const registerGetLibs = () => {
       throw new Error("failed to get libs: no main database opened");
     }
     log.info("Reading Zotero database for libraries");
-    const libs: { libraryID: number; name: string }[] = db
-      .prepare(libsSql)
-      .all();
+    const libs: { libraryID: number; name: string }[] = await libsSql(db);
     log.info("Reading Zotero database for libraries done");
     return [[libs]];
   });

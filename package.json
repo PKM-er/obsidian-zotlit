@@ -18,7 +18,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",
     "@aidenlx/esbuild-plugin-obsidian": "^0.1.4",
     "@aidenlx/eslint-config": "^0.1.2",
     "@aidenlx/obsidian-plugin-bumper": "^0.1.3",
@@ -73,5 +72,9 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "dependencies": {
+    "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",
+    "@aidenlx/knex": ">=2.3.0-mod <2.3.0-mod0"
   }
 }

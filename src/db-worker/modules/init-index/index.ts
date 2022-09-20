@@ -3,9 +3,9 @@ import { getItemKeyGroupID, multipartToSQL } from "@utils";
 import type { RegularItem } from "@zt-types";
 import Fuse from "fuse.js";
 
-import betterBibTexSql from "./better-bibtex.sql";
-import creatorsSql from "./creators.sql";
-import generalSql from "./general.sql";
+import betterBibTexSql from "./better-bibtex";
+import creatorsSql from "./creators";
+import generalSql from "./general";
 
 const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
   keys: ["title"],
@@ -18,14 +18,11 @@ const fuseOptions: Fuse.IFuseOptions<RegularItem> = {
 export const registerInitIndex = () => {
   Comms.handle("cb:initIndex", async (libraryID, refresh = false) => {
     if (refresh) {
-      await Promise.all([
-        Databases.main.refresh(),
-        Databases.bbt?.refresh(),
-      ]);
+      await Promise.all([Databases.main.refresh(), Databases.bbt?.refresh()]);
     }
 
-    const { general, creators } = readMainDb(libraryID);
-    const citekeyMap = readBbtDb();
+    const { general, creators } = await readMainDb(libraryID);
+    const citekeyMap = await readBbtDb();
 
     // prepare for fuse index
     let entries = {} as any;
@@ -65,20 +62,20 @@ export const registerInitIndex = () => {
   });
 };
 
-const readMainDb = (libraryID: number) => {
+const readMainDb = async (libraryID: number) => {
   log.info("Reading main Zotero database for index");
   const db = Databases.main.db;
   if (!db) {
     throw new Error("failed to init index: no main database opened");
   }
   const result = {
-    general: db.prepare(generalSql).all(libraryID),
-    creators: db.prepare(creatorsSql).all(libraryID),
+    general: await generalSql(db, libraryID),
+    creators: await creatorsSql(db, libraryID),
   };
   log.info("Reading main Zotero database for index done");
   return result;
 };
-const readBbtDb = () => {
+const readBbtDb = async () => {
   log.info("Reading Better BibTex database");
   if (!Databases.bbt) {
     log.info("Better BibTex database not enabled, skipping...");
@@ -88,7 +85,7 @@ const readBbtDb = () => {
   if (!db) {
     throw new Error("failed to init index: no Better BibTex database opened");
   }
-  const result = db.prepare(betterBibTexSql).all();
+  const result = await betterBibTexSql(db);
   log.info("Reading Better BibTex done");
   return result;
 };
