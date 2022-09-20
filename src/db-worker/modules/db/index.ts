@@ -3,7 +3,7 @@ import DB from "@aidenlx/better-sqlite3";
 import log from "@log";
 import path, { join } from "path";
 
-import { libName } from "../../../const.js";
+import { libName } from "../../../const.mjs";
 // import { DatabaseNotSetError } from "./misc";
 // import { createDbCopy, getLatestDbCopyPath, updateDbCopy } from "./manage-copy";
 import { DatabaseNotSetError } from "./misc";

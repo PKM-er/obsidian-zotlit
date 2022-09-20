@@ -16,9 +16,9 @@ import {
 import { CitationSuggester, insertCitation } from "./suggester";
 import ZoteroDb from "./zotero-db";
 
+checkLib();
+
 export default class ZoteroPlugin extends Plugin {
-  /** check if better-sqlite exists */
-  check = (checkLib(), undefined);
   settings: ZoteroSettings = getDefaultSettings();
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
