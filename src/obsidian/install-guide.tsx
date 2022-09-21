@@ -18,8 +18,8 @@ const moduleVersions = ["103"] as const;
 const PlatformSupported = {
   "103": {
     darwin: ["arm64", "x64"],
-    // linux: ["x64"],
-    // win32: ["x64", "ia32"],
+    linux: ["x64"],
+    win32: ["x64", "ia32"],
   },
 } as {
   [moduleVersion in ModuleVersions]: {
@@ -98,7 +98,7 @@ const getGuideContent = ({
   selectBtn: HTMLButtonElement;
   reloadBtn: HTMLButtonElement;
 }): HTMLElement => {
-  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${modules}-${platform}-${arch}.zip?raw=true`,
+  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}-${modules}.zip?raw=true`,
     moduleFilename = <code>{libName}</code>;
   return (
     <div>
