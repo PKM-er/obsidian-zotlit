@@ -1,5 +1,5 @@
 {
-  "extends": "@aidenlx/ts-config/tsconfig.json",
+  "extends": "@aidenlx/eslint-config",
   "compilerOptions": {
     "outDir": "./dist/",
     "target": "ES2018",
