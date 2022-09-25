@@ -5,6 +5,18 @@
       "path": "app/obsidian"
     },
     {
+      "name": "database",
+      "path": "lib/database"
+    },
+    {
+      "name": "common",
+      "path": "lib/common"
+    },
+    {
+      "name": "zotero-type",
+      "path": "lib/zotero-type"
+    },
+    {
       "name": "root",
       "path": "."
     }
@@ -13,6 +25,7 @@
     "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
   },
   "settings": {
+    "javascript.preferences.importModuleSpecifierEnding": "js",
     "editor.formatOnSave": false,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "eslint.format.enable": true,
@@ -37,14 +50,15 @@
     // https://github.com/Microsoft/vscode-eslint#mono-repository-setup
     "eslint.workingDirectories": [
       "./app/obsidian",
+      "./lib/common",
+      "./lib/database",
+      "./lib/zotero-type"
     ],
     "[shellscript]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
     },
     "conventionalCommits.gitmoji": false,
-    "conventionalCommits.scopes": [
-      "obsidian",
-    ],
+    "conventionalCommits.scopes": ["obsidian"],
     "[sql]": {
       "editor.defaultFormatter": "lea21st.vscode-sql-formatter"
     },

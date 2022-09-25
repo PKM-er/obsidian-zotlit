@@ -1,30 +1,27 @@
-import type { ItemType } from "../zotero-types";
-export * from "./zotero-date";
+import endent from "endent";
+import { Platform } from "obsidian";
 
-/**
- * @param index set to true to generate key without praentItem to be used for indexing
- * @returns ITEMKEY(gGROUPID) / ANNOT_KEYaATTACHMENT_KEY(gGROUPID)
- */
-export const getItemKeyGroupID = (
-  {
-    key,
-    groupID,
-    parentItem,
-    itemType = "journalArticle",
-  }: {
-    key: string;
-    groupID?: number;
-    parentItem?: string;
-    itemType?: ItemType;
-  },
-  index = false,
-) => {
-  const suffix = typeof groupID === "number" ? `g${groupID}` : "";
-  if (!index && itemType === "annotation") {
-    if (!parentItem)
-      throw new Error(
-        "parentItem is required for creating annotation zotero key",
-      );
-    return `${key}a${parentItem}${suffix}`;
-  } else return key + suffix;
-};
+export const promptOpenLog = () => endent.default`
+Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
+  Platform.isMacOS ? "⌥ Option" : "Shift"
+} + I, then go to the "Console" tab to see the log.`;
+// export const checkNodeInWorker = () => {
+//   const url = URL.createObjectURL(
+//     new Blob(['self.postMessage("require" in self); self.close()'], {
+//       type: "text/javascript",
+//     }),
+//   );
+//   const worker = new Worker(url);
+//   URL.revokeObjectURL(url);
+//   return new Promise<boolean>((resolve, reject) => {
+//     worker.onmessage = (e) => {
+//       resolve(e.data ?? false), worker.terminate();
+//     };
+//     worker.onerror = (e) => {
+//       resolve(false), console.error(e), worker.terminate();
+//     };
+//     worker.onmessageerror = (e) => {
+//       resolve(false), console.error(e), worker.terminate();
+//     };
+//   });
+// };

@@ -1,0 +1,21 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "compilerOptions": {
+    "lib": ["WebWorker", "es2018"],
+    "baseUrl": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "incremental": false,
+    "noEmit": false,
+    "paths": {
+      "@log": ["./logger.ts"],
+      "@api": ["./api.ts"],
+      "@init": ["./init.ts"],
+      "@knex": ["./modules/db/knex.config.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

@@ -1,5 +1,8 @@
 app/obsidian/build
 
+dist
+tsconfig.tsbuildinfo
+
 # Logs
 *.log
 npm-debug.log*

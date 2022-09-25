@@ -1,0 +1,10 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "noEmit": false
+  },
+  "include": ["src/**/*.ts"]
+}

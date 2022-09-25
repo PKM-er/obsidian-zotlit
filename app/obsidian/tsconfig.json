@@ -1,9 +1,15 @@
 {
   "extends": "@aidenlx/eslint-config",
   "compilerOptions": {
-    "outDir": "./dist/",
+    "baseUrl": "src",
+    "outDir": "dist",
     "target": "ES2018",
-    "lib": ["es2018"],
+    "lib": ["dom", "ES2018"],
+    "jsx": "react",
+    "paths": {
+      "@log": ["./logger.ts"]
+    },
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

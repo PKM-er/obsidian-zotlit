@@ -24,7 +24,7 @@
    * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
    * for details about these alternatives.
    */
-  "pnpmVersion": "7.9.0",
+  "pnpmVersion": "7.12.2",
   // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
   /**
@@ -369,6 +369,18 @@
     {
       "packageName": "obsidian-zotero-plugin",
       "projectFolder": "app/obsidian"
+    },
+    {
+      "packageName": "@obzt/database",
+      "projectFolder": "lib/database"
+    },
+    {
+      "packageName": "@obzt/zotero-type",
+      "projectFolder": "lib/zotero-type"
+    },
+    {
+      "packageName": "@obzt/common",
+      "projectFolder": "lib/common"
     }
   ]
 }
