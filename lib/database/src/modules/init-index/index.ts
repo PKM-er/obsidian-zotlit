@@ -52,11 +52,11 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
     entries[itemID] && (entries[itemID].citekey = citekey);
   }
 
-  log.info("start indexing for fuse");
+  log.trace("Start fuse indexing");
   const items = Object.values(entries) as RegularItem[];
 
   index[libraryID] = new Fuse(items, fuseOptions);
-  log.info("fuse initialized");
+  log.info("Library index initialized");
 
   // const itemMap = items.reduce(
   //   (record, item) => ((record[getItemKeyGroupID(item)] = item), record),
@@ -68,7 +68,7 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
 export default initIndex;
 
 const readMainDb = async (libraryID: number) => {
-  log.info("Reading main Zotero database for index");
+  log.debug("Reading main Zotero database for index");
   const db = databases.main.db;
   if (!db) {
     throw new Error("failed to init index: no main database opened");
@@ -77,11 +77,11 @@ const readMainDb = async (libraryID: number) => {
     general: await generalSql(db, libraryID),
     creators: await creatorsSql(db, libraryID),
   };
-  log.info("Reading main Zotero database for index done");
+  log.info("Finished reading main Zotero database for index");
   return result;
 };
 const readBbtDb = async () => {
-  log.info("Reading Better BibTex database");
+  log.debug("Reading Better BibTex database");
   if (!databases.bbt) {
     log.info("Better BibTex database not enabled, skipping...");
     return [];
@@ -91,6 +91,6 @@ const readBbtDb = async () => {
     throw new Error("failed to init index: no Better BibTex database opened");
   }
   const result = await betterBibTexSql(db);
-  log.info("Reading Better BibTex done");
+  log.info("Finished reading Better BibTex");
   return result;
 };

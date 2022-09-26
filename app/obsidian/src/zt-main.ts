@@ -18,12 +18,18 @@ export default class ZoteroPlugin extends Plugin {
   settings: ZoteroSettings = getDefaultSettings();
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
+  #db?: ZoteroDb;
+  get db() {
+    if (!this.#db) throw new Error("access database before load");
+    return this.#db;
+  }
 
-  db = new ZoteroDb(this);
   noteIndex: NoteIndex = new NoteIndex(this);
 
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
+    await this.loadSettings();
+    this.#db = new ZoteroDb(this);
 
     this.addCommand({
       id: "insert-markdown-citation",
@@ -47,8 +53,6 @@ export default class ZoteroPlugin extends Plugin {
         new Notice("Literature notes re-indexed");
       },
     });
-
-    await this.loadSettings();
 
     getZoteroLinkHandlers(this).forEach((args) =>
       this.registerObsidianProtocolHandler(...args),

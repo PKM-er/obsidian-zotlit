@@ -1,3 +1,4 @@
+import type { LogLevel } from "@obzt/common";
 import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
 import type Fuse from "fuse.js";
@@ -24,6 +25,7 @@ export default class ZoteroDb {
       workerType: "web",
     });
     this.#proxy = this.#pool.proxy();
+    this.setLoglevel(this.plugin.settings.logLevel);
     URL.revokeObjectURL(url);
   }
 
@@ -44,6 +46,11 @@ export default class ZoteroDb {
   }
   get bbtDbPath() {
     return this.plugin.settings.betterBibTexDbPath;
+  }
+
+  async setLoglevel(level: LogLevel) {
+    const proxy = await this.#proxy;
+    await proxy.setLoglevel(level);
   }
 
   /** calling this will reload database worker */

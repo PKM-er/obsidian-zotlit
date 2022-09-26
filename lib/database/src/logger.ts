@@ -1,7 +1,7 @@
-import { constants } from "@obzt/common";
-import { getLogger } from "log4js";
-const logger = getLogger(constants.loggerCategory("db-worker"));
+import { initLogger } from "@obzt/common";
+import type { LogLevel } from "@obzt/common";
+import log4js from "log4js";
 
-logger.level = "debug";
+export const DEFAULT_LOGLEVEL: LogLevel = "INFO";
 
-export default logger;
+export default initLogger("db-worker", DEFAULT_LOGLEVEL, log4js);

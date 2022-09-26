@@ -1,7 +1,9 @@
+import type { LogLevel } from "@obzt/common";
 import type { RegularItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
 export interface DbWorkerAPI {
+  setLoglevel(level: LogLevel): void;
   /* open new database, return true if successful */
   openDb(
     pluginDir: string,

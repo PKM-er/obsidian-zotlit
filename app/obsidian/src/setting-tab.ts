@@ -93,7 +93,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       const libs = await this.plugin.db.getLibs(refresh);
       s.addDropdown((dd) => {
         dropdown = dd;
-        for (const { libraryID, name } of libs) {
+        for (const { libraryID, name } of libs ?? []) {
           dd.addOption(libraryID.toString(), name);
         }
         dd.setValue(this.plugin.settings.citationLibrary.toString()).onChange(
@@ -176,8 +176,10 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .addOptions(logLevels)
           .setValue(log.level.toString())
           .onChange(async (val) => {
-            log.level = val;
-            this.plugin.settings.logLevel = val as LogLevel;
+            const level = val as LogLevel;
+            log.level = level;
+            await this.plugin.db.setLoglevel(level);
+            this.plugin.settings.logLevel = level;
             await this.plugin.saveSettings();
           }),
       );

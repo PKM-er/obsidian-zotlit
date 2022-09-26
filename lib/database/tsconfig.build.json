@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "files": ["src/index.ts", "src/api.ts", "src/web-worker.d.ts"],
+  "include": []
+}

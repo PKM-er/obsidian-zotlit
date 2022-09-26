@@ -9,9 +9,9 @@ const getLibs: DbWorkerAPI["getLibs"] = async () => {
   if (!db) {
     throw new Error("failed to get libs: no main database opened");
   }
-  log.info("Reading Zotero database for libraries");
+  log.debug("Reading Zotero database for libraries");
   const libs: { libraryID: number; name: string }[] = await libsSql(db);
-  log.info("Reading Zotero database for libraries done");
+  log.info("Finished reading Zotero database for libraries");
   return libs;
 };
 export default getLibs;
