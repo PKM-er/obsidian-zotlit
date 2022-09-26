@@ -1,7 +1,7 @@
 import endent from "endent";
 import { Platform } from "obsidian";
 
-export const promptOpenLog = () => endent.default`
+export const promptOpenLog = () => endent`
 Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
   Platform.isMacOS ? "⌥ Option" : "Shift"
 } + I, then go to the "Console" tab to see the log.`;

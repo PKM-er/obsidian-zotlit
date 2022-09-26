@@ -32,18 +32,18 @@ export const ZOTERO_KEY_FIELDNAME = "zotero-key";
 
 export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
   filename: "{{#filename}}{{coalesce citekey DOI title key}}.md{{/filename}}",
-  content: endent.default`
+  content: endent`
             # {{title}}
 
             [Zotero]({{backlink}})
 
             {{> annots}}
             `,
-  annots: endent.default`
+  annots: endent`
             {{#each annotations}}
             {{> annotation}}
             {{/each}}`,
-  annotation: endent.default`
+  annotation: endent`
 
             ## Annotation ^{{blockID}}
 
