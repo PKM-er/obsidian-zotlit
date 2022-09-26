@@ -10,8 +10,7 @@
     "jsx": "react",
     "paths": {
       "@log": ["./logger.ts"]
-    },
-    "allowSyntheticDefaultImports": true
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

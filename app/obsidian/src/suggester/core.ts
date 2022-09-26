@@ -11,7 +11,7 @@ import type Fuse from "fuse.js";
 import type ZoteroPlugin from "../zt-main.js";
 import unionRanges from "./union.js";
 
-export type FuzzyMatch<T> = Fuse.default.FuseResult<T>;
+export type FuzzyMatch<T> = Fuse.FuseResult<T>;
 
 const PRIMARY_MATCH_FIELD = "title";
 export const CLASS_ID = "zt-citations";
@@ -109,7 +109,7 @@ const creatorToString = (creators: Creator[] | undefined) => {
 const renderMatches = (
   el: HTMLElement,
   text: string,
-  indices?: readonly Fuse.default.RangeTuple[],
+  indices?: readonly Fuse.RangeTuple[],
   offset?: number,
 ) => {
   if (indices) {

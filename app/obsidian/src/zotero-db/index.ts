@@ -87,7 +87,7 @@ export default class ZoteroDb {
     limit = 20,
     lib = this.defaultLibId,
   ) {
-    const exp = query.map<Fuse.default.Expression>((s) => ({
+    const exp = query.map<Fuse.Expression>((s) => ({
       [matchField]: s,
     }));
     const result = await (

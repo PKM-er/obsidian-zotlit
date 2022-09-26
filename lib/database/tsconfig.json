@@ -1,9 +1,10 @@
 {
   "extends": "@aidenlx/eslint-config",
   "compilerOptions": {
-    "lib": ["WebWorker", "es2018"],
     "baseUrl": "src",
     "outDir": "dist",
+    "target": "ES2020",
+    "lib": ["WebWorker", "es2018"],
     "declaration": true,
     "emitDeclarationOnly": true,
     "moduleResolution": "Node",
