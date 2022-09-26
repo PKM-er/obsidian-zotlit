@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { homedir } from "os";
 import { join } from "path";
-// import type { LogLevelNumbers } from "loglevel";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
-import log from "@log";
+import type { LogLevel } from "@log";
+import log, { DEFAULT_LOGLEVEL } from "@log";
 
 import NoteTemplate from "./note-template/index.js";
 import type ZoteroPlugin from "./zt-main.js";
@@ -14,18 +14,17 @@ export interface ZoteroSettings {
   betterBibTexDbPath: string | null;
   literatureNoteFolder: InVaultPath;
   literatureNoteTemplate: NoteTemplate;
-  // logLevel: LogLevelNumbers;
+  logLevel: LogLevel;
   citationLibrary: number;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
 }
 
-const DEFAULT_LOG_LEVEL = 4;
-
 export const getDefaultSettings = (): Omit<
   ZoteroSettings,
   "betterBibTexDbPath"
 > & { betterBibTexDbPath: string } => {
+  // set inside logger.ts
   // log.setDefaultLevel(DEFAULT_LOG_LEVEL);
   const defaultRoot = join(homedir(), "Zotero");
   return {
@@ -33,7 +32,7 @@ export const getDefaultSettings = (): Omit<
     betterBibTexDbPath: join(defaultRoot, "better-bibtex-search.sqlite"),
     literatureNoteFolder: new InVaultPath(),
     literatureNoteTemplate: new NoteTemplate(),
-    // logLevel: DEFAULT_LOG_LEVEL,
+    logLevel: DEFAULT_LOGLEVEL,
     citationLibrary: 1,
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
@@ -59,7 +58,7 @@ export async function loadSettings(this: ZoteroPlugin) {
     json,
     updateFromJSON("literatureNoteFolder", "literatureNoteTemplate"),
   );
-  // log.setLevel(this.settings.logLevel);
+  log.level = this.settings.logLevel;
 }
 
 export async function saveSettings(this: ZoteroPlugin) {

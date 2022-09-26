@@ -58,7 +58,12 @@
       "editor.defaultFormatter": "foxundermoon.shell-format"
     },
     "conventionalCommits.gitmoji": false,
-    "conventionalCommits.scopes": ["obsidian"],
+    "conventionalCommits.scopes": [
+      "obsidian",
+      "lib/database",
+      "lib/common",
+      "lib/zotero-type"
+    ],
     "[sql]": {
       "editor.defaultFormatter": "lea21st.vscode-sql-formatter"
     },

@@ -1,9 +1,9 @@
 import { dialog } from "@electron/remote";
 import { assertNever } from "assert-never";
-// import type { LogLevelNumbers } from "loglevel";
 import type { DropdownComponent, TextAreaComponent } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
-import log from "@log";
+import type { LogLevel } from "@log";
+import log, { logLevels } from "@log";
 
 import type { SettingKeyWithType } from "./settings.js";
 import { getDefaultSettings } from "./settings.js";
@@ -159,30 +159,27 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   logLevel = () => {
     new Setting(this.containerEl).setHeading().setName("Debug");
-    new Setting(this.containerEl).setName("Log Level").setDesc(
-      createFragment((frag) => {
-        frag.appendText("Change level of logs output to the console.");
-        frag.createEl("br");
-        frag.appendText("Set to DEBUG if debug is required");
-        frag.createEl("br");
-        frag.appendText("To check console, " + promptOpenLog());
-      }),
-    );
-    // .addDropdown((dp) =>
-    //   dp
-    //     .then((dp) =>
-    //       Object.entries(log.levels).forEach(([key, val]) =>
-    //         dp.addOption(val.toString(), key),
-    //       ),
-    //     )
-    //     .setValue(log.getLevel().toString())
-    //     .onChange(async (val) => {
-    //       const level = +val as LogLevelNumbers;
-    //       log.setLevel(level);
-    //       this.plugin.settings.logLevel = level;
-    //       await this.plugin.saveSettings();
-    //     }),
-    // );
+    new Setting(this.containerEl)
+      .setName("Log Level")
+      .setDesc(
+        createFragment((frag) => {
+          frag.appendText("Change level of logs output to the console.");
+          frag.createEl("br");
+          frag.appendText("Set to DEBUG if debug is required");
+          frag.createEl("br");
+          frag.appendText("To check console, " + promptOpenLog());
+        }),
+      )
+      .addDropdown((dp) =>
+        dp
+          .addOptions(logLevels)
+          .setValue(log.level.toString())
+          .onChange(async (val) => {
+            log.level = val;
+            this.plugin.settings.logLevel = val as LogLevel;
+            await this.plugin.saveSettings();
+          }),
+      );
   };
 
   addToggle(addTo: HTMLElement, key: SettingKeyWithType<boolean>): Setting {
