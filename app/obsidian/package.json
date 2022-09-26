@@ -3,13 +3,12 @@
   "version": "0.1.0",
   "description": "Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
   "scripts": {
-    "dev": "cross-env BUILD=dev node esbuild.config.js",
-    "build": "cross-env BUILD=production node esbuild.config.js",
+    "dev": "cross-env BUILD=dev node esbuild.config.mjs",
+    "build": "cross-env BUILD=production node esbuild.config.mjs",
     "check": "tsc --noEmit",
     "eslint": "eslint src/ --ext .ts,.tsx --fix",
     "release": "release-it"
   },
-  "type": "module",
   "keywords": [],
   "author": {
     "name": "AidenLx",
@@ -39,7 +38,7 @@
     "tslib": "^2.3.1",
     "typescript": "^4.8.3",
     "eslint": "~8.24.0",
-    "@aidenlx/eslint-config": "2.0.4",
+    "@aidenlx/eslint-config": "2.0.5",
     "electron": "18.0.3",
     "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",
     "fuse.js": "^6.5.3",

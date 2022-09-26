@@ -15,7 +15,7 @@ module.exports = {
       preset: "angular",
       infile: "CHANGELOG.md",
     },
-    "./scripts/ob-bumper.js": {
+    "./scripts/ob-bumper.mjs": {
       indent: 2,
     },
   },
