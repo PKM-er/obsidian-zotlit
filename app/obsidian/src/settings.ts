@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { homedir } from "os";
 import { join } from "path";
+import type { LogLevel } from "@obzt/common";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
-import type { LogLevel } from "@log";
 import log, { DEFAULT_LOGLEVEL } from "@log";
 
 import NoteTemplate from "./note-template/index.js";

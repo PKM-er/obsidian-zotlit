@@ -1,9 +1,10 @@
 import { dialog } from "@electron/remote";
+import type { LogLevel } from "@obzt/common";
+import { logLevels } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { DropdownComponent, TextAreaComponent } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
-import type { LogLevel } from "@log";
-import log, { logLevels } from "@log";
+import log from "@log";
 
 import type { SettingKeyWithType } from "./settings.js";
 import { getDefaultSettings } from "./settings.js";
