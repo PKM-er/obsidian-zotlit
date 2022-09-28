@@ -12,15 +12,37 @@
 
 import type { Knex } from "@knex";
 
+declare module "@aidenlx/knex/types/tables" {
+  interface Library {
+    libraryID: number;
+    type: "user" | "group";
+    editable: number;
+    filesEditable: number;
+    version: number;
+    storageVersion: number;
+    lastSync: number;
+    archived: number;
+  }
+
+  interface Group {
+    groupID: number;
+    libraryID: number;
+    name: string;
+    description: string;
+    version: number;
+  }
+
+  interface Tables {
+    libraries: Library;
+    groups: Group;
+  }
+}
+
 const betterBibTexSql = (knex: Knex) =>
   knex
-    .select(
-      "libraryID",
-      knex.raw("CASE type WHEN 'user' THEN 'My Library' ELSE name END AS name"),
-    )
+    .select("libraryID", "type", "groupID")
     .from("libraries")
-    .leftJoin("groups", function () {
-      this.using("libraryID");
-    })
+    .leftJoin("groups", (j) => j.using("libraryID"))
     .orderBy("libraryID");
+
 export default betterBibTexSql;

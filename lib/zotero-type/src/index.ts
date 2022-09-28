@@ -37,7 +37,7 @@ export type { Creator, Tag } from "./item-base.js";
 export * from "./regular.js";
 
 // Zotero.Items._loadAnnotations
-enum AnnotationType {
+export const enum AnnotationType {
   highlight = 1,
   note = 2,
   image = 3,

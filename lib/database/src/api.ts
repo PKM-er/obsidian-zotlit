@@ -1,6 +1,32 @@
 import type { LogLevel } from "@obzt/common";
-import type { RegularItem } from "@obzt/zotero-type";
+import type { AnnotationType, RegularItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
+
+interface Annotation {
+  itemID: number;
+  key: string;
+  libraryID: number;
+  groupID: number;
+  type: AnnotationType;
+  authorName: string | null;
+  text: string | null;
+  comment: string | null;
+  color: string;
+  pageLabel: string;
+  sortIndex: string;
+  position: string;
+}
+
+interface AttachmentInfo {
+  itemID: number;
+  count?: string | number;
+}
+
+interface LibraryInfo {
+  libraryID: number;
+  type: string;
+  groupID: number | null;
+}
 
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
@@ -20,7 +46,12 @@ export interface DbWorkerAPI {
     options?: Fuse.FuseSearchOptions,
   ): Promise<Fuse.FuseResult<RegularItem>[]>;
 
-  getLibs(): Promise<{ libraryID: number; name: string }[]>;
+  getLibs(): Promise<LibraryInfo[]>;
+  getAnnotations(
+    attachmentId: number,
+    libraryID: number,
+  ): Promise<Annotation[]>;
+  getAttachments(docId: number, libraryID: number): Promise<AttachmentInfo[]>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {
