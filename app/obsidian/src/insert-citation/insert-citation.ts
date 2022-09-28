@@ -8,11 +8,13 @@ import type {
 } from "obsidian";
 
 import type NoteTemplate from "../note-template/index.js";
+import type { FuzzyMatch } from "../suggester/index.js";
+import {
+  isAlternative,
+  ZoteroItemEditorSuggest,
+  ZoteroItemSuggestModal,
+} from "../suggester/index.js";
 import type ZoteroPlugin from "../zt-main.js";
-import type { FuzzyMatch } from "./core.js";
-import { isAlternative } from "./core.js";
-import ZoteroItemSuggester from "./editor-suggest.js";
-import ZoteroItemSelector from "./modal.js";
 
 const instructions = [
   { command: "↑↓", purpose: "to navigate" },
@@ -22,9 +24,9 @@ const instructions = [
 ];
 
 export const insertCitation = (plugin: ZoteroPlugin) => (editor: Editor) =>
-  new CitationSuggesterModal(plugin).insertTo(editor);
+  new CitationSuggestModal(plugin).insertTo(editor);
 
-class CitationSuggesterModal extends ZoteroItemSelector {
+class CitationSuggestModal extends ZoteroItemSuggestModal {
   constructor(public plugin: ZoteroPlugin) {
     super(plugin);
     this.setInstructions(instructions);
@@ -33,7 +35,7 @@ class CitationSuggesterModal extends ZoteroItemSelector {
     const result = await (this.promise ?? this.open());
     if (!result) return false;
     insertCitationTo(
-      result,
+      { item: result.value.item, alt: isAlternative(result.evt) },
       undefined,
       editor,
       this.plugin.settings.literatureNoteTemplate,
@@ -42,7 +44,7 @@ class CitationSuggesterModal extends ZoteroItemSelector {
   }
 }
 
-export class CitationSuggester extends ZoteroItemSuggester {
+export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   constructor(public plugin: ZoteroPlugin) {
     super(plugin);
     this.setInstructions(instructions);

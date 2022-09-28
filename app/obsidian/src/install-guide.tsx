@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/naming-convention */
-/** @jsx el */
 
 import { statSync } from "fs";
 import { join } from "path";
@@ -9,6 +8,9 @@ import { constants } from "@obzt/common";
 import { fileDialog } from "file-select-dialog";
 import type { FileSystemAdapter } from "obsidian";
 import { Modal, Notice } from "obsidian";
+import { render } from "preact";
+import { useState } from "preact/hooks";
+import log from "@log";
 
 // #region check if compatible lib exists
 
@@ -70,8 +72,6 @@ const showInstallGuide = (libPath: string) => {
 const getConfigDirFunc = () =>
   (app.vault.adapter as FileSystemAdapter).getFullPath(app.vault.configDir);
 
-import { el, mount, unmount } from "redom";
-
 const checkLib = () => {
   const libPath = join(getConfigDirFunc(), constants.libName);
   try {
@@ -87,26 +87,75 @@ export default checkLib;
 // #endregion
 
 // #region Install Guide Modal
-declare global {
-  namespace JSX {
-    export interface IntrinsicElements {
-      [elemName: string]: any;
-    }
-    // export type ElementClass = RedomComponent;
-    // export type Element = RedomElement | HTMLElement
-  }
-}
 const colorSuccess = "var(--background-modifier-success)",
   colorDisabled = "var(--background-modifier-cover)";
-const getGuideContent = ({
-  selectBtn,
-  reloadBtn,
+
+declare module "obsidian" {
+  interface App {
+    openWithDefaultApp(path: string): void;
+  }
+}
+const PLUGIN_ID = "obsidian-zotero-plugin";
+
+class GoToDownloadModal extends Modal {
+  constructor() {
+    super(app);
+    this.modalEl.addClass("zt-install-guide");
+  }
+  onOpen() {
+    render(
+      <GuideContent reloadPlugin={this.reloadPlugin.bind(this)} />,
+      this.contentEl,
+    );
+  }
+  onClose() {
+    render(null, this.contentEl);
+  }
+
+  async reloadPlugin() {
+    await app.plugins.disablePlugin(PLUGIN_ID);
+    this.close();
+    await app.plugins.enablePlugin(PLUGIN_ID);
+  }
+}
+
+const importModule = async (): Promise<boolean> => {
+  const file = await fileDialog({
+    multiple: false,
+    accept: ".node",
+    strict: true,
+  });
+  if (!file) return false;
+  try {
+    await app.vault.adapter.writeBinary(
+      app.vault.configDir + "/" + constants.libName,
+      await file.arrayBuffer(),
+    );
+    return true;
+  } catch (error) {
+    new Notice(
+      `failed to write ${constants.libName}, check console for details`,
+    );
+    log.error(`failed to write ${constants.libName}`, error);
+    return false;
+  }
+};
+
+const GuideContent = ({
+  reloadPlugin,
 }: {
-  selectBtn: HTMLButtonElement;
-  reloadBtn: HTMLButtonElement;
-}): HTMLElement => {
+  reloadPlugin: () => Promise<void>;
+}) => {
   const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}-${modules}.zip?raw=true`,
     moduleFilename = <code>{constants.libName}</code>;
+
+  const [fileImported, setFileImported] = useState(false);
+
+  const onSelectFileClicked = async () => {
+    const result = await importModule();
+    if (result) setFileImported(true);
+  };
+
   return (
     <div>
       <h1>Install better-sqlite3</h1>
@@ -120,72 +169,51 @@ const getGuideContent = ({
         </li>
         <li>Extract the zip file to get {moduleFilename} file</li>
         <li>
-          Click the button to select {moduleFilename}: {selectBtn}
+          Click the button to select {moduleFilename}:
+          <SelectButton onClick={onSelectFileClicked} done={fileImported} />
         </li>
-        <li>Click the button to reload Obsidian Zotero Plugin: {reloadBtn}</li>
+        <li>
+          Click the button to reload Obsidian Zotero Plugin:
+          <ReloadButton onClick={reloadPlugin} disabled={!fileImported} />
+        </li>
       </ol>
     </div>
   );
 };
 
-declare module "obsidian" {
-  interface App {
-    openWithDefaultApp(path: string): void;
-  }
-}
-const PLUGIN_ID = "obsidian-zotero-plugin";
+const SelectButton = ({
+  done,
+  onClick,
+}: {
+  done: boolean;
+  onClick: () => any;
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      style={{ backgroundColor: done ? colorSuccess : undefined }}
+    >
+      {!done ? "Select" : "Library file imported"}
+    </button>
+  );
+};
 
-class GoToDownloadModal extends Modal {
-  selectBtn: HTMLButtonElement;
-  reloadBtn: HTMLButtonElement;
-  jsx: HTMLElement;
+const ReloadButton = ({
+  disabled,
+  onClick,
+}: {
+  disabled: boolean;
+  onClick: () => any;
+}) => {
+  return (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      style={{ backgroundColor: disabled ? colorDisabled : undefined }}
+    >
+      Reload Plugin
+    </button>
+  );
+};
 
-  constructor() {
-    super(app);
-    this.modalEl.addClass("zt-install-guide");
-    this.selectBtn = (
-      <button onclick={this.onSelectingFile.bind(this)}>Select</button>
-    );
-    this.reloadBtn = (
-      <button disabled onclick={this.onReloadPlugin.bind(this)}>
-        Reload Plugin
-      </button>
-    );
-    this.reloadBtn.style.backgroundColor = colorDisabled;
-    this.jsx = getGuideContent(this);
-  }
-  onOpen() {
-    mount(this.contentEl, this.jsx);
-  }
-  onClose() {
-    unmount(this.contentEl, this.jsx);
-    this.contentEl.empty();
-  }
-
-  async onSelectingFile() {
-    const file = await fileDialog({
-      multiple: false,
-      accept: ".node",
-      strict: true,
-    });
-    if (!file) return;
-    await this.app.vault.adapter.writeBinary(
-      this.app.vault.configDir + "/" + constants.libName,
-      await file.arrayBuffer(),
-    );
-    if (this.selectBtn) {
-      this.selectBtn.setText("Library file imported");
-      this.selectBtn.style.backgroundColor = colorSuccess;
-    }
-    if (this.reloadBtn) {
-      this.reloadBtn.disabled = false;
-      this.reloadBtn.style.backgroundColor = "";
-    }
-  }
-  async onReloadPlugin() {
-    await this.app.plugins.disablePlugin(PLUGIN_ID);
-    this.close();
-    await this.app.plugins.enablePlugin(PLUGIN_ID);
-  }
-}
 // #endregion

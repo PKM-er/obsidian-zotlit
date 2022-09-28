@@ -1,21 +1,13 @@
-import "./style.less";
-
 import type { RegularItem } from "@obzt/zotero-type";
-import { debounce, SuggestModal } from "obsidian";
+import { debounce } from "obsidian";
 
 import type ZoteroPlugin from "../zt-main.js";
 import type { FuzzyMatch, SuggesterBase } from "./core.js";
-import {
-  CLASS_ID,
-  getSuggestions,
-  isAlternative,
-  renderSuggestion,
-} from "./core.js";
+import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
+import { SuggestModalWithPromise } from "./modal-promise";
 
-type ModalResult = { item: RegularItem; alt: boolean };
-
-export default class ZoteroItemSelector
-  extends SuggestModal<FuzzyMatch<RegularItem>>
+export default class ZoteroItemSuggestModal
+  extends SuggestModalWithPromise<FuzzyMatch<RegularItem>>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {
@@ -52,40 +44,4 @@ export default class ZoteroItemSelector
     return getSuggestions(input, this.plugin);
   }
   renderSuggestion = renderSuggestion.bind(this);
-
-  // Promisify the modal
-  resolve: ((value: ModalResult | null) => void) | null = null;
-  promise: Promise<ModalResult | null> | null = null;
-  open(): Promise<ModalResult | null> {
-    super.open();
-    this.promise = new Promise((resolve) => {
-      this.resolve = resolve;
-    });
-    return this.promise;
-  }
-  onClose() {
-    if (this.resolve) {
-      this.resolve(null);
-      this.resolve = null;
-    }
-  }
-
-  onChooseSuggestion(): void {
-    // console.log(suggestion);
-  }
-  selectSuggestion(
-    value: FuzzyMatch<RegularItem> | null,
-    evt: MouseEvent | KeyboardEvent,
-  ): void {
-    if (this.resolve) {
-      if (value?.item) {
-        this.resolve({ item: value.item, alt: isAlternative(evt) });
-      } else {
-        this.resolve(null);
-      }
-      this.resolve = null;
-    }
-
-    super.selectSuggestion(value as never, evt);
-  }
 }

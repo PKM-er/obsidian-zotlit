@@ -15,8 +15,9 @@ export default class ZoteroDb {
 
   #pool: workerpool.WorkerPool;
   #proxy: workerpool.Promise<workerpool.Proxy<DbWorkerAPI>, Error>;
-
-  constructor(private plugin: ZoteroPlugin) {
+  #plugin: ZoteroPlugin;
+  constructor(plugin: ZoteroPlugin) {
+    this.#plugin = plugin;
     plugin.register(this.close.bind(this));
     const url = dbWorker();
     this.#pool = workerpool.pool(url, {
@@ -25,27 +26,36 @@ export default class ZoteroDb {
       workerType: "web",
     });
     this.#proxy = this.#pool.proxy();
-    this.setLoglevel(this.plugin.settings.logLevel);
+    this.setLoglevel(plugin.settings.logLevel);
     URL.revokeObjectURL(url);
+
+    if (process.env.NODE_ENV === "development") {
+      // expose proxy in dev env
+      Object.defineProperty(this, "proxy", {
+        get() {
+          return this.#proxy;
+        },
+      });
+    }
   }
 
   #configPath?: string;
   get configPath(): string {
     if (this.#configPath) return this.#configPath;
-    const { adapter, configDir } = this.plugin.app.vault;
+    const { adapter, configDir } = this.#plugin.app.vault;
     if (adapter instanceof FileSystemAdapter) {
       this.#configPath = adapter.getFullPath(configDir);
       return this.#configPath;
     } else throw new Error("Unsupported adapter");
   }
   get defaultLibId() {
-    return this.plugin.settings.citationLibrary;
+    return this.#plugin.settings.citationLibrary;
   }
   get mainDbPath() {
-    return this.plugin.settings.zoteroDbPath;
+    return this.#plugin.settings.zoteroDbPath;
   }
   get bbtDbPath() {
-    return this.plugin.settings.betterBibTexDbPath;
+    return this.#plugin.settings.betterBibTexDbPath;
   }
 
   async setLoglevel(level: LogLevel) {
@@ -56,14 +66,14 @@ export default class ZoteroDb {
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
-    const [mainOpened, bbtOpened] = await this.openDatabase();
+    const [mainOpened, bbtOpened] = await this.#openDatabase();
     if (this.bbtDbPath && !bbtOpened) {
       log.warn("Better BibTex database not found");
-      new NoticeBBTStatus(this.plugin);
+      new NoticeBBTStatus(this.#plugin);
       return;
     }
     if (mainOpened) {
-      await this.initIndex(this.defaultLibId);
+      await this.#initIndex(this.defaultLibId);
       await this.getLibs();
     } else {
       log.error("Failed to init ZoteroDB");
@@ -75,17 +85,25 @@ export default class ZoteroDb {
       )}`,
     );
   }
-  public refreshIndex() {
-    return this.initIndex(this.defaultLibId, true);
+  refreshIndex() {
+    return this.#initIndex(this.defaultLibId, true);
   }
 
-  private async openDatabase() {
+  async #openDatabase() {
     const proxy = await this.#proxy;
     return await proxy.openDb(this.configPath, this.mainDbPath, this.bbtDbPath);
   }
-  private async initIndex(lib: number, refresh = false) {
+  async #initIndex(lib: number, refresh = false) {
     const proxy = await this.#proxy;
     await proxy.initIndex(lib, refresh);
+  }
+  async getAttachments(docId: number, libId = this.defaultLibId) {
+    const proxy = await this.#proxy;
+    return await proxy.getAttachments(docId, libId);
+  }
+  async getAnnotations(attachmentId: number, libId = this.defaultLibId) {
+    const proxy = await this.#proxy;
+    return await proxy.getAnnotations(attachmentId, libId);
   }
 
   async search(
@@ -111,18 +129,25 @@ export default class ZoteroDb {
     return result;
   }
 
-  private libs: { libraryID: number; name: string }[] | null = null;
+  #libs:
+    | {
+        libraryID: number;
+        type: string;
+        groupID: number | null;
+      }[]
+    | null = null;
   async getLibs(refresh = false) {
     try {
-      if (refresh || !this.libs) {
+      if (refresh || !this.#libs) {
         const result = await (await this.#proxy).getLibs();
-        this.libs = result;
+        this.#libs = result;
       }
     } catch (error) {
-      if (!this.libs) this.libs = [{ libraryID: 1, name: "My Library" }];
+      if (!this.#libs)
+        this.#libs = [{ libraryID: 1, type: "user", groupID: null }];
       log.error(error);
     }
-    return this.libs;
+    return this.#libs;
   }
 
   close(force = false) {

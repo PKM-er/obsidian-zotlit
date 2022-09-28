@@ -2,11 +2,11 @@ import type { LogLevel } from "@obzt/common";
 import type { AnnotationType, RegularItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
-interface Annotation {
+export interface Annotation {
   itemID: number;
   key: string;
   libraryID: number;
-  groupID: number;
+  groupID: number | null;
   type: AnnotationType;
   authorName: string | null;
   text: string | null;
@@ -17,12 +17,14 @@ interface Annotation {
   position: string;
 }
 
-interface AttachmentInfo {
+export interface AttachmentInfo {
   itemID: number;
+  key: string;
+  path: string;
   count?: string | number;
 }
 
-interface LibraryInfo {
+export interface LibraryInfo {
   libraryID: number;
   type: string;
   groupID: number | null;

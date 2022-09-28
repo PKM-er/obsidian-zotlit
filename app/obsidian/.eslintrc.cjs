@@ -26,11 +26,20 @@ module.exports = {
     "@aidenlx/eslint-config/regexp",
     // Apply prettier and disable incompatible rules
     "@aidenlx/eslint-config/prettier",
+    "@aidenlx/eslint-config/react",
   ],
   rules: {
     "import/no-unresolved": [
       2,
-      { ignore: ["worker:", "\\.less$", "@electron/remote"] },
+      {
+        ignore: [
+          "worker:",
+          "\\.less$",
+          "@electron/remote",
+          "react-dom",
+          "dompurify",
+        ],
+      },
     ],
   },
   settings: {

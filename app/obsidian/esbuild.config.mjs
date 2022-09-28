@@ -31,7 +31,24 @@ try {
     entryPoints: ["src/zt-main.ts"],
     banner: { js: banner },
     outfile: "build/main.js",
-    plugins: [lessLoader(), obPlugin()],
+    plugins: [
+      lessLoader(),
+      obPlugin(),
+      {
+        name: "react-alias",
+        setup(build) {
+          build.onResolve({ filter: /^react$|^react-dom$/ }, async () => {
+            const result = await build.resolve("@preact/compat", {
+              resolveDir: ".",
+            });
+            if (result.errors.length > 0) {
+              return { errors: result.errors };
+            }
+            return { path: result.path };
+          });
+        },
+      },
+    ],
   });
 } catch (err) {
   console.error(err);

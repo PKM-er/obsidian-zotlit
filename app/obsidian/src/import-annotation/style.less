@@ -1,0 +1,83 @@
+.annot-excerpt {
+  blockquote {
+    display: flex;
+    font-style: var(--blockquote-font-style);
+    background-color: var(--blockquote-background-color);
+    border-left: var(--blockquote-border-thickness) solid
+      var(--blockquote-border-color);
+    padding: 0 0 0 var(--size-4-2);
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    max-height: 200px;
+    display: flex;
+  }
+
+  img {
+    width: 100%;
+    object-fit: scale-down;
+  }
+}
+
+.annot-excerpt blockquote,
+.annot-excerpt p,
+.annot-comment p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.annot-list-item {
+  font-size: var(--font-ui-smaller);
+  line-height: var(--line-height-tight);
+  background-color: var(--background-primary);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  margin: var(--size-4-1) 0 var(--size-4-2);
+  color: var(--text-muted);
+  box-shadow: 0 0 0 1px var(--background-modifier-border);
+
+  &.selected .annot-header::after {
+    content: "✅";
+    margin-left: var(--size-4-1);
+  }
+}
+
+.annot-preview {
+  > * {
+    cursor: var(--cursor);
+    position: relative;
+    padding: var(--size-4-2) var(--size-4-5) var(--size-4-2) var(--size-4-3);
+    white-space: pre-wrap;
+    width: 100%;
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+  > *:last-child {
+    border-bottom: none;
+  }
+}
+
+.annot-header {
+  display: flex;
+  align-items: center;
+}
+
+.annot-type-icon {
+  -webkit-app-region: no-drag;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: var(--icon-opacity);
+  transition: opacity 0.15s ease-in-out;
+  height: auto;
+  flex-grow: 1;
+  justify-content: flex-start;
+}
+
+.modal.select-annot-modal .modal-content {
+  overflow: scroll;
+}
+
+.annot-list {
+  padding-right: var(--size-4-4);
+  padding-left: var(--size-4-1);
+}

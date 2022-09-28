@@ -3,13 +3,16 @@ import "./main.less";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
+import {
+  CitationEditorSuggest,
+  insertCitation,
+} from "./insert-citation/index.js";
 import checkLib from "./install-guide.js";
 import getZoteroLinkHandlers from "./link-handler/index.js";
 import NoteIndex from "./note-index/index.js";
 import { ZoteroSettingTab } from "./setting-tab.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
-import { CitationSuggester, insertCitation } from "./suggester/index.js";
 import ZoteroDb from "./zotero-db/index.js";
 
 checkLib();
@@ -36,7 +39,7 @@ export default class ZoteroPlugin extends Plugin {
       name: "Insert Markdown citation",
       editorCallback: insertCitation(this),
     });
-    this.registerEditorSuggest(new CitationSuggester(this));
+    this.registerEditorSuggest(new CitationEditorSuggest(this));
     this.addCommand({
       id: "refresh-zotero-index",
       name: "Refresh Zotero Index",

@@ -1,5 +1,3 @@
-import "./style.less";
-
 import type { RegularItem } from "@obzt/zotero-type";
 import type {
   Editor,
@@ -13,7 +11,7 @@ import type ZoteroPlugin from "../zt-main.js";
 import type { FuzzyMatch, SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 
-export default abstract class ZoteroItemSuggester
+export default abstract class ZoteroItemEditorSuggest
   extends EditorSuggest<FuzzyMatch<RegularItem>>
   implements SuggesterBase
 {

@@ -1,5 +1,3 @@
-import "./style.less";
-
 import type {
   Creator,
   JournalArticleItem,
@@ -138,5 +136,3 @@ const renderMatches = (
     textIndex < text.length && el.appendText(text.substring(textIndex));
   } else el.appendText(text);
 };
-
-export const isAlternative = (evt: KeyboardEvent | MouseEvent) => evt.shiftKey;

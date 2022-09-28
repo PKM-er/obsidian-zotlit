@@ -21,8 +21,8 @@ declare module "@aidenlx/knex/types/tables" {
 
 const queryAttachments = (knex: Knex, itemId: number, libId: number) =>
   knex
-    .select("itemAttachments.itemID" as "itemID")
-    .count({ count: "attachments.itemID" })
+    .select("itemAttachments.itemID" as "itemID", "path", "key")
+    .count({ count: "itemAttachments.itemID" })
     .from("itemAttachments")
     .join("items", (j) => j.using("itemID"))
     .join("itemAnnotations", (j) =>
@@ -30,6 +30,6 @@ const queryAttachments = (knex: Knex, itemId: number, libId: number) =>
     )
     .where("itemAttachments.parentItemID", itemId)
     .andWhere("libraryID", libId)
-    .groupBy("attachments.itemID");
+    .groupBy("itemAttachments.itemID");
 
 export default queryAttachments;
