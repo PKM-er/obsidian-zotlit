@@ -1,6 +1,7 @@
 import type { LogLevel } from "@obzt/common";
-import type { AnnotationType, RegularItem } from "@obzt/zotero-type";
+import type { AnnotationType } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
+import type { GeneralItem } from "./modules/init-index";
 
 export interface Annotation {
   itemID: number | null;
@@ -56,7 +57,7 @@ export interface DbWorkerAPI {
     libraryID: number,
     pattern: string | Fuse.Expression | null,
     options?: Fuse.FuseSearchOptions,
-  ): Promise<Fuse.FuseResult<RegularItem>[]>;
+  ): Promise<Fuse.FuseResult<GeneralItem>[]>;
 
   getLibs(): Promise<LibraryInfo[]>;
   getAnnotations(

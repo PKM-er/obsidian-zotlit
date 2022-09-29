@@ -2,7 +2,7 @@ import type { DbWorkerAPI } from "@api";
 import { databases } from "@init";
 import log from "@log";
 
-import libsSql from "./libraries.js";
+import libsSql from "./query.js";
 
 const getLibs: DbWorkerAPI["getLibs"] = async () => {
   const db = databases.main.db;

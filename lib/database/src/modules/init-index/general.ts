@@ -26,24 +26,36 @@
 import { nonRegularItemTypes } from "@obzt/zotero-type";
 import type { Knex } from "@knex";
 
-const sql = (knex: Knex, libId: number) =>
+export const itemSQL = (knex: Knex, libId: number) =>
   knex
-    .select(
-      "libraryID",
-      "groupID",
-      "key",
-      "itemID",
-      "typeName",
-      "fieldName",
-      "value",
-    )
+    .select("libraryID", "groupID", "key", "itemID", "typeName")
+    .from("items")
+    .join("itemTypesCombined", (j) => j.using("itemTypeID"))
+    .leftJoin("groups", (j) => j.using("libraryID"))
+    .where("libraryID", libId)
+    .whereNotIn("itemType", nonRegularItemTypes)
+    .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
+
+export const itemFieldsSQL = (knex: Knex, libId: number) =>
+  knex
+    .select("itemID", "fieldName", "value")
     .from("items")
     .join("itemData", (j) => j.using("itemID"))
     .join("itemDataValues", (j) => j.using("valueID"))
-    .join("fields", (j) => j.using("fieldID"))
-    .join("itemTypes", (j) => j.using("itemTypeID"))
-    .leftJoin("groups", (j) => j.using("libraryID"))
+    .join("fieldsCombined", (j) => j.using("fieldID"))
     .where("libraryID", libId)
-    .whereNotIn("typeName", nonRegularItemTypes)
+    .whereNotIn("itemType", nonRegularItemTypes)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
-export default sql;
+
+export type Item = {
+  itemID: number | null;
+  libraryID: number;
+  key: string;
+  groupID: number | null;
+  typeName: string;
+};
+export type ItemField = {
+  itemID: number | null;
+  fieldName: string;
+  value: unknown;
+};

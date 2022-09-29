@@ -20,7 +20,7 @@
 
 import type { Knex } from "@knex";
 
-const creatorSql = (knex: Knex, libId: number) =>
+const sql = (knex: Knex, libId: number) =>
   knex
     .select(
       "itemID",
@@ -37,4 +37,13 @@ const creatorSql = (knex: Knex, libId: number) =>
     .where("libraryID", libId)
     .orderBy("itemID", "orderIndex");
 
-export default creatorSql;
+export default sql;
+
+export type ItemCreator = {
+  itemID: number;
+  firstName: string | null;
+  lastName: string | null;
+  fieldMode: number | null;
+  creatorType: string | null;
+  orderIndex: number;
+};

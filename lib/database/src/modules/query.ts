@@ -1,17 +1,17 @@
-import type { RegularItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
 import { index } from "@init";
+import type { GeneralItem } from "./init-index";
 
 const query: DbWorkerAPI["query"] = async (libId, pattern, options) => {
   const fuse = index[libId];
   if (!fuse) {
     throw new Error("Query before init");
   }
-  let result: Fuse.FuseResult<RegularItem>[];
+  let result: Fuse.FuseResult<GeneralItem>[];
   if (pattern === null) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let docs = (fuse as any)?._docs as RegularItem[] | undefined;
+    let docs = (fuse as any)?._docs as GeneralItem[] | undefined;
     if (!docs) {
       result = [];
     } else {

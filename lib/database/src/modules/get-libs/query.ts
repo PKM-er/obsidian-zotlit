@@ -12,11 +12,11 @@
 
 import type { Knex } from "@knex";
 
-const betterBibTexSql = (knex: Knex) =>
+const sql = (knex: Knex) =>
   knex
     .select("libraryID", "type", "groupID")
     .from("libraries")
     .leftJoin("groups", (j) => j.using("libraryID"))
     .orderBy("libraryID");
 
-export default betterBibTexSql;
+export default sql;

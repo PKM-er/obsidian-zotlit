@@ -1,5 +1,20 @@
 import type { Knex } from "@knex";
 
-const betterBibTexSql = (knex: Knex) =>
-  knex.select("itemID", "citekey").from("citekeys");
-export default betterBibTexSql;
+declare module "@aidenlx/knex/types/tables" {
+  export interface CiteKeys {
+    itemID: number;
+    libraryID: number;
+    itemKey: string;
+    citekey: string;
+  }
+  interface Tables {
+    citekeys: CiteKeys;
+  }
+}
+const sql = (knex: Knex) => knex.select("itemID", "citekey").from("citekeys");
+export default sql;
+
+export type ItemCitekey = {
+  itemID: number;
+  citekey: string;
+};
