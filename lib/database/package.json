@@ -2,7 +2,8 @@
   "name": "@obzt/database",
   "version": "0.0.1",
   "scripts": {
-    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json"
+    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json",
+    "db-type": "node --experimental-import-meta-resolve scripts/sql-type.mjs && pnpm eslint src/knex.d.ts src/db-types.ts --fix"
   },
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +13,9 @@
     "typescript": "^4.8.3",
     "eslint": "~8.24.0",
     "@types/workerpool": "~6.1.0",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "@rmp135/sql-ts": "~1.15.0",
+    "endent": "~2.1.0"
   },
   "dependencies": {
     "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",

@@ -14,7 +14,7 @@ const isAnnotationItem = (item: unknown): item is AnnotationItem =>
   (item as Item).itemType === "annotation" &&
   typeof (item as AnnotationItem).parentItem === "string" &&
   (!!(item as AnnotationItem).key ||
-    typeof (item as AnnotationItem).annotationPosition?.pageIndex === "number");
+    typeof (item as AnnotationItem).position?.pageIndex === "number");
 
 export const partial = {} as const;
 
@@ -28,11 +28,8 @@ export const helpers: HelperDeclareSpec = {
       url = new URL(`zotero://select/${target}/items/${this.key}`);
     } else if (isAnnotationItem(this)) {
       url = new URL(`zotero://open-pdf/${target}/items/${this.parentItem}`);
-      if (typeof this.annotationPosition?.pageIndex === "number")
-        url.searchParams.append(
-          "page",
-          this.annotationPosition.pageIndex.toString(),
-        );
+      if (typeof this.position?.pageIndex === "number")
+        url.searchParams.append("page", this.position.pageIndex.toString());
       if (this.key) url.searchParams.append("annotation", this.key);
     } else return "";
     return url.toString();
@@ -53,8 +50,8 @@ export const helpers: HelperDeclareSpec = {
   blockID(this: AnnotationItem | any): string {
     if (isAnnotationItem(this)) {
       let id = getItemKeyGroupID(this);
-      if (typeof this.annotationPosition.pageIndex === "number")
-        id += `p${this.annotationPosition.pageIndex}`;
+      if (typeof this.position.pageIndex === "number")
+        id += `p${this.position.pageIndex}`;
       return id;
     } else return "";
   },

@@ -2,15 +2,10 @@ import type { Annotation } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
-import DOMPurify from "dompurify";
 import { setIcon } from "obsidian";
 import { useContext, useEffect, useRef } from "preact/hooks";
+import { renderHTMLReact } from "../utils";
 import { AnnotationContext } from "./annot-list";
-
-declare global {
-  // eslint-disable-next-line no-var
-  var DOMPurify: typeof DOMPurify;
-}
 
 export const AnnotationPreview = ({
   annotation: annot,
@@ -100,7 +95,7 @@ const PicExcerpt = ({ annot }: { annot: Annotation }) => {
 const Comment = ({ comment }: { comment: string | null }) => {
   return comment ? (
     <div className="annot-comment">
-      <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment) }} />
+      <p {...renderHTMLReact(comment)} />
     </div>
   ) : null;
 };
@@ -113,7 +108,7 @@ const Icon = ({
 }: {
   icon: string;
   size?: number;
-  color?: string;
+  color?: string | null;
   className?: string;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -125,5 +120,6 @@ const Icon = ({
       node.empty();
     };
   }, [icon, size]);
-  return <div ref={ref} style={{ color }} className={className} />;
+  const style = color ? { color } : undefined;
+  return <div ref={ref} style={style} className={className} />;
 };

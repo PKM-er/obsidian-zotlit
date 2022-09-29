@@ -12,32 +12,6 @@
 
 import type { Knex } from "@knex";
 
-declare module "@aidenlx/knex/types/tables" {
-  interface Library {
-    libraryID: number;
-    type: "user" | "group";
-    editable: number;
-    filesEditable: number;
-    version: number;
-    storageVersion: number;
-    lastSync: number;
-    archived: number;
-  }
-
-  interface Group {
-    groupID: number;
-    libraryID: number;
-    name: string;
-    description: string;
-    version: number;
-  }
-
-  interface Tables {
-    libraries: Library;
-    groups: Group;
-  }
-}
-
 const betterBibTexSql = (knex: Knex) =>
   knex
     .select("libraryID", "type", "groupID")

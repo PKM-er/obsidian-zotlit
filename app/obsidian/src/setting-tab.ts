@@ -94,6 +94,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       s.addDropdown((dd) => {
         dropdown = dd;
         for (const { libraryID, type, groupID } of libs) {
+          if (!libraryID) continue;
           dd.addOption(
             libraryID.toString(),
             type === "user" ? "My Library" : `Group ${groupID}`,

@@ -1,24 +1,5 @@
 import type { Knex } from "@knex";
 
-declare module "@aidenlx/knex/types/tables" {
-  export interface Attachment {
-    itemID: number;
-    parentItemID: number;
-    linkMode: number;
-    contentType: string;
-    charsetID: number;
-    path: string;
-    syncState: number;
-    storageModTime: number;
-    storageHash: string;
-    lastProcessedModificationTime: number;
-  }
-
-  interface Tables {
-    itemAttachments: Attachment;
-  }
-}
-
 const queryAttachments = (knex: Knex, itemId: number, libId: number) =>
   knex
     .select("itemAttachments.itemID" as "itemID", "path", "key")

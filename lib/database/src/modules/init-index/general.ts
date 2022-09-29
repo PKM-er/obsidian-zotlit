@@ -26,14 +26,14 @@
 import { nonRegularItemTypes } from "@obzt/zotero-type";
 import type { Knex } from "@knex";
 
-const betterBibTexSql = (knex: Knex, libId: number) =>
+const sql = (knex: Knex, libId: number) =>
   knex
     .select(
       "libraryID",
       "groupID",
       "key",
       "itemID",
-      "typeName AS itemType",
+      "typeName",
       "fieldName",
       "value",
     )
@@ -44,6 +44,6 @@ const betterBibTexSql = (knex: Knex, libId: number) =>
     .join("itemTypes", (j) => j.using("itemTypeID"))
     .leftJoin("groups", (j) => j.using("libraryID"))
     .where("libraryID", libId)
-    .whereNotIn("itemType", nonRegularItemTypes)
+    .whereNotIn("typeName", nonRegularItemTypes)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
-export default betterBibTexSql;
+export default sql;

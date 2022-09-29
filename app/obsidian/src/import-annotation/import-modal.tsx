@@ -47,6 +47,15 @@ export class LiteratureSelectModal extends ZoteroItemSuggestModal {
       if (!result) return;
       targetAttachment = result.value.item;
     }
+    if (!targetAttachment.itemID) {
+      new Notice(
+        `Failed to get attachment: itemID missing for ${
+          targetAttachment.path ?? targetAttachment.key
+        }`,
+      );
+      return;
+    }
+
     const annotations = await this.plugin.db.getAnnotations(
       targetAttachment.itemID,
       libraryID,
@@ -82,7 +91,7 @@ class AttachmentSelectModal extends FuzzySuggestModalWithPromise<AttachmentInfo>
   }
 
   getItemText(item: AttachmentInfo): string {
-    return item.path.replace(/^storage:/, "");
+    return item.path?.replace(/^storage:/, "") ?? item.key;
   }
 
   // get result in promise

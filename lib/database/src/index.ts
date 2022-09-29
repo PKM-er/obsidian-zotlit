@@ -42,3 +42,5 @@ export const sortBySortIndex = (a: string, b: string) => {
   }
   return 0;
 };
+
+export * from "db-types";

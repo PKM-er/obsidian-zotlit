@@ -1,5 +1,5 @@
 import type { LogLevel } from "@obzt/common";
-import type { DbWorkerAPI } from "@obzt/database";
+import type { DbWorkerAPI, LibraryInfo } from "@obzt/database";
 import dbWorker from "@obzt/database";
 import type Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
@@ -129,13 +129,7 @@ export default class ZoteroDb {
     return result;
   }
 
-  #libs:
-    | {
-        libraryID: number;
-        type: string;
-        groupID: number | null;
-      }[]
-    | null = null;
+  #libs: LibraryInfo[] | null = null;
   async getLibs(refresh = false) {
     try {
       if (refresh || !this.#libs) {

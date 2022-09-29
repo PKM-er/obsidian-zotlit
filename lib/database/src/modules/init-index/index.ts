@@ -33,7 +33,9 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
   const entries = {} as any;
   // eslint-disable-next-line prefer-const
   for (let { itemID, fieldName, value, ...props } of general) {
-    if (fieldName === "date") value = multipartToSQL(value).split("-")[0];
+    if (fieldName === "date")
+      value = multipartToSQL(value as string).split("-")[0];
+    if (!itemID || !fieldName) continue;
     if (itemID in entries) {
       entries[itemID][fieldName] = value;
     } else {

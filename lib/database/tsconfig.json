@@ -18,5 +18,5 @@
       "@knex": ["./modules/db/knex.config.ts"]
     }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "scripts/sql-type.ts"]
 }

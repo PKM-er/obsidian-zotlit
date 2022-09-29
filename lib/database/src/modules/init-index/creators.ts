@@ -20,48 +20,6 @@
 
 import type { Knex } from "@knex";
 
-declare module "@aidenlx/knex/types/tables" {
-  interface Item {
-    itemID: number;
-    itemTypeID: number;
-    dateAdded: string;
-    dateModified: string;
-    clientDateModified: string;
-    libraryID: number;
-    key: string;
-    version: number;
-    synced: number;
-  }
-
-  interface ItemCreator {
-    itemID: number;
-    creatorID: number;
-    creatorTypeID: number;
-    orderIndex: number;
-  }
-  interface Creator {
-    creatorID: number;
-    firstName: string;
-    lastName: string;
-    /**
-     * 0: with full name, 1: only last name
-     */
-    fieldMode: 0 | 1;
-  }
-
-  interface CreatorType {
-    creatorTypeID: number;
-    creatorType: string;
-  }
-
-  interface Tables {
-    items: Item;
-    itemCreators: ItemCreator;
-    creators: Creator;
-    creatorTypes: CreatorType;
-  }
-}
-
 const creatorSql = (knex: Knex, libId: number) =>
   knex
     .select(

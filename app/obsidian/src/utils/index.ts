@@ -1,5 +1,5 @@
 import endent from "endent";
-import { Platform } from "obsidian";
+import { Platform, setIcon } from "obsidian";
 
 export const promptOpenLog = () => endent`
 Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
@@ -25,3 +25,12 @@ Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
 //     };
 //   });
 // };
+
+declare global {
+  // eslint-disable-next-line no-var, @typescript-eslint/naming-convention, @typescript-eslint/consistent-type-imports
+  var DOMPurify: typeof import("dompurify");
+}
+
+export const renderHTMLReact = (html: string) => ({
+  dangerouslySetInnerHTML: { __html: DOMPurify.sanitize(html) },
+});

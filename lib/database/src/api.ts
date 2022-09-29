@@ -3,7 +3,7 @@ import type { AnnotationType, RegularItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
 export interface Annotation {
-  itemID: number;
+  itemID: number | null;
   key: string;
   libraryID: number;
   groupID: number | null;
@@ -11,21 +11,21 @@ export interface Annotation {
   authorName: string | null;
   text: string | null;
   comment: string | null;
-  color: string;
-  pageLabel: string;
+  color: string | null;
+  pageLabel: string | null;
   sortIndex: string;
   position: string;
 }
 
 export interface AttachmentInfo {
-  itemID: number;
+  itemID: number | null;
   key: string;
-  path: string;
+  path: string | null;
   count?: string | number;
 }
 
 export interface LibraryInfo {
-  libraryID: number;
+  libraryID: number | null;
   type: string;
   groupID: number | null;
 }
