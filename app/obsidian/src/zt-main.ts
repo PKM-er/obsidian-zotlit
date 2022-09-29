@@ -8,7 +8,7 @@ import {
   insertCitation,
 } from "./insert-citation/index.js";
 import checkLib from "./install-guide.js";
-import getZoteroLinkHandlers from "./link-handler/index.js";
+import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
 import { ZoteroSettingTab } from "./setting-tab.js";
 import type { ZoteroSettings } from "./settings.js";
@@ -56,6 +56,7 @@ export default class ZoteroPlugin extends Plugin {
         new Notice("Literature notes re-indexed");
       },
     });
+    registerNoteFeature(this);
 
     // getZoteroLinkHandlers(this).forEach((args) =>
     //   this.registerObsidianProtocolHandler(...args),

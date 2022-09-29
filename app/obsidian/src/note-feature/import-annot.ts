@@ -1,12 +1,12 @@
-import { MarkdownView, Notice, TFile } from "obsidian";
+import { MarkdownView, TFile } from "obsidian";
+import type { ItemWithAnnots } from "../note-template/const.js";
 
 import type ZoteroPlugin from "../zt-main.js";
-import createNote from "./create-note.js";
-import type { SendDataAnnoExport } from "./index.js";
+import { createNote } from "./open-create.js";
 
-export const importAnnoItems = async (
+export const importAnnotation = async (
   plugin: ZoteroPlugin,
-  data: SendDataAnnoExport,
+  data: ItemWithAnnots,
 ) => {
   const { vault, workspace } = plugin.app,
     { literatureNoteTemplate: template } = plugin.settings;
@@ -14,11 +14,15 @@ export const importAnnoItems = async (
   const open = (file: TFile, newLeaf = false) =>
     workspace.openLinkText(file.path, "", newLeaf);
 
-  const info = plugin.noteIndex.getNoteFromKey(data.info);
+  const info = plugin.noteIndex.getNoteFromKey(data);
   const noteFile = info && plugin.app.vault.getAbstractFileByPath(info.file);
   if (noteFile && noteFile instanceof TFile) {
-    const annots = template.render("annots", data.annotations),
+    // insert into existing note
+    const annots = data.annotations
+        ? template.render("annots", data.annotations)
+        : "",
       view = workspace.getActiveViewOfType(MarkdownView);
+    if (!annots) return;
     if (view && view.file.path === noteFile.path) {
       const { editor } = view;
       if (editor.somethingSelected()) {
@@ -35,6 +39,7 @@ export const importAnnoItems = async (
       open(noteFile);
     }
   } else {
-    open(await createNote(plugin, data.info, data.annotations));
+    // create new note and open
+    open(await createNote(plugin, data));
   }
 };

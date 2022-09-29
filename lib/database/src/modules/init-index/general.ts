@@ -56,6 +56,7 @@ export const itemFieldsSQL = (knex: Knex, libId: number) =>
     .join("itemData", (j) => j.using("itemID"))
     .join("itemDataValues", (j) => j.using("valueID"))
     .join("fieldsCombined", (j) => j.using("fieldID"))
+    .join("itemTypesCombined", (j) => j.using("itemTypeID"))
     .where("libraryID", libId)
-    .whereNotIn("itemType", nonRegularItemTypes)
+    .whereNotIn("typeName", nonRegularItemTypes)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
