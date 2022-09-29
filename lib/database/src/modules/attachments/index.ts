@@ -10,10 +10,10 @@ const getAttachments: DbWorkerAPI["getAttachments"] = async (docId, libId) => {
     throw new Error("failed to get attachments: no main database opened");
   }
   log.debug(`Reading Zotero database for attachments of item ${docId}`);
-  const libs = await query(db, docId, libId);
+  const attachments = await query(db, docId, libId);
   log.debug(
-    `Finished reading Zotero database for attachments of item ${docId}, count: ${libs.length}`,
+    `Finished reading Zotero database for attachments of item ${docId}, count: ${attachments.length}`,
   );
-  return libs;
+  return attachments;
 };
 export default getAttachments;

@@ -7,12 +7,14 @@ import getLibs from "./modules/get-libs/index.js";
 import initIndex from "./modules/init-index/index.js";
 import openDb from "./modules/open-db.js";
 import query from "./modules/query.js";
+import getTags from "./modules/tags/index.js";
 
 const methods: DbWorkerAPI = {
   getLibs,
   initIndex,
   openDb,
   query,
+  getTags,
   getAttachments,
   getAnnotations,
   setLoglevel: (level) => {

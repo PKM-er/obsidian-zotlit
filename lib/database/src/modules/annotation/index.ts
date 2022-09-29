@@ -15,10 +15,10 @@ const getAnnotations: DbWorkerAPI["getAnnotations"] = async (
   log.debug(
     `Reading Zotero database for annotations of attachment ${attachmentId}`,
   );
-  const libs = await query(db, attachmentId, libId);
+  const annots = await query(db, attachmentId, libId);
   log.debug(
-    `Finished reading Zotero database for annotations of attachment ${attachmentId}, count: ${libs.length}`,
+    `Finished reading Zotero database for annotations of attachment ${attachmentId}, count: ${annots.length}`,
   );
-  return libs;
+  return annots;
 };
 export default getAnnotations;

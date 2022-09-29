@@ -30,6 +30,16 @@ export interface LibraryInfo {
   groupID: number | null;
 }
 
+export interface TagInfo {
+  itemID: number | null;
+  /**
+   * 0 or missing indicates a manually added tag
+   * 1 indicates an automatically fetched tag
+   */
+  type: 0 | 1;
+  name: string | null;
+}
+
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
   /* open new database, return true if successful */
@@ -54,6 +64,7 @@ export interface DbWorkerAPI {
     libraryID: number,
   ): Promise<Annotation[]>;
   getAttachments(docId: number, libraryID: number): Promise<AttachmentInfo[]>;
+  getTags(itemIds: number[], libraryID: number): Promise<TagInfo[]>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {
