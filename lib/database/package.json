@@ -2,8 +2,7 @@
   "name": "@obzt/database",
   "version": "0.0.1",
   "scripts": {
-    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json",
-    "db-type": "node --experimental-import-meta-resolve scripts/sql-type.mjs && pnpm eslint src/knex.d.ts src/db-types.ts --fix"
+    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json"
   },
   "module": "dist/index.js",
   "types": "dist/index.d.ts",

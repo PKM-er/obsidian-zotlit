@@ -154,13 +154,21 @@ importers:
 
   ../../lib/zotero-type:
     specifiers:
+      '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/eslint-config': 2.0.5
+      '@aidenlx/knex': '>=2.3.0-mod <2.3.0-mod0'
+      '@rmp135/sql-ts': ~1.15.0
       '@types/node': ^17.0.10
+      endent: ~2.1.0
       eslint: ~8.24.0
       typescript: ^4.8.3
     devDependencies:
+      '@aidenlx/better-sqlite3': 7.6.2-mod.2
       '@aidenlx/eslint-config': 2.0.5_ezse5hvtfn6hw4hsrycs5yicpi
+      '@aidenlx/knex': 2.3.0-mod.1_lyhqer75kdng42kiqldhcbpj2q
+      '@rmp135/sql-ts': 1.15.0
       '@types/node': 17.0.45
+      endent: 2.1.0
       eslint: 8.24.0
       typescript: 4.8.3
 
@@ -306,7 +314,6 @@ packages:
       tildify: 2.0.0
     transitivePeerDependencies:
       - supports-color
-    dev: false
 
   /@ardatan/sync-fetch/0.0.1:
     resolution: {integrity: sha512-xhlTqH0m31mnsG0tIP4ETgfSB6gXDaYYsUWTrlUV93fFQPI9dd8hE0Ot6MHLCtqgB32hwJAC3YZMWlXZw7AleA==}
@@ -2067,7 +2074,6 @@ packages:
 
   /colorette/2.0.19:
     resolution: {integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==}
-    dev: false
 
   /combined-stream/1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}

@@ -39,11 +39,4 @@ const sql = (knex: Knex, libId: number) =>
 
 export default sql;
 
-export type ItemCreator = {
-  itemID: number;
-  firstName: string | null;
-  lastName: string | null;
-  fieldMode: number | null;
-  creatorType: string | null;
-  orderIndex: number;
-};
+

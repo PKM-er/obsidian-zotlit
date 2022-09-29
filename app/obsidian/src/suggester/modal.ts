@@ -1,4 +1,4 @@
-import type { RegularItem } from "@obzt/zotero-type";
+import type { GeneralItem } from "@obzt/database";
 import { debounce } from "obsidian";
 
 import type ZoteroPlugin from "../zt-main.js";
@@ -7,7 +7,7 @@ import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 import { SuggestModalWithPromise } from "./modal-promise";
 
 export default class ZoteroItemSuggestModal
-  extends SuggestModalWithPromise<FuzzyMatch<RegularItem>>
+  extends SuggestModalWithPromise<FuzzyMatch<GeneralItem>>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {

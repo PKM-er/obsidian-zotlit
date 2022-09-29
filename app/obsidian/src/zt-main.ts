@@ -57,9 +57,9 @@ export default class ZoteroPlugin extends Plugin {
       },
     });
 
-    getZoteroLinkHandlers(this).forEach((args) =>
-      this.registerObsidianProtocolHandler(...args),
-    );
+    // getZoteroLinkHandlers(this).forEach((args) =>
+    //   this.registerObsidianProtocolHandler(...args),
+    // );
 
     this.db.init();
 

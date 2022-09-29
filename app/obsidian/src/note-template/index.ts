@@ -1,4 +1,4 @@
-import type { RegularItem } from "@obzt/zotero-type";
+import type { GeneralItem } from "@obzt/database";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
@@ -76,16 +76,14 @@ export default class NoteTemplate {
     return renderWith(obj);
   }
 
-  private renderFrontmatter<T extends RegularItem>(target: T) {
+  private renderFrontmatter<T extends GeneralItem>(target: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {};
     let notEmpty = false;
     // zotero-key required
     data[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(target);
-    for (const [k, config] of Object.entries<string[] | true>(
-      this.frontmatter,
-    )) {
-      if (!(k in target)) continue;
+    for (const [k, config] of Object.entries(this.frontmatter)) {
+      if (!(k in target) || config === undefined) continue;
       const value = target[k as keyof T];
       if (config === true) {
         data[k] = value;

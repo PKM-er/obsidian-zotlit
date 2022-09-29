@@ -1,3 +1,4 @@
+import type { ItemKeyGroup } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
 import type {
   CachedMetadata,
@@ -28,9 +29,7 @@ export default class NoteIndex extends Events {
   }
 
   fileMap: Map<string, FileMapInfo> = new Map();
-  getNoteFromKey(
-    item: Parameters<typeof getItemKeyGroupID>[0],
-  ): FileMapInfo | undefined {
+  getNoteFromKey(item: ItemKeyGroup): FileMapInfo | undefined {
     log.debug("getNoteFromKey: ", item, getItemKeyGroupID(item, true));
     return this.fileMap.get(getItemKeyGroupID(item, true));
   }

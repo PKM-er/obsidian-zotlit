@@ -1,9 +1,6 @@
-import type {
-  Creator,
-  JournalArticleItem,
-  RegularItem,
-} from "@obzt/zotero-type";
-import { isFullName } from "@obzt/zotero-type";
+import type { GeneralItem } from "@obzt/database";
+import type { Creator, JournalArticleItem } from "@obzt/zotero-type";
+import { isCreatorNameOnly, isCreatorFullName } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
 import type ZoteroPlugin from "../zt-main.js";
@@ -20,7 +17,7 @@ export interface SuggesterBase {
 export const getSuggestions = async (
   input: string,
   plugin: ZoteroPlugin,
-): Promise<FuzzyMatch<RegularItem>[]> => {
+): Promise<FuzzyMatch<GeneralItem>[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
     return await plugin.db.search(
       input.replace(/^\+|\+$/g, "").split(/\+/),
@@ -34,15 +31,15 @@ export const getSuggestions = async (
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function renderSuggestion(
   this: SuggesterBase,
-  suggestion: FuzzyMatch<RegularItem>,
+  suggestion: FuzzyMatch<GeneralItem>,
   el: HTMLElement,
 ): void {
-  const item = suggestion.item as JournalArticleItem;
+  const item = suggestion.item;
   const title = item[PRIMARY_MATCH_FIELD],
     { matches } = suggestion;
 
   const titleEl = el.createDiv({ cls: "title" });
-  if (!title) {
+  if (!(typeof title === "string" && title)) {
     titleEl.setText("Title missing");
   } else if (matches) {
     const indices =
@@ -62,8 +59,13 @@ export function renderSuggestion(
   if (this.plugin.settings.showCitekeyInSuggester && item.citekey) {
     el.createDiv({ cls: "citekey", text: item.citekey });
   }
-  el.append(getArticleMeta(item));
+  if (isJournalArticleItem(item)) {
+    el.append(getArticleMeta(item));
+  }
 }
+
+const isJournalArticleItem = (item: GeneralItem): item is JournalArticleItem =>
+  item.itemType === "journalArticle";
 
 const getArticleMeta = (item: JournalArticleItem) => {
   const { creators, date, publicationTitle, volume, issue, pages } = item;
@@ -96,9 +98,11 @@ const getArticleMeta = (item: JournalArticleItem) => {
 const creatorToString = (creators: Creator[] | undefined) => {
   if (!creators || !creators[0]) return "";
   const firstCreator = creators[0];
-  let str = isFullName(firstCreator)
+  let str = isCreatorFullName(firstCreator)
     ? firstCreator.lastName
-    : firstCreator.name;
+    : isCreatorNameOnly(firstCreator)
+    ? firstCreator.name
+    : "";
   if (creators.length > 1) str = str.trim() + " et al.";
   return str;
 };

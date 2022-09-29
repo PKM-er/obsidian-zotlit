@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "obsidian";
 declare module "obsidian" {
   interface App {
@@ -10,7 +11,7 @@ declare module "obsidian" {
     createNewMarkdownFileFromLinktext(
       linktext: string,
       sourcePath: string,
-    ): TFile;
+    ): Promise<TFile>;
   }
   interface MetadataCache {
     on(name: "finished", callback: () => any, ctx?: any): EventRef;

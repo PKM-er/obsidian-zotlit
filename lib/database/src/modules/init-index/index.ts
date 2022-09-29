@@ -1,14 +1,17 @@
 import { multipartToSQL } from "@obzt/common";
+import type {
+  Item,
+  ItemField,
+  ItemCitekey,
+  ItemCreator,
+} from "@obzt/zotero-type";
 import Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
 import { databases, index } from "@init";
 import log from "@log";
 
-import type { ItemCitekey } from "./better-bibtex.js";
 import sql from "./better-bibtex.js";
-import type { ItemCreator } from "./creators.js";
 import creatorsSql from "./creators.js";
-import type { Item, ItemField } from "./general.js";
 import { itemFieldsSQL, itemSQL } from "./general.js";
 
 const fuseOptions: Fuse.IFuseOptions<GeneralItem> = {
@@ -34,12 +37,12 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
     await Promise.all([databases.main.refresh(), databases.bbt?.refresh()]);
   }
 
-  const { item, itemFields, creators } = await readMainDb(libraryID);
+  const { items, itemFields, creators } = await readMainDb(libraryID);
   const citekeyMap = await readBbtDb();
 
   // prepare for fuse index
 
-  const entries = item.reduce(
+  const entries = items.reduce(
     (rec, { itemID, ...props }) => (
       itemID &&
         (rec[itemID] = { ...props, itemID, creators: [], citekey: null }),
@@ -79,9 +82,9 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
   }
 
   log.trace("Start fuse indexing");
-  const items = Object.values(entries);
+  const generalItems = Object.values(entries);
 
-  index[libraryID] = new Fuse(items, fuseOptions);
+  index[libraryID] = new Fuse(generalItems, fuseOptions);
   log.info("Library index initialized");
 
   // const itemMap = items.reduce(
@@ -96,7 +99,7 @@ export default initIndex;
 const readMainDb = async (
   libraryID: number,
 ): Promise<{
-  item: Item[];
+  items: Item[];
   itemFields: ItemField[];
   creators: ItemCreator[];
 }> => {
@@ -106,7 +109,7 @@ const readMainDb = async (
     throw new Error("failed to init index: no main database opened");
   }
   const result = {
-    item: await itemSQL(db, libraryID),
+    items: await itemSQL(db, libraryID),
     itemFields: await itemFieldsSQL(db, libraryID),
     creators: await creatorsSql(db, libraryID),
   };

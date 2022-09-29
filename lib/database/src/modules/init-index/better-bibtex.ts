@@ -13,8 +13,3 @@ declare module "@aidenlx/knex/types/tables" {
 }
 const sql = (knex: Knex) => knex.select("itemID", "citekey").from("citekeys");
 export default sql;
-
-export type ItemCitekey = {
-  itemID: number;
-  citekey: string;
-};

@@ -1,10 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "files": [
-    "src/index.ts",
-    "src/api.ts",
-    "src/web-worker.d.ts",
-    "src/db-types.ts"
-  ],
-  "include": []
+  "include": ["src/**/*.ts"]
 }

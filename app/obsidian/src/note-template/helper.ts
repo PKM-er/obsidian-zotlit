@@ -1,35 +1,32 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import type { AnnotationItem, Item, RegularItem } from "@obzt/zotero-type";
+import type { Annotation, GeneralItem, Item } from "@obzt/database";
 import { nonRegularItemTypes } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { HelperDeclareSpec, HelperOptions } from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
 
-const isRegularItem = (item: unknown): item is RegularItem =>
+const isGeneralItem = (item: unknown): item is GeneralItem =>
   !nonRegularItemTypes.includes((item as Item).itemType as never) &&
   typeof (item as Item).key === "string";
-const isAnnotationItem = (item: unknown): item is AnnotationItem =>
-  (item as Item).itemType === "annotation" &&
-  typeof (item as AnnotationItem).parentItem === "string" &&
-  (!!(item as AnnotationItem).key ||
-    typeof (item as AnnotationItem).position?.pageIndex === "number");
+const isAnnotationItem = (item: unknown): item is Annotation =>
+  (item as Item).itemType === "annotation" && !!(item as Annotation).parentItem;
 
 export const partial = {} as const;
 
 export const helpers: HelperDeclareSpec = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  backlink(this: RegularItem | AnnotationItem | any): string {
+  backlink(this: GeneralItem | Annotation | any): string {
     let url: URL;
-    const target =
+    const library =
       typeof this.groupID === "number" ? `groups/${this.groupID}` : "library";
-    if (isRegularItem(this)) {
-      url = new URL(`zotero://select/${target}/items/${this.key}`);
+    if (isGeneralItem(this)) {
+      url = new URL(`zotero://select/${library}/items/${this.key}`);
     } else if (isAnnotationItem(this)) {
-      url = new URL(`zotero://open-pdf/${target}/items/${this.parentItem}`);
-      if (typeof this.position?.pageIndex === "number")
-        url.searchParams.append("page", this.position.pageIndex.toString());
+      url = new URL(`zotero://open-pdf/${library}/items/${this.parentItem}`);
+      const page = toPage(this.pageLabel);
+      if (page) url.searchParams.append("page", page.toString());
       if (this.key) url.searchParams.append("annotation", this.key);
     } else return "";
     return url.toString();
@@ -47,12 +44,22 @@ export const helpers: HelperDeclareSpec = {
     return filenamify(options.fn(this), { replacement: "_" });
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blockID(this: AnnotationItem | any): string {
+  blockID(this: Annotation | any): string {
     if (isAnnotationItem(this)) {
       let id = getItemKeyGroupID(this);
-      if (typeof this.position.pageIndex === "number")
-        id += `p${this.position.pageIndex}`;
+      const page = toPage(this.pageLabel);
+      if (page) id += `p${page}`;
       return id;
     } else return "";
   },
+};
+
+const toPage = (pageLabel: string | null): number | null => {
+  if (!pageLabel) return null;
+  const page = parseInt(pageLabel, 10);
+  if (Number.isInteger(page)) {
+    return page;
+  } else {
+    return null;
+  }
 };

@@ -1,22 +1,23 @@
-import type { AnnotationItem, ItemField, RegularItem } from "@obzt/zotero-type";
+import type { Annotation, GeneralItem } from "@obzt/database";
+import type { ItemFields } from "@obzt/zotero-type";
 import endent from "endent";
 import type { TemplateDelegate } from "handlebars";
 
 // #region type defs
 
-export type ItemWithAnnos<I extends RegularItem = RegularItem> = I & {
-  annotations?: AnnotationItem[];
+export type ItemWithAnnots<I extends GeneralItem = GeneralItem> = I & {
+  annotations?: Annotation[];
 };
 export interface TemplateItemTypeMap {
-  content: ItemWithAnnos;
-  filename: RegularItem;
-  annotation: AnnotationItem;
-  annots: AnnotationItem[];
-  mdCite: RegularItem;
-  altMdCite: RegularItem;
+  content: ItemWithAnnots;
+  filename: GeneralItem;
+  annotation: Annotation;
+  annots: Annotation[];
+  mdCite: GeneralItem;
+  altMdCite: GeneralItem;
 }
 export type FieldsInFrontmatter = {
-  [K in ItemField | keyof RegularItem]?: true | string[];
+  [K in ItemFields | keyof GeneralItem]?: true | string[];
 };
 
 export type TemplateInstances = {
@@ -49,7 +50,7 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 
             [Zotero]({{backlink}})
 
-            {{#if annotationText}}> {{annotationText}}{{/if}}
+            {{#if text}}> {{text}}{{/if}}
             `,
   mdCite: `[@{{citekey}}]`,
   altMdCite: `@{{citekey}}`,
