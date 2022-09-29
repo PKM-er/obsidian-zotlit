@@ -16,9 +16,18 @@ const getAnnotations: DbWorkerAPI["getAnnotations"] = async (
     `Reading Zotero database for annotations of attachment ${attachmentId}`,
   );
   const annots = await query(db, attachmentId, libId);
+  const { key: attachmentKey } =
+    (await db.first("key").from("items").where("itemID", attachmentId)) ?? {};
+  if (!attachmentKey)
+    throw new Error(`failed to get key of attachment ${attachmentId}`);
+
   log.debug(
     `Finished reading Zotero database for annotations of attachment ${attachmentId}, count: ${annots.length}`,
   );
-  return annots;
+  return annots.map((annot) => ({
+    ...annot,
+    parentItemID: attachmentId,
+    parentItem: attachmentKey,
+  }));
 };
 export default getAnnotations;

@@ -16,6 +16,9 @@ export interface Annotation {
   pageLabel: string | null;
   sortIndex: string;
   position: string;
+  parentItemID: number;
+  /** key of parent item (commonly attachment) */
+  parentItem: string;
 }
 
 export interface AttachmentInfo {
