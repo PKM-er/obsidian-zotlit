@@ -1,4 +1,4 @@
-import type { GeneralItem } from "@obzt/database";
+import type { GeneralItem } from "@obzt/zotero-type";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";

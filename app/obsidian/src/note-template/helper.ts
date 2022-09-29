@@ -1,6 +1,6 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import type { Annotation, GeneralItem, Item } from "@obzt/database";
+import type { Annotation, GeneralItem, Item } from "@obzt/zotero-type";
 import { nonRegularItemTypes } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { HelperDeclareSpec, HelperOptions } from "handlebars";

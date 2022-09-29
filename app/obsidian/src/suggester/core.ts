@@ -1,5 +1,8 @@
-import type { GeneralItem } from "@obzt/database";
-import type { Creator, JournalArticleItem } from "@obzt/zotero-type";
+import type {
+  GeneralItem,
+  Creator,
+  JournalArticleItem,
+} from "@obzt/zotero-type";
 import { isCreatorNameOnly, isCreatorFullName } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
@@ -98,11 +101,10 @@ const getArticleMeta = (item: JournalArticleItem) => {
 const creatorToString = (creators: Creator[] | undefined) => {
   if (!creators || !creators[0]) return "";
   const firstCreator = creators[0];
-  let str = isCreatorFullName(firstCreator)
-    ? firstCreator.lastName
-    : isCreatorNameOnly(firstCreator)
-    ? firstCreator.name
-    : "";
+  let str =
+    isCreatorFullName(firstCreator) || isCreatorNameOnly(firstCreator)
+      ? firstCreator.lastName
+      : "";
   if (creators.length > 1) str = str.trim() + " et al.";
   return str;
 };

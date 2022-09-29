@@ -38,5 +38,3 @@ const sql = (knex: Knex, libId: number) =>
     .orderBy("itemID", "orderIndex");
 
 export default sql;
-
-

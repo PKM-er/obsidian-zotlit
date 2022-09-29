@@ -1,5 +1,4 @@
-import type { Annotation, GeneralItem } from "@obzt/database";
-import type { ItemFields } from "@obzt/zotero-type";
+import type { Annotation, GeneralItem, ItemFields } from "@obzt/zotero-type";
 import endent from "endent";
 import type { TemplateDelegate } from "handlebars";
 

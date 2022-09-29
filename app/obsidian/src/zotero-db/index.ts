@@ -1,6 +1,7 @@
 import type { LogLevel } from "@obzt/common";
-import type { DbWorkerAPI, LibraryInfo } from "@obzt/database";
+import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
+import type { LibraryInfo } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";

@@ -1,3 +1,4 @@
+import { CreatorFieldMode } from "./misc.js";
 import type { AnnotationType, TagType } from "./misc.js";
 
 export type Item = {
@@ -14,30 +15,33 @@ export type ItemField = {
 };
 export type ItemCreator = {
   itemID: number;
-  fieldMode: number | null;
   orderIndex: number;
+  creatorType: string | null;
 } & Creator;
 
 export interface Creator {
   firstName: string | null;
   lastName: string | null;
-  name: string | null;
-  creatorType: string | null;
+  fieldMode: CreatorFieldMode | null;
 }
-export type CreatorFullName = Record<
-  "firstName" | "lastName" | "creatorType",
-  string
-> &
-  Record<"name", null>;
-export type CreatorNameOnly = Record<"name" | "creatorType", string> &
-  Record<"firstName" | "lastName", null>;
+export type CreatorFullName = Record<"firstName" | "lastName", string> &
+  Record<"fieldMode", CreatorFieldMode.fullName | null>;
+export type CreatorNameOnly = {
+  firstName: null;
+  lastName: string;
+  fieldMode: CreatorFieldMode.nameOnly;
+};
 
 export const isCreatorFullName = (
   creator: Creator,
-): creator is CreatorFullName => !!creator.firstName && !!creator.lastName;
+): creator is CreatorFullName =>
+  creator.fieldMode === CreatorFieldMode.fullName &&
+  creator.firstName != null &&
+  creator.lastName != null;
 export const isCreatorNameOnly = (
   creator: Creator,
-): creator is CreatorNameOnly => !!creator.name;
+): creator is CreatorNameOnly =>
+  creator.fieldMode === CreatorFieldMode.nameOnly && creator.lastName !== null;
 
 export type ItemCitekey = {
   itemID: number;
@@ -67,7 +71,7 @@ export interface Annotation {
   parentItem: string;
 }
 
-export interface Tag {
+export interface ItemTag {
   itemID: number | null;
   type: TagType;
   name: string | null;
@@ -84,3 +88,9 @@ export const nonRegularItemTypes = [
   "note",
   "annotation",
 ] as const;
+
+export interface LibraryInfo {
+  libraryID: number | null;
+  type: string;
+  groupID: number | null;
+}

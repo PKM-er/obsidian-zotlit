@@ -1,5 +1,5 @@
-import type { Annotation } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
+import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { setIcon } from "obsidian";

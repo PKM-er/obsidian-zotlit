@@ -7,9 +7,7 @@ export default function getDbWorker() {
 
 export type {
   DbWorkerAPIWorkpool as DbWorkerAPI,
-  Annotation,
   AttachmentInfo,
-  LibraryInfo,
 } from "./api.js";
 
 /**
@@ -44,10 +42,3 @@ export const sortBySortIndex = (a: string, b: string) => {
 };
 
 export * from "db-types";
-export type {
-  Item,
-  ItemCitekey,
-  ItemField,
-  ItemCreator,
-  GeneralItem,
-} from "./modules/init-index/index.js";

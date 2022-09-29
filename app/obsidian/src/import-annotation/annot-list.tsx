@@ -1,5 +1,5 @@
-import type { Annotation } from "@obzt/database";
 import { sortBySortIndex } from "@obzt/database";
+import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { createContext } from "preact";
 import { useContext } from "preact/hooks";

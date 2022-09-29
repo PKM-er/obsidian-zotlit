@@ -1,4 +1,4 @@
-import type { GeneralItem } from "@obzt/database";
+import type { GeneralItem } from "@obzt/zotero-type";
 import type {
   Editor,
   EditorPosition,

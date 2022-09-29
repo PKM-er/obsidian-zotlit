@@ -1,8 +1,8 @@
 import "./style.less";
 
 import { dirname } from "path";
-import type { Annotation, AttachmentInfo } from "@obzt/database";
-import type { JournalArticleItem } from "@obzt/zotero-type";
+import type { AttachmentInfo } from "@obzt/database";
+import type { Annotation, JournalArticleItem } from "@obzt/zotero-type";
 import type { FuzzyMatch } from "obsidian";
 import { Modal, Notice } from "obsidian";
 import { render } from "preact";
@@ -33,6 +33,7 @@ export class LiteratureSelectModal extends ZoteroItemSuggestModal {
     if (!result) return;
     const { libraryID, itemID, title } = result.value
       .item as JournalArticleItem;
+    if (!itemID) throw new Error("No itemID for selected attachment " + title);
     const attachments = await this.plugin.db.getAttachments(itemID, libraryID);
     if (attachments.length === 0) {
       new Notice(`No attachment found for this literature ${title}`);

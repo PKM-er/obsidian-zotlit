@@ -34,3 +34,9 @@ export enum AttachmentType {
   linkedUrl = 3,
   embeddedImage = 4,
 }
+
+export enum CreatorFieldMode {
+  fullName = 0,
+  /** store in last name */
+  nameOnly = 1,
+}
