@@ -36,7 +36,8 @@ export const createNote = async (
     const metadata = meta.getCache(existingFile.path);
     if (
       metadata?.frontmatter &&
-      metadata.frontmatter[ZOTERO_KEY_FIELDNAME] === getItemKeyGroupID(item)
+      metadata.frontmatter[ZOTERO_KEY_FIELDNAME] ===
+        getItemKeyGroupID(item, true)
     ) {
       // only throw error if the note is linked to the same zotero item
       throw new NoteExistsError(filepath, item.key);

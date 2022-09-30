@@ -81,7 +81,7 @@ export default class NoteTemplate {
     const data: Record<string, any> = {};
     let notEmpty = false;
     // zotero-key required
-    data[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(target);
+    data[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(target, true);
     for (const [k, config] of Object.entries(this.frontmatter)) {
       if (!(k in target) || config === undefined) continue;
       const value = target[k as keyof T];
