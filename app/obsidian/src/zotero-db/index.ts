@@ -1,7 +1,7 @@
 import type { LogLevel } from "@obzt/common";
 import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
-import type { LibraryInfo } from "@obzt/zotero-type";
+import type { GeneralItem, LibraryInfo } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import { FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
@@ -105,6 +105,15 @@ export default class ZoteroDb {
   async getAnnotations(attachmentId: number, libId = this.defaultLibId) {
     const proxy = await this.#proxy;
     return await proxy.getAnnotations(attachmentId, libId);
+  }
+  async getItem(itemKey: string, lib?: number): Promise<GeneralItem | null>;
+  async getItem(itemId: number, lib?: number): Promise<GeneralItem | null>;
+  async getItem(
+    item: string | number,
+    lib = this.defaultLibId,
+  ): Promise<GeneralItem | null> {
+    const proxy = await this.#proxy;
+    return await proxy.getItem(item, lib);
   }
 
   async search(

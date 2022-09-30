@@ -125,6 +125,7 @@ importers:
       '@rmp135/sql-ts': ~1.15.0
       '@types/node': ^17.0.10
       '@types/workerpool': ~6.1.0
+      assert-never: ^1.2.1
       cross-env: ^7.0.3
       endent: ~2.1.0
       esbuild: ^0.14.21
@@ -138,6 +139,7 @@ importers:
       '@aidenlx/knex': 2.3.0-mod.1_lyhqer75kdng42kiqldhcbpj2q
       '@obzt/common': link:../common
       '@obzt/zotero-type': link:../zotero-type
+      assert-never: 1.2.1
       esbuild: 0.14.54
       fuse.js: 6.6.2
       log4js: 6.6.1

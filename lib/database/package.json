@@ -24,6 +24,7 @@
     "workerpool": "~6.2.1",
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
-    "esbuild": "^0.14.21"
+    "esbuild": "^0.14.21",
+    "assert-never": "^1.2.1"
   }
 }

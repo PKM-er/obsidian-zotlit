@@ -1,13 +1,14 @@
-import { multipartToSQL } from "@obzt/common";
+import { getItemKeyGroupID, multipartToSQL } from "@obzt/common";
 import type {
   Item,
   ItemField,
   ItemCitekey,
   ItemCreator,
+  GeneralItem,
 } from "@obzt/zotero-type";
 import Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
-import { databases, index } from "@init";
+import { databases, fuseIndex, itemIdIndex, itemKeyIndex } from "@init";
 import log from "@log";
 
 import sql from "./better-bibtex.js";
@@ -21,13 +22,6 @@ const fuseOptions: Fuse.IFuseOptions<GeneralItem> = {
   includeMatches: true,
   shouldSort: true,
 };
-
-export type GeneralItem = Item & {
-  creators: Omit<ItemCreator, "itemID">[];
-  citekey: string | null;
-  date?: string;
-} & Record<string, unknown>;
-export type { Item, ItemCitekey, ItemField, ItemCreator };
 
 const initIndex: DbWorkerAPI["initIndex"] = async (
   libraryID,
@@ -84,14 +78,19 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
   log.trace("Start fuse indexing");
   const generalItems = Object.values(entries);
 
-  index[libraryID] = new Fuse(generalItems, fuseOptions);
+  fuseIndex[libraryID] = new Fuse(generalItems, fuseOptions);
   log.info("Library index initialized");
 
-  // const itemMap = items.reduce(
-  //   (record, item) => ((record[getItemKeyGroupID(item)] = item), record),
-  //   {} as Record<string, RegularItem>,
-  // );
-  // return [[itemMap]];
+  itemKeyIndex[libraryID] = generalItems.reduce(
+    (record, item) => ((record[item.key] = item), record),
+    {} as Record<string, GeneralItem>,
+  );
+  itemIdIndex[libraryID] = generalItems.reduce(
+    (record, item) => (
+      item.itemID !== null && (record[item.itemID] = item), record
+    ),
+    {} as Record<string, GeneralItem>,
+  );
 };
 
 export default initIndex;
