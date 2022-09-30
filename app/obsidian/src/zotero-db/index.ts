@@ -64,21 +64,34 @@ export default class ZoteroDb {
     await proxy.setLoglevel(level);
   }
 
+  initialized = false;
+  #initPromise = new Promise<void>((resolve) => {
+    this.initResolve = resolve;
+  });
+  private initResolve!: (value: void | PromiseLike<void>) => void;
+
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
     const [mainOpened, bbtOpened] = await this.#openDatabase();
+    const inited = () => {
+      this.initialized = true;
+      this.initResolve();
+    };
     if (this.bbtDbPath && !bbtOpened) {
       log.warn("Better BibTex database not found");
       new NoticeBBTStatus(this.#plugin);
+      inited();
       return;
     }
     if (mainOpened) {
       await this.#initIndex(this.defaultLibId);
       await this.getLibs();
+      inited();
     } else {
       log.error("Failed to init ZoteroDB");
     }
+
     new Notice("ZoteroDB Initialization complete.");
     log.debug(
       `ZoteroDB Initialization complete. Took ${prettyHrtime(
@@ -109,6 +122,7 @@ export default class ZoteroDb {
     item: string | number,
     lib = this.defaultLibId,
   ): Promise<GeneralItem | null> {
+    await this.#initPromise;
     const proxy = await this.#proxy;
     return await proxy.getItem(item, lib);
   }
@@ -134,6 +148,7 @@ export default class ZoteroDb {
     limit = 20,
     lib = this.defaultLibId,
   ) {
+    await this.#initPromise;
     const exp = query.map<Fuse.Expression>((s) => ({
       [matchField]: s,
     }));
@@ -143,6 +158,7 @@ export default class ZoteroDb {
     return result;
   }
   async getAll(limit = 20, lib = this.defaultLibId) {
+    await this.#initPromise;
     const result = await (
       await this.#proxy
     ).query(lib, null, {

@@ -56,13 +56,14 @@ export default class ZoteroPlugin extends Plugin {
         new Notice("Literature notes re-indexed");
       },
     });
-    registerNoteFeature(this);
 
     // getZoteroLinkHandlers(this).forEach((args) =>
     //   this.registerObsidianProtocolHandler(...args),
     // );
 
     this.db.init();
+
+    registerNoteFeature(this);
 
     this.addSettingTab(new ZoteroSettingTab(this));
   }
