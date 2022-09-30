@@ -82,7 +82,7 @@ const initIndex: DbWorkerAPI["initIndex"] = async (
   log.info("Library index initialized");
 
   itemKeyIndex[libraryID] = generalItems.reduce(
-    (record, item) => ((record[item.key] = item), record),
+    (record, item) => ((record[getItemKeyGroupID(item, true)] = item), record),
     {} as Record<string, GeneralItem>,
   );
   itemIdIndex[libraryID] = generalItems.reduce(
