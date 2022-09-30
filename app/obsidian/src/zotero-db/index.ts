@@ -86,9 +86,6 @@ export default class ZoteroDb {
       )}`,
     );
   }
-  refreshIndex() {
-    return this.#initIndex(this.defaultLibId, true);
-  }
 
   async #openDatabase() {
     const proxy = await this.#proxy;
@@ -114,6 +111,21 @@ export default class ZoteroDb {
   ): Promise<GeneralItem | null> {
     const proxy = await this.#proxy;
     return await proxy.getItem(item, lib);
+  }
+  async refreshDatabases() {
+    const proxy = await this.#proxy;
+    await proxy.refreshDatabases();
+  }
+
+  // TODO: queue to avoid multiple refresh
+  async refreshIndex() {
+    await this.#initIndex(this.defaultLibId, true);
+    await this.getLibs(true);
+  }
+
+  async fullRefresh() {
+    await this.refreshDatabases();
+    await this.refreshIndex();
   }
 
   async search(

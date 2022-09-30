@@ -8,8 +8,8 @@ import { constants } from "@obzt/common";
 import { fileDialog } from "file-select-dialog";
 import type { FileSystemAdapter } from "obsidian";
 import { Modal, Notice } from "obsidian";
-import { render } from "preact";
-import { useState } from "preact/hooks";
+import { useState } from "react";
+import { createRoot } from "react-dom/client";
 import log from "@log";
 
 // #region check if compatible lib exists
@@ -102,14 +102,14 @@ class GoToDownloadModal extends Modal {
     super(app);
     this.modalEl.addClass("zt-install-guide");
   }
+  root = createRoot(this.contentEl);
   onOpen() {
-    render(
+    this.root.render(
       <GuideContent reloadPlugin={this.reloadPlugin.bind(this)} />,
-      this.contentEl,
     );
   }
   onClose() {
-    render(null, this.contentEl);
+    this.root.unmount();
   }
 
   async reloadPlugin() {

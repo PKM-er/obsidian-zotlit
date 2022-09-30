@@ -1,5 +1,6 @@
 import { worker } from "workerpool";
 import type { DbWorkerAPI } from "./api.js";
+import { databases } from "./init.js";
 import logger from "./logger.js";
 import getAnnotations from "./modules/annotation/index.js";
 import getAttachments from "./modules/attachments/index.js";
@@ -19,6 +20,10 @@ const methods: DbWorkerAPI = {
   getAttachments,
   getAnnotations,
   getItem,
+  refreshDatabases: async () => {
+    await databases.main.refresh();
+    await databases.bbt?.refresh();
+  },
   setLoglevel: (level) => {
     logger.level = level;
   },

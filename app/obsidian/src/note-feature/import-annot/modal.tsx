@@ -1,24 +1,28 @@
-import "./style.less";
-
-import { dirname } from "path";
 import type { AttachmentInfo } from "@obzt/database";
 import type { Annotation, JournalArticleItem } from "@obzt/zotero-type";
+import { Provider } from "jotai";
 import type { FuzzyMatch } from "obsidian";
 import { Modal, Notice } from "obsidian";
-import { render } from "preact";
+import { Suspense } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  atchIdAtom,
+  createInitialValues,
+  pluginAtom,
+} from "@component/atoms.js";
 import {
   FuzzySuggestModalWithPromise,
   ZoteroItemSuggestModal,
-} from "../suggester/index.js";
-import type ZoteroPlugin from "../zt-main";
-import { AnnotationContext, AnnotationList } from "./annot-list.js";
+} from "../../suggester/index.js";
+import type ZoteroPlugin from "../../zt-main";
+import { AnnotationImport, buttonContainerAtom } from "./annot-import.js";
 
 const instructions = [
   { command: "↑↓", purpose: "to navigate" },
   { command: "↵", purpose: "select literature to import citation" },
   { command: "esc", purpose: "to dismiss" },
 ];
-export class LiteratureSelectModal extends ZoteroItemSuggestModal {
+export class AnnotationImportModal extends ZoteroItemSuggestModal {
   constructor(public plugin: ZoteroPlugin) {
     super(plugin);
     this.setInstructions(instructions);
@@ -57,12 +61,8 @@ export class LiteratureSelectModal extends ZoteroItemSuggestModal {
       return;
     }
 
-    const annotations = await this.plugin.db.getAnnotations(
-      targetAttachment.itemID,
-      libraryID,
-    );
     const selectedAnnots = await new AnnotationSelectModal(
-      annotations,
+      targetAttachment.itemID,
       this.plugin,
     ).open();
     if (selectedAnnots && selectedAnnots.length > 0) {
@@ -103,11 +103,12 @@ class AttachmentSelectModal extends FuzzySuggestModalWithPromise<AttachmentInfo>
 
 export class AnnotationSelectModal extends Modal {
   buttonContainerEl = this.modalEl.createDiv("modal-button-container");
-  constructor(public annotations: Annotation[], public plugin: ZoteroPlugin) {
+  constructor(public attachmentId: number, public plugin: ZoteroPlugin) {
     super(app);
     this.modalEl.addClass("select-annot-modal");
     this.titleEl.setText("Select Annotations to Import");
   }
+  root = createRoot(this.contentEl);
   resolve: ((value: Annotation[] | null) => void) | null = null;
   open() {
     super.open();
@@ -116,19 +117,16 @@ export class AnnotationSelectModal extends Modal {
     });
   }
   onOpen(): void {
-    render(
-      <AnnotationContext.Provider
-        value={{
-          buttonContainer: this.buttonContainerEl,
-          zoteroDataDir: dirname(this.plugin.settings.zoteroDbPath),
-        }}
-      >
-        <AnnotationList
-          annotations={this.annotations}
-          onSelectDone={this.onSelectDone.bind(this)}
-        />
-      </AnnotationContext.Provider>,
-      this.contentEl,
+    const initVals = createInitialValues();
+    initVals.set(pluginAtom, this.plugin);
+    initVals.set(atchIdAtom, this.attachmentId);
+    initVals.set(buttonContainerAtom, this.buttonContainerEl);
+    this.root.render(
+      <Provider initialValues={initVals.get()}>
+        <Suspense fallback="loading">
+          <AnnotationImport onSelectDone={this.onSelectDone.bind(this)} />
+        </Suspense>
+      </Provider>,
     );
   }
   onSelectDone(annotations: Annotation[]) {
@@ -138,6 +136,7 @@ export class AnnotationSelectModal extends Modal {
   }
 
   onClose() {
+    this.root.unmount();
     if (this.resolve) {
       this.resolve(null);
       this.resolve = null;

@@ -23,7 +23,7 @@ export default function* getZoteroKeyFileMap(
   }
 
   // fileKey
-  yield { file, ...cache.frontmatter[ZOTERO_KEY_FIELDNAME] };
+  yield { file, key: itemKey };
 
   // extract annotation keys
   for (const section of cache.sections ?? []) {

@@ -8,9 +8,9 @@
     "moduleResolution": "Node",
     "module": "ESNext",
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
     "paths": {
-      "@log": ["./logger.ts"]
+      "@log": ["./logger.ts"],
+      "@component/*": ["./component/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

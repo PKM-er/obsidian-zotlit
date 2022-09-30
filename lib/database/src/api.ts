@@ -39,6 +39,8 @@ export interface DbWorkerAPI {
     libraryID: number,
   ): Promise<GeneralItem | null>;
 
+  refreshDatabases(): Promise<void>;
+
   getLibs(): Promise<LibraryInfo[]>;
   getAnnotations(
     attachmentId: number,

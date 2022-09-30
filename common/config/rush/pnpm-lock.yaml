@@ -13,14 +13,14 @@ importers:
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
       '@obzt/zotero-type': workspace:*
-      '@preact/compat': ^17.1.1
       '@release-it/bumper': ^4.0.0
       '@release-it/conventional-changelog': ^5.1.0
       '@types/dompurify': ~2.3.4
       '@types/json-schema': ^7.0.9
       '@types/node': ^17.0.10
       '@types/pretty-hrtime': ^1.0.1
-      '@types/react-dom': ^17.0.11
+      '@types/react': ~18.0.21
+      '@types/react-dom': ~18.0.6
       '@types/workerpool': ~6.1.0
       assert-never: ^1.2.1
       builtin-modules: ^3.2.0
@@ -39,23 +39,24 @@ importers:
       fuse.js: ^6.5.3
       gray-matter: ^4.0.3
       handlebars: ^4.7.7
+      immer: ~9.0.15
+      jotai: ~1.8.4
       js-base64: ^3.7.2
       log4js: ~6.6.1
       make-error: ^1.3.6
       obsidian: 0.15.9
-      preact: ^10.11.0
       pretty-hrtime: ^1.0.3
+      react: ~18.2.0
+      react-dom: ~18.2.0
       redom: ^3.27.1
       release-it: ^15.4.2
       tslib: ^2.3.1
       typescript: ^4.8.3
-      use-immer: ~0.7.0
       workerpool: ~6.2.1
     dependencies:
       '@obzt/common': link:../../lib/common
       '@obzt/database': link:../../lib/database
       '@obzt/zotero-type': link:../../lib/zotero-type
-      '@preact/compat': 17.1.1_preact@10.11.0
       assert-never: 1.2.1
       classnames: 2.3.2
       endent: 2.1.0
@@ -64,14 +65,16 @@ importers:
       filenamify: 5.1.1
       gray-matter: 4.0.3
       handlebars: 4.7.7
+      immer: 9.0.15
+      jotai: 1.8.4_immer@9.0.15+react@18.2.0
       js-base64: 3.7.2
       log4js: 6.6.1
       make-error: 1.3.6
       obsidian: 0.15.9_gfxzz7znl3munfhalmzjkxl7vm
-      preact: 10.11.0
       pretty-hrtime: 1.0.3
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
       redom: 3.29.1
-      use-immer: 0.7.0_immer@9.0.15+react@18.2.0
       workerpool: 6.2.1
     devDependencies:
       '@aidenlx/better-sqlite3': 7.6.2-mod.2
@@ -83,7 +86,8 @@ importers:
       '@types/json-schema': 7.0.11
       '@types/node': 17.0.45
       '@types/pretty-hrtime': 1.0.1
-      '@types/react-dom': 17.0.17
+      '@types/react': 18.0.21
+      '@types/react-dom': 18.0.6
       '@types/workerpool': 6.1.0
       builtin-modules: 3.3.0
       conventional-changelog-angular: 5.0.13
@@ -1028,14 +1032,6 @@ packages:
       config-chain: 1.1.13
     dev: true
 
-  /@preact/compat/17.1.1_preact@10.11.0:
-    resolution: {integrity: sha512-OjQJ6oVcjFTiKWs4MIoE/cORFFGhqnt1RO0uxGNAFUglBMPNahMDJyX5w+qEOEaOpaNTLM1L3ixc2bFEpxgs3A==}
-    peerDependencies:
-      preact: '*'
-    dependencies:
-      preact: 10.11.0
-    dev: false
-
   /@release-it/bumper/4.0.0_release-it@15.4.2:
     resolution: {integrity: sha512-DswMVRuWNeeuDPd8DNpMhuHjqxnwOi5A+v9CTrbAQ7/1K+VOGUGItS4ekjWfb1qBvJw/ouiAinBo9ckjtnhktA==}
     engines: {node: '>=14'}
@@ -1237,14 +1233,14 @@ packages:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
     dev: true
 
-  /@types/react-dom/17.0.17:
-    resolution: {integrity: sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==}
+  /@types/react-dom/18.0.6:
+    resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
     dependencies:
-      '@types/react': 17.0.50
+      '@types/react': 18.0.21
     dev: true
 
-  /@types/react/17.0.50:
-    resolution: {integrity: sha512-ZCBHzpDb5skMnc1zFXAXnL3l1FAdi+xZvwxK+PkglMmBrwjpp9nKaWuEvrGnSifCJmBFGxZOOFuwC6KH/s0NuA==}
+  /@types/react/18.0.21:
+    resolution: {integrity: sha512-7QUCOxvFgnD5Jk8ZKlUAhVcRj7GuJRjnjjiY/IUBWKgOlnvDvTMLD4RTF7NPyVmbRhNrbomZiOepg7M/2Kj1mA==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -4829,6 +4825,44 @@ packages:
       iterate-iterator: 1.0.2
     dev: true
 
+  /jotai/1.8.4_immer@9.0.15+react@18.2.0:
+    resolution: {integrity: sha512-bkHDHNxm7bU4+bJL4z96fTlJYN34UDRTu3ghEajJrDepayON9YEaxPrXr7xhLnIRntoFC6eDYYhMNA/ilbj2RQ==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@babel/core': '*'
+      '@babel/template': '*'
+      '@tanstack/query-core': '*'
+      '@urql/core': '*'
+      immer: '*'
+      optics-ts: '*'
+      react: '>=16.8'
+      valtio: '*'
+      wonka: '*'
+      xstate: '*'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@babel/template':
+        optional: true
+      '@tanstack/query-core':
+        optional: true
+      '@urql/core':
+        optional: true
+      immer:
+        optional: true
+      optics-ts:
+        optional: true
+      valtio:
+        optional: true
+      wonka:
+        optional: true
+      xstate:
+        optional: true
+    dependencies:
+      immer: 9.0.15
+      react: 18.2.0
+    dev: false
+
   /js-base64/3.7.2:
     resolution: {integrity: sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==}
     dev: false
@@ -6022,10 +6056,6 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /preact/10.11.0:
-    resolution: {integrity: sha512-Fk6+vB2kb6mSJfDgODq0YDhMfl0HNtK5+Uc9QqECO4nlyPAQwCI+BKyWO//idA7ikV7o+0Fm6LQmNuQi1wXI1w==}
-    dev: false
-
   /prebuild-install/7.1.1:
     resolution: {integrity: sha512-jAXscXWMcCK8GgCoHOfIr0ODh5ai8mj63L2nWrjuAgXE6tDyYGnx4/8o/rCgU+B4JSyZBKbeZqzhtwtC3ovxjw==}
     engines: {node: '>=10'}
@@ -6205,6 +6235,16 @@ packages:
       ini: 1.3.8
       minimist: 1.2.6
       strip-json-comments: 2.0.1
+
+  /react-dom/18.2.0_react@18.2.0:
+    resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      loose-envify: 1.4.0
+      react: 18.2.0
+      scheduler: 0.23.0
+    dev: false
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -6584,6 +6624,12 @@ packages:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
     dev: true
     optional: true
+
+  /scheduler/0.23.0:
+    resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
+    dependencies:
+      loose-envify: 1.4.0
+    dev: false
 
   /scslre/0.1.6:
     resolution: {integrity: sha512-JORxVRlQTfjvlOAaiQKebgFElyAm5/W8b50lgaZ0OkEnKnagJW2ufDh3xRfU75UD9z3FGIu1gL1IyR3Poa6Qmw==}
@@ -7395,16 +7441,6 @@ packages:
     dependencies:
       prepend-http: 2.0.0
     dev: true
-
-  /use-immer/0.7.0_immer@9.0.15+react@18.2.0:
-    resolution: {integrity: sha512-Re4hjrP3a/2ABZjAc0b7AK9s626bnO+H33RO2VUhiDZ2StBz5B663K6WNNlr4QtHWaGUmvLpwt3whFvvWuolQw==}
-    peerDependencies:
-      immer: '>=2.0.0'
-      react: ^16.8.0 || ^17.0.1 || ^18.0.0
-    dependencies:
-      immer: 9.0.15
-      react: 18.2.0
-    dev: false
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}

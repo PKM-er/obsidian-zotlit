@@ -88,10 +88,17 @@ export default class NoteIndex extends Events {
     return this._folder.folder;
   }
 
-  /** check if file belongs to literature note folder */
   isLiteratureNote(file: string): boolean;
   isLiteratureNote(file: TAbstractFile): file is TFile;
   isLiteratureNote(file: TAbstractFile | string): boolean {
+    const path = getFilePath(file);
+    return this.fileKeyMap.has(path);
+  }
+
+  /** check if file belongs to literature note folder */
+  #isLiteratureNote(file: string): boolean;
+  #isLiteratureNote(file: TAbstractFile): file is TFile;
+  #isLiteratureNote(file: TAbstractFile | string): boolean {
     if (typeof file === "string") {
       return file.endsWith(".md") && file.startsWith(this._folder.joinPath);
     } else
@@ -110,15 +117,15 @@ export default class NoteIndex extends Events {
       }
   }
   onMetaChanged(file: TFile, _data: string, cache: CachedMetadata) {
-    if (!this.isLiteratureNote(file)) return;
+    if (!this.#isLiteratureNote(file)) return;
     this.updateFileRecord(file, cache);
   }
   onFileMoved(file: TAbstractFile, oldPath?: string) {
     if (!(file instanceof TFile && file.extension === "md")) return;
-    const isCurrNote = this.isLiteratureNote(file.path);
+    const isCurrNote = this.#isLiteratureNote(file.path);
     if (oldPath) {
       // file renamed
-      const isOldNote = this.isLiteratureNote(oldPath);
+      const isOldNote = this.#isLiteratureNote(oldPath);
       if (!isCurrNote && !isOldNote) {
         return; // not inside note folder
       } else if (isCurrNote && isOldNote) {

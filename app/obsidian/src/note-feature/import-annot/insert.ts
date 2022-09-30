@@ -1,10 +1,10 @@
 import { MarkdownView, TFile } from "obsidian";
-import type { ItemWithAnnots } from "../note-template/const.js";
+import type { ItemWithAnnots } from "../../note-template/const.js";
 
-import type ZoteroPlugin from "../zt-main.js";
-import { createNote } from "./open-create.js";
+import type ZoteroPlugin from "../../zt-main.js";
+import { createNote } from "../open-create.js";
 
-export const importAnnotation = async (
+export const insertAnnotIntoFile = async (
   plugin: ZoteroPlugin,
   data: ItemWithAnnots,
 ) => {
