@@ -4,7 +4,7 @@ import { Provider } from "jotai";
 import type { FuzzyMatch } from "obsidian";
 import { Modal, Notice } from "obsidian";
 import { Suspense } from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom";
 import {
   atchIdAtom,
   createInitialValues,
@@ -108,7 +108,7 @@ export class AnnotationSelectModal extends Modal {
     this.modalEl.addClass("select-annot-modal");
     this.titleEl.setText("Select Annotations to Import");
   }
-  root = createRoot(this.contentEl);
+
   resolve: ((value: Annotation[] | null) => void) | null = null;
   open() {
     super.open();
@@ -121,12 +121,13 @@ export class AnnotationSelectModal extends Modal {
     initVals.set(pluginAtom, this.plugin);
     initVals.set(atchIdAtom, this.attachmentId);
     initVals.set(buttonContainerAtom, this.buttonContainerEl);
-    this.root.render(
+    ReactDOM.render(
       <Provider initialValues={initVals.get()}>
         <Suspense fallback="loading">
           <AnnotationImport onSelectDone={this.onSelectDone.bind(this)} />
         </Suspense>
       </Provider>,
+      this.contentEl,
     );
   }
   onSelectDone(annotations: Annotation[]) {
@@ -136,7 +137,7 @@ export class AnnotationSelectModal extends Modal {
   }
 
   onClose() {
-    this.root.unmount();
+    ReactDOM.unmountComponentAtNode(this.contentEl);
     if (this.resolve) {
       this.resolve(null);
       this.resolve = null;

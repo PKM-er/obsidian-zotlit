@@ -9,7 +9,7 @@ import { fileDialog } from "file-select-dialog";
 import type { FileSystemAdapter } from "obsidian";
 import { Modal, Notice } from "obsidian";
 import { useState } from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom";
 import log from "@log";
 
 // #region check if compatible lib exists
@@ -102,14 +102,15 @@ class GoToDownloadModal extends Modal {
     super(app);
     this.modalEl.addClass("zt-install-guide");
   }
-  root = createRoot(this.contentEl);
+  // root = createRoot(this.contentEl);
   onOpen() {
-    this.root.render(
+    ReactDOM.render(
       <GuideContent reloadPlugin={this.reloadPlugin.bind(this)} />,
+      this.contentEl,
     );
   }
   onClose() {
-    this.root.unmount();
+    ReactDOM.unmountComponentAtNode(this.contentEl);
   }
 
   async reloadPlugin() {

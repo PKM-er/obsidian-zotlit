@@ -3,7 +3,7 @@ import { Provider, useAtomValue, useSetAtom } from "jotai";
 import type { WorkspaceLeaf } from "obsidian";
 import { ItemView } from "obsidian";
 import { Suspense, useEffect } from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom";
 import AnnotationList from "@component/annot-list";
 import {
   activeDocAtom,
@@ -21,7 +21,7 @@ export class AnnotationView extends ItemView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
   }
-  root = createRoot(this.contentEl);
+  // root = createRoot(this.contentEl);
 
   public getViewType(): string {
     return annotViewType;
@@ -39,16 +39,17 @@ export class AnnotationView extends ItemView {
     await super.onOpen();
     const initVals = createInitialValues();
     initVals.set(pluginAtom, this.plugin);
-    this.root.render(
+    ReactDOM.render(
       <Provider initialValues={initVals.get()}>
         <Suspense fallback="loading">
           <AnnotView />
         </Suspense>
       </Provider>,
+      this.contentEl,
     );
   }
   protected async onClose() {
-    this.root.unmount();
+    ReactDOM.unmountComponentAtNode(this.contentEl);
     await super.onClose();
   }
 }
