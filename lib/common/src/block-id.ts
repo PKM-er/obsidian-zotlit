@@ -1,9 +1,30 @@
-import type { CachedMetadata } from "obsidian";
+export interface ItemKeyGroup {
+  key: string;
+  groupID?: number | null;
+  parentItem?: string;
+}
 
-import { ZOTERO_KEY_FIELDNAME } from "../note-template/const.js";
+/**
+ * @param index set to true to generate key without parentItem to be used for indexing
+ * @returns ITEMKEY(gGROUPID) / ANNOT_KEYaATTACHMENT_KEY(gGROUPID)
+ */
+export const getItemKeyGroupID = (
+  { key, groupID, parentItem }: ItemKeyGroup,
+  index = false,
+) => {
+  const parts = [key];
+  if (!index && parentItem) {
+    // a => at
+    parts.push(`a${parentItem}`);
+  }
+  if (typeof groupID === "number") {
+    parts.push(`g${groupID}`);
+  }
+  return parts.join("");
+};
 
-export type FileMapInfo = { file: string; blockId?: string };
-type KeyFileMap = [key: string, info: FileMapInfo];
+type FileMapInfo = { file: string; blockId?: string };
+export type KeyFileInfo = Record<"key", string> & FileMapInfo;
 
 /**
  * @param getValFromExp get string to fill the template from expression
@@ -61,48 +82,14 @@ const itemKeyBase = String.raw`[23456789ABCDEFGHIJKLMNPQRSTUVWXYZ]{8}`,
     )`${"annotKey"}a${"parentKey"}(?:g${"groupID"})?(?:p${"page"})?`;
   };
 
-const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
+export const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
   itemKeyGroupIdPattern = getRegExp()`${itemKeyBase}(?:g${idBase})?`,
   annotKeyPagePattern = getRegExp()`${annotKeyPageBase(true)}`,
   /**
-   * 9DCRTRSC     9DCRTRSC     g  123   p 131  n  9DCRT...
+   * 9DCRTRSC   a    9DCRTRSC     g  123   p 131  n  9DCRT...
    *
-   * ^^^^^^^^     ^^^^^^^^        ^^^     ^^^     ^^^^^^^
+   * ^^^^^^^^   a    ^^^^^^^^        ^^^     ^^^     ^^^^^^^
    *
-   * annot-key  attachment-key  group-id  page   next-item
+   * annot-key  @  attachment-key  group-id  page   next-item
    */
   multipleAnnotKeyPagePattern = getRegExp()`(?:${annotKeyPageBase(false)}n?)+`;
-
-export function* getZoteroKeyFileMap(
-  file: string,
-  cache: CachedMetadata,
-): IterableIterator<KeyFileMap> {
-  if (!(cache.frontmatter && ZOTERO_KEY_FIELDNAME in cache.frontmatter)) {
-    return null;
-  }
-  const itemKey = cache.frontmatter[ZOTERO_KEY_FIELDNAME];
-
-  if (!itemKeyGroupIdPattern.test(itemKey)) {
-    return;
-  }
-
-  // fileKey
-  yield [cache.frontmatter[ZOTERO_KEY_FIELDNAME], { file: file }];
-
-  // extract annotation keys
-  for (const section of cache.sections ?? []) {
-    if (
-      section.type === "heading" &&
-      section.id?.match(multipleAnnotKeyPagePattern)
-    )
-      for (const annotKeyWithPage of section.id.split("n")) {
-        const [, annotKey, , groupID] = annotKeyWithPage
-          .split("p")[0]
-          .match(annotKeyPagePattern)!;
-        yield [
-          groupID ? `${annotKey}g${groupID}` : annotKey,
-          { file: file, blockId: section.id },
-        ];
-      }
-  }
-}

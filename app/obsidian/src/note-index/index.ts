@@ -1,5 +1,6 @@
-import type { ItemKeyGroup } from "@obzt/common";
+import type { ItemKeyGroup, KeyFileInfo } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
+import assertNever from "assert-never";
 import type {
   CachedMetadata,
   MetadataCache,
@@ -9,12 +10,8 @@ import type {
 import { Events, TFile, TFolder } from "obsidian";
 import log from "@log";
 
-// import { PromiseWorker } from "../utils.js";
 import type ZoteroPlugin from "../zt-main.js";
-// import type { Input, Output } from "./build-filemap.worker.js";
-// import buildFilemap from "./build-filemap.worker.ts.js";
-import type { FileMapInfo } from "./utils.js";
-import { getZoteroKeyFileMap } from "./utils.js";
+import getZoteroKeyFileMap from "./ztkey-file-map.js";
 
 export { getItemKeyGroupID };
 export default class NoteIndex extends Events {
@@ -28,10 +25,36 @@ export default class NoteIndex extends Events {
     return this.plugin.settings.literatureNoteTemplate;
   }
 
-  fileMap: Map<string, FileMapInfo> = new Map();
-  getNoteFromKey(item: ItemKeyGroup): FileMapInfo | undefined {
+  keyFileMap: Map<string, KeyFileInfo> = new Map();
+  fileKeyMap: Map<string, KeyFileInfo> = new Map();
+
+  addToIndex(info: KeyFileInfo): void {
+    this.keyFileMap.set(info.key, info);
+    this.fileKeyMap.set(info.file, info);
+  }
+  deleteFromIndex(k: string, use: "itemKey" | "file"): boolean {
+    let key: string | undefined, file: string | undefined;
+    switch (use) {
+      case "itemKey":
+        key = k;
+        file = this.keyFileMap.get(key)?.file;
+        break;
+      case "file":
+        file = k;
+        key = this.fileKeyMap.get(file)?.key;
+        break;
+      default:
+        assertNever(use);
+    }
+    if (!key || !file) return false;
+    this.keyFileMap.delete(key);
+    this.fileKeyMap.delete(file);
+    return true;
+  }
+
+  getNoteFromKey(item: ItemKeyGroup): KeyFileInfo | undefined {
     log.debug("getNoteFromKey: ", item, getItemKeyGroupID(item, true));
-    return this.fileMap.get(getItemKeyGroupID(item, true));
+    return this.keyFileMap.get(getItemKeyGroupID(item, true));
   }
 
   // buildFilemapWorker: PromiseWorker<Input, Output>;
@@ -119,29 +142,24 @@ export default class NoteIndex extends Events {
   }
   removeFileRecord(file: TFile | string): void {
     const path = getFilePath(file);
-    for (const [key, { file }] of this.fileMap.entries()) {
-      if (file === path) {
-        this.fileMap.delete(key);
-      }
-    }
+    this.deleteFromIndex(path, "file");
   }
   renameFileRecord(file: TFile | string, oldPath: string): void {
     const path = getFilePath(file);
-    for (const info of this.fileMap.values()) {
-      if (info.file === oldPath) {
-        info.file = path;
-      }
+    const info = this.fileKeyMap.get(oldPath);
+    if (info) {
+      info.file = path;
     }
   }
   updateFileRecord(file: TFile | string, cache: CachedMetadata): void {
     const path = getFilePath(file);
-    for (const kfMap of getZoteroKeyFileMap(path, cache)) {
-      this.fileMap.set(...kfMap);
+    for (const info of getZoteroKeyFileMap(path, cache)) {
+      this.addToIndex(info);
     }
   }
 
   reload(): void {
-    this.fileMap.clear();
+    this.keyFileMap.clear();
     this.onMetaBuilt();
   }
 
