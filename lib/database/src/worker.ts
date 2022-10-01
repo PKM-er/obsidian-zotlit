@@ -24,6 +24,18 @@ const methods: DbWorkerAPI = {
     await databases.main.refresh();
     await databases.bbt?.refresh();
   },
+  /**
+   * raw query on zotero database
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  raw: async <R>(sql: string, args: any[]) => {
+    const { db } = databases.main;
+    if (!db) {
+      throw new Error("failed to query raw: no main database opened");
+    }
+    const result = await db.raw(sql, ...args);
+    return result as R;
+  },
   setLoglevel: (level) => {
     logger.level = level;
   },

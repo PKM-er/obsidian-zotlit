@@ -162,6 +162,17 @@ export default class ZoteroDb {
     await this.refreshIndex();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async raw<R>(sql: string, args: any[]): Promise<R> {
+    // wait for db refresh
+    if (this.#dbRefresh) {
+      await this.#dbRefresh;
+    }
+    const proxy = await this.#proxy;
+    const result = await proxy.raw(sql, args);
+    return result as R;
+  }
+
   async search(
     query: string[],
     matchField: string,
