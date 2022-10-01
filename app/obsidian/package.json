@@ -45,7 +45,8 @@
     "@types/workerpool": "~6.1.0",
     "@types/react-dom": "~17.0.11",
     "@types/dompurify": "~2.3.4",
-    "@types/react": "~17.0.8"
+    "@types/react": "~17.0.8",
+    "@types/lodash-es": "~4.17.6"
   },
   "config": {
     "commitizen": {
@@ -74,6 +75,7 @@
     "jotai": "~1.8.4",
     "immer": "~9.0.15",
     "react": "~17.0.2",
-    "react-dom": "~17.0.2"
+    "react-dom": "~17.0.2",
+    "lodash-es": "~4.17.21"
   }
 }

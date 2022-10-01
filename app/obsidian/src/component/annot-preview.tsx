@@ -1,5 +1,6 @@
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
+import { startCase } from "lodash-es";
 import { renderHTMLReact } from "../utils";
 import type { AnnotProps } from "./atoms";
 import { useDerivedAtom } from "./atoms";
@@ -57,7 +58,7 @@ const Header = ({ annotAtom }: AnnotProps) => {
         ref={iconRef}
         className="annot-type-icon"
         style={{ color }}
-        aria-label={AnnotationType[type]}
+        aria-label={startCase(AnnotationType[type])}
         aria-label-delay="500"
       />
       <div className="annot-header-space" />
