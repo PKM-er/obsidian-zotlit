@@ -22,6 +22,7 @@ const queryAnnotations = (knex: Knex, attachmentId: number, libId: number) =>
     .join<Omit<Libraries, "type">>("libraries", (j) => j.using("libraryID"))
     .leftJoin("groups", (j) => j.using("libraryID"))
     .where("parentItemID", attachmentId)
-    .andWhere("libraryID", libId);
+    .andWhere("libraryID", libId)
+    .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
 
 export default queryAnnotations;
