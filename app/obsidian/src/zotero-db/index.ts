@@ -126,15 +126,35 @@ export default class ZoteroDb {
     const proxy = await this.#proxy;
     return await proxy.getItem(item, lib);
   }
-  async refreshDatabases() {
+
+  #dbRefresh: Promise<void> | null = null;
+  async #refreshDatabases() {
     const proxy = await this.#proxy;
     await proxy.refreshDatabases();
   }
+  async refreshDatabases() {
+    if (!this.#dbRefresh) {
+      this.#dbRefresh = this.#refreshDatabases();
+    }
+    await this.#dbRefresh;
+    this.#dbRefresh = null;
+  }
 
-  // TODO: queue to avoid multiple refresh
-  async refreshIndex() {
+  #indexRefresh: Promise<void> | null = null;
+  async #refreshIndex() {
     await this.#initIndex(this.defaultLibId, true);
     await this.getLibs(true);
+  }
+  async refreshIndex() {
+    // wait for db refresh
+    if (this.#dbRefresh) {
+      await this.#dbRefresh;
+    }
+    if (!this.#indexRefresh) {
+      this.#indexRefresh = this.#refreshIndex();
+    }
+    await this.#indexRefresh;
+    this.#indexRefresh = null;
   }
 
   async fullRefresh() {

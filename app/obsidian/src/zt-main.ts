@@ -41,11 +41,11 @@ export default class ZoteroPlugin extends Plugin {
     });
     this.registerEditorSuggest(new CitationEditorSuggest(this));
     this.addCommand({
-      id: "refresh-zotero-index",
-      name: "Refresh Zotero Index",
+      id: "refresh-zotero-data",
+      name: "Refresh Zotero Data",
       callback: async () => {
-        await this.db.refreshIndex();
-        new Notice("Zotero index is now up-to-date");
+        await this.db.fullRefresh();
+        new Notice("Zotero data is now up-to-date");
       },
     });
     this.addCommand({
@@ -56,16 +56,13 @@ export default class ZoteroPlugin extends Plugin {
         new Notice("Literature notes re-indexed");
       },
     });
-
+    this.addSettingTab(new ZoteroSettingTab(this));
     // getZoteroLinkHandlers(this).forEach((args) =>
     //   this.registerObsidianProtocolHandler(...args),
     // );
 
-    this.db.init();
-
+    await this.db.init();
     registerNoteFeature(this);
-
-    this.addSettingTab(new ZoteroSettingTab(this));
   }
 
   onunload() {
