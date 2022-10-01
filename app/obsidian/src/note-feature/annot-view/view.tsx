@@ -19,7 +19,10 @@ export class AnnotationView extends ItemView {
   }
 
   public getDisplayText(): string {
-    return "Zotero Annotations";
+    const activeDoc = this.plugin.app.workspace.getActiveFile();
+    let suffix = "";
+    if (activeDoc?.extension === "md") suffix = ` for ${activeDoc.basename}`;
+    return "Zotero Annotations" + suffix;
   }
 
   public getIcon(): string {

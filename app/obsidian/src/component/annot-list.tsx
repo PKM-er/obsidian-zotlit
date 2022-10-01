@@ -34,8 +34,9 @@ const annotAtomFamily = weakAtomFamily((annot: Annotation) => atom(annot));
 const filterAtom = atom("all");
 
 const filteredAtom = atom((get) => {
-  const filter = get(filterAtom);
   const annots = get(annotsAtom);
+  if (!annots) return null;
+  const filter = get(filterAtom);
   const selected = get(selectedItemsAtom);
   if (filter === "all") return annots;
   else if (filter === "selected") {
@@ -50,7 +51,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   const annots = useAtomValue(filteredAtom);
   return (
     <div className="annot-list">
-      {annots.map((annot) => (
+      {annots?.map((annot) => (
         <AnnotListItem
           selectable={selectable}
           annot={annot}

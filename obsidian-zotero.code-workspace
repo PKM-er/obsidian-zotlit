@@ -60,6 +60,7 @@
     "conventionalCommits.gitmoji": false,
     "conventionalCommits.scopes": [
       "obsidian",
+      "obsidian/annot-view",
       "lib/database",
       "lib/common",
       "lib/zotero-type"

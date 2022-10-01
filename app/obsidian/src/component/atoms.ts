@@ -67,7 +67,7 @@ export const docKeyAtom = atom(async (get): Promise<string | null> => {
 
 const fetchAnnots = async (get: Getter) => {
   const attachmentId = get(atchIdAtom);
-  if (attachmentId === null) return [];
+  if (attachmentId === null) return null;
   const { db } = get(pluginAtom);
   return (await db.getAnnotations(attachmentId)).sort((a, b) =>
     sortBySortIndex(a.sortIndex, b.sortIndex),
@@ -82,11 +82,12 @@ export interface AnnotProps {
   annotAtom: AnnotAtom;
 }
 export const selectedItemsAtom = atom(new Set<number>());
-export const selectedAnnotsAtom = atom((get) =>
-  get(annotsAtom).filter((annot) =>
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    get(selectedItemsAtom).has(annot.itemID!),
-  ),
+export const selectedAnnotsAtom = atom(
+  (get) =>
+    get(annotsAtom)?.filter((annot) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      get(selectedItemsAtom).has(annot.itemID!),
+    ) ?? null,
 );
 
 /** attachments atom */
