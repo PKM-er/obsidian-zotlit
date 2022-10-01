@@ -12,7 +12,7 @@ Obsidian.md plugin to integrate with Zotero, create literature notes and insert 
 
 ## Compatibility
 
-The required API feature is only available for Obsidian v0.15.9+.
+The required API feature is only available for Obsidian v0.16.0+.
 
 ## Installation
 
