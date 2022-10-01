@@ -5,12 +5,52 @@ import type { Atom, Getter, PrimitiveAtom } from "jotai";
 import { useAtomValue, atom } from "jotai";
 import { atomWithDefault } from "jotai/utils";
 import { useMemo } from "react";
+import log from "../logger";
 import type ZoteroPlugin from "../zt-main";
 
 // Provider
 export const pluginAtom = atom<ZoteroPlugin>(null as never),
   /** update when active leaf changes */
-  activeDocAtom = atom<string | null>(null);
+  statusAtom = atom<Status>({ type: "inactive" }),
+  activeDocAtom = atom(
+    (get) => {
+      const status = get(statusAtom);
+      return status.type === "active" ? status.doc : null;
+    },
+    (get, set, doc: string | null) => {
+      set(
+        statusAtom,
+        doc === null ? { type: "inactive" } : { type: "active", doc: doc },
+      );
+    },
+  );
+
+// https://github.com/pmndrs/jotai/issues/71#issuecomment-701148885
+export const refreshAtom = atom(
+  (get) => get(statusAtom).type === "refresh",
+  async (get, set) => {
+    const { db } = get(pluginAtom);
+    const prevStatus = get(statusAtom);
+    set(statusAtom, { type: "refresh" });
+    await db.refreshDatabases();
+    set(statusAtom, prevStatus);
+    // index refresh should be non blocking
+    db.refreshIndex();
+  },
+);
+
+type Status = StatusActive | StatusInactive | StatusRefresh;
+interface StatusActive {
+  type: "active";
+  doc: string;
+}
+interface StatusRefresh {
+  type: "refresh";
+}
+
+interface StatusInactive {
+  type: "inactive";
+}
 
 export const zoteroDataDirAtom = atom((get) =>
   dirname(get(pluginAtom).settings.zoteroDbPath),
@@ -35,18 +75,7 @@ const fetchAnnots = async (get: Getter) => {
 };
 
 /** annotations atom */
-const annotsAtom = atomWithDefault(fetchAnnots);
-// https://github.com/pmndrs/jotai/issues/71#issuecomment-701148885
-export const latestAnnotsAtom = atom(
-  (get) => get(annotsAtom),
-  async (get, set) => {
-    const { db } = get(pluginAtom);
-    await db.refreshDatabases();
-    set(annotsAtom, await fetchAnnots(get));
-    // don't wait for index to rebuild
-    db.refreshIndex();
-  },
-);
+export const annotsAtom = atom(fetchAnnots);
 
 export type AnnotAtom = PrimitiveAtom<Annotation>;
 export interface AnnotProps {
@@ -54,7 +83,7 @@ export interface AnnotProps {
 }
 export const selectedItemsAtom = atom(new Set<number>());
 export const selectedAnnotsAtom = atom((get) =>
-  get(latestAnnotsAtom).filter((annot) =>
+  get(annotsAtom).filter((annot) =>
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     get(selectedItemsAtom).has(annot.itemID!),
   ),
@@ -62,7 +91,7 @@ export const selectedAnnotsAtom = atom((get) =>
 
 /** attachments atom */
 export const atchIdAtom = atomWithDefault<number | null>((get) => {
-  const attachments = get(atchsAtom);
+  const attachments = get(attachmentsAtom);
   if (attachments && attachments.length > 0) {
     return attachments[0].itemID;
   } else return null;
@@ -73,14 +102,14 @@ export const setAtchIdAtom = atom(
     set(atchIdAtom, parseInt(evt.target.value, 10));
   },
 );
-export const atchsAtom = atom(async (get) => {
+export const attachmentsAtom = atom(async (get) => {
   const docKey = get(docKeyAtom);
   // no active note for literature
   if (!docKey) return null;
-
   const plugin = get(pluginAtom);
   const item = await plugin.db.getItem(docKey);
   if (!item || !item.itemID) return null;
+  log.debug("fetching attachments for", docKey);
   return await plugin.db.getAttachments(item.itemID, item.libraryID);
 });
 

@@ -8,11 +8,13 @@ import { useMemo } from "react";
 import { AnnotationPreview } from "./annot-preview";
 import type { AnnotProps } from "./atoms";
 import {
+  refreshAtom,
   selectedAnnotsAtom,
-  latestAnnotsAtom,
+  annotsAtom,
   selectedItemsAtom,
 } from "./atoms";
 import { getIsSelectedAtom } from "./derived-atom";
+import { useIconRef } from "./icon";
 
 const weakAtomFamily = <Param extends object, AtomType extends Atom<unknown>>(
   initializeAtom: (param: Param) => AtomType,
@@ -33,7 +35,7 @@ const filterAtom = atom("all");
 
 const filteredAtom = atom((get) => {
   const filter = get(filterAtom);
-  const annots = get(latestAnnotsAtom);
+  const annots = get(annotsAtom);
   const selected = get(selectedItemsAtom);
   if (filter === "all") return annots;
   else if (filter === "selected") {
@@ -48,7 +50,6 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   const annots = useAtomValue(filteredAtom);
   return (
     <div className="annot-list">
-      <Refresh />
       {annots.map((annot) => (
         <AnnotListItem
           selectable={selectable}
@@ -61,9 +62,18 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
 };
 export default AnnotationList;
 
-const Refresh = () => {
-  const refresh = useSetAtom(latestAnnotsAtom);
-  return <button onClick={refresh}>Refresh</button>;
+export const Refresh = () => {
+  const refresh = useSetAtom(refreshAtom);
+  const [ref] = useIconRef<HTMLButtonElement>("refresh-ccw");
+  return (
+    <button
+      ref={ref}
+      className="clickable-icon"
+      onClick={refresh}
+      aria-label="Refresh Annotation List"
+      aria-label-delay="50"
+    />
+  );
 };
 
 const AnnotListItem = ({

@@ -7,7 +7,7 @@ import { selectedItemsAtom, zoteroDataDirAtom } from "./atoms";
 import type { AnnotAtom } from "./atoms";
 
 export const getColorAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => annot.color);
+  selectAtom(annot, (annot) => annot.color ?? undefined);
 export const getTypeAtom = (annot: AnnotAtom) =>
   selectAtom(annot, (annot) => annot.type);
 export const getPageAtom = (annot: AnnotAtom) =>

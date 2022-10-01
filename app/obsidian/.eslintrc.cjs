@@ -29,6 +29,8 @@ module.exports = {
     "@aidenlx/eslint-config/react",
   ],
   rules: {
+    "react/no-unknown-property": ["error", { ignore: ["aria-label-delay"] }],
+    "jsx-a11y/aria-props": "off",
     "import/no-unresolved": [
       2,
       {
