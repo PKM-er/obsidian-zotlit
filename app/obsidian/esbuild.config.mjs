@@ -15,7 +15,7 @@ const opts = {
   bundle: true,
   watch: !isProd,
   platform: "node",
-  logLevel: "info",
+  logLevel: process.env.BUILD === "development" ? "info" : "silent",
   external: ["obsidian", "electron", "@electron/remote"],
   format: "cjs",
   mainFields: ["browser", "module", "main"],
@@ -31,10 +31,7 @@ try {
     entryPoints: ["src/zt-main.ts"],
     banner: { js: banner },
     outfile: "build/main.js",
-    plugins: [
-      lessLoader(),
-      obPlugin(),
-    ],
+    plugins: [lessLoader(), obPlugin()],
   });
 } catch (err) {
   console.error(err);
