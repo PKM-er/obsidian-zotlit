@@ -1,5 +1,5 @@
 import { getCacheImagePath } from "@obzt/database";
-import { AnnotationType } from "@obzt/zotero-type";
+import { AnnotationType, getBacklink } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { atom } from "jotai";
 import { selectAtom } from "jotai/utils";
@@ -14,6 +14,9 @@ export const getPageAtom = (annot: AnnotAtom) =>
   selectAtom(annot, (annot) => annot.pageLabel);
 export const getCommentAtom = (annot: AnnotAtom) =>
   selectAtom(annot, (annot) => annot.comment);
+
+export const getBacklinkAtom = (annot: AnnotAtom) =>
+  selectAtom(annot, (annot) => getBacklink(annot));
 
 export const getImgSrcAtom = (annot: AnnotAtom) =>
   atom((get) => {

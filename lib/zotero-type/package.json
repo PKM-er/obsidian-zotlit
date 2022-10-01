@@ -17,5 +17,8 @@
     "@rmp135/sql-ts": "~1.15.0",
     "endent": "~2.1.0",
     "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0"
+  },
+  "dependencies": {
+    "@obzt/common": "workspace:*"
   }
 }

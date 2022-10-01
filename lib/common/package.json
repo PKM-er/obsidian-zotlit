@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "build": "tsc"
   },
@@ -14,7 +13,6 @@
     "eslint": "~8.24.0"
   },
   "dependencies": {
-    "log4js": "~6.6.1",
-    "@obzt/zotero-type": "workspace:*"
+    "log4js": "~6.6.1"
   }
 }

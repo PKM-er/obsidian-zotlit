@@ -12,6 +12,7 @@ import {
   getImgSrcAtom,
   getImgAltAtom,
   getCommentAtom,
+  getBacklinkAtom,
 } from "./derived-atom";
 import { useIconRef } from "./icon";
 
@@ -48,7 +49,6 @@ const AnnotContent = ({ annotAtom }: AnnotProps) => {
 const Header = ({ annotAtom }: AnnotProps) => {
   const icon = useDerivedAtom(annotAtom, getIconAtom);
   const color = useDerivedAtom(annotAtom, getColorAtom);
-  const page = useDerivedAtom(annotAtom, getPageAtom);
   const type = useDerivedAtom(annotAtom, getTypeAtom);
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
@@ -58,10 +58,10 @@ const Header = ({ annotAtom }: AnnotProps) => {
         className="annot-type-icon"
         style={{ color }}
         aria-label={AnnotationType[type]}
-        aria-label-delay="50"
+        aria-label-delay="500"
       />
       <div className="annot-header-space" />
-      <span className="annot-page">Page {page}</span>
+      <Page annotAtom={annotAtom} />
     </div>
   );
 };
@@ -94,4 +94,23 @@ const Comment = ({ annotAtom }: AnnotProps) => {
       <p {...renderHTMLReact(comment)} />
     </div>
   ) : null;
+};
+
+const Page = ({ annotAtom }: AnnotProps) => {
+  const page = useDerivedAtom(annotAtom, getPageAtom);
+  const backlink = useDerivedAtom(annotAtom, getBacklinkAtom);
+  const pageText = page ? `Page ${page}` : "";
+
+  if (backlink)
+    return (
+      <a
+        className="annot-page"
+        href={backlink}
+        aria-label={`Open Annotation In Zotero at Page ${page}`}
+        aria-label-delay="500"
+      >
+        {pageText}
+      </a>
+    );
+  else return <span className="annot-page">{pageText}</span>;
 };

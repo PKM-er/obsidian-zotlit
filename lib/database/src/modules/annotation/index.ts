@@ -26,6 +26,7 @@ const getAnnotations: DbWorkerAPI["getAnnotations"] = async (
   );
   return annots.map((annot) => ({
     ...annot,
+    itemType: "annotation",
     parentItemID: attachmentId,
     parentItem: attachmentKey,
   }));

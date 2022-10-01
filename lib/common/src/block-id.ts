@@ -93,3 +93,14 @@ export const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
    * annot-key  @  attachment-key  group-id  page   next-item
    */
   multipleAnnotKeyPagePattern = getRegExp()`(?:${annotKeyPageBase(false)}n?)+`;
+
+/** convert pagelabel to page interger */
+export const toPage = (pageLabel: string | null): number | null => {
+  if (!pageLabel) return null;
+  const page = parseInt(pageLabel, 10);
+  if (Number.isInteger(page)) {
+    return page;
+  } else {
+    return null;
+  }
+};

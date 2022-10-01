@@ -1,5 +1,6 @@
 import { CreatorFieldMode } from "./misc.js";
 import type { AnnotationType, TagType } from "./misc.js";
+import type { AnnotationItem } from "./non-regular.js";
 
 export type Item = {
   itemID: number | null;
@@ -53,11 +54,7 @@ export type GeneralItem = Item & {
   citekey: string | null;
 } & Record<string, unknown>;
 
-export interface Annotation {
-  itemID: number | null;
-  key: string;
-  libraryID: number;
-  groupID: number | null;
+export type Annotation = AnnotationItem & {
   type: AnnotationType;
   authorName: string | null;
   text: string | null;
@@ -69,7 +66,7 @@ export interface Annotation {
   parentItemID: number;
   /** key of parent item (commonly attachment) */
   parentItem: string;
-}
+};
 
 export interface ItemTag {
   itemID: number | null;
