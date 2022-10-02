@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { AnnotationPreview } from "./annot-preview";
 import type { AnnotProps } from "./atoms";
 import {
+  weakAtomFamily,
   refreshAtom,
   selectedAnnotsAtom,
   annotsAtom,
@@ -15,19 +16,6 @@ import {
 } from "./atoms";
 import { getIsSelectedAtom } from "./derived-atom";
 import { useIconRef } from "./icon";
-
-const weakAtomFamily = <Param extends object, AtomType extends Atom<unknown>>(
-  initializeAtom: (param: Param) => AtomType,
-) => {
-  const atoms = new WeakMap<Param, AtomType>();
-  return (obj: Param) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (atoms.has(obj)) return atoms.get(obj)!;
-    const newAtom = initializeAtom(obj);
-    atoms.set(obj, newAtom);
-    return newAtom;
-  };
-};
 
 const annotAtomFamily = weakAtomFamily((annot: Annotation) => atom(annot));
 

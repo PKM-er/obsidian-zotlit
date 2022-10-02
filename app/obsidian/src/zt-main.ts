@@ -3,6 +3,7 @@ import "./main.less";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
+import { activeAtchIdAtomFamily } from "./component/atoms";
 import {
   CitationEditorSuggest,
   insertCitation,
@@ -67,6 +68,9 @@ export default class ZoteroPlugin extends Plugin {
 
   onunload() {
     log.info("unloading Obsidian Zotero Plugin");
+    // clean up atom family
+    activeAtchIdAtomFamily.setShouldRemove(() => true);
+    activeAtchIdAtomFamily.setShouldRemove(null);
   }
 
   async getLiteratureNoteFolder(): Promise<TFolder> {
