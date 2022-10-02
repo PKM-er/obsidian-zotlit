@@ -371,6 +371,10 @@
       "projectFolder": "app/obsidian"
     },
     {
+      "packageName": "zotero-obsidian-note",
+      "projectFolder": "app/zotero"
+    },
+    {
       "packageName": "@obzt/database",
       "projectFolder": "lib/database"
     },

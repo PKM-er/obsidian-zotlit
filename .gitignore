@@ -1,4 +1,14 @@
-app/obsidian/build
+app/*/build
+
+app/zotero/wiki
+app/zotero/gen
+app/zotero/build
+app/zotero/**/*.swp
+app/zotero/**/*.debug
+app/zotero/**/*.cache
+app/zotero/**/*.status
+app/zotero/**/*.tmp
+app/zotero/**/*.xpi
 
 dist
 tsconfig.tsbuildinfo

@@ -5,6 +5,10 @@
       "path": "app/obsidian"
     },
     {
+      "name": "zotero",
+      "path": "app/zotero"
+    },
+    {
       "name": "database",
       "path": "lib/database"
     },
@@ -50,6 +54,7 @@
     // https://github.com/Microsoft/vscode-eslint#mono-repository-setup
     "eslint.workingDirectories": [
       "./app/obsidian",
+      "./app/zotero",
       "./lib/common",
       "./lib/database",
       "./lib/zotero-type"
@@ -61,6 +66,7 @@
     "conventionalCommits.scopes": [
       "obsidian",
       "obsidian/annot-view",
+      "zotero",
       "lib/database",
       "lib/common",
       "lib/zotero-type"

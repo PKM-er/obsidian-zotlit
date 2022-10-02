@@ -1,0 +1,7 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "env": {
+    "browser": true,
+    "node": false
+  }
+}
