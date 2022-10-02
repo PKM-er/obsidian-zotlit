@@ -84,7 +84,43 @@
   font-weight: bold;
 }
 
-// .annot-list {
-//   padding-right: var(--size-4-4);
-//   padding-left: var(--size-4-1);
-// }
+.annot-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 var(--size-4-3) var(--size-4-6) var(--size-4-3);
+}
+
+.annot-view-header {
+  padding: var(--size-4-2);
+  flex-wrap: wrap;
+  justify-content: space-around;
+  display: flex;
+  gap: var(--size-4-2) 0;
+}
+
+.annot-view-button-container {
+  flex-wrap: wrap;
+  gap: var(--size-2-1);
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.atch-select {
+  max-width: 10em;
+  text-overflow: ellipsis;
+  margin-left: var(--size-4-2);
+}
+
+.workspace-leaf-content[data-type="zotero-annotation-view"] {
+  .view-content {
+    padding: 0;
+  }
+}
+
+.annot-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

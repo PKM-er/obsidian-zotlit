@@ -23,8 +23,10 @@ export const AnnotView = () => {
     <div className="annot-view">
       {activeDoc ? (
         <>
-          <div className="annot-toolbar">
-            <Refresh />
+          <div className="annot-view-header">
+            <div className="annot-view-button-container">
+              <Refresh />
+            </div>
             <Suspense fallback="loading attachments...">
               <AttachmentSelect />
             </Suspense>
