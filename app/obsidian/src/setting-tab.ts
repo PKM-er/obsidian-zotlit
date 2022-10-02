@@ -88,9 +88,9 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;
-    const renderDropdown = async (s: Setting, refresh = false) => {
+    const renderDropdown = async (s: Setting) => {
       dropdown && dropdown.selectEl.remove();
-      const libs = await this.plugin.db.getLibs(refresh);
+      const libs = await this.plugin.db.getLibs();
       s.addDropdown((dd) => {
         dropdown = dd;
         for (const { libraryID, type, groupID } of libs) {
@@ -104,7 +104,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           async (val) => {
             const level = +val;
             this.plugin.settings.citationLibrary = level;
-            await this.plugin.db.refreshIndex();
+            await this.plugin.db.initIndex();
             new Notice("Zotero database updated.");
             await this.plugin.saveSettings();
           },
@@ -117,7 +117,10 @@ export class ZoteroSettingTab extends PluginSettingTab {
         cb
           .setIcon("switch")
           .setTooltip("Refresh")
-          .onClick(() => renderDropdown(setting, true)),
+          .onClick(async () => {
+            await this.plugin.db.fullRefresh();
+            renderDropdown(setting);
+          }),
       )
       .then(renderDropdown);
   }

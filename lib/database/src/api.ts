@@ -24,7 +24,7 @@ export interface DbWorkerAPI {
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
 
   /* start index for library, need to be called before query and after openDb */
-  initIndex(libraryID: number, refresh?: boolean): Promise<void>;
+  initIndex(libraryID: number): Promise<void>;
 
   query(
     libraryID: number,
@@ -39,7 +39,7 @@ export interface DbWorkerAPI {
     libraryID: number,
   ): Promise<GeneralItem | null>;
 
-  refreshDatabases(): Promise<void>;
+  initDbConnection(): Promise<void>;
 
   getLibs(): Promise<LibraryInfo[]>;
   getAnnotations(
@@ -57,6 +57,6 @@ type ToWorkpoolType<API extends DbWorkerAPI> = {
     ? (...args: P) => Promise<Awaited<R>>
     : never;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-} & Record<string, (...args: any[]) => any>;
+};
 
 export type DbWorkerAPIWorkpool = ToWorkpoolType<DbWorkerAPI>;

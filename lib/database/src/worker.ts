@@ -20,9 +20,8 @@ const methods: DbWorkerAPI = {
   getAttachments,
   getAnnotations,
   getItem,
-  refreshDatabases: async () => {
-    await databases.main.refresh();
-    await databases.bbt?.refresh();
+  initDbConnection: async () => {
+    await Promise.all([databases.main.refresh(), databases.bbt?.refresh()]);
   },
   /**
    * raw query on zotero database

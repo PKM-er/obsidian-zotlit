@@ -3,7 +3,7 @@ import { sortBySortIndex } from "@obzt/database";
 import type { Annotation, GeneralItem } from "@obzt/zotero-type";
 import type { Atom, Getter, PrimitiveAtom } from "jotai";
 import { useAtomValue, atom } from "jotai";
-import { atomFamily, atomWithDefault, atomWithStorage } from "jotai/utils";
+import { atomFamily, atomWithStorage } from "jotai/utils";
 import { useMemo } from "react";
 import log from "../logger";
 import type ZoteroPlugin from "../zt-main";
@@ -32,10 +32,10 @@ export const refreshAtom = atom(
     const { db } = get(pluginAtom);
     const prevStatus = get(statusAtom);
     set(statusAtom, { type: "refresh" });
-    await db.refreshDatabases();
+    await db.initDbConnection();
     set(statusAtom, prevStatus);
     // index refresh should be non blocking
-    db.refreshIndex();
+    db.initIndex();
   },
 );
 

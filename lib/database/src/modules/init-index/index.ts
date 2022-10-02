@@ -23,14 +23,7 @@ const fuseOptions: Fuse.IFuseOptions<GeneralItem> = {
   shouldSort: true,
 };
 
-const initIndex: DbWorkerAPI["initIndex"] = async (
-  libraryID,
-  refresh = false,
-) => {
-  if (refresh) {
-    await Promise.all([databases.main.refresh(), databases.bbt?.refresh()]);
-  }
-
+const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
   const { items, itemFields, creators } = await readMainDb(libraryID);
   const citekeyMap = await readBbtDb();
 

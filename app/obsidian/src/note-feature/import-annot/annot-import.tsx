@@ -17,14 +17,13 @@ export const AnnotationImport = ({
   return (
     <>
       <AnnotationList selectable />
-      {createPortal(
-        <>
+      {annots &&
+        createPortal(
           <button className="mod-cta" onClick={() => onSelectDone?.(annots)}>
             Import
-          </button>
-        </>,
-        buttonContainer,
-      )}
+          </button>,
+          buttonContainer,
+        )}
     </>
   );
 };

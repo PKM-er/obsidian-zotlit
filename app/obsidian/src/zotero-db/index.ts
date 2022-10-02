@@ -104,10 +104,31 @@ export default class ZoteroDb {
     const proxy = await this.#proxy;
     return await proxy.openDb(this.configPath, this.mainDbPath, this.bbtDbPath);
   }
-  async #initIndex(lib: number, refresh = false) {
+
+  #indexed = false;
+  async #initIndex(lib = this.defaultLibId) {
     const proxy = await this.#proxy;
-    await proxy.initIndex(lib, refresh);
+    await proxy.initIndex(lib);
+    this.#libs = await proxy.getLibs();
   }
+  #initIndexTask: Promise<void> | null = null;
+  async initIndex(force = false) {
+    // wait for db refresh
+    if (this.#initDbTask) {
+      await this.#initDbTask;
+    }
+    // since database is opened as immutable one
+    // if index is already initialized, skip
+    if (this.#indexed && !force) return;
+    if (!this.#initIndexTask) {
+      this.#initIndexTask = this.#initIndex().then(() => {
+        this.#indexed = true;
+      });
+    }
+    await this.#initIndexTask;
+    this.#initIndexTask = null;
+  }
+
   async getAttachments(docId: number, libId = this.defaultLibId) {
     const proxy = await this.#proxy;
     return await proxy.getAttachments(docId, libId);
@@ -127,46 +148,43 @@ export default class ZoteroDb {
     return await proxy.getItem(item, lib);
   }
 
-  #dbRefresh: Promise<void> | null = null;
-  async #refreshDatabases() {
+  #initDbTask: Promise<void> | null = null;
+  #waitingInitDb = false;
+  async #initDbConnection() {
     const proxy = await this.#proxy;
-    await proxy.refreshDatabases();
-  }
-  async refreshDatabases() {
-    if (!this.#dbRefresh) {
-      this.#dbRefresh = this.#refreshDatabases();
-    }
-    await this.#dbRefresh;
-    this.#dbRefresh = null;
-  }
+    await proxy.initDbConnection();
 
-  #indexRefresh: Promise<void> | null = null;
-  async #refreshIndex() {
-    await this.#initIndex(this.defaultLibId, true);
-    await this.getLibs(true);
+    if (!this.#waitingInitDb) {
+      this.#initDbTask = null;
+      // connection refresh done
+    } else {
+      this.#waitingInitDb = false;
+      // continue to query
+      await this.#initDbConnection();
+    }
   }
-  async refreshIndex() {
-    // wait for db refresh
-    if (this.#dbRefresh) {
-      await this.#dbRefresh;
+  async initDbConnection() {
+    if (!this.#initDbTask) {
+      // if no task is running, start a new one
+      this.#initDbTask = this.#initDbConnection().then(() => {
+        this.#indexed = false;
+      });
+    } else {
+      this.#waitingInitDb = true;
     }
-    if (!this.#indexRefresh) {
-      this.#indexRefresh = this.#refreshIndex();
-    }
-    await this.#indexRefresh;
-    this.#indexRefresh = null;
+    return this.#initDbTask;
   }
 
   async fullRefresh() {
-    await this.refreshDatabases();
-    await this.refreshIndex();
+    await this.initDbConnection();
+    await this.initIndex();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async raw<R>(sql: string, args: any[]): Promise<R> {
     // wait for db refresh
-    if (this.#dbRefresh) {
-      await this.#dbRefresh;
+    if (this.#initDbTask) {
+      await this.#initDbTask;
     }
     const proxy = await this.#proxy;
     const result = await proxy.raw(sql, args);
@@ -199,9 +217,9 @@ export default class ZoteroDb {
   }
 
   #libs: LibraryInfo[] | null = null;
-  async getLibs(refresh = false) {
+  async getLibs() {
     try {
-      if (refresh || !this.#libs) {
+      if (!this.#libs) {
         const result = await (await this.#proxy).getLibs();
         this.#libs = result;
       }
