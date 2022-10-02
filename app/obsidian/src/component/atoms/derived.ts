@@ -3,8 +3,9 @@ import { AnnotationType, getBacklink } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { atom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { selectedItemsAtom, zoteroDataDirAtom } from "./atoms";
-import type { AnnotAtom } from "./atoms";
+import type { AnnotAtom } from "./annotation";
+import { selectedItemsAtom } from "./annotation";
+import { zoteroDataDirAtom } from "./obsidian";
 
 export const getColorAtom = (annot: AnnotAtom) =>
   selectAtom(annot, (annot) => annot.color ?? undefined);

@@ -3,7 +3,7 @@ import "./main.less";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
-import { activeAtchIdAtomFamily } from "./component/atoms";
+import { activeAtchIdAtomFamily } from "./component/atoms/attachment";
 import {
   CitationEditorSuggest,
   insertCitation,

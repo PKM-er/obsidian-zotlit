@@ -2,19 +2,18 @@ import "./style.less";
 
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
-import type { Atom } from "jotai";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { useMemo } from "react";
 import { AnnotationPreview } from "./annot-preview";
-import type { AnnotProps } from "./atoms";
 import {
-  weakAtomFamily,
-  refreshAtom,
   selectedAnnotsAtom,
   annotsAtom,
   selectedItemsAtom,
-} from "./atoms";
-import { getIsSelectedAtom } from "./derived-atom";
+} from "./atoms/annotation";
+import type { AnnotProps } from "./atoms/annotation";
+import { getIsSelectedAtom } from "./atoms/derived";
+import { manualRefreshAtom } from "./atoms/refresh";
+import { weakAtomFamily } from "./atoms/utils";
 import { useIconRef } from "./icon";
 
 const annotAtomFamily = weakAtomFamily((annot: Annotation) => atom(annot));
@@ -52,7 +51,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
 export default AnnotationList;
 
 export const Refresh = () => {
-  const refresh = useSetAtom(refreshAtom);
+  const refresh = useSetAtom(manualRefreshAtom);
   const [ref] = useIconRef<HTMLButtonElement>("refresh-ccw");
   return (
     <button

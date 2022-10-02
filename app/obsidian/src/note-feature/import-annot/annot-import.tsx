@@ -2,7 +2,7 @@ import type { Annotation } from "@obzt/zotero-type";
 import { atom, useAtomValue } from "jotai";
 import { createPortal } from "react-dom";
 import AnnotationList from "@component/annot-list";
-import { selectedAnnotsAtom } from "@component/atoms";
+import { selectedAnnotsAtom } from "@component/atoms/annotation";
 
 export const buttonContainerAtom = atom<HTMLDivElement>(null as never);
 

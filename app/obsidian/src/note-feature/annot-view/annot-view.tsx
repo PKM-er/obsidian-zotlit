@@ -1,11 +1,11 @@
 import { useAtom } from "jotai";
 import { Suspense, useEffect } from "react";
 import AnnotationList, { Refresh } from "@component/annot-list";
-import { activeDocAtom } from "@component/atoms";
+import { activeFileAtom } from "@component/atoms/obsidian";
 import { AttachmentSelect } from "./atch-select";
 
 export const AnnotView = () => {
-  const [activeDoc, setActiveDoc] = useAtom(activeDocAtom);
+  const [activeDoc, setActiveDoc] = useAtom(activeFileAtom);
   useEffect(() => {
     const updateActiveDoc = () => {
       const activeFile = app.workspace.getActiveFile();
@@ -21,17 +21,17 @@ export const AnnotView = () => {
   }, [setActiveDoc]);
   return (
     <div className="annot-view">
-      {activeDoc ? (
+      {activeDoc !== null ? (
         <>
           <div className="annot-view-header">
             <div className="annot-view-button-container">
               <Refresh />
             </div>
-            <Suspense fallback="loading attachments...">
+            <Suspense fallback={null}>
               <AttachmentSelect />
             </Suspense>
           </div>
-          <Suspense fallback="loading annotations...">
+          <Suspense fallback={null}>
             <AnnotationList />
           </Suspense>
         </>

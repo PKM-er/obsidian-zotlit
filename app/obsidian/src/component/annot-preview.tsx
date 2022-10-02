@@ -2,8 +2,7 @@ import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { startCase } from "lodash-es";
 import { renderHTMLReact } from "../utils";
-import type { AnnotProps } from "./atoms";
-import { useDerivedAtom } from "./atoms";
+import type { AnnotProps } from "./atoms/annotation";
 import {
   getTypeAtom,
   getIconAtom,
@@ -14,7 +13,8 @@ import {
   getImgAltAtom,
   getCommentAtom,
   getBacklinkAtom,
-} from "./derived-atom";
+} from "./atoms/derived";
+import { useDerivedAtom } from "./atoms/utils";
 import { useIconRef } from "./icon";
 
 export const AnnotationPreview = ({ annotAtom: atom }: AnnotProps) => {

@@ -2,7 +2,8 @@ import { Provider } from "jotai";
 import type { WorkspaceLeaf } from "obsidian";
 import { ItemView } from "obsidian";
 import ReactDOM from "react-dom";
-import { createInitialValues, pluginAtom } from "@component/atoms";
+import { pluginAtom } from "@component/atoms/obsidian";
+import { createInitialValues } from "@component/atoms/utils";
 import type ZoteroPlugin from "../../zt-main";
 import { AnnotView } from "./annot-view";
 

@@ -5,11 +5,9 @@ import type { FuzzyMatch } from "obsidian";
 import { Modal, Notice } from "obsidian";
 import { Suspense } from "react";
 import ReactDOM from "react-dom";
-import {
-  atchIdAtom,
-  createInitialValues,
-  pluginAtom,
-} from "@component/atoms.js";
+import { activeAtchIdAtom } from "@component/atoms/attachment";
+import { pluginAtom } from "@component/atoms/obsidian";
+import { createInitialValues } from "@component/atoms/utils.js";
 import {
   FuzzySuggestModalWithPromise,
   ZoteroItemSuggestModal,
@@ -119,7 +117,7 @@ export class AnnotationSelectModal extends Modal {
   onOpen(): void {
     const initVals = createInitialValues();
     initVals.set(pluginAtom, this.plugin);
-    initVals.set(atchIdAtom, this.attachmentId);
+    initVals.set(activeAtchIdAtom, this.attachmentId);
     initVals.set(buttonContainerAtom, this.buttonContainerEl);
     ReactDOM.render(
       <Provider initialValues={initVals.get()}>
