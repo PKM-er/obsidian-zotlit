@@ -64,30 +64,18 @@ export default class ZoteroDb {
     await proxy.setLoglevel(level);
   }
 
-  initialized = false;
-  #initPromise = new Promise<void>((resolve) => {
-    this.initResolve = resolve;
-  });
-  private initResolve!: (value: void | PromiseLike<void>) => void;
-
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
-    const [mainOpened, bbtOpened] = await this.#openDatabase();
-    const inited = () => {
-      this.initialized = true;
-      this.initResolve();
-    };
+    const [mainOpened, bbtOpened] = await this.openDbConn();
     if (this.bbtDbPath && !bbtOpened) {
       log.warn("Better BibTex database not found");
       new NoticeBBTStatus(this.#plugin);
-      inited();
       return;
     }
     if (mainOpened) {
       await this.#initIndex(this.defaultLibId);
       await this.getLibs();
-      inited();
     } else {
       log.error("Failed to init ZoteroDB");
     }
@@ -100,9 +88,67 @@ export default class ZoteroDb {
     );
   }
 
-  async #openDatabase() {
+  #dbInited = false;
+  #initDbTask: Promise<[mainDbResult: boolean, bbtDbResult: boolean]> | null =
+    null;
+  #waitingInitDb = false;
+  async #refreshDbConn() {
+    const proxy = await this.#proxy;
+    let result = await proxy.refreshDb();
+
+    if (!this.#waitingInitDb) {
+      this.#initDbTask = null;
+      // connection refresh done
+    } else {
+      this.#waitingInitDb = false;
+      // continue to query
+      result = await this.#refreshDbConn();
+    }
+    return result;
+  }
+  async #openDbConn() {
+    if (this.#dbInited) {
+      log.debug(
+        `Database already initialized, reopen with new params: ${[
+          this.configPath,
+          this.mainDbPath,
+          this.bbtDbPath,
+        ]}`,
+      );
+    }
     const proxy = await this.#proxy;
     return await proxy.openDb(this.configPath, this.mainDbPath, this.bbtDbPath);
+  }
+
+  async #execOpenDbConnTask(refresh: boolean) {
+    const prevTask = this.#initDbTask;
+    let result;
+    if (prevTask) {
+      if (!refresh) {
+        log.warn("Database already initializing");
+      } else {
+        this.#waitingInitDb = true;
+      }
+      result = await prevTask;
+    } else {
+      if (!refresh) {
+        result = await this.#openDbConn();
+        this.#dbInited = true;
+      } else {
+        result = await this.#refreshDbConn();
+      }
+      this.#indexed = false;
+    }
+    this.#initDbTask = null;
+    return result;
+  }
+
+  openDbConn(
+    refresh = false,
+  ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]> {
+    const task = this.#execOpenDbConnTask(refresh);
+    this.#initDbTask = task;
+    return task;
   }
 
   #indexed = false;
@@ -112,21 +158,28 @@ export default class ZoteroDb {
     this.#libs = await proxy.getLibs();
   }
   #initIndexTask: Promise<void> | null = null;
-  async initIndex(force = false) {
-    // wait for db refresh
+  async #execInitIndexTask(force: boolean) {
+    // if db conn is initializing, continue after it's done
     if (this.#initDbTask) {
       await this.#initDbTask;
     }
-    // since database is opened as immutable one
-    // if index is already initialized, skip
-    if (this.#indexed && !force) return;
-    if (!this.#initIndexTask) {
-      this.#initIndexTask = this.#initIndex().then(() => {
-        this.#indexed = true;
-      });
+    let result;
+    if (this.#indexed && !force) {
+      // since database is opened as immutable one
+      // if index is already initialized, skip
+      result = void 0;
+    } else {
+      result = await this.#initIndex();
+      this.#indexed = true;
+      this.#initIndexTask = null;
     }
-    await this.#initIndexTask;
     this.#initIndexTask = null;
+    return result;
+  }
+  async initIndex(force = false): Promise<void> {
+    const task = this.#execInitIndexTask(force);
+    this.#initIndexTask = task;
+    return task;
   }
 
   async getAttachments(docId: number, libId = this.defaultLibId) {
@@ -143,40 +196,13 @@ export default class ZoteroDb {
     item: string | number,
     lib = this.defaultLibId,
   ): Promise<GeneralItem | null> {
-    await this.#initPromise;
+    await this.#initDbTask;
     const proxy = await this.#proxy;
     return await proxy.getItem(item, lib);
   }
 
-  #initDbTask: Promise<void> | null = null;
-  #waitingInitDb = false;
-  async #initDbConnection() {
-    const proxy = await this.#proxy;
-    await proxy.initDbConnection();
-
-    if (!this.#waitingInitDb) {
-      this.#initDbTask = null;
-      // connection refresh done
-    } else {
-      this.#waitingInitDb = false;
-      // continue to query
-      await this.#initDbConnection();
-    }
-  }
-  async initDbConnection() {
-    if (!this.#initDbTask) {
-      // if no task is running, start a new one
-      this.#initDbTask = this.#initDbConnection().then(() => {
-        this.#indexed = false;
-      });
-    } else {
-      this.#waitingInitDb = true;
-    }
-    return this.#initDbTask;
-  }
-
   async fullRefresh() {
-    await this.initDbConnection();
+    await this.openDbConn();
     await this.initIndex();
   }
 
@@ -197,7 +223,7 @@ export default class ZoteroDb {
     limit = 20,
     lib = this.defaultLibId,
   ) {
-    await this.#initPromise;
+    await this.#initIndexTask;
     const exp = query.map<Fuse.Expression>((s) => ({
       [matchField]: s,
     }));
@@ -207,7 +233,7 @@ export default class ZoteroDb {
     return result;
   }
   async getAll(limit = 20, lib = this.defaultLibId) {
-    await this.#initPromise;
+    await this.#initIndexTask;
     const result = await (
       await this.#proxy
     ).query(lib, null, {
