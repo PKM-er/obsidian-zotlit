@@ -182,6 +182,11 @@ export default class ZoteroDb {
     return task;
   }
 
+  async isUpToDate() {
+    const proxy = await this.#proxy;
+    return await proxy.isUpToDate();
+  }
+
   async getAttachments(docId: number, libId = this.defaultLibId) {
     const proxy = await this.#proxy;
     return await proxy.getAttachments(docId, libId);

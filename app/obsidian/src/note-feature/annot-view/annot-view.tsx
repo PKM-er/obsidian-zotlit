@@ -27,16 +27,18 @@ export const AnnotView = () => {
     };
   }, [plugin.settings.autoRefreshOnFocus, refresh, setActiveDoc]);
   useEffect(() => {
+    if (!plugin.settings.autoRefreshOnFocus) return;
     const focused = async () => {
-      if (!plugin.settings.autoRefreshOnFocus) return;
       await sleep(500);
-      refresh();
+      const outOfDate = !(await plugin.db.isUpToDate());
+      if (outOfDate) refresh();
     };
     const window = getCurrentWindow();
     window.on("focus", focused);
     return () => {
       window.off("focus", focused);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plugin.settings.autoRefreshOnFocus, refresh]);
   return (
     <div className="annot-view">
