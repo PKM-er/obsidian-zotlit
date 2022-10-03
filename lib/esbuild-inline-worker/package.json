@@ -20,6 +20,9 @@
     "index.js",
     "index.d.ts"
   ],
+  "scripts": {
+    "build": ""
+  },
   "peerDependencies": {
     "esbuild": "latest"
   }

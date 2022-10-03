@@ -10,7 +10,7 @@ importers:
       '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/esbuild-plugin-obsidian': ^0.1.4
       '@aidenlx/eslint-config': 2.0.5
-      '@aidenlx/workerpool': '>=6.2.1-mod <6.2.1-mod0'
+      '@aidenlx/workerpool': '>=6.2.1-mod.4 <6.2.1-mod0'
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
       '@obzt/zotero-type': workspace:*
@@ -55,7 +55,7 @@ importers:
       tslib: ^2.3.1
       typescript: ^4.8.3
     dependencies:
-      '@aidenlx/workerpool': 6.2.1-mod.3
+      '@aidenlx/workerpool': 6.2.1-mod.4
       '@obzt/common': link:../../lib/common
       '@obzt/database': link:../../lib/database
       '@obzt/zotero-type': link:../../lib/zotero-type
@@ -159,7 +159,7 @@ importers:
       '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/eslint-config': 2.0.5
       '@aidenlx/knex': '>=2.3.0-mod <2.3.0-mod0'
-      '@aidenlx/workerpool': '>=6.2.1-mod <6.2.1-mod0'
+      '@aidenlx/workerpool': '>=6.2.1-mod.4 <6.2.1-mod0'
       '@obzt/common': workspace:*
       '@obzt/esbuild-plugin-inline-worker': workspace:*
       '@obzt/zotero-type': workspace:*
@@ -172,17 +172,19 @@ importers:
       eslint: ~8.24.0
       fuse.js: ^6.5.3
       log4js: ~6.6.1
+      monkey-around: ^2.3.0
       typescript: ^4.8.3
     dependencies:
       '@aidenlx/better-sqlite3': 7.6.2-mod.2
       '@aidenlx/knex': 2.3.0-mod.1_lyhqer75kdng42kiqldhcbpj2q
-      '@aidenlx/workerpool': 6.2.1-mod.3
+      '@aidenlx/workerpool': 6.2.1-mod.4
       '@obzt/common': link:../common
       '@obzt/zotero-type': link:../zotero-type
       assert-never: 1.2.1
       esbuild: 0.14.54
       fuse.js: 6.6.2
       log4js: 6.6.1
+      monkey-around: 2.3.0
     devDependencies:
       '@aidenlx/eslint-config': 2.0.5_ksn4eycaeggbrckn3ykh37hwf4
       '@obzt/esbuild-plugin-inline-worker': link:../esbuild-inline-worker
@@ -365,8 +367,8 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@aidenlx/workerpool/6.2.1-mod.3:
-    resolution: {integrity: sha512-GEPXl6FnzStf2BNTZ5AJuvEZoq8ek7+CZN5j28tJhHMDm98c9SzK0dX3/CTdtSzuGMvCx51mLqrcQgg0GC35zA==}
+  /@aidenlx/workerpool/6.2.1-mod.4:
+    resolution: {integrity: sha512-e2nA6iRp48Lt9JGFhw04FnQWfoszJZI/bQntff6Bf0+Klx9i4y3tYnEiKjGKF46pR51nE8qfQMw27R2GjLeU1w==}
     dev: false
 
   /@ardatan/sync-fetch/0.0.1:

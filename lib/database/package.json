@@ -22,10 +22,11 @@
     "@aidenlx/knex": ">=2.3.0-mod <2.3.0-mod0",
     "fuse.js": "^6.5.3",
     "@obzt/zotero-type": "workspace:*",
-    "@aidenlx/workerpool": ">=6.2.1-mod <6.2.1-mod0",
+    "@aidenlx/workerpool": ">=6.2.1-mod.4 <6.2.1-mod0",
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
     "esbuild": "^0.14.21",
-    "assert-never": "^1.2.1"
+    "assert-never": "^1.2.1",
+    "monkey-around": "^2.3.0"
   }
 }

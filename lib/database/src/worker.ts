@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { worker } from "@aidenlx/workerpool";
+import { around } from "monkey-around";
 import type { DbWorkerAPI } from "./api.js";
 import { databases } from "./init.js";
 import logger from "./logger.js";
@@ -39,4 +41,22 @@ const methods: DbWorkerAPI = {
   },
 };
 
-worker(methods as never);
+const logError = (methods: DbWorkerAPI) => {
+  const logger =
+    (next: any) =>
+    async (...args: any[]) => {
+      try {
+        return await next(...args);
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };
+  around(
+    methods,
+    Object.fromEntries(Object.keys(methods).map((name) => [name, logger])),
+  );
+  return methods as never;
+};
+
+worker(logError(methods));

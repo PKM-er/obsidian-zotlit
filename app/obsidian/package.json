@@ -69,7 +69,7 @@
     "endent": "~2.1.0",
     "@obzt/zotero-type": "workspace:*",
     "@obzt/database": "workspace:*",
-    "@aidenlx/workerpool": ">=6.2.1-mod <6.2.1-mod0",
+    "@aidenlx/workerpool": ">=6.2.1-mod.4 <6.2.1-mod0",
     "classnames": "~2.3.2",
     "jotai": "~1.8.4",
     "immer": "~9.0.15",
