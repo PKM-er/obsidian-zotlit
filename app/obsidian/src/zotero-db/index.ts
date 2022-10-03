@@ -1,9 +1,12 @@
+import type { FSWatcher } from "fs";
+import { watch } from "fs";
 import type { LogLevel } from "@obzt/common";
 import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
 import type { GeneralItem, LibraryInfo } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
-import { FileSystemAdapter, Notice } from "obsidian";
+import type { EventRef } from "obsidian";
+import { Events, debounce, FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import workerpool from "workerpool";
 import log from "@log";
@@ -11,15 +14,16 @@ import log from "@log";
 import type ZoteroPlugin from "../zt-main.js";
 import NoticeBBTStatus from "./notice-bbt.js";
 
-export default class ZoteroDb {
+export default class ZoteroDb extends Events {
   // itemMap: Record<string, RegularItem> = {};
 
   #pool: workerpool.WorkerPool;
   #proxy: workerpool.Promise<workerpool.Proxy<DbWorkerAPI>, Error>;
   #plugin: ZoteroPlugin;
   constructor(plugin: ZoteroPlugin) {
+    super();
     this.#plugin = plugin;
-    plugin.register(this.close.bind(this));
+    plugin.register(() => this.close());
     const url = dbWorker();
     this.#pool = workerpool.pool(url, {
       minWorkers: 1,
@@ -28,6 +32,7 @@ export default class ZoteroDb {
     });
     this.#proxy = this.#pool.proxy();
     this.setLoglevel(plugin.settings.logLevel);
+    this.setAutoRefresh(plugin.settings.autoRefresh);
     URL.revokeObjectURL(url);
 
     if (process.env.NODE_ENV === "development") {
@@ -64,6 +69,33 @@ export default class ZoteroDb {
     await proxy.setLoglevel(level);
   }
 
+  watcher: Record<"main" | "bbt", FSWatcher | null> = {
+    main: null,
+    bbt: null,
+  };
+  #autoRefresh = debounce(this.#refreshDbConn.bind(this), 500, true);
+  #autoRefreshEnabled = false;
+  #unloadWatchers() {
+    for (const k in this.watcher) {
+      const key = k as keyof ZoteroDb["watcher"];
+      this.watcher[key]?.close();
+      this.watcher[key] = null;
+    }
+  }
+  async setAutoRefresh(val: boolean, force = false) {
+    if (val === this.#autoRefreshEnabled && !force) return;
+    log.info("Auto refresh set to " + val);
+    this.#autoRefreshEnabled = val;
+    this.#unloadWatchers();
+    if (val) {
+      await this.#refreshDbConn();
+      this.watcher.main = watch(this.mainDbPath, this.#autoRefresh);
+      if (this.bbtDbPath) {
+        this.watcher.bbt = watch(this.bbtDbPath, this.#autoRefresh);
+      }
+    }
+  }
+
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
@@ -88,6 +120,13 @@ export default class ZoteroDb {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(name: "refresh", callback: () => any): EventRef;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(name: string, callback: (...data: any) => any, ctx?: any): EventRef {
+    return super.on(name, callback, ctx);
+  }
+
   #dbInited = false;
   #initDbTask: Promise<[mainDbResult: boolean, bbtDbResult: boolean]> | null =
     null;
@@ -104,6 +143,7 @@ export default class ZoteroDb {
       // continue to query
       result = await this.#refreshDbConn();
     }
+    this.trigger("refresh");
     return result;
   }
   async #openDbConn() {
@@ -264,5 +304,7 @@ export default class ZoteroDb {
 
   close(force = false) {
     this.#pool.terminate(force);
+    this.#unloadWatchers();
+    log.info("ZoteroDB unloaded");
   }
 }

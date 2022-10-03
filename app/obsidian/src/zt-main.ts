@@ -34,7 +34,6 @@ export default class ZoteroPlugin extends Plugin {
     log.info("loading Obsidian Zotero Plugin");
     await this.loadSettings();
     this.#db = new ZoteroDb(this);
-
     this.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",

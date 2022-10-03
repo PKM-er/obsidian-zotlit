@@ -31,6 +31,9 @@ export class ZoteroSettingTab extends PluginSettingTab {
 
     this.setDatabasePath("Zotero Database", "zoteroDbPath");
     this.setDatabasePath("BetterBibTex Database", "betterBibTexDbPath");
+    this.addToggle(this.containerEl, "autoRefresh", (val) =>
+      this.plugin.db.setAutoRefresh(val),
+    ).setName("Refresh automatically when Zotero updates database");
 
     this.setLiteratureNoteFolder();
     this.setCitationLibrary();
@@ -46,9 +49,6 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   annotView(): void {
     new Setting(this.containerEl).setHeading().setName("Annotaion View");
-    this.addToggle(this.containerEl, "autoRefreshOnFocus").setName(
-      "Refresh annotations on focus",
-    );
   }
   setLiteratureNoteFolder() {
     const setter = async (value: string, text: TextAreaComponent) => {
@@ -199,15 +199,17 @@ export class ZoteroSettingTab extends PluginSettingTab {
       );
   };
 
-  addToggle(addTo: HTMLElement, key: SettingKeyWithType<boolean>): Setting {
+  addToggle(
+    addTo: HTMLElement,
+    key: SettingKeyWithType<boolean>,
+    set?: (value: boolean) => void,
+  ): Setting {
     return new Setting(addTo).addToggle((toggle) => {
-      toggle
-        .setValue(this.plugin.settings[key])
-        .onChange(
-          (value) => (
-            (this.plugin.settings[key] = value), this.plugin.saveSettings()
-          ),
-        );
+      toggle.setValue(this.plugin.settings[key]).onChange((value) => {
+        this.plugin.settings[key] = value;
+        set?.(value);
+        this.plugin.saveSettings();
+      });
     });
   }
   addTextField(
