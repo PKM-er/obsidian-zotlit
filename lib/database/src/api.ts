@@ -22,6 +22,7 @@ export interface DbWorkerAPI {
     mainDbPath: string,
     bbtDbPath: string | null,
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
+  isUpToDate(): Promise<boolean | null>;
   refreshDb(): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
 
   /* start index for library, need to be called before query and after openDb */
