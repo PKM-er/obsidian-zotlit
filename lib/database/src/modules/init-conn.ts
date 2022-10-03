@@ -3,32 +3,34 @@ import { databases } from "@init";
 import log from "@log";
 import Database from "./db/index.js";
 
-const openDb: DbWorkerAPI["openDb"] = async (
+export const openDb: DbWorkerAPI["openDb"] = async (
   pluginDir,
   mainDbPath,
   bbtDbPath,
 ) => {
-  const tasks: [main: Promise<boolean>, bbt?: Promise<boolean>] = [
-    databases.main.open(mainDbPath, pluginDir),
-  ];
+  const mainOpened = databases.main.open(mainDbPath, pluginDir);
+  let bbtOpened: Promise<boolean> | null = null;
   if (bbtDbPath) {
-    if (!databases.bbt) databases.bbt = new Database();
-    tasks[1] = databases.bbt.open(bbtDbPath, pluginDir);
-  } else {
-    databases.bbt = null;
+    databases.bbt = databases.bbt ?? new Database();
+    bbtOpened = databases.bbt.open(bbtDbPath, pluginDir);
   }
-  const [main, bbt] = await Promise.allSettled(tasks);
+  const [main, bbt] = await Promise.allSettled([mainOpened, bbtOpened]);
 
   return [logError("main", mainDbPath, main), logError("bbt", bbtDbPath, bbt)];
 };
-export default openDb;
+export const refreshDb: DbWorkerAPI["refreshDb"] = async () => {
+  return await Promise.all([
+    databases.main.refresh(),
+    databases.bbt?.refresh() ?? false,
+  ]);
+};
 /**
  * @returns true if opened successfully
  */
 const logError = (
   name: "main" | "bbt",
   path: string | null,
-  result: PromiseSettledResult<boolean | undefined> | undefined,
+  result: PromiseSettledResult<boolean | null> | undefined,
 ): boolean => {
   if (!result || !path) return false;
   if (result.status === "fulfilled" && result.value === true) {

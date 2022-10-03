@@ -6,8 +6,8 @@ import getAnnotations from "./modules/annotation/index.js";
 import getAttachments from "./modules/attachments/index.js";
 import getItem from "./modules/get-item.js";
 import getLibs from "./modules/get-libs/index.js";
+import { openDb, refreshDb } from "./modules/init-conn.js";
 import initIndex from "./modules/init-index/index.js";
-import openDb from "./modules/open-db.js";
 import query from "./modules/query.js";
 import getTags from "./modules/tags/index.js";
 
@@ -20,9 +20,7 @@ const methods: DbWorkerAPI = {
   getAttachments,
   getAnnotations,
   getItem,
-  initDbConnection: async () => {
-    await Promise.all([databases.main.refresh(), databases.bbt?.refresh()]);
-  },
+  refreshDb,
   /**
    * raw query on zotero database
    */

@@ -22,6 +22,7 @@ export interface DbWorkerAPI {
     mainDbPath: string,
     bbtDbPath: string | null,
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
+  refreshDb(): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
 
   /* start index for library, need to be called before query and after openDb */
   initIndex(libraryID: number): Promise<void>;
@@ -38,8 +39,6 @@ export interface DbWorkerAPI {
     item: string | number,
     libraryID: number,
   ): Promise<GeneralItem | null>;
-
-  initDbConnection(): Promise<void>;
 
   getLibs(): Promise<LibraryInfo[]>;
   getAnnotations(

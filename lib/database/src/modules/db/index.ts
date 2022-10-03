@@ -1,3 +1,4 @@
+import { promises as fs } from "fs";
 import { join } from "path";
 import { constants } from "@obzt/common";
 import type { Knex } from "@knex";
@@ -15,14 +16,23 @@ import { DatabaseNotSetError } from "./misc.js";
 //   nativeBinding: join(__ob_cfg_dir, libName),
 // };
 
+const getMtime = async (dbPath: string) => (await fs.stat(dbPath)).mtimeMs;
+
 export default class Database {
   // private _dbInfo: DBInfo | null = null;
-  private _database: Knex | null = null;
+  #database: { db: Knex; mtime: number; path: string } | null = null;
   public get db() {
-    return this._database;
+    return this.#database?.db;
   }
-  #path: string | null = null;
   #nativeBinding: string | null = null;
+
+  /**
+   * @returns null if no database available
+   */
+  async isUpToDate(): Promise<boolean | null> {
+    if (!this.#database) return null;
+    return this.#database.mtime === (await getMtime(this.#database.path));
+  }
 
   /**
    * set new database path and open connection
@@ -32,15 +42,23 @@ export default class Database {
   public async open(dbPath: string, pluginDir: string): Promise<boolean> {
     this.#nativeBinding = join(pluginDir, constants.libName);
     try {
-      if (this._database) {
-        log.info("Database opened before, closing: ", this._database.name);
-        await this._database.destroy();
-        this._database.initialize(getKnexOptions(dbPath, this.#nativeBinding));
+      if (this.#database?.db) {
+        log.info("Database opened before, closing: ", this.#database.db.name);
+        await this.#database.db.destroy();
+        const mtime = await getMtime(dbPath);
+        this.#database.db.initialize(
+          getKnexOptions(dbPath, this.#nativeBinding),
+        );
+        this.#database.mtime = mtime;
+        this.#database.path = dbPath;
       } else {
-        this._database = knex(dbPath, this.#nativeBinding);
+        this.#database = {
+          db: knex(dbPath, this.#nativeBinding),
+          mtime: await getMtime(dbPath),
+          path: dbPath,
+        };
       }
       log.info("Database opened: ", dbPath);
-      this.#path = dbPath;
       return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
@@ -48,16 +66,17 @@ export default class Database {
     }
   }
   public refresh() {
-    if (!this.#path) throw new DatabaseNotSetError();
+    if (!this.#database?.path) throw new DatabaseNotSetError();
     if (!this.#nativeBinding) {
       throw new Error(
         "Failed to refresh database: no native binding path set before",
       );
     }
-    return this.open(this.#path, this.#nativeBinding);
+    return this.open(this.#database.path, this.#nativeBinding);
   }
 
   public async close() {
-    await this._database?.destroy();
+    await this.#database?.db.destroy();
+    this.#database = null;
   }
 }
