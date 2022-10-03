@@ -379,6 +379,10 @@
       "projectFolder": "lib/database"
     },
     {
+      "packageName": "@obzt/esbuild-plugin-inline-worker",
+      "projectFolder": "lib/esbuild-inline-worker"
+    },
+    {
       "packageName": "@obzt/zotero-type",
       "projectFolder": "lib/zotero-type"
     },

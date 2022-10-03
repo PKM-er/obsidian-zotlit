@@ -13,6 +13,10 @@
       "path": "lib/database"
     },
     {
+      "name": "esbuild-inline-worker",
+      "path": "lib/esbuild-inline-worker"
+    },
+    {
       "name": "common",
       "path": "lib/common"
     },
@@ -57,6 +61,7 @@
       "./app/zotero",
       "./lib/common",
       "./lib/database",
+      "./lib/esbuild-inline-worker",
       "./lib/zotero-type"
     ],
     "[shellscript]": {
@@ -69,6 +74,7 @@
       "obsidian/zotero-db",
       "zotero",
       "lib/database",
+      "lib/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type"
     ],

@@ -1,0 +1,26 @@
+{
+  "name": "@obzt/esbuild-plugin-inline-worker",
+  "description": "Esbuild loader for inline Web Workers",
+  "version": "0.1.1",
+  "keywords": [
+    "workers",
+    "esbuild"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js"
+    }
+  },
+  "browser": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "peerDependencies": {
+    "esbuild": "latest"
+  }
+}
