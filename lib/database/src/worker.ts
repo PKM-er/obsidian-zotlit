@@ -1,4 +1,4 @@
-import { worker } from "workerpool";
+import { worker } from "@aidenlx/workerpool";
 import type { DbWorkerAPI } from "./api.js";
 import { databases } from "./init.js";
 import logger from "./logger.js";

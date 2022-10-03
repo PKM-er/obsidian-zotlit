@@ -1,5 +1,6 @@
 import type { FSWatcher } from "fs";
 import { watch } from "fs";
+import workerpool from "@aidenlx/workerpool";
 import type { LogLevel } from "@obzt/common";
 import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
@@ -8,7 +9,6 @@ import type Fuse from "fuse.js";
 import type { EventRef } from "obsidian";
 import { Events, debounce, FileSystemAdapter, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
-import workerpool from "workerpool";
 import log from "@log";
 
 import type ZoteroPlugin from "../zt-main.js";
@@ -23,17 +23,20 @@ export default class ZoteroDb extends Events {
   constructor(plugin: ZoteroPlugin) {
     super();
     this.#plugin = plugin;
-    plugin.register(() => this.close());
     const url = dbWorker();
     this.#pool = workerpool.pool(url, {
       minWorkers: 1,
       maxWorkers: 1,
       workerType: "web",
+      name: "Zotero Database Workers",
     });
     this.#proxy = this.#pool.proxy();
     this.setLoglevel(plugin.settings.logLevel);
     this.setAutoRefresh(plugin.settings.autoRefresh);
-    URL.revokeObjectURL(url);
+    plugin.register(() => {
+      URL.revokeObjectURL(url);
+      this.close();
+    });
 
     if (process.env.NODE_ENV === "development") {
       // expose proxy in dev env
