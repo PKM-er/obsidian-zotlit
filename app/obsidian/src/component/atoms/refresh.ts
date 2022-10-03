@@ -8,6 +8,5 @@ export const manualRefreshAtom = atom(null, async (get, set) => {
   await db.initDbConnection();
   set(attachmentsAtom, await getAttachments(get));
   set(annotsAtom, await fetchAnnots(get));
-  // non-blocking index refresh
-  db.initIndex();
+  // don't trigger index refresh
 });

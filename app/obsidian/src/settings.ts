@@ -18,6 +18,7 @@ export interface ZoteroSettings {
   citationLibrary: number;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
+  autoRefreshOnFocus: boolean;
 }
 
 export const getDefaultSettings = (): Omit<
@@ -36,6 +37,7 @@ export const getDefaultSettings = (): Omit<
     citationLibrary: 1,
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
+    autoRefreshOnFocus: true,
   };
 };
 export type SettingKeyWithType<T> = {

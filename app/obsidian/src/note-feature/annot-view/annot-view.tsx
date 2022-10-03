@@ -1,11 +1,16 @@
-import { useAtom } from "jotai";
+import { getCurrentWindow } from "@electron/remote";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect } from "react";
 import AnnotationList, { Refresh } from "@component/annot-list";
-import { activeFileAtom } from "@component/atoms/obsidian";
+import { activeFileAtom, pluginAtom } from "@component/atoms/obsidian";
+import { manualRefreshAtom } from "@component/atoms/refresh";
 import { AttachmentSelect } from "./atch-select";
 
 export const AnnotView = () => {
   const [activeDoc, setActiveDoc] = useAtom(activeFileAtom);
+  const refresh = useSetAtom(manualRefreshAtom);
+  const plugin = useAtomValue(pluginAtom);
+
   useEffect(() => {
     const updateActiveDoc = () => {
       const activeFile = app.workspace.getActiveFile();
@@ -17,8 +22,22 @@ export const AnnotView = () => {
     };
     updateActiveDoc();
     app.workspace.on("active-leaf-change", updateActiveDoc);
-    return () => app.workspace.off("active-leaf-change", updateActiveDoc);
-  }, [setActiveDoc]);
+    return () => {
+      app.workspace.off("active-leaf-change", updateActiveDoc);
+    };
+  }, [plugin.settings.autoRefreshOnFocus, refresh, setActiveDoc]);
+  useEffect(() => {
+    const focused = async () => {
+      if (!plugin.settings.autoRefreshOnFocus) return;
+      await sleep(500);
+      refresh();
+    };
+    const window = getCurrentWindow();
+    window.on("focus", focused);
+    return () => {
+      window.off("focus", focused);
+    };
+  }, [plugin.settings.autoRefreshOnFocus, refresh]);
   return (
     <div className="annot-view">
       {activeDoc !== null ? (

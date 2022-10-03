@@ -21,6 +21,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
   display(): void {
     this.containerEl.empty();
     this.general();
+    this.annotView();
     this.suggester();
     this.templates();
     this.logLevel();
@@ -41,6 +42,12 @@ export class ZoteroSettingTab extends PluginSettingTab {
     );
     this.addToggle(this.containerEl, "showCitekeyInSuggester").setName(
       "Show BibTex Citekey in Suggester",
+    );
+  }
+  annotView(): void {
+    new Setting(this.containerEl).setHeading().setName("Annotaion View");
+    this.addToggle(this.containerEl, "autoRefreshOnFocus").setName(
+      "Refresh annotations on focus",
     );
   }
   setLiteratureNoteFolder() {

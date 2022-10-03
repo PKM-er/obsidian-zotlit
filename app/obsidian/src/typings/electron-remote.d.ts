@@ -1,6 +1,8 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-var */
 // from https://github.com/electron/remote/blob/main/index.d.ts
 declare module "@electron/remote" {
+  import "electron";
   export var ClientRequest: Electron.ClientRequest;
   export var CommandLine: Electron.CommandLine;
   export var Cookies: Electron.Cookies;
@@ -59,6 +61,7 @@ declare module "@electron/remote" {
   // Taken from `Remote`
   export function getCurrentWebContents(): Electron.WebContents;
   export function getCurrentWindow(): Electron.BrowserWindow;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export function getGlobal(name: string): any;
   export var process: NodeJS.Process;
   export var require: NodeJS.Require;
