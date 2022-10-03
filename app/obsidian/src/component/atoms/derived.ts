@@ -30,11 +30,7 @@ export const getImgAltAtom = (annot: AnnotAtom) =>
     ({ text, pageLabel }) => text ?? `Area Excerpt for Page ${pageLabel}`,
   );
 export const getTextAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, ({ text }) => {
-    return text && text.length > 100
-      ? text.substring(0, 100) + "..."
-      : text ?? "";
-  });
+  selectAtom(annot, ({ text }) => text);
 export const getIconAtom = (annot: AnnotAtom) =>
   selectAtom(annot, ({ type }) => {
     switch (type) {

@@ -31,3 +31,5 @@ export const selectedAnnotsAtom = atom(
       get(selectedItemsAtom).has(annot.itemID!),
     ) ?? null,
 );
+
+export const isCollapsedAtom = atom(true);

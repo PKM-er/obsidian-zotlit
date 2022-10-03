@@ -127,3 +127,17 @@
   flex-direction: column;
   height: 100%;
 }
+
+.annot-list.is-collapsed .annot-excerpt {
+  blockquote {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  img {
+    max-height: 5em;
+    object-fit: cover;
+    object-position: 0 0;
+  }
+}

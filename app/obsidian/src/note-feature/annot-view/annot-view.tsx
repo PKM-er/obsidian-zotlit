@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect } from "react";
-import AnnotationList, { Refresh } from "@component/annot-list";
+import AnnotationList, { Collapse, Refresh } from "@component/annot-list";
 import { activeFileAtom, pluginAtom } from "@component/atoms/obsidian";
 import { autoRefreshAtom } from "@component/atoms/refresh";
 import { AttachmentSelect } from "./atch-select";
@@ -39,6 +39,7 @@ export const AnnotView = () => {
         <>
           <div className="annot-view-header">
             <div className="annot-view-button-container">
+              <Collapse />
               <Refresh />
             </div>
             <Suspense fallback={null}>

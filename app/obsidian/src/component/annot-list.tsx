@@ -9,6 +9,7 @@ import {
   selectedAnnotsAtom,
   annotsAtom,
   selectedItemsAtom,
+  isCollapsedAtom,
 } from "./atoms/annotation";
 import type { AnnotProps } from "./atoms/annotation";
 import { getIsSelectedAtom } from "./atoms/derived";
@@ -36,8 +37,9 @@ const filteredAtom = atom((get) => {
 
 const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   const annots = useAtomValue(filteredAtom);
+  const isCollapsed = useAtomValue(isCollapsedAtom);
   return (
-    <div className="annot-list">
+    <div className={cls("annot-list", { "is-collapsed": isCollapsed })}>
       {annots?.map((annot) => (
         <AnnotListItem
           selectable={selectable}
@@ -49,6 +51,21 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   );
 };
 export default AnnotationList;
+
+export const Collapse = () => {
+  const [isCollapsed, setCollapsed] = useAtom(isCollapsedAtom);
+  const [ref] = useIconRef<HTMLButtonElement>(
+    isCollapsed ? "chevrons-up-down" : "chevrons-down-up",
+  );
+  return (
+    <button
+      ref={ref}
+      className="clickable-icon"
+      onClick={() => setCollapsed((v) => !v)}
+      aria-label={isCollapsed ? "Expand" : "Collapse"}
+    />
+  );
+};
 
 export const Refresh = () => {
   const refresh = useSetAtom(manualRefreshAtom);
