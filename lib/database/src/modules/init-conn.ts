@@ -8,6 +8,7 @@ export const openDb: DbWorkerAPI["openDb"] = async (
   mainDbPath,
   bbtDbPath,
 ) => {
+  log.debug("open database", pluginDir, mainDbPath, bbtDbPath);
   const mainOpened = databases.main.open(mainDbPath, pluginDir);
   let bbtOpened: Promise<boolean> | null = null;
   if (bbtDbPath) {
@@ -19,6 +20,7 @@ export const openDb: DbWorkerAPI["openDb"] = async (
   return [logError("main", mainDbPath, main), logError("bbt", bbtDbPath, bbt)];
 };
 export const refreshDb: DbWorkerAPI["refreshDb"] = async () => {
+  log.debug("refresh database");
   return await Promise.all([
     databases.main.refresh(),
     databases.bbt?.refresh() ?? false,

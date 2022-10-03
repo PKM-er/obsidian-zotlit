@@ -2,7 +2,8 @@
   "name": "@obzt/database",
   "version": "0.0.1",
   "scripts": {
-    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json"
+    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json",
+    "dev": "cross-env BUILD=development node esbuild.config.mjs && tsc --project tsconfig.build.json"
   },
   "module": "dist/index.js",
   "types": "dist/index.d.ts",

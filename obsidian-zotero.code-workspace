@@ -66,6 +66,7 @@
     "conventionalCommits.scopes": [
       "obsidian",
       "obsidian/annot-view",
+      "obsidian/zotero-db",
       "zotero",
       "lib/database",
       "lib/common",

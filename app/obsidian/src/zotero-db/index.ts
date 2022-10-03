@@ -88,7 +88,9 @@ export default class ZoteroDb extends Events {
     this.#autoRefreshEnabled = val;
     this.#unloadWatchers();
     if (val) {
-      await this.#refreshDbConn();
+      if (this.#dbInited) {
+        await this.#refreshDbConn();
+      }
       this.watcher.main = watch(this.mainDbPath, this.#autoRefresh);
       if (this.bbtDbPath) {
         this.watcher.bbt = watch(this.bbtDbPath, this.#autoRefresh);
