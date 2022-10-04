@@ -52,7 +52,7 @@ export default class NoteIndex extends Events {
     return true;
   }
 
-  getNoteFromKey(item: ItemKeyGroup): KeyFileInfo | undefined {
+  getNoteFromItem(item: ItemKeyGroup): KeyFileInfo | undefined {
     log.debug("getNoteFromKey: ", item, getItemKeyGroupID(item, true));
     return this.keyFileMap.get(getItemKeyGroupID(item, true));
   }

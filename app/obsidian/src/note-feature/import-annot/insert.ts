@@ -14,7 +14,7 @@ export const insertAnnotIntoFile = async (
   const open = (file: TFile, newLeaf = false) =>
     workspace.openLinkText(file.path, "", newLeaf);
 
-  const info = plugin.noteIndex.getNoteFromKey(data);
+  const info = plugin.noteIndex.getNoteFromItem(data);
   const noteFile = info && plugin.app.vault.getAbstractFileByPath(info.file);
   if (noteFile && noteFile instanceof TFile) {
     // insert into existing note

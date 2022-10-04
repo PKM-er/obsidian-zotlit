@@ -21,7 +21,7 @@ export const createNote = async (
   plugin: ZoteroPlugin,
   item: ItemWithAnnots,
 ): Promise<TFile> => {
-  const info = plugin.noteIndex.getNoteFromKey(item);
+  const info = plugin.noteIndex.getNoteFromItem(item);
   if (info) {
     // only throw error if the note is linked to the same zotero item
     throw new NoteExistsError(info.file, item.key);
@@ -59,7 +59,7 @@ export const openNote = async (
 ): Promise<boolean> => {
   const { workspace } = plugin.app;
 
-  const info = plugin.noteIndex.getNoteFromKey(item);
+  const info = plugin.noteIndex.getNoteFromItem(item);
   if (!info) {
     !slience &&
       new Notice(

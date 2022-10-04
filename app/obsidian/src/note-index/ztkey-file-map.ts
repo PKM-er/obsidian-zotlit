@@ -39,7 +39,10 @@ export default function* getZoteroKeyFileMap(
         yield {
           file: file,
           blockId: section.id,
-          key: getItemKeyGroupID({ key: annotKey, groupID: +groupID }, true),
+          key: getItemKeyGroupID(
+            { key: annotKey, groupID: groupID ? +groupID : undefined },
+            true,
+          ),
         };
       }
   }
