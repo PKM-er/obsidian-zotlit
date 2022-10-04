@@ -2,6 +2,7 @@ import { dirname } from "path";
 import type { GeneralItem } from "@obzt/zotero-type";
 import { atom } from "jotai";
 import { RESET } from "jotai/utils";
+import { getItemKeyFromFrontmatter } from "../../note-index/ztkey-file-map";
 import type ZoteroPlugin from "../../zt-main";
 import { annotsAtom } from "./annotation";
 import { attachmentsAtom } from "./attachment";
@@ -21,11 +22,7 @@ export const activeFileAtom = atom(
     if (prevFile === activeFile) return;
     const { noteIndex } = get(pluginAtom);
     // no active note for literature
-    if (
-      !activeFile ||
-      !noteIndex.isLiteratureNote(activeFile) ||
-      !noteIndex.fileKeyMap.has(activeFile)
-    ) {
+    if (!activeFile || !noteIndex.isLiteratureNote(activeFile)) {
       set(_activeFileAtom, null);
       return;
     }
@@ -37,13 +34,14 @@ export const activeFileAtom = atom(
   },
 );
 export const activeDocItemAtom = atom(async (get) => {
-  const { noteIndex, db } = get(pluginAtom);
+  const { db } = get(pluginAtom);
   const activeFile = get(_activeFileAtom);
+
   if (!activeFile) return null;
-  const key = noteIndex.fileKeyMap.get(activeFile)?.key;
+  const key = getItemKeyFromFrontmatter(app.metadataCache.getCache(activeFile));
   if (!key) return null;
   const item = await db.getItem(key);
-  if (!item?.itemID) return null;
+  if (!item) return null;
   return item as DocItem;
 });
 

@@ -9,6 +9,15 @@ import type { CachedMetadata } from "obsidian";
 
 import { ZOTERO_KEY_FIELDNAME } from "../note-template/const.js";
 
+export const getItemKeyFromFrontmatter = (
+  cache: CachedMetadata | null,
+): string | null => {
+  const field = cache?.frontmatter?.[ZOTERO_KEY_FIELDNAME];
+  if (field && typeof field === "string" && itemKeyGroupIdPattern.test(field)) {
+    return field;
+  } else return null;
+};
+
 export default function* getZoteroKeyFileMap(
   file: string,
   cache: CachedMetadata,
@@ -16,11 +25,9 @@ export default function* getZoteroKeyFileMap(
   if (!(cache.frontmatter && ZOTERO_KEY_FIELDNAME in cache.frontmatter)) {
     return null;
   }
-  const itemKey = cache.frontmatter[ZOTERO_KEY_FIELDNAME];
+  const itemKey = getItemKeyFromFrontmatter(cache);
 
-  if (!itemKeyGroupIdPattern.test(itemKey)) {
-    return;
-  }
+  if (!itemKey) return;
 
   // fileKey
   yield { file, key: itemKey };

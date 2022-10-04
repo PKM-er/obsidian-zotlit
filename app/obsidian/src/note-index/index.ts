@@ -11,7 +11,9 @@ import { Events, TFile, TFolder } from "obsidian";
 import log from "@log";
 
 import type ZoteroPlugin from "../zt-main.js";
-import getZoteroKeyFileMap from "./ztkey-file-map.js";
+import getZoteroKeyFileMap, {
+  getItemKeyFromFrontmatter,
+} from "./ztkey-file-map.js";
 
 export { getItemKeyGroupID };
 export default class NoteIndex extends Events {
@@ -26,11 +28,9 @@ export default class NoteIndex extends Events {
   }
 
   keyFileMap: Map<string, KeyFileInfo> = new Map();
-  fileKeyMap: Map<string, KeyFileInfo> = new Map();
 
   addToIndex(info: KeyFileInfo): void {
     this.keyFileMap.set(info.key, info);
-    this.fileKeyMap.set(info.file, info);
   }
   deleteFromIndex(k: string, use: "itemKey" | "file"): boolean {
     let key: string | undefined, file: string | undefined;
@@ -41,14 +41,13 @@ export default class NoteIndex extends Events {
         break;
       case "file":
         file = k;
-        key = this.fileKeyMap.get(file)?.key;
+        key = [...this.keyFileMap.values()].find((v) => v.file === file)?.key;
         break;
       default:
         assertNever(use);
     }
     if (!key || !file) return false;
     this.keyFileMap.delete(key);
-    this.fileKeyMap.delete(file);
     return true;
   }
 
@@ -91,8 +90,10 @@ export default class NoteIndex extends Events {
   isLiteratureNote(file: string): boolean;
   isLiteratureNote(file: TAbstractFile): file is TFile;
   isLiteratureNote(file: TAbstractFile | string): boolean {
-    const path = getFilePath(file);
-    return this.fileKeyMap.has(path);
+    const path = getFilePath(file),
+      itemKey = getItemKeyFromFrontmatter(this.meta.getCache(path));
+    if (!itemKey) return false;
+    return this.keyFileMap.has(itemKey);
   }
 
   /** check if file belongs to literature note folder */
@@ -153,7 +154,9 @@ export default class NoteIndex extends Events {
   }
   renameFileRecord(file: TFile | string, oldPath: string): void {
     const path = getFilePath(file);
-    const info = this.fileKeyMap.get(oldPath);
+    const info = [...this.keyFileMap.values()].find(
+      ({ file }) => file === oldPath,
+    );
     if (info) {
       info.file = path;
     }
