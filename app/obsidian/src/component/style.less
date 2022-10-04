@@ -9,7 +9,6 @@
     margin-inline-start: 0;
     margin-inline-end: 0;
     max-height: 200px;
-    display: flex;
   }
 
   img {
@@ -58,6 +57,8 @@
 .annot-header {
   display: flex;
   align-items: center;
+  background-color: var(--background-primary-alt);
+  padding: var(--size-2-3) var(--size-4-2) var(--size-2-3) var(--size-4-3);
 }
 
 .annot-type-icon {
@@ -78,10 +79,6 @@
 
 .modal.select-annot-modal .modal-content {
   overflow: scroll;
-}
-
-.annot-page {
-  font-weight: bold;
 }
 
 .annot-list {
@@ -140,4 +137,11 @@
     object-fit: cover;
     object-position: 0 0;
   }
+}
+
+a.annot-page.external-link {
+  background-position-y: 2px;
+  background-size: 10px;
+  padding-right: 16px;
+  text-decoration-line: none;
 }

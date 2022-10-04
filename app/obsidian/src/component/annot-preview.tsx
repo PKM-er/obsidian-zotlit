@@ -1,5 +1,6 @@
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
+import cls from "classnames";
 import { startCase } from "lodash-es";
 import { renderHTMLReact } from "../utils";
 import type { AnnotProps } from "./atoms/annotation";
@@ -105,7 +106,7 @@ const Page = ({ annotAtom }: AnnotProps) => {
   if (backlink)
     return (
       <a
-        className="annot-page"
+        className={cls("annot-page", "external-link")}
         href={backlink}
         aria-label={`Open Annotation In Zotero at Page ${page}`}
         aria-label-delay="500"

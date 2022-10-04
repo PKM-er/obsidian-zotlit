@@ -37,7 +37,7 @@ export const getIconAtom = (annot: AnnotAtom) =>
       case AnnotationType.highlight:
         return "align-left";
       case AnnotationType.image:
-        return "box-select";
+        return "frame";
       case AnnotationType.note:
       case AnnotationType.ink:
         return "file-question";
