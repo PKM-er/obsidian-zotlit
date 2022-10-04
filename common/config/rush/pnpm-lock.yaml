@@ -10,9 +10,10 @@ importers:
       '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/esbuild-plugin-obsidian': ^0.1.4
       '@aidenlx/eslint-config': 2.0.5
-      '@aidenlx/workerpool': '>=6.2.1-mod.4 <6.2.1-mod0'
+      '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
+      '@obzt/note-parser': workspace:*
       '@obzt/zotero-type': workspace:*
       '@release-it/bumper': ^4.0.0
       '@release-it/conventional-changelog': ^5.1.0
@@ -55,9 +56,10 @@ importers:
       tslib: ^2.3.1
       typescript: ^4.8.3
     dependencies:
-      '@aidenlx/workerpool': 6.2.1-mod.4
+      '@aidenlx/workerpool': 6.2.1-mod.13
       '@obzt/common': link:../../lib/common
       '@obzt/database': link:../../lib/database
+      '@obzt/note-parser': link:../../lib/note-parser
       '@obzt/zotero-type': link:../../lib/zotero-type
       assert-never: 1.2.1
       classnames: 2.3.2
@@ -159,7 +161,7 @@ importers:
       '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/eslint-config': 2.0.5
       '@aidenlx/knex': '>=2.3.0-mod <2.3.0-mod0'
-      '@aidenlx/workerpool': '>=6.2.1-mod.4 <6.2.1-mod0'
+      '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
       '@obzt/common': workspace:*
       '@obzt/esbuild-plugin-inline-worker': workspace:*
       '@obzt/zotero-type': workspace:*
@@ -177,7 +179,7 @@ importers:
     dependencies:
       '@aidenlx/better-sqlite3': 7.6.2-mod.2
       '@aidenlx/knex': 2.3.0-mod.1_lyhqer75kdng42kiqldhcbpj2q
-      '@aidenlx/workerpool': 6.2.1-mod.4
+      '@aidenlx/workerpool': 6.2.1-mod.13
       '@obzt/common': link:../common
       '@obzt/zotero-type': link:../zotero-type
       assert-never: 1.2.1
@@ -200,6 +202,41 @@ importers:
       esbuild: latest
     dependencies:
       esbuild: 0.15.10
+
+  ../../lib/note-parser:
+    specifiers:
+      '@aidenlx/eslint-config': 2.0.5
+      '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
+      '@obzt/common': workspace:*
+      '@obzt/esbuild-plugin-inline-worker': workspace:*
+      '@obzt/zotero-type': workspace:*
+      '@types/node': ^17.0.10
+      '@types/turndown': ~5.0.1
+      assert-never: ^1.2.1
+      cross-env: ^7.0.3
+      esbuild: ^0.14.21
+      eslint: ~8.24.0
+      iframe-worker: ~0.2.4
+      monkey-around: ^2.3.0
+      turndown: ~7.1.1
+      typescript: ^4.8.3
+    dependencies:
+      '@aidenlx/workerpool': 6.2.1-mod.13
+      '@obzt/common': link:../common
+      '@obzt/zotero-type': link:../zotero-type
+      assert-never: 1.2.1
+      iframe-worker: 0.2.4
+      monkey-around: 2.3.0
+      turndown: 7.1.1
+    devDependencies:
+      '@aidenlx/eslint-config': 2.0.5_ksn4eycaeggbrckn3ykh37hwf4
+      '@obzt/esbuild-plugin-inline-worker': link:../esbuild-inline-worker
+      '@types/node': 17.0.45
+      '@types/turndown': 5.0.1
+      cross-env: 7.0.3
+      esbuild: 0.14.54
+      eslint: 8.24.0
+      typescript: 4.8.4
 
   ../../lib/zotero-type:
     specifiers:
@@ -321,6 +358,11 @@ packages:
       - utf-8-validate
     dev: true
 
+  /@aidenlx/iframe-worker/0.2.4-mod.5:
+    resolution: {integrity: sha512-joYR8m6T57ZAbOyc89DScH2X4zPdz60HwRg1+uLp6I7rr0GWGSLOLL60uGTAx3yrykwW4IQT9QKBNKoxkTtcBg==}
+    engines: {node: '>= 16'}
+    dev: false
+
   /@aidenlx/knex/2.3.0-mod.1_lyhqer75kdng42kiqldhcbpj2q:
     resolution: {integrity: sha512-dsHRGsHjkt32j+fkvVR6MANYpBkklrZ6/07/lCQsZsp9fLqo9kBN+TKkBNqxjuGPB+0IZ2CQUs3mEyV8JX9lyA==}
     engines: {node: '>=12'}
@@ -367,8 +409,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@aidenlx/workerpool/6.2.1-mod.4:
-    resolution: {integrity: sha512-e2nA6iRp48Lt9JGFhw04FnQWfoszJZI/bQntff6Bf0+Klx9i4y3tYnEiKjGKF46pR51nE8qfQMw27R2GjLeU1w==}
+  /@aidenlx/workerpool/6.2.1-mod.13:
+    resolution: {integrity: sha512-EUFVvv3wQBbPbFyiYKoC0s0IdIKk39e1Bvb+x7oUdCcIr8BQ9edjfwbqO6AiI+CAsSCWCFfZK4ceP1bQzJJn7g==}
+    dependencies:
+      '@aidenlx/iframe-worker': 0.2.4-mod.5
     dev: false
 
   /@ardatan/sync-fetch/0.0.1:
@@ -1358,6 +1402,10 @@ packages:
 
   /@types/trusted-types/2.0.2:
     resolution: {integrity: sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==}
+    dev: true
+
+  /@types/turndown/5.0.1:
+    resolution: {integrity: sha512-N8Ad4e3oJxh9n9BiZx9cbe/0M3kqDpOTm2wzj13wdDUxDPjfjloWIJaquZzWE1cYTAHpjOH3rcTnXQdpEfS/SQ==}
     dev: true
 
   /@types/ws/8.5.3:
@@ -2933,6 +2981,10 @@ packages:
 
   /doctypes/1.1.0:
     resolution: {integrity: sha512-LLBi6pEqS6Do3EKQ3J0NqHWV5hhb78Pi8vvESYwyOy2c31ZEZVdtitdzsQsKb7878PEERhzUk0ftqGhG6Mz+pQ==}
+    dev: false
+
+  /domino/2.1.6:
+    resolution: {integrity: sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==}
     dev: false
 
   /dot-case/3.0.4:
@@ -4939,6 +4991,11 @@ packages:
 
   /ieee754/1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+
+  /iframe-worker/0.2.4:
+    resolution: {integrity: sha512-+jvzRgFVMPJGAcW0KajcvlgR0Gu8hMdxy40g8dShPSxMVAAHf6YRsslh99ZsZMwaL233b9XPN0UPxLyTH8j00A==}
+    engines: {node: '>= 16'}
+    dev: false
 
   /ignore/5.2.0:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
@@ -8119,6 +8176,12 @@ packages:
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
     dev: true
     optional: true
+
+  /turndown/7.1.1:
+    resolution: {integrity: sha512-BEkXaWH7Wh7e9bd2QumhfAXk5g34+6QUmmWx+0q6ThaVOLuLUqsnkq35HQ5SBHSaxjSfSM7US5o4lhJNH7B9MA==}
+    dependencies:
+      domino: 2.1.6
+    dev: false
 
   /type-check/0.3.2:
     resolution: {integrity: sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==}

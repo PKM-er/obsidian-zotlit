@@ -379,6 +379,10 @@
       "projectFolder": "lib/database"
     },
     {
+      "packageName": "@obzt/note-parser",
+      "projectFolder": "lib/note-parser"
+    },
+    {
       "packageName": "@obzt/esbuild-plugin-inline-worker",
       "projectFolder": "lib/esbuild-inline-worker"
     },

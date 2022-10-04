@@ -13,6 +13,10 @@
       "path": "lib/database"
     },
     {
+      "name": "note-parser",
+      "path": "lib/note-parser"
+    },
+    {
       "name": "esbuild-inline-worker",
       "path": "lib/esbuild-inline-worker"
     },
@@ -61,6 +65,7 @@
       "./app/zotero",
       "./lib/common",
       "./lib/database",
+      "./lib/note-parser",
       "./lib/esbuild-inline-worker",
       "./lib/zotero-type"
     ],
@@ -74,6 +79,7 @@
       "obsidian/zotero-db",
       "zotero",
       "lib/database",
+      "lib/note-parser",
       "lib/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type"

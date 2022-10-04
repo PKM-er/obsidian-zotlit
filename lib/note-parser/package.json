@@ -1,0 +1,29 @@
+{
+  "name": "@obzt/note-parser",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc",
+    "dev": "cross-env BUILD=development node esbuild.config.mjs && tsc"
+  },
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@aidenlx/eslint-config": "2.0.5",
+    "@types/node": "^17.0.10",
+    "typescript": "^4.8.3",
+    "eslint": "~8.24.0",
+    "cross-env": "^7.0.3",
+    "@obzt/esbuild-plugin-inline-worker": "workspace:*",
+    "esbuild": "^0.14.21",
+    "@types/turndown": "~5.0.1"
+  },
+  "dependencies": {
+    "@obzt/zotero-type": "workspace:*",
+    "@obzt/common": "workspace:*",
+    "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
+    "assert-never": "^1.2.1",
+    "iframe-worker": "~0.2.4",
+    "monkey-around": "^2.3.0",
+    "turndown": "~7.1.1"
+  }
+}

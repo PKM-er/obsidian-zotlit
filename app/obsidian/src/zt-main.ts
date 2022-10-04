@@ -11,6 +11,7 @@ import {
 import checkLib from "./install-guide.js";
 import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
+import NoteParser from "./note-parser";
 import { ZoteroSettingTab } from "./setting-tab.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
@@ -23,6 +24,7 @@ export default class ZoteroPlugin extends Plugin {
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
+  noteParser = new NoteParser(this);
   get db() {
     if (!this.#db) throw new Error("access database before load");
     return this.#db;
