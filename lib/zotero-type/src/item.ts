@@ -49,10 +49,11 @@ export type ItemCitekey = {
   citekey: string;
 };
 
-export type GeneralItem = Item & {
+export type GeneralItem = GeneralItemBase & Record<string, unknown[]>;
+export type GeneralItemBase = Item & {
   creators: Omit<ItemCreator, "itemID">[];
   citekey: string | null;
-} & Record<string, unknown>;
+};
 
 export type Annotation = AnnotationItem & {
   type: AnnotationType;

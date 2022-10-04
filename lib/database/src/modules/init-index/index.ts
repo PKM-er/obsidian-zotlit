@@ -5,6 +5,7 @@ import type {
   ItemCitekey,
   ItemCreator,
   GeneralItem,
+  GeneralItemBase,
 } from "@obzt/zotero-type";
 import Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
@@ -29,14 +30,18 @@ const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
 
   // prepare for fuse index
 
-  const entries = items.reduce(
-    (rec, { itemID, ...props }) => (
-      itemID &&
-        (rec[itemID] = { ...props, itemID, creators: [], citekey: null }),
-      rec
-    ),
-    {} as Record<number, GeneralItem>,
-  );
+  const entries = items.reduce((rec, { itemID, ...props }) => {
+    if (itemID) {
+      const item: GeneralItemBase = {
+        ...props,
+        itemID,
+        creators: [],
+        citekey: null,
+      };
+      rec[itemID] = item as GeneralItem;
+    }
+    return rec;
+  }, {} as Record<number, GeneralItem>);
 
   // eslint-disable-next-line prefer-const
   for (let { itemID, fieldName, value } of itemFields) {
@@ -44,7 +49,9 @@ const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
     if (fieldName === "date")
       value = multipartToSQL(value as string).split("-")[0];
     if (itemID in entries) {
-      entries[itemID][fieldName] = value;
+      const values = (entries[itemID][fieldName] =
+        entries[itemID][fieldName] || []);
+      values.push(value);
     } else {
       console.error(
         `Field: No item found for itemID ${itemID}`,
