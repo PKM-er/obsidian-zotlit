@@ -1,3 +1,5 @@
+import type { Creator } from "@obzt/zotero-type";
+import { isCreatorNameOnly, isCreatorFullName } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -86,6 +88,8 @@ const DocItemDetails = () => {
           theme={isDarkMode ? themeDark : themeLight}
           invertTheme={false}
           keyPath={["Zotero Item Data"]}
+          shouldExpandNode={shouldExpandNode}
+          getItemString={getItemString}
         />
       );
     } else {
@@ -99,6 +103,53 @@ const DocItemDetails = () => {
 };
 
 const showDocItemDetails = atom(false);
+
+const shouldExpandNode = (
+  keyPath: (string | number)[],
+  data: unknown,
+  level: number,
+) => {
+  if (
+    level < 1 ||
+    (keyPath[1] === "creators" && level < 2) ||
+    (level < 2 && Array.isArray(data) && data.length > 1)
+  )
+    return true;
+  return false;
+};
+
+const getItemString = (
+  _nodeType: string,
+  data: unknown,
+  itemType: React.ReactNode,
+  itemString: string,
+  keyPath: (string | number)[],
+): React.ReactNode => {
+  if (keyPath[1] === "creators" && keyPath.length === 3) {
+    const creator = data as Creator;
+    if (isCreatorFullName(creator)) {
+      return (
+        <span>
+          {creator.firstName} {creator.lastName}
+        </span>
+      );
+    } else if (isCreatorNameOnly(creator)) {
+      return <span>{creator.lastName}</span>;
+    }
+  }
+  if (keyPath.length === 2 && Array.isArray(data) && data.length === 1) {
+    return (
+      <span>
+        {itemType} {JSON.stringify(data[0])}
+      </span>
+    );
+  }
+  return (
+    <span>
+      {itemType} {itemString}
+    </span>
+  );
+};
 
 export const DocItemDetailsButton = () => {
   const [showingDetails, setShowDetails] = useAtom(showDocItemDetails);
