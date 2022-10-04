@@ -1,5 +1,9 @@
 import type { Creator } from "@obzt/zotero-type";
-import { isCreatorNameOnly, isCreatorFullName } from "@obzt/zotero-type";
+import {
+  requiredKeys,
+  isCreatorNameOnly,
+  isCreatorFullName,
+} from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -164,24 +168,24 @@ const getKeyName = (keyPath: (string | number)[]) =>
     .join(".");
 
 const labelRenderer = (
-  keyPath: (string | number)[],
+  keyPathWithRoot: (string | number)[],
   nodeType: string,
   _expanded: boolean,
   _expandable: boolean,
 ): React.ReactNode => {
-  const isRoot = keyPath.length === 1;
-  const handler = (revt: React.MouseEvent<HTMLSpanElement>) => {
-    keyPath = keyPath.slice(0, -1);
+  const isRoot = keyPathWithRoot.length === 1;
+  const keyPath = keyPathWithRoot.slice(0, -1);
+  const handler = (evt: React.MouseEvent<HTMLSpanElement>) => {
     const path = getKeyName(keyPath);
 
     const menu = new Menu()
       .addItem((i) =>
-        i.setTitle("Copy Template String").onClick(() => {
+        i.setTitle("Copy Template").onClick(() => {
           navigator.clipboard.writeText("{{" + path + "}}");
         }),
       )
       .addItem((i) =>
-        i.setTitle("Copy Template String (using {{#with}})").onClick(() => {
+        i.setTitle("Copy Template (using {{#with}})").onClick(() => {
           navigator.clipboard.writeText(
             "{{#with " + path + "}}" + " " + "{{/with}}",
           );
@@ -189,16 +193,24 @@ const labelRenderer = (
       );
     if (nodeType === "Array") {
       menu.addItem((i) =>
-        i.setTitle("Copy Template String (using {{#each}})").onClick(() => {
+        i.setTitle("Copy Template (using {{#each}})").onClick(() => {
           navigator.clipboard.writeText(
             "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
           );
         }),
       );
     }
-    const evt = revt.nativeEvent;
-    revt.preventDefault();
-    menu.showAtMouseEvent(evt);
+    if (!requiredKeys.has(keyPath[0] as never)) {
+      menu.addItem((i) =>
+        i.setTitle("Copy Template (render when present)").onClick(() => {
+          navigator.clipboard.writeText(
+            "{{#if " + path + "}}" + "{{this}}" + "{{/if}}",
+          );
+        }),
+      );
+    }
+    evt.preventDefault();
+    menu.showAtMouseEvent(evt.nativeEvent);
   };
 
   const props = !isRoot
@@ -207,7 +219,7 @@ const labelRenderer = (
         style: { cursor: "context-menu" },
       }
     : undefined;
-  return <span {...props}>{keyPath[0]}: </span>;
+  return <span {...props}>{keyPathWithRoot[0]}: </span>;
 };
 
 export const DocItemDetailsButton = () => {
