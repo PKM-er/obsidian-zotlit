@@ -1,9 +1,12 @@
 import { AnnotationType } from "@obzt/zotero-type";
+import { useMemoizedFn } from "ahooks";
 import assertNever from "assert-never";
 import cls from "classnames";
+import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
+import React from "react";
 import { renderHTMLReact } from "../utils";
-import type { AnnotProps } from "./atoms/annotation";
+import type { AnnotAtom, AnnotProps } from "./atoms/annotation";
 import {
   getTypeAtom,
   getIconAtom,
@@ -15,6 +18,7 @@ import {
   getCommentAtom,
   getBacklinkAtom,
 } from "./atoms/derived";
+import { pluginAtom } from "./atoms/obsidian";
 import { useDerivedAtom } from "./atoms/utils";
 import { useIconRef } from "./icon";
 
@@ -48,20 +52,45 @@ const AnnotContent = ({ annotAtom }: AnnotProps) => {
   return <div className="annot-excerpt">{content}</div>;
 };
 
-const Header = ({ annotAtom }: AnnotProps) => {
+const HeaderIcon = ({ annotAtom }: AnnotProps) => {
   const icon = useDerivedAtom(annotAtom, getIconAtom);
   const color = useDerivedAtom(annotAtom, getColorAtom);
   const type = useDerivedAtom(annotAtom, getTypeAtom);
+  const dragProps = useDrag(annotAtom);
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
+    <div
+      ref={iconRef}
+      {...dragProps}
+      className="annot-type-icon"
+      style={{ color }}
+      aria-label={startCase(AnnotationType[type])}
+      aria-label-delay="500"
+    />
+  );
+};
+
+const useDrag = (annotAtom: AnnotAtom) => {
+  const annot = useAtomValue(annotAtom);
+  const {
+    settings: { literatureNoteTemplate },
+  } = useAtomValue(pluginAtom);
+  const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
+    (evt) => {
+      evt.dataTransfer.setData(
+        "text/plain",
+        literatureNoteTemplate.render("annotation", annot),
+      );
+      evt.dataTransfer.dropEffect = "copy";
+    },
+  );
+  return { draggable: true, onDragStart };
+};
+
+const Header = ({ annotAtom }: AnnotProps) => {
+  return (
     <div className="annot-header">
-      <div
-        ref={iconRef}
-        className="annot-type-icon"
-        style={{ color }}
-        aria-label={startCase(AnnotationType[type])}
-        aria-label-delay="500"
-      />
+      <HeaderIcon annotAtom={annotAtom} />
       <div className="annot-header-space" />
       <Page annotAtom={annotAtom} />
     </div>

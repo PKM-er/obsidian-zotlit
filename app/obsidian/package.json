@@ -77,6 +77,7 @@
     "react-dom": "~17.0.2",
     "lodash-es": "~4.17.21",
     "@obzt/note-parser": "workspace:*",
-    "react-json-tree": "~0.17.0"
+    "react-json-tree": "~0.17.0",
+    "ahooks": "~3.7.1"
   }
 }
