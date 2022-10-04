@@ -40,12 +40,16 @@ export const itemSQL = async (knex: Knex, libId: number) => {
     .from("items")
     .join("itemTypesCombined", (j) => j.using("itemTypeID"))
     .leftJoin("groups", (j) => j.using("libraryID"))
+    .whereNotNull("itemID")
     .where("libraryID", libId)
     .whereNotIn("itemType", nonRegularItemTypes)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
 
   type Item = typeof result[0];
-  type Return = Omit<Item, "typeName"> & { itemType: Item["typeName"] };
+  type Return = Omit<Item, "typeName"> & {
+    itemType: Item["typeName"];
+    itemID: number;
+  };
   return result as unknown as Return[];
 };
 

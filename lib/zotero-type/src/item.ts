@@ -1,9 +1,10 @@
+import { enumerate } from "@obzt/common";
 import { CreatorFieldMode } from "./misc.js";
 import type { AnnotationType, TagType } from "./misc.js";
 import type { AnnotationItem } from "./non-regular.js";
 
 export type Item = {
-  itemID: number | null;
+  itemID: number;
   libraryID: number;
   key: string;
   groupID: number | null;
@@ -54,6 +55,19 @@ export type GeneralItemBase = Item & {
   creators: Omit<ItemCreator, "itemID">[];
   citekey: string | null;
 };
+
+type IsNotNullable<T, K> = null extends T ? never : K;
+type NotNullableKeys<T> = { [K in keyof T]-?: IsNotNullable<T[K], K> }[keyof T];
+
+export const requiredKeys = new Set(
+  enumerate<NotNullableKeys<GeneralItemBase>>()(
+    "creators",
+    "itemID",
+    "itemType",
+    "key",
+    "libraryID",
+  ),
+);
 
 export type Annotation = AnnotationItem & {
   type: AnnotationType;
