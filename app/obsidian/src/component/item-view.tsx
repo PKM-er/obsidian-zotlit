@@ -4,6 +4,7 @@ import assertNever from "assert-never";
 import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
+import { Keymap, Menu } from "obsidian";
 import { useEffect } from "react";
 import { JSONTree } from "react-json-tree";
 import { activeDocItemAtom } from "./atoms/obsidian";
@@ -85,6 +86,7 @@ const DocItemDetails = () => {
       return (
         <JSONTree
           data={activeDocItem.data}
+          labelRenderer={labelRenderer}
           theme={isDarkMode ? themeDark : themeLight}
           invertTheme={false}
           keyPath={["Zotero Item Data"]}
@@ -149,6 +151,63 @@ const getItemString = (
       {itemType} {itemString}
     </span>
   );
+};
+
+const getKeyName = (keyPath: (string | number)[]) =>
+  keyPath
+    .reverse()
+    .map((v) => {
+      if (typeof v === "number" || v.includes("-") || v.includes(" "))
+        return `[${v}]`;
+      else return v;
+    })
+    .join(".");
+
+const labelRenderer = (
+  keyPath: (string | number)[],
+  nodeType: string,
+  _expanded: boolean,
+  _expandable: boolean,
+): React.ReactNode => {
+  const isRoot = keyPath.length === 1;
+  const handler = (revt: React.MouseEvent<HTMLSpanElement>) => {
+    keyPath = keyPath.slice(0, -1);
+    const path = getKeyName(keyPath);
+
+    const menu = new Menu()
+      .addItem((i) =>
+        i.setTitle("Copy Template String").onClick(() => {
+          navigator.clipboard.writeText("{{" + path + "}}");
+        }),
+      )
+      .addItem((i) =>
+        i.setTitle("Copy Template String (using {{#with}})").onClick(() => {
+          navigator.clipboard.writeText(
+            "{{#with " + path + "}}" + " " + "{{/with}}",
+          );
+        }),
+      );
+    if (nodeType === "Array") {
+      menu.addItem((i) =>
+        i.setTitle("Copy Template String (using {{#each}})").onClick(() => {
+          navigator.clipboard.writeText(
+            "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
+          );
+        }),
+      );
+    }
+    const evt = revt.nativeEvent;
+    revt.preventDefault();
+    menu.showAtMouseEvent(evt);
+  };
+
+  const props = !isRoot
+    ? {
+        onContextMenu: handler,
+        style: { cursor: "context-menu" },
+      }
+    : undefined;
+  return <span {...props}>{keyPath[0]}: </span>;
 };
 
 export const DocItemDetailsButton = () => {
