@@ -52,7 +52,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
 };
 export default AnnotationList;
 
-export const Collapse = () => {
+export const CollapseButton = () => {
   const [isCollapsed, setCollapsed] = useAtom(isCollapsedAtom);
   const [ref] = useIconRef<HTMLButtonElement>(
     isCollapsed ? "chevrons-up-down" : "chevrons-down-up",
@@ -67,7 +67,7 @@ export const Collapse = () => {
   );
 };
 
-export const Refresh = () => {
+export const RefreshButton = () => {
   const refresh = useSetAtom(manualRefreshAtom);
   const [ref] = useIconRef<HTMLButtonElement>("refresh-ccw");
   return (
