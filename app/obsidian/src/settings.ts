@@ -19,6 +19,7 @@ export interface ZoteroSettings {
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
   autoRefresh: boolean;
+  mutoolPath: string | null;
 }
 
 export const getDefaultSettings = (): Omit<
@@ -38,6 +39,7 @@ export const getDefaultSettings = (): Omit<
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
     autoRefresh: true,
+    mutoolPath: null,
   };
 };
 export type SettingKeyWithType<T> = {

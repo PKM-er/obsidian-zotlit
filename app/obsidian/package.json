@@ -78,6 +78,7 @@
     "lodash-es": "~4.17.21",
     "@obzt/note-parser": "workspace:*",
     "react-json-tree": "~0.17.0",
-    "ahooks": "~3.7.1"
+    "ahooks": "~3.7.1",
+    "query-string": "~7.1.1"
   }
 }
