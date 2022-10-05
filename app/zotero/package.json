@@ -25,7 +25,8 @@
   "dependencies": {
     "lodash-es": "~4.17.21",
     "monkey-around": "^2.3.0",
-    "zotero-plugin": "^1.0.62"
+    "zotero-plugin": "^1.0.62",
+    "@types/eslint": "~8.4.6"
   },
   "xpi": {
     "name": "Obsidian Note for Zotero",
@@ -44,7 +45,8 @@
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.3",
+    "@types/eslint": "~8.4.6"
   },
   "config": {
     "commitizen": {

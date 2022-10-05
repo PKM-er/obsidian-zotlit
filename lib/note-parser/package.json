@@ -15,7 +15,8 @@
     "cross-env": "^7.0.3",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
     "esbuild": "^0.14.21",
-    "@types/turndown": "~5.0.1"
+    "@types/turndown": "~5.0.1",
+    "@types/eslint": "~8.4.6"
   },
   "dependencies": {
     "@obzt/zotero-type": "workspace:*",

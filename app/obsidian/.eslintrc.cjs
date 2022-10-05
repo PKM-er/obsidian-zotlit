@@ -13,6 +13,9 @@ const typescriptOptions = {
   project: "tsconfig.json",
 };
 
+/**
+ * @type {import('eslint').Linter.Config}
+ */
 module.exports = {
   root: true,
   parserOptions: {

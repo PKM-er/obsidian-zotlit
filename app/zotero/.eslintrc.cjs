@@ -20,8 +20,9 @@ module.exports = {
   root: true,
   parserOptions: {
     ...typescriptOptions,
-    ecmaVersion: "latest",
-    sourceType: "module",
+  },
+  env: {
+    browser: true,
   },
   ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: [
@@ -35,7 +36,13 @@ module.exports = {
       typescript: typescriptOptions,
     },
   },
-  rules: {
-    "import/no-unresolved": [2, { ignore: ["worker:"] }],
-  },
+  overrides: [
+    {
+      files: ["content/**/*"],
+      env: {
+        node: false,
+      },
+    },
+  ],
+  rules: {},
 };

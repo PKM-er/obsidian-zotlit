@@ -15,7 +15,8 @@
     "cross-env": "^7.0.3",
     "@rmp135/sql-ts": "~1.15.0",
     "endent": "~2.1.0",
-    "@obzt/esbuild-plugin-inline-worker": "workspace:*"
+    "@obzt/esbuild-plugin-inline-worker": "workspace:*",
+    "@types/eslint": "~8.4.6"
   },
   "dependencies": {
     "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",

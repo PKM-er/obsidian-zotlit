@@ -16,7 +16,8 @@
     "@aidenlx/knex": ">=2.3.0-mod <2.3.0-mod0",
     "@rmp135/sql-ts": "~1.15.0",
     "endent": "~2.1.0",
-    "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0"
+    "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",
+    "@types/eslint": "~8.4.6"
   },
   "dependencies": {
     "@obzt/common": "workspace:*"
