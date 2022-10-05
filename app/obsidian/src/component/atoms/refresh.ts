@@ -1,5 +1,6 @@
 import type { Getter, Setter } from "jotai";
 import { atom } from "jotai";
+import { Notice } from "obsidian";
 import { annotsAtom, fetchAnnots } from "./annotation";
 import { attachmentsAtom, getAttachments } from "./attachment";
 import { pluginAtom } from "./obsidian";
@@ -8,6 +9,7 @@ export const manualRefreshAtom = atom(null, async (get, set) => {
   const { db } = get(pluginAtom);
   await db.openDbConn(true);
   await refresh(get, set);
+  new Notice("Annotations refreshed", 500);
   // don't trigger index refresh
 });
 
