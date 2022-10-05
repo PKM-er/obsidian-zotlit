@@ -8,8 +8,8 @@ import assertNever from "assert-never";
 import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
-import { Menu } from "obsidian";
-import { useEffect } from "react";
+import { Menu, Notice } from "obsidian";
+import React, { useCallback, useEffect } from "react";
 import { JSONTree } from "react-json-tree";
 import { activeDocItemAtom } from "./atoms/obsidian";
 import { useIconRef } from "./icon";
@@ -124,6 +124,11 @@ const shouldExpandNode = (
   return false;
 };
 
+const CopyJSONIcon = () => {
+  const [iconRef] = useIconRef<HTMLSpanElement>("clipboard-copy", 8);
+  return <span ref={iconRef} />;
+};
+
 const getItemString = (
   _nodeType: string,
   data: unknown,
@@ -131,6 +136,32 @@ const getItemString = (
   itemString: string,
   keyPath: (string | number)[],
 ): React.ReactNode => {
+  if (keyPath.length === 1) {
+    const copy = async (
+      evt:
+        | React.MouseEvent<HTMLSpanElement>
+        | React.KeyboardEvent<HTMLSpanElement>,
+    ) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      await navigator.clipboard.writeText(
+        "```json\n" + JSON.stringify(data, null, 2) + "\n```",
+      );
+      new Notice("Copied JSON code block to clipboard");
+    };
+
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={copy}
+        onKeyDown={copy}
+        aria-label="Copy Item Details in JSON"
+      >
+        {itemString} <CopyJSONIcon />
+      </span>
+    );
+  }
   if (keyPath[1] === "creators" && keyPath.length === 3) {
     const creator = data as Creator;
     if (isCreatorFullName(creator)) {
