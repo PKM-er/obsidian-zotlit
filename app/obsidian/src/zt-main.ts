@@ -12,7 +12,7 @@ import checkLib from "./install-guide.js";
 import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
 import NoteParser from "./note-parser";
-import { getPDFOutline } from "./pdf-outline";
+import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
@@ -26,19 +26,13 @@ export default class ZoteroPlugin extends Plugin {
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
   noteParser = new NoteParser(this);
+  pdfCache = new PDFCache(this);
   get db() {
     if (!this.#db) throw new Error("access database before load");
     return this.#db;
   }
 
   noteIndex: NoteIndex = new NoteIndex(this);
-
-  parsePDFOutline(path: string) {
-    if (!this.settings.mutoolPath) {
-      throw new Error("mutool path is not set");
-    }
-    return getPDFOutline(path, this.settings.mutoolPath);
-  }
 
   async onload() {
     log.info("loading Obsidian Zotero Plugin");

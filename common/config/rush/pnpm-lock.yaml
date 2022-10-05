@@ -42,6 +42,7 @@ importers:
       fuse.js: ^6.5.3
       gray-matter: ^4.0.3
       handlebars: ^4.7.7
+      idb: ~7.1.0
       immer: ~9.0.15
       jotai: ~1.8.4
       js-base64: ^3.7.2
@@ -73,6 +74,7 @@ importers:
       filenamify: 5.1.1
       gray-matter: 4.0.3
       handlebars: 4.7.7
+      idb: 7.1.0
       immer: 9.0.15
       jotai: 1.8.4_immer@9.0.15+react@17.0.2
       js-base64: 3.7.2
@@ -157,7 +159,7 @@ importers:
     dependencies:
       log4js: 6.6.1
     devDependencies:
-      '@aidenlx/eslint-config': 2.0.5_ksn4eycaeggbrckn3ykh37hwf4
+      '@aidenlx/eslint-config': 2.0.5_vykabcxbkxlmlplwycrkrrmi2a
       '@types/node': 17.0.45
       eslint: 8.24.0
       typescript: 4.8.4
@@ -332,6 +334,46 @@ packages:
       '@types/shell-quote': 1.7.1
       '@typescript-eslint/eslint-plugin': 5.38.1_bzu4h7ky62maqhjzf7bo52cm6u
       '@typescript-eslint/parser': 5.38.1_n6o7c4j52sqif4e7zyvkw23cty
+      eslint: 8.21.0
+      eslint-config-prettier: 8.5.0_eslint@8.21.0
+      eslint-import-resolver-typescript: 3.5.1_jatgrcxl4x7ywe7ak6cnjca2ae
+      eslint-plugin-import: 2.26.0_eslint@8.21.0
+      eslint-plugin-jest: 26.9.0_pc3y5yilyds5sby4gtzc3kqcaq
+      eslint-plugin-jest-formatting: 3.1.0_eslint@8.21.0
+      eslint-plugin-jsx-a11y: 6.6.1_eslint@8.21.0
+      eslint-plugin-playwright: 0.10.0_qg43gprmvwhouznvqvy4sdpcni
+      eslint-plugin-prefer-arrow: 1.2.3_eslint@8.21.0
+      eslint-plugin-prettier: 4.2.1_h62lvancfh4b7r6zn2dgodrh5e
+      eslint-plugin-react: 7.31.8_eslint@8.21.0
+      eslint-plugin-react-hooks: 4.6.0_eslint@8.21.0
+      eslint-plugin-regexp: 1.9.0_eslint@8.21.0
+      eslint-plugin-simple-import-sort: 7.0.0_eslint@8.21.0
+      eslint-plugin-sonarjs: 0.15.0_eslint@8.21.0
+      eslint-plugin-storybook: 0.6.4_n6o7c4j52sqif4e7zyvkw23cty
+      eslint-plugin-tailwindcss: 3.6.2_ts-node@10.9.1
+      graphql: 16.5.0
+      prettier: 2.7.1
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - bufferutil
+      - encoding
+      - jest
+      - supports-color
+      - ts-node
+      - typescript
+      - utf-8-validate
+    dev: true
+
+  /@aidenlx/eslint-config/2.0.5_vykabcxbkxlmlplwycrkrrmi2a:
+    resolution: {integrity: sha512-8Ng2Jv4+plv3YO3vadlHISXzsfugEiHzIW/blR/kHMMklPFwGncSKXbxIUCpKRcTbSXpsQXETIXVNYxyKoGmGQ==}
+    dependencies:
+      '@graphql-eslint/eslint-plugin': 3.11.2_dhkx2jhrssybjdppguqcbvfgsa
+      '@rushstack/eslint-patch': 1.2.0
+      '@types/shell-quote': 1.7.1
+      '@typescript-eslint/eslint-plugin': 5.38.1_bzu4h7ky62maqhjzf7bo52cm6u
+      '@typescript-eslint/parser': 5.38.1_ypn2ylkkyfa5i233caldtndbqa
       eslint: 8.21.0
       eslint-config-prettier: 8.5.0_eslint@8.21.0
       eslint-import-resolver-typescript: 3.5.1_jatgrcxl4x7ywe7ak6cnjca2ae
@@ -1526,7 +1568,6 @@ packages:
       typescript: 4.8.4
     transitivePeerDependencies:
       - supports-color
-    dev: false
 
   /@typescript-eslint/scope-manager/5.38.1:
     resolution: {integrity: sha512-BfRDq5RidVU3RbqApKmS7RFMtkyWMM50qWnDAkKgQiezRtLKsoyRKIvz1Ok5ilRWeD9IuHvaidaLxvGx/2eqTQ==}
@@ -3687,7 +3728,7 @@ packages:
       debug: 4.3.4
       enhanced-resolve: 5.10.0
       eslint: 8.21.0
-      eslint-plugin-import: 2.26.0_eslint@8.24.0
+      eslint-plugin-import: 2.26.0_eslint@8.21.0
       get-tsconfig: 4.2.0
       globby: 13.1.2
       is-core-module: 2.10.0
@@ -5047,6 +5088,10 @@ packages:
       safer-buffer: 2.1.2
     dev: true
     optional: true
+
+  /idb/7.1.0:
+    resolution: {integrity: sha512-Wsk07aAxDsntgYJY4h0knZJuTxM73eQ4reRAO+Z1liOh8eMCJ/MoDS8fCui1vGT9mnjtl1sOu3I2i/W1swPYZg==}
+    dev: false
 
   /ieee754/1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}

@@ -1,3 +1,5 @@
+import { constants } from "fs";
+import { access } from "fs/promises";
 import { dialog } from "@electron/remote";
 import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
@@ -49,6 +51,30 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   annotView(): void {
     new Setting(this.containerEl).setHeading().setName("Annotaion View");
+    this.setMutool();
+  }
+  setMutool() {
+    this.addTextComfirm(
+      this.containerEl,
+      () => this.plugin.settings.mutoolPath ?? "",
+      async (value: string, _text) => {
+        try {
+          await access(value, constants.X_OK);
+          new Notice("mutool path is saved.");
+          this.plugin.settings.mutoolPath = value;
+          await this.plugin.saveSettings();
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+            new Notice("File not found");
+          } else if ((error as NodeJS.ErrnoException).code === "EACCES") {
+            new Notice("File not executable");
+          } else {
+            throw error;
+          }
+        }
+      },
+      { rows: 1 },
+    ).setName("`mutool` path");
   }
   setLiteratureNoteFolder() {
     const setter = async (value: string, text: TextAreaComponent) => {

@@ -1,7 +1,13 @@
 import { execFile as _execFile } from "child_process";
+import type { Stats } from "fs";
+import { stat } from "fs/promises";
 import { promisify } from "util";
+import type { DBSchema } from "idb";
+import { openDB } from "idb";
+import { Events, Notice } from "obsidian";
 import queryString from "query-string";
 import log from "./logger";
+import type ZoteroPlugin from "./zt-main";
 const execFile = promisify(_execFile);
 
 export interface PDFOutline {
@@ -12,24 +18,22 @@ export interface PDFOutline {
   zoom: number[];
 }
 
-export const getPDFOutline = async (pdfPath: string, mutool: string) => {
-  try {
-    const { stdout, stderr } = await execFile(mutool, [
-      "show",
-      pdfPath,
-      "outline",
-    ]);
-    if (stderr) {
-      throw new Error(stderr);
-    }
-    if (stdout) {
-      return parseResult(stdout);
-    }
-  } catch (error) {
-    log.error(error);
-  }
-  return null;
-};
+interface OutlineCacheValue {
+  path: string;
+  mtime: number;
+  outline: PDFOutline[];
+  created: number;
+}
+
+const dbName = "obsidian-zotero-plugin",
+  pdfOutlineStore = "pdf-outline";
+
+interface ZoteroPluginDB extends DBSchema {
+  [pdfOutlineStore]: {
+    key: string;
+    value: OutlineCacheValue;
+  };
+}
 
 const parseResult = (result: string) =>
   result.split("\n").map((line) =>
@@ -60,3 +64,82 @@ const parseResult = (result: string) =>
         { level: 0 } as PDFOutline,
       ),
   );
+
+export default class PDFCache extends Events {
+  db = openDB<ZoteroPluginDB>(dbName, 1, {
+    upgrade(db) {
+      db.createObjectStore(pdfOutlineStore, { keyPath: "path" });
+    },
+  });
+
+  constructor(public plugin: ZoteroPlugin) {
+    super();
+  }
+  get mutool() {
+    return this.plugin.settings.mutoolPath;
+  }
+
+  async getCachedOutlineKeys() {
+    const db = await this.db;
+    const keys = await db.getAllKeys(pdfOutlineStore);
+    return keys;
+  }
+
+  async getPDFOutline(
+    pdfPath: string,
+    force = false,
+  ): Promise<PDFOutline[] | null> {
+    const db = await this.db;
+    const cache = await db.get(pdfOutlineStore, pdfPath);
+    let stats: Stats;
+    try {
+      stats = await stat(pdfPath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        new Notice("PDF file not found");
+        return null;
+      } else {
+        throw error;
+      }
+    }
+    if (cache) {
+      if (stats.mtimeMs === cache.mtime && !force) {
+        log.debug("PDF outline cache hit", pdfPath);
+        return cache.outline;
+      }
+    }
+    const outline = await this.parsePDFOutline(pdfPath);
+    if (!outline) return null;
+    // save to cache
+    await db.put(pdfOutlineStore, {
+      path: pdfPath,
+      mtime: stats.mtimeMs,
+      outline,
+      created: Date.now(),
+    });
+    log.debug("PDF outline cache miss and updated", pdfPath);
+    return outline;
+  }
+
+  async parsePDFOutline(pdfPath: string) {
+    if (!this.mutool) {
+      throw new Error("mutool not configured");
+    }
+    try {
+      const { stdout, stderr } = await execFile(this.mutool, [
+        "show",
+        pdfPath,
+        "outline",
+      ]);
+      if (stderr) {
+        throw new Error(stderr);
+      }
+      if (stdout) {
+        return parseResult(stdout);
+      }
+    } catch (error) {
+      log.error(error);
+    }
+    return null;
+  }
+}
