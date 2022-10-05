@@ -8,7 +8,7 @@ import assertNever from "assert-never";
 import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
-import { Keymap, Menu } from "obsidian";
+import { Menu } from "obsidian";
 import { useEffect } from "react";
 import { JSONTree } from "react-json-tree";
 import { activeDocItemAtom } from "./atoms/obsidian";
@@ -159,46 +159,53 @@ const getItemString = (
 
 const getKeyName = (keyPath: (string | number)[]) =>
   keyPath
-    .reverse()
     .map((v) => {
       if (typeof v === "number" || v.includes("-") || v.includes(" "))
         return `[${v}]`;
       else return v;
     })
+    .reverse()
     .join(".");
 
 const labelRenderer = (
   keyPathWithRoot: (string | number)[],
   nodeType: string,
   _expanded: boolean,
-  _expandable: boolean,
+  expandable: boolean,
 ): React.ReactNode => {
   const isRoot = keyPathWithRoot.length === 1;
   const keyPath = keyPathWithRoot.slice(0, -1);
+  const path = getKeyName(keyPath);
   const handler = (evt: React.MouseEvent<HTMLSpanElement>) => {
-    const path = getKeyName(keyPath);
+    const menu = new Menu().addItem((i) =>
+      i.setTitle("Copy Template").onClick(() => {
+        navigator.clipboard.writeText("{{" + path + "}}");
+      }),
+    );
 
-    const menu = new Menu()
-      .addItem((i) =>
-        i.setTitle("Copy Template").onClick(() => {
-          navigator.clipboard.writeText("{{" + path + "}}");
-        }),
-      )
-      .addItem((i) =>
+    if (expandable && nodeType !== "Array") {
+      menu.addItem((i) =>
         i.setTitle("Copy Template (using {{#with}})").onClick(() => {
           navigator.clipboard.writeText(
             "{{#with " + path + "}}" + " " + "{{/with}}",
           );
         }),
       );
+    }
     if (nodeType === "Array") {
-      menu.addItem((i) =>
-        i.setTitle("Copy Template (using {{#each}})").onClick(() => {
-          navigator.clipboard.writeText(
-            "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
-          );
-        }),
-      );
+      menu
+        .addItem((i) =>
+          i.setTitle("Copy Template (using {{#each}})").onClick(() => {
+            navigator.clipboard.writeText(
+              "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
+            );
+          }),
+        )
+        .addItem((i) =>
+          i.setTitle("Copy Template (pick first element)").onClick(() => {
+            navigator.clipboard.writeText("{{" + path + ".[0]}}");
+          }),
+        );
     }
     if (!requiredKeys.has(keyPath[0] as never)) {
       menu.addItem((i) =>
