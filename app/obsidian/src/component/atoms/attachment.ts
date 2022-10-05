@@ -41,7 +41,7 @@ export const getAttachments = async (get: Getter) => {
     { db } = get(pluginAtom);
   // no active note for literature
   if (!item) return null;
-  log.debug("fetching attachments for", item);
+  log.trace("fetching attachments for", item);
   return db.getAttachments(item.itemID, item.libraryID);
 };
 

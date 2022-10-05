@@ -111,8 +111,7 @@ export default class ZoteroDb extends Events {
       return;
     }
     if (mainOpened) {
-      await this.#initIndex(this.defaultLibId);
-      await this.getLibs();
+      await this.initIndex(true);
     } else {
       log.error("Failed to init ZoteroDB");
     }
@@ -141,13 +140,15 @@ export default class ZoteroDb extends Events {
     let result = await proxy.refreshDb();
 
     if (!this.#waitingInitDb) {
-      this.#initDbTask = null;
+      log.debug("no waiting task in queue, resolve init db task");
       // connection refresh done
     } else {
       this.#waitingInitDb = false;
+      log.debug("current task done, continue init db task in queue");
       // continue to query
       result = await this.#refreshDbConn();
     }
+    log.debug("refresh db conn done");
     this.trigger("refresh");
     return result;
   }
@@ -162,19 +163,29 @@ export default class ZoteroDb extends Events {
       );
     }
     const proxy = await this.#proxy;
-    return await proxy.openDb(this.configPath, this.mainDbPath, this.bbtDbPath);
+    const result = await proxy.openDb(
+      this.configPath,
+      this.mainDbPath,
+      this.bbtDbPath,
+    );
+    log.debug("open db conn done");
+    return result;
   }
 
-  async #execOpenDbConnTask(refresh: boolean) {
-    const prevTask = this.#initDbTask;
+  async #execOpenDbConnTask(
+    refresh: boolean,
+    pending: Promise<[mainDbResult: boolean, bbtDbResult: boolean]> | null,
+  ) {
     let result;
-    if (prevTask) {
+    if (pending) {
       if (!refresh) {
         log.warn("Database already initializing");
       } else {
+        log.debug("Database already initializing, send to queue");
         this.#waitingInitDb = true;
       }
-      result = await prevTask;
+      result = await pending;
+      log.debug("pending init db task done");
     } else {
       if (!refresh) {
         result = await this.#openDbConn();
@@ -184,14 +195,15 @@ export default class ZoteroDb extends Events {
       }
       this.#indexed = false;
     }
-    this.#initDbTask = null;
     return result;
   }
 
   openDbConn(
     refresh = false,
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]> {
-    const task = this.#execOpenDbConnTask(refresh);
+    const task = this.#execOpenDbConnTask(refresh, this.#initDbTask).finally(
+      () => (this.#initDbTask = null),
+    );
     this.#initDbTask = task;
     return task;
   }
@@ -202,27 +214,41 @@ export default class ZoteroDb extends Events {
     await proxy.initIndex(lib);
     this.#libs = await proxy.getLibs();
   }
-  #initIndexTask: Promise<void> | null = null;
-  async #execInitIndexTask(force: boolean) {
+  private initIndexTask: Promise<void> | null = null;
+  get #initIndexTask() {
+    return this.initIndexTask;
+  }
+  set #initIndexTask(val) {
+    this.initIndexTask = val;
+  }
+  async #execInitIndexTask(force: boolean, pending: Promise<void> | null) {
     // if db conn is initializing, continue after it's done
     if (this.#initDbTask) {
       await this.#initDbTask;
+      log.debug("pending init db task finished");
+    }
+    if (pending) {
+      await pending;
+      log.debug("pending initIndex task finished");
     }
     let result;
     if (this.#indexed && !force) {
       // since database is opened as immutable one
       // if index is already initialized, skip
       result = void 0;
+      log.debug("Index already initialized, skip");
     } else {
+      log.debug("Index not initialized after init db, start indexing");
       result = await this.#initIndex();
       this.#indexed = true;
-      this.#initIndexTask = null;
+      log.debug("Index initialized");
     }
-    this.#initIndexTask = null;
     return result;
   }
   async initIndex(force = false): Promise<void> {
-    const task = this.#execInitIndexTask(force);
+    const task = this.#execInitIndexTask(force, this.#initIndexTask).finally(
+      () => (this.initIndexTask = null),
+    );
     this.#initIndexTask = task;
     return task;
   }
@@ -246,7 +272,7 @@ export default class ZoteroDb extends Events {
     item: string | number,
     lib = this.defaultLibId,
   ): Promise<GeneralItem | null> {
-    await this.#initDbTask;
+    await this.initIndex();
     const proxy = await this.#proxy;
     return await proxy.getItem(item, lib);
   }
@@ -273,7 +299,7 @@ export default class ZoteroDb extends Events {
     limit = 20,
     lib = this.defaultLibId,
   ) {
-    await this.#initIndexTask;
+    await this.initIndex();
     const exp = query.map<Fuse.Expression>((s) => ({
       [matchField]: s,
     }));
@@ -283,7 +309,7 @@ export default class ZoteroDb extends Events {
     return result;
   }
   async getAll(limit = 20, lib = this.defaultLibId) {
-    await this.#initIndexTask;
+    await this.initIndex();
     const result = await (
       await this.#proxy
     ).query(lib, null, {
