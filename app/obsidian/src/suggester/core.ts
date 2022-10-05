@@ -38,7 +38,7 @@ export function renderSuggestion(
   el: HTMLElement,
 ): void {
   const item = suggestion.item;
-  const title = item[PRIMARY_MATCH_FIELD],
+  const [title] = item[PRIMARY_MATCH_FIELD],
     { matches } = suggestion;
 
   const titleEl = el.createDiv({ cls: "title" });

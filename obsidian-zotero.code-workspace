@@ -78,6 +78,7 @@
       "obsidian/annot-view",
       "obsidian/zotero-db",
       "obsidian/note-index",
+      "obsidian/suggester",
       "zotero",
       "lib/database",
       "lib/note-parser",
