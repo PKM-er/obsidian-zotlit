@@ -31,7 +31,7 @@ export type NoteTemplateJSON = Record<keyof TemplateItemTypeMap, string>;
 export const ZOTERO_KEY_FIELDNAME = "zotero-key";
 
 export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
-  filename: "{{#filename}}{{coalesce citekey DOI title key}}.md{{/filename}}",
+  filename: "{{coalesce citekey DOI title key}}.md",
   content: endent`
             # {{title}}
 

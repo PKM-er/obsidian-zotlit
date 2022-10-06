@@ -24,9 +24,6 @@ export const helpers: HelperDeclareSpec = {
     }
     return null;
   },
-  filename(options: HelperOptions): string {
-    return filenamify(options.fn(this), { replacement: "_" });
-  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   blockID(this: Annotation | any): string {
     if (isAnnotationItem(this)) {
@@ -37,3 +34,6 @@ export const helpers: HelperDeclareSpec = {
     } else return "";
   },
 };
+
+export const renderFilename = (name: string) =>
+  filenamify(name, { replacement: "_" });

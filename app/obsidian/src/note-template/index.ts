@@ -15,7 +15,7 @@ import {
   DEFAULT_TEMPLATE,
   ZOTERO_KEY_FIELDNAME,
 } from "./const.js";
-import { helpers, partial } from "./helper.js";
+import { helpers, partial, renderFilename } from "./helper.js";
 
 const compileOptions: Parameters<typeof Handlebars.compile>[1] = {
     noEscape: true,
@@ -72,6 +72,8 @@ export default class NoteTemplate {
         return stringify(content, frontmatterData, grayMatterOptions);
     } else if (target === "annots") {
       return renderWith({ annotations: obj });
+    } else if (target === "filename") {
+      return renderFilename(renderWith(obj));
     }
     return renderWith(obj);
   }

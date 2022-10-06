@@ -79,6 +79,7 @@
       "obsidian/zotero-db",
       "obsidian/note-index",
       "obsidian/suggester",
+      "obsidian/template",
       "zotero",
       "lib/database",
       "lib/note-parser",
