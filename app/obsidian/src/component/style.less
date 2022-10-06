@@ -25,7 +25,7 @@
 }
 
 .annot-list-item {
-  font-size: var(--font-ui-smaller);
+  font-size: var(--font-ui-small);
   line-height: var(--line-height-tight);
   background-color: var(--background-primary);
   border-radius: var(--radius-s);
@@ -59,6 +59,7 @@
   align-items: center;
   background-color: var(--background-primary-alt);
   padding: var(--size-2-3) var(--size-4-2) var(--size-2-3) var(--size-4-3);
+  cursor: context-menu;
 }
 
 .annot-type-icon {
@@ -148,7 +149,7 @@
 }
 
 a.annot-page.external-link {
-  background-position-y: 2px;
+  background-position-y: 3px;
   background-size: 10px;
   padding-right: 16px;
   text-decoration-line: none;
@@ -172,7 +173,7 @@ a.annot-page.external-link {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding: var(--size-2-3) var(--size-4-3) !important;
-    font-size: var(--font-ui-smaller);
+    font-size: var(--font-ui-small);
     line-height: var(--line-height-tight);
     background-color: var(--background-primary) !important;
     border-radius: var(--radius-s);
@@ -186,9 +187,26 @@ a.annot-page.external-link {
   span[role="button"] {
     cursor: pointer;
     svg {
-      width: var(--font-ui-smaller);
-      height: var(--font-ui-smaller);
+      width: var(--font-ui-small);
+      height: var(--font-ui-small);
       vertical-align: text-bottom;
     }
+  }
+}
+
+.annot-header-more-options {
+  display: flex;
+  width: var(--font-ui-small);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.annot-action-container {
+  display: flex;
+  gap: var(--size-2-3);
+  cursor: auto;
+  &:hover .annot-header-more-options {
+    opacity: 1;
   }
 }
