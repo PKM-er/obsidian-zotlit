@@ -1,16 +1,4 @@
-import { sortBySortIndex } from "@obzt/database";
-import type { Atom, Getter } from "jotai";
-import { useAtomValue } from "jotai";
-import { useMemo } from "react";
-import type { AnnotAtom } from "./annotation";
-
-export const useDerivedAtom = <V>(
-  annot: AnnotAtom,
-  getAtom: (annot: AnnotAtom) => Atom<V>,
-) => {
-  const derivedAtom = useMemo(() => getAtom(annot), [annot, getAtom]);
-  return useAtomValue(derivedAtom);
-};
+import type { Atom } from "jotai";
 
 export const createInitialValues = () => {
   const initialValues: (readonly [Atom<unknown>, unknown])[] = [];

@@ -1,4 +1,4 @@
-import { AnnotationType } from "@obzt/zotero-type";
+import { AnnotationType, getBacklink } from "@obzt/zotero-type";
 import { useMemoizedFn } from "ahooks";
 import assertNever from "assert-never";
 import cls from "classnames";
@@ -7,19 +7,8 @@ import { startCase } from "lodash-es";
 import React from "react";
 import { renderHTMLReact } from "../utils";
 import type { AnnotAtom, AnnotProps } from "./atoms/annotation";
-import {
-  getTypeAtom,
-  getIconAtom,
-  getColorAtom,
-  getPageAtom,
-  getTextAtom,
-  getImgSrcAtom,
-  getImgAltAtom,
-  getCommentAtom,
-  getBacklinkAtom,
-} from "./atoms/derived";
+import { getColor, getIcon, useImgSrc, useSelector } from "./atoms/derived";
 import { pluginAtom } from "./atoms/obsidian";
-import { useDerivedAtom } from "./atoms/utils";
 import { useIconRef } from "./icon";
 
 export const AnnotationPreview = ({ annotAtom: atom }: AnnotProps) => {
@@ -33,7 +22,7 @@ export const AnnotationPreview = ({ annotAtom: atom }: AnnotProps) => {
 };
 
 const AnnotContent = ({ annotAtom }: AnnotProps) => {
-  const type = useDerivedAtom(annotAtom, getTypeAtom);
+  const type = useSelector(annotAtom, ({ type }) => type);
   let content;
   switch (type) {
     case AnnotationType.highlight:
@@ -53,9 +42,9 @@ const AnnotContent = ({ annotAtom }: AnnotProps) => {
 };
 
 const HeaderIcon = ({ annotAtom }: AnnotProps) => {
-  const icon = useDerivedAtom(annotAtom, getIconAtom);
-  const color = useDerivedAtom(annotAtom, getColorAtom);
-  const type = useDerivedAtom(annotAtom, getTypeAtom);
+  const icon = useSelector(annotAtom, (annot) => getIcon(annot));
+  const color = useSelector(annotAtom, getColor);
+  const type = useSelector(annotAtom, ({ type }) => type);
   const dragProps = useDrag(annotAtom);
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
@@ -98,8 +87,8 @@ const Header = ({ annotAtom }: AnnotProps) => {
 };
 
 const TextExcerpt = ({ annotAtom }: AnnotProps) => {
-  const color = useDerivedAtom(annotAtom, getColorAtom);
-  const text = useDerivedAtom(annotAtom, getTextAtom);
+  const color = useSelector(annotAtom, getColor);
+  const text = useSelector(annotAtom, ({ text }) => text);
   return (
     <blockquote style={{ borderColor: color ?? undefined }}>
       <p>{text}</p>
@@ -108,9 +97,12 @@ const TextExcerpt = ({ annotAtom }: AnnotProps) => {
 };
 
 const PicExcerpt = ({ annotAtom }: AnnotProps) => {
-  const imgSrc = useDerivedAtom(annotAtom, getImgSrcAtom);
-  const color = useDerivedAtom(annotAtom, getColorAtom);
-  const imgAlt = useDerivedAtom(annotAtom, getImgAltAtom);
+  const imgSrc = useImgSrc(annotAtom);
+  const color = useSelector(annotAtom, getColor);
+  const imgAlt = useSelector(
+    annotAtom,
+    ({ text, pageLabel }) => text ?? `Area Excerpt for Page ${pageLabel}`,
+  );
   return (
     <blockquote style={{ borderColor: color ?? undefined }}>
       <img src={imgSrc} alt={imgAlt} />
@@ -119,7 +111,7 @@ const PicExcerpt = ({ annotAtom }: AnnotProps) => {
 };
 
 const Comment = ({ annotAtom }: AnnotProps) => {
-  const comment = useDerivedAtom(annotAtom, getCommentAtom);
+  const comment = useSelector(annotAtom, ({ comment }) => comment);
   return comment ? (
     <div className="annot-comment">
       <p {...renderHTMLReact(comment)} />
@@ -128,8 +120,8 @@ const Comment = ({ annotAtom }: AnnotProps) => {
 };
 
 const Page = ({ annotAtom }: AnnotProps) => {
-  const page = useDerivedAtom(annotAtom, getPageAtom);
-  const backlink = useDerivedAtom(annotAtom, getBacklinkAtom);
+  const page = useSelector(annotAtom, ({ pageLabel }) => pageLabel);
+  const backlink = useSelector(annotAtom, getBacklink);
   const pageText = page ? `Page ${page}` : "";
 
   if (backlink)

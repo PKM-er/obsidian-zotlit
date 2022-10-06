@@ -9,7 +9,7 @@ import cls from "classnames";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import { Menu, Notice } from "obsidian";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { JSONTree } from "react-json-tree";
 import { activeDocItemAtom } from "./atoms/obsidian";
 import { useIconRef } from "./icon";
