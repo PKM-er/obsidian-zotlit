@@ -3,16 +3,15 @@ import "./style.less";
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
-import { useMemo } from "react";
 import { AnnotationPreview } from "./annot-preview";
+import type { AnnotProps } from "./atoms/annotation";
 import {
   selectedAnnotsAtom,
   annotsAtom,
   selectedItemsAtom,
   isCollapsedAtom,
 } from "./atoms/annotation";
-import type { AnnotProps } from "./atoms/annotation";
-import { getIsSelectedAtom } from "./atoms/derived";
+import { useIsSelectedAnnot } from "./atoms/derived";
 import { manualRefreshAtom } from "./atoms/refresh";
 import { weakAtomFamily } from "./atoms/utils";
 import { useIconRef } from "./icon";
@@ -104,10 +103,6 @@ const AnnotListItem = ({
 };
 
 const SelectCheckbox = ({ annotAtom }: AnnotProps) => {
-  const isSelectedAtom = useMemo(
-    () => getIsSelectedAtom(annotAtom),
-    [annotAtom],
-  );
-  const [selected, setSelected] = useAtom(isSelectedAtom);
+  const [selected, setSelected] = useIsSelectedAnnot(annotAtom);
   return <input type="checkbox" checked={selected} onChange={setSelected} />;
 };

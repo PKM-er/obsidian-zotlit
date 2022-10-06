@@ -1,61 +1,68 @@
 import { getCacheImagePath } from "@obzt/database";
-import { AnnotationType, getBacklink } from "@obzt/zotero-type";
+import type { Annotation } from "@obzt/zotero-type";
+import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
-import { atom } from "jotai";
+import type { Atom, Getter, Setter } from "jotai";
+import { useAtom, useAtomValue, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
+import { useMemo } from "react";
 import type { AnnotAtom } from "./annotation";
 import { selectedItemsAtom } from "./annotation";
 import { zoteroDataDirAtom } from "./obsidian";
 
-export const getColorAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => annot.color ?? undefined);
-export const getTypeAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => annot.type);
-export const getPageAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => annot.pageLabel);
-export const getCommentAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => annot.comment);
-
-export const getBacklinkAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, (annot) => getBacklink(annot));
-
-export const getImgSrcAtom = (annot: AnnotAtom) =>
-  atom((get) => {
-    const path = getCacheImagePath(get(annot), get(zoteroDataDirAtom));
-    return `app://local${path}`;
-  });
-export const getImgAltAtom = (annot: AnnotAtom) =>
-  selectAtom(
-    annot,
-    ({ text, pageLabel }) => text ?? `Area Excerpt for Page ${pageLabel}`,
+export const useSelector = <Value, Slice>(
+  anAtom: Atom<Value>,
+  selector: (v: Awaited<Value>) => Slice,
+  equalityFn?: (a: Slice, b: Slice) => boolean,
+) => {
+  const atom = useMemo(
+    () => selectAtom(anAtom, selector, equalityFn),
+    [anAtom],
   );
-export const getTextAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, ({ text }) => text);
-export const getIconAtom = (annot: AnnotAtom) =>
-  selectAtom(annot, ({ type }) => {
-    switch (type) {
-      case AnnotationType.highlight:
-        return "align-left";
-      case AnnotationType.image:
-        return "frame";
-      case AnnotationType.note:
-      case AnnotationType.ink:
-        return "file-question";
-      default:
-        assertNever(type);
-    }
-  });
+  return useAtomValue(atom);
+};
 
-export const getIsSelectedAtom = (annot: AnnotAtom) =>
-  atom(
-    (get) => {
-      const { itemID } = get(annot);
+export const getColor = ({ color }: Annotation) => color ?? undefined;
+
+export const useImgSrc = (annotAtom: AnnotAtom) => {
+  const imgsrcAtom = useMemo(
+    () =>
+      atom(
+        (get) =>
+          `app://local${getCacheImagePath(
+            get(annotAtom),
+            get(zoteroDataDirAtom),
+          )}`,
+      ),
+    [annotAtom],
+  );
+  return useAtomValue(imgsrcAtom);
+};
+
+export const getIcon = ({ type }: Annotation) => {
+  switch (type) {
+    case AnnotationType.highlight:
+      return "align-left";
+    case AnnotationType.image:
+      return "frame";
+    case AnnotationType.note:
+    case AnnotationType.ink:
+      return "file-question";
+    default:
+      assertNever(type);
+  }
+};
+
+export const useIsSelectedAnnot = (annotAtom: AnnotAtom) => {
+  const isSelectedAtom = useMemo(() => {
+    const getter = (get: Getter) => {
+      const { itemID } = get(annotAtom);
       if (!itemID) return false;
       return get(selectedItemsAtom).has(itemID);
-    },
-    (get, set) => {
+    };
+    const setter = (get: Getter, set: Setter) => {
       const items = get(selectedItemsAtom);
-      const { itemID } = get(annot);
+      const { itemID } = get(annotAtom);
       if (!itemID) return;
       if (items.has(itemID)) {
         set(
@@ -68,5 +75,8 @@ export const getIsSelectedAtom = (annot: AnnotAtom) =>
           (items) => (items.add(itemID), new Set([...items])),
         );
       }
-    },
-  );
+    };
+    return atom(getter, setter);
+  }, [annotAtom]);
+  return useAtom(isSelectedAtom);
+};
