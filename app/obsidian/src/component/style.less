@@ -49,10 +49,10 @@
     padding: var(--size-4-2) var(--size-4-3);
     white-space: pre-wrap;
     width: 100%;
-    border-bottom: 1px solid var(--background-modifier-border);
+    border-top: 1px solid var(--background-modifier-border);
   }
-  > *:last-child {
-    border-bottom: none;
+  > *:first-child {
+    border-top: none;
   }
 }
 
@@ -129,7 +129,7 @@
   height: 100%;
   > *:not(:last-child) {
     padding-bottom: var(--size-4-2);
-    &.annot-doc-details:not(.showing) {
+    &.doc-details:not(.showing) {
       padding-bottom: 0;
     }
   }
@@ -157,36 +157,49 @@ a.annot-page.external-link {
   text-decoration-line: none;
 }
 
-.annot-doc-details {
-  padding: 0 var(--size-4-3);
+.doc-details,
+.annot-details {
   max-height: 0;
   opacity: 0;
   transition: all 0.25s ease-in-out;
   &.showing {
-    max-height: 500px;
     opacity: 1;
+    max-height: 500px;
   }
   span {
     word-break: break-word !important;
   }
   & > * {
     height: 100%;
-    overflow: scroll;
+    overflow-y: scroll;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding: var(--size-2-3) var(--size-4-3) !important;
     font-size: var(--font-ui-small);
     line-height: var(--line-height-tight);
     background-color: var(--background-primary) !important;
-    border-radius: var(--radius-s);
     color: var(--text-muted);
-    box-shadow: 0 0 0 1px var(--background-modifier-border);
     > * {
       padding-top: 0 !important;
     }
   }
+}
 
-  span[role="button"] {
+.doc-details {
+  padding: 0 var(--size-4-3);
+  & > * {
+    border-radius: var(--radius-s);
+    box-shadow: 0 0 0 1px var(--background-modifier-border);
+  }
+}
+
+.annot-details {
+  padding: 0;
+  overflow-y: scroll;
+}
+
+.annot-view {
+  [role="button"] {
     cursor: pointer;
     svg {
       width: var(--font-ui-small);
@@ -194,11 +207,14 @@ a.annot-page.external-link {
       vertical-align: text-bottom;
     }
   }
+  .annot-header button {
+    padding: var(--size-2-1) var(--size-2-2);
+  }
 }
 
-.annot-header-more-options {
+.annot-header-more-options,
+.annot-header-details-toggle {
   display: flex;
-  width: var(--font-ui-small);
   opacity: 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
@@ -206,9 +222,17 @@ a.annot-page.external-link {
 
 .annot-action-container {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: var(--size-2-3);
   cursor: auto;
-  &:hover .annot-header-more-options {
+  &:hover {
+    .annot-header-more-options,
+    .annot-header-details-toggle {
+      opacity: 1;
+    }
+  }
+  .annot-header-details-toggle.showing {
     opacity: 1;
   }
 }

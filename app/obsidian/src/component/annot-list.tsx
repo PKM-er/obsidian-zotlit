@@ -6,12 +6,11 @@ import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { AnnotationPreview } from "./annot-preview";
 import type { AnnotProps } from "./atoms/annotation";
 import {
-  selectedAnnotsAtom,
+  stateAtomFamily,
+  useIsSelected,
   annotsAtom,
-  selectedItemsAtom,
   isCollapsedAtom,
 } from "./atoms/annotation";
-import { useIsSelectedAnnot } from "./atoms/derived";
 import { manualRefreshAtom } from "./atoms/refresh";
 import { weakAtomFamily } from "./atoms/utils";
 import { useIconRef } from "./icon";
@@ -24,13 +23,16 @@ const filteredAtom = atom((get) => {
   const annots = get(annotsAtom);
   if (!annots) return null;
   const filter = get(filterAtom);
-  const selected = get(selectedItemsAtom);
   if (filter === "all") return annots;
   else if (filter === "selected") {
-    return get(selectedAnnotsAtom);
+    return annots.filter((annot) =>
+      get(stateAtomFamily.isSelected(annot.itemID)),
+    );
   } else {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return annots.filter((annot) => !selected.has(annot.itemID!));
+    return annots.filter(
+      (annot) => !get(stateAtomFamily.isSelected(annot.itemID)),
+    );
   }
 });
 
@@ -103,6 +105,12 @@ const AnnotListItem = ({
 };
 
 const SelectCheckbox = ({ annotAtom }: AnnotProps) => {
-  const [selected, setSelected] = useIsSelectedAnnot(annotAtom);
-  return <input type="checkbox" checked={selected} onChange={setSelected} />;
+  const [selected, setSelected] = useIsSelected(annotAtom);
+  return (
+    <input
+      type="checkbox"
+      checked={selected}
+      onChange={() => setSelected((prev) => !prev)}
+    />
+  );
 };

@@ -6,10 +6,8 @@ import AnnotationList, {
 } from "@component/annot-list";
 import { activeFileAtom, pluginAtom } from "@component/atoms/obsidian";
 import { autoRefreshAtom } from "@component/atoms/refresh";
-import {
-  DocItemDetailsButton,
-  DocDetailsView,
-} from "../../component/item-view";
+import { DocDetailsView } from "@component/item-view";
+import { DocItemDetailsToggle } from "@component/item-view/item-details-toggle";
 import { AttachmentSelect } from "./atch-select";
 
 export const AnnotView = () => {
@@ -46,7 +44,7 @@ export const AnnotView = () => {
         <>
           <div className="annot-view-header">
             <div className="annot-view-button-container">
-              <DocItemDetailsButton />
+              <DocItemDetailsToggle />
               <CollapseButton />
               <RefreshButton />
             </div>

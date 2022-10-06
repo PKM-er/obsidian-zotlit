@@ -22,6 +22,7 @@ const Content = ({ annotAtom }: AnnotProps) => {
   }
   return <div className="annot-excerpt">{content}</div>;
 };
+
 const TextExcerpt = ({ annotAtom }: AnnotProps) => {
   const color = useSelector(annotAtom, getColor);
   const text = useSelector(annotAtom, ({ text }) => text);

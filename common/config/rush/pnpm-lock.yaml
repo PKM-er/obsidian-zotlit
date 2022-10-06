@@ -1496,7 +1496,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.38.1_ypn2ylkkyfa5i233caldtndbqa
+      '@typescript-eslint/parser': 5.38.1_n6o7c4j52sqif4e7zyvkw23cty
       '@typescript-eslint/scope-manager': 5.38.1
       '@typescript-eslint/type-utils': 5.38.1_n6o7c4j52sqif4e7zyvkw23cty
       '@typescript-eslint/utils': 5.38.1_n6o7c4j52sqif4e7zyvkw23cty
@@ -3748,7 +3748,7 @@ packages:
       debug: 4.3.4
       enhanced-resolve: 5.10.0
       eslint: 8.21.0
-      eslint-plugin-import: 2.26.0_eslint@8.24.0
+      eslint-plugin-import: 2.26.0_eslint@8.21.0
       get-tsconfig: 4.2.0
       globby: 13.1.2
       is-core-module: 2.10.0
@@ -3756,6 +3756,19 @@ packages:
       synckit: 0.8.4
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /eslint-module-utils/2.7.4_eslint@8.21.0:
+    resolution: {integrity: sha512-j4GT+rqzCoRKHwURX7pddtIPGySnX9Si/cgMI5ztrcqOPtk5dDEeZ34CQVPphnqkJytlc97Vuk05Um2mJ3gEQA==}
+    engines: {node: '>=4'}
+    peerDependencies:
+      eslint: '*'
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+    dependencies:
+      debug: 3.2.7
+      eslint: 8.21.0
     dev: true
 
   /eslint-module-utils/2.7.4_eslint@8.24.0:
@@ -3782,7 +3795,7 @@ packages:
       doctrine: 2.1.0
       eslint: 8.21.0
       eslint-import-resolver-node: 0.3.6
-      eslint-module-utils: 2.7.4_eslint@8.24.0
+      eslint-module-utils: 2.7.4_eslint@8.21.0
       has: 1.0.3
       is-core-module: 2.10.0
       is-glob: 4.0.3
@@ -6863,7 +6876,7 @@ packages:
     dependencies:
       lilconfig: 2.0.6
       postcss: 8.4.17
-      ts-node: 10.9.1_ksn4eycaeggbrckn3ykh37hwf4
+      ts-node: 10.9.1_5ra3kupzwcghzakkfdrtyjk72u
       yaml: 1.10.2
     dev: true
 

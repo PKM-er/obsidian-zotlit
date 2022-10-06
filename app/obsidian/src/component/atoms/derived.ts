@@ -2,12 +2,11 @@ import { getCacheImagePath } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
-import type { Atom, Getter, Setter } from "jotai";
-import { useAtom, useAtomValue, atom } from "jotai";
+import type { Atom } from "jotai";
+import { useAtomValue, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 import type { AnnotAtom } from "./annotation";
-import { selectedItemsAtom } from "./annotation";
 import { zoteroDataDirAtom } from "./obsidian";
 
 export const useSelector = <Value, Slice>(
@@ -51,32 +50,4 @@ export const getIcon = ({ type }: Annotation) => {
     default:
       assertNever(type);
   }
-};
-
-export const useIsSelectedAnnot = (annotAtom: AnnotAtom) => {
-  const isSelectedAtom = useMemo(() => {
-    const getter = (get: Getter) => {
-      const { itemID } = get(annotAtom);
-      if (!itemID) return false;
-      return get(selectedItemsAtom).has(itemID);
-    };
-    const setter = (get: Getter, set: Setter) => {
-      const items = get(selectedItemsAtom);
-      const { itemID } = get(annotAtom);
-      if (!itemID) return;
-      if (items.has(itemID)) {
-        set(
-          selectedItemsAtom,
-          (items) => (items.delete(itemID), new Set([...items])),
-        );
-      } else {
-        set(
-          selectedItemsAtom,
-          (items) => (items.add(itemID), new Set([...items])),
-        );
-      }
-    };
-    return atom(getter, setter);
-  }, [annotAtom]);
-  return useAtom(isSelectedAtom);
 };
