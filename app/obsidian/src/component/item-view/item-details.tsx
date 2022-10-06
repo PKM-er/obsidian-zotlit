@@ -1,20 +1,14 @@
-import type { Creator } from "@obzt/zotero-type";
 import {
   requiredKeys,
   isCreatorNameOnly,
   isCreatorFullName,
 } from "@obzt/zotero-type";
-import assertNever from "assert-never";
-import cls from "classnames";
-import { atom, useAtom, useAtomValue } from "jotai";
-import { loadable } from "jotai/utils";
+import type { Creator, GeneralItem, Annotation } from "@obzt/zotero-type";
+import { atom, useAtom } from "jotai";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect } from "react";
 import { JSONTree } from "react-json-tree";
-import { activeDocItemAtom } from "./atoms/obsidian";
-import { useIconRef } from "./icon";
-
-const docItemAtom = loadable(activeDocItemAtom);
+import { useIconRef } from "../icon";
 
 const queryDarkMode = () => document.body.hasClass("theme-dark");
 
@@ -62,54 +56,30 @@ const themeDark = {
   base0F: "#d33682",
 };
 
-export const DocDetailsView = () => {
-  const activeDocItem = useAtomValue(docItemAtom);
-  const showingDetails = useAtomValue(showDocItemDetails);
-  return (
-    <div
-      className={cls("annot-doc-details", {
-        loading: activeDocItem.state === "loading",
-        showing: showingDetails,
-      })}
-    >
-      <DocItemDetails />
-    </div>
-  );
-};
-
-const DocItemDetails = () => {
-  const activeDocItem = useAtomValue(docItemAtom);
+export const ItemDetails = ({
+  item,
+}: {
+  item: GeneralItem | Annotation | null;
+}) => {
   const [isDarkMode, setDarkMode] = useAtom(darkModeAtom);
   useEffect(() => {
     const listener = () => setDarkMode(queryDarkMode());
     app.workspace.on("css-change", listener);
     return () => app.workspace.off("css-change", listener);
   }, [setDarkMode]);
-  if (activeDocItem.state === "hasData") {
-    if (activeDocItem.data) {
-      return (
-        <JSONTree
-          data={activeDocItem.data}
-          labelRenderer={labelRenderer}
-          theme={isDarkMode ? themeDark : themeLight}
-          invertTheme={false}
-          keyPath={["Zotero Item Data"]}
-          shouldExpandNode={shouldExpandNode}
-          getItemString={getItemString}
-        />
-      );
-    } else {
-      return <div>No Details Available</div>;
-    }
-  } else if (activeDocItem.state === "loading") {
-    return null;
-  } else if (activeDocItem.state === "hasError") {
-    return <div>An Error Occurred: {activeDocItem.error}</div>;
-  } else assertNever(activeDocItem);
+  if (!item) return <div>No Details Available</div>;
+  return (
+    <JSONTree
+      data={item}
+      labelRenderer={labelRenderer}
+      theme={isDarkMode ? themeDark : themeLight}
+      invertTheme={false}
+      keyPath={["Zotero Item Data"]}
+      shouldExpandNode={shouldExpandNode}
+      getItemString={getItemString}
+    />
+  );
 };
-
-const showDocItemDetails = atom(false);
-
 const shouldExpandNode = (
   keyPath: (string | number)[],
   data: unknown,
@@ -123,12 +93,10 @@ const shouldExpandNode = (
     return true;
   return false;
 };
-
 const CopyJSONIcon = () => {
   const [iconRef] = useIconRef<HTMLSpanElement>("clipboard-copy", 8);
   return <span ref={iconRef} />;
 };
-
 const getItemString = (
   _nodeType: string,
   data: unknown,
@@ -187,7 +155,6 @@ const getItemString = (
     </span>
   );
 };
-
 const getKeyName = (keyPath: (string | number)[]) =>
   keyPath
     .map((v) => {
@@ -197,7 +164,6 @@ const getKeyName = (keyPath: (string | number)[]) =>
     })
     .reverse()
     .join(".");
-
 const labelRenderer = (
   keyPathWithRoot: (string | number)[],
   nodeType: string,
@@ -258,17 +224,4 @@ const labelRenderer = (
       }
     : undefined;
   return <span {...props}>{keyPathWithRoot[0]}: </span>;
-};
-
-export const DocItemDetailsButton = () => {
-  const [showingDetails, setShowDetails] = useAtom(showDocItemDetails);
-  const [ref] = useIconRef<HTMLButtonElement>("info");
-  return (
-    <button
-      ref={ref}
-      className={cls("clickable-icon", { "is-active": showingDetails })}
-      onClick={() => setShowDetails((v) => !v)}
-      aria-label={`${showingDetails ? "Hide" : "Show"} details`}
-    />
-  );
 };

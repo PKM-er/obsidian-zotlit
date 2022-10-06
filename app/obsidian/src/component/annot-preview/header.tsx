@@ -5,11 +5,11 @@ import cls from "classnames";
 import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
 import { Menu } from "obsidian";
-import React, { useCallback } from "react";
 import type { AnnotAtom, AnnotProps } from "../atoms/annotation";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
 import { pluginAtom } from "../atoms/obsidian";
 import { useIconRef } from "../icon";
+import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
 
 const HeaderIcon = ({ annotAtom }: AnnotProps) => {
   const icon = useSelector(annotAtom, (annot) => getIcon(annot));
@@ -72,6 +72,7 @@ const Header = ({ annotAtom }: AnnotProps) => {
     <div className="annot-header" onContextMenu={openMenu}>
       <div className="annot-action-container">
         <HeaderIcon annotAtom={annotAtom} />
+        <AnnotDetailsToggle annotAtom={annotAtom} />
         <MoreOptionsButton annotAtom={annotAtom} />
       </div>
       <div className="annot-header-space" />
