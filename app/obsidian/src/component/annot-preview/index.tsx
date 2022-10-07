@@ -9,6 +9,7 @@ import { AnnotDetailsView } from "./annot-details";
 import { annotAtom, useIsSelected } from "./atom";
 import Content from "./content";
 import Header from "./header.jsx";
+import { Tags } from "./tags";
 
 export const AnnotationPreview = () => {
   return (
@@ -16,6 +17,7 @@ export const AnnotationPreview = () => {
       <Header />
       <Content />
       <Comment />
+      <Tags />
       <AnnotDetailsView />
     </div>
   );

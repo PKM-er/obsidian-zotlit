@@ -85,6 +85,7 @@ export type Annotation = AnnotationItem & {
 
 export interface ItemTag {
   itemID: number;
+  tagID: number;
   type: TagType;
   name: string | null;
 }

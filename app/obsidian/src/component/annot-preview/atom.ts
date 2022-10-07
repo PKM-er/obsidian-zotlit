@@ -1,7 +1,9 @@
 import type { Annotation } from "@obzt/zotero-type";
+import { TagType } from "@obzt/zotero-type";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { stateAtomFamily } from "../atoms/annotation";
+import { pluginAtom } from "../atoms/obsidian";
 
 /** annotations atom */
 
@@ -22,3 +24,9 @@ export const useIsSelected = () => {
   );
   return useAtom(useAtomValue(myAtom));
 };
+
+export const tagsAtom = atom(async (get) =>
+  (await get(pluginAtom).db.getTags([get(annotAtom).itemID])).filter(
+    (t) => t.type === TagType.manual,
+  ),
+);
