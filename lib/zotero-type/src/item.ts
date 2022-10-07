@@ -11,7 +11,7 @@ export type Item = {
   itemType: string;
 };
 export type ItemField = {
-  itemID: number | null;
+  itemID: number;
   fieldName: string;
   value: unknown;
 };
@@ -84,13 +84,13 @@ export type Annotation = AnnotationItem & {
 };
 
 export interface ItemTag {
-  itemID: number | null;
+  itemID: number;
   type: TagType;
   name: string | null;
 }
 
 export interface Attachment {
-  itemID: number | null;
+  itemID: number;
   key: string;
   path: string | null;
 }
