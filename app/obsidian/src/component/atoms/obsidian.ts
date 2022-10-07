@@ -1,4 +1,3 @@
-import { dirname } from "path";
 import type { GeneralItem } from "@obzt/zotero-type";
 import { atom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -44,7 +43,3 @@ export const activeDocItemAtom = atom(async (get) => {
   if (!item) return null;
   return item as DocItem;
 });
-
-export const zoteroDataDirAtom = atom((get) =>
-  dirname(get(pluginAtom).settings.zoteroDbPath),
-);

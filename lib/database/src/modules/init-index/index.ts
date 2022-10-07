@@ -117,7 +117,7 @@ const readMainDb = async (
 };
 const readBbtDb = async (): Promise<ItemCitekey[]> => {
   log.debug("Reading Better BibTex database");
-  if (!databases.bbt) {
+  if (!databases.bbt.opened) {
     log.info("Better BibTex database not enabled, skipping...");
     return [];
   }

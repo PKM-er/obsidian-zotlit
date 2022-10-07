@@ -34,6 +34,7 @@ export default class Database {
     return this.#database.mtime === (await getMtime(this.#database.path));
   }
 
+  opened = false;
   /**
    * set new database path and open connection
    * @param dbPath
@@ -44,6 +45,7 @@ export default class Database {
     try {
       if (this.#database?.db) {
         log.info("Database opened before, closing: ", this.#database.db.name);
+        this.opened = false;
         await this.#database.db.destroy();
         const mtime = await getMtime(dbPath);
         this.#database.db.initialize(
@@ -59,9 +61,11 @@ export default class Database {
         };
       }
       log.info("Database opened: ", dbPath);
+      this.opened = true;
       return true;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      this.opened = false;
       return false;
     }
   }
@@ -76,6 +80,7 @@ export default class Database {
   }
 
   public async close() {
+    this.opened = false;
     await this.#database?.db.destroy();
     this.#database = null;
   }
