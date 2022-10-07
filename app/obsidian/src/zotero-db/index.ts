@@ -266,6 +266,10 @@ export default class ZoteroDb extends Events {
     const proxy = await this.#proxy;
     return await proxy.getAnnotations(attachmentId, libId);
   }
+  async getTags(itemIDs: number[], libId = this.defaultLibId) {
+    const proxy = await this.#proxy;
+    return await proxy.getTags(itemIDs, libId);
+  }
   async getItem(itemKey: string, lib?: number): Promise<GeneralItem | null>;
   async getItem(itemId: number, lib?: number): Promise<GeneralItem | null>;
   async getItem(
