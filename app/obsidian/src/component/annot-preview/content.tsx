@@ -1,17 +1,18 @@
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
-import type { AnnotProps } from "../atoms/annotation.js";
-import { getColor, useImgSrc, useSelector } from "../atoms/derived.js";
+import { useAtomValue } from "jotai";
+import { getColor, imgSrcAtom, useSelector } from "../atoms/derived.js";
+import { annotAtom } from "./atom.js";
 
-const Content = ({ annotAtom }: AnnotProps) => {
+const Content = () => {
   const type = useSelector(annotAtom, ({ type }) => type);
   let content;
   switch (type) {
     case AnnotationType.highlight:
-      content = <TextExcerpt annotAtom={annotAtom} />;
+      content = <TextExcerpt />;
       break;
     case AnnotationType.image:
-      content = <PicExcerpt annotAtom={annotAtom} />;
+      content = <PicExcerpt />;
       break;
     case AnnotationType.note:
     case AnnotationType.ink:
@@ -23,7 +24,7 @@ const Content = ({ annotAtom }: AnnotProps) => {
   return <div className="annot-excerpt">{content}</div>;
 };
 
-const TextExcerpt = ({ annotAtom }: AnnotProps) => {
+const TextExcerpt = () => {
   const color = useSelector(annotAtom, getColor);
   const text = useSelector(annotAtom, ({ text }) => text);
   return (
@@ -32,8 +33,8 @@ const TextExcerpt = ({ annotAtom }: AnnotProps) => {
     </blockquote>
   );
 };
-const PicExcerpt = ({ annotAtom }: AnnotProps) => {
-  const imgSrc = useImgSrc(annotAtom);
+const PicExcerpt = () => {
+  const imgSrc = useAtomValue(imgSrcAtom);
   const color = useSelector(annotAtom, getColor);
   const imgAlt = useSelector(
     annotAtom,

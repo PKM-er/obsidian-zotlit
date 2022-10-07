@@ -1,21 +1,15 @@
 import "./style.less";
 
-import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
-import { AnnotationPreview } from "./annot-preview";
-import type { AnnotProps } from "./atoms/annotation";
+import { AnnotListItem } from "./annot-preview";
 import {
   stateAtomFamily,
-  useIsSelected,
   annotsAtom,
   isCollapsedAtom,
 } from "./atoms/annotation";
 import { manualRefreshAtom } from "./atoms/refresh";
-import { weakAtomFamily } from "./atoms/utils";
 import { useIconRef } from "./icon";
-
-const annotAtomFamily = weakAtomFamily((annot: Annotation) => atom(annot));
 
 const filterAtom = atom("all");
 
@@ -44,7 +38,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
       {annots?.map((annot) => (
         <AnnotListItem
           selectable={selectable}
-          annot={annot}
+          data={annot}
           key={annot.itemID}
         />
       ))}
@@ -78,39 +72,6 @@ export const RefreshButton = () => {
       onClick={refresh}
       aria-label="Refresh Annotation List"
       aria-label-delay="50"
-    />
-  );
-};
-
-const AnnotListItem = ({
-  annot,
-  selectable,
-}: {
-  annot: Annotation;
-  selectable: boolean;
-}) => {
-  const annotAtom = annotAtomFamily(annot);
-  const { itemID } = useAtomValue(annotAtom);
-  return itemID !== null ? (
-    <div
-      key={itemID}
-      className={cls("annot-list-item")}
-      role="menuitem"
-      tabIndex={0}
-    >
-      {selectable && <SelectCheckbox annotAtom={annotAtom} />}
-      <AnnotationPreview annotAtom={annotAtom} />
-    </div>
-  ) : null;
-};
-
-const SelectCheckbox = ({ annotAtom }: AnnotProps) => {
-  const [selected, setSelected] = useIsSelected(annotAtom);
-  return (
-    <input
-      type="checkbox"
-      checked={selected}
-      onChange={() => setSelected((prev) => !prev)}
     />
   );
 };

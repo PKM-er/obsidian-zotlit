@@ -6,7 +6,7 @@ import type { Atom } from "jotai";
 import { useAtomValue, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
-import type { AnnotAtom } from "./annotation";
+import { annotAtom } from "../annot-preview/atom";
 import { zoteroDataDirAtom } from "./obsidian";
 
 export const useSelector = <Value, Slice>(
@@ -23,20 +23,10 @@ export const useSelector = <Value, Slice>(
 
 export const getColor = ({ color }: Annotation) => color ?? undefined;
 
-export const useImgSrc = (annotAtom: AnnotAtom) => {
-  const imgsrcAtom = useMemo(
-    () =>
-      atom(
-        (get) =>
-          `app://local${getCacheImagePath(
-            get(annotAtom),
-            get(zoteroDataDirAtom),
-          )}`,
-      ),
-    [annotAtom],
-  );
-  return useAtomValue(imgsrcAtom);
-};
+export const imgSrcAtom = atom(
+  (get) =>
+    `app://local${getCacheImagePath(get(annotAtom), get(zoteroDataDirAtom))}`,
+);
 
 export const getIcon = ({ type }: Annotation) => {
   switch (type) {

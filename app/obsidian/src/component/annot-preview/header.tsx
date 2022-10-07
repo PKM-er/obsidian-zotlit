@@ -5,17 +5,17 @@ import cls from "classnames";
 import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
 import { Menu } from "obsidian";
-import type { AnnotAtom, AnnotProps } from "../atoms/annotation";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
 import { pluginAtom } from "../atoms/obsidian";
 import { useIconRef } from "../icon";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
+import { annotAtom } from "./atom";
 
-const HeaderIcon = ({ annotAtom }: AnnotProps) => {
+const HeaderIcon = () => {
   const icon = useSelector(annotAtom, (annot) => getIcon(annot));
   const color = useSelector(annotAtom, getColor);
   const type = useSelector(annotAtom, ({ type }) => type);
-  const dragProps = useDrag(annotAtom);
+  const dragProps = useDrag();
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
     <div
@@ -28,7 +28,7 @@ const HeaderIcon = ({ annotAtom }: AnnotProps) => {
     />
   );
 };
-const Page = ({ annotAtom }: AnnotProps) => {
+const Page = () => {
   const page = useSelector(annotAtom, ({ pageLabel }) => pageLabel);
   const backlink = useSelector(annotAtom, getBacklink);
   const pageText = page ? `Page ${page}` : "";
@@ -46,7 +46,7 @@ const Page = ({ annotAtom }: AnnotProps) => {
     );
   else return <span className="annot-page">{pageText}</span>;
 };
-const useDrag = (annotAtom: AnnotAtom) => {
+const useDrag = () => {
   const annot = useAtomValue(annotAtom);
   const {
     settings: { literatureNoteTemplate },
@@ -63,7 +63,7 @@ const useDrag = (annotAtom: AnnotAtom) => {
   return { draggable: true, onDragStart };
 };
 
-const Header = ({ annotAtom }: AnnotProps) => {
+const Header = () => {
   const annot = useAtomValue(annotAtom);
   const openMenu = useMemoizedFn((evt: React.MouseEvent) => {
     moreOptionsMenuHandler(annot, evt);
@@ -71,17 +71,17 @@ const Header = ({ annotAtom }: AnnotProps) => {
   return (
     <div className="annot-header" onContextMenu={openMenu}>
       <div className="annot-action-container">
-        <HeaderIcon annotAtom={annotAtom} />
-        <AnnotDetailsToggle annotAtom={annotAtom} />
-        <MoreOptionsButton annotAtom={annotAtom} />
+        <HeaderIcon />
+        <AnnotDetailsToggle />
+        <MoreOptionsButton />
       </div>
       <div className="annot-header-space" />
-      <Page annotAtom={annotAtom} />
+      <Page />
     </div>
   );
 };
 
-const MoreOptionsButton = ({ annotAtom }: AnnotProps) => {
+const MoreOptionsButton = () => {
   const annot = useAtomValue(annotAtom);
   const openMenu = useMemoizedFn(
     (evt: React.MouseEvent | React.KeyboardEvent) => {
