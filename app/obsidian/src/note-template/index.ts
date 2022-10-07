@@ -38,11 +38,35 @@ export default class NoteTemplate {
   getAllTemplatePropNames(): (keyof TemplateItemTypeMap)[] {
     return Object.keys(this.templateInstances) as never;
   }
-  private compile(name: keyof NoteTemplateJSON, template: string) {
-    const tpl = Handlebars.compile(template, compileOptions);
-    this.templateInstances[name] = tpl as never;
-    if (name === "annotation" || name === "annots")
-      Handlebars.registerPartial(name, tpl);
+  private compile(target: keyof NoteTemplateJSON, template: string) {
+    const delegate = Handlebars.compile(template, compileOptions);
+    let renderer: (obj: never) => string;
+    if (target === "content") {
+      renderer = (obj: TemplateItemTypeMap[typeof target]) => {
+        const content = delegate(obj);
+        const frontmatterData = this.renderFrontmatter(
+          obj as TemplateItemTypeMap["content"],
+        );
+        if (frontmatterData)
+          return stringify(content, frontmatterData, grayMatterOptions);
+        else return content;
+      };
+    } else if (target === "annots") {
+      renderer = (obj: TemplateItemTypeMap[typeof target]) => {
+        const content = delegate({ annotations: obj });
+        return content;
+      };
+    } else if (target === "filename") {
+      renderer = (obj: TemplateItemTypeMap[typeof target]) => {
+        const filename = delegate({ annotations: obj });
+        return renderFilename(filename);
+      };
+    } else {
+      renderer = delegate;
+    }
+    this.templateInstances[target] = renderer as never;
+    if (target === "annotation" || target === "annots")
+      Handlebars.registerPartial(target, delegate);
   }
   public complieAll(): void {
     for (const key of this.getAllTemplatePropNames()) {
@@ -61,21 +85,7 @@ export default class NoteTemplate {
     target: Target,
     obj: TemplateItemTypeMap[Target],
   ): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const renderWith = (obj: any) => this.templateInstances[target](obj);
-    if (target === "content") {
-      const content = renderWith(obj);
-      const frontmatterData = this.renderFrontmatter(
-        obj as TemplateItemTypeMap["content"],
-      );
-      if (frontmatterData)
-        return stringify(content, frontmatterData, grayMatterOptions);
-    } else if (target === "annots") {
-      return renderWith({ annotations: obj });
-    } else if (target === "filename") {
-      return renderFilename(renderWith(obj));
-    }
-    return renderWith(obj);
+    return this.templateInstances[target](obj);
   }
 
   private renderFrontmatter<T extends GeneralItem>(target: T) {

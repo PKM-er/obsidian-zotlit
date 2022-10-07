@@ -4,7 +4,7 @@ import { toPage } from "@obzt/common";
 import type { Annotation, GeneralItem } from "@obzt/zotero-type";
 import { isAnnotationItem, getBacklink } from "@obzt/zotero-type";
 import filenamify from "filenamify";
-import type { HelperDeclareSpec, HelperOptions } from "handlebars";
+import type { HelperDeclareSpec } from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
 

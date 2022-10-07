@@ -1,6 +1,5 @@
 import type { Annotation, GeneralItem, ItemFields } from "@obzt/zotero-type";
 import endent from "endent";
-import type { TemplateDelegate } from "handlebars";
 
 // #region type defs
 
@@ -20,9 +19,7 @@ export type FieldsInFrontmatter = {
 };
 
 export type TemplateInstances = {
-  [key in keyof TemplateItemTypeMap]: TemplateDelegate<
-    TemplateItemTypeMap[key]
-  >;
+  [key in keyof TemplateItemTypeMap]: (obj: TemplateItemTypeMap[key]) => string;
 };
 export type NoteTemplateJSON = Record<keyof TemplateItemTypeMap, string>;
 // #endregion
