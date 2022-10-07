@@ -2,10 +2,10 @@ import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { useAtomValue } from "jotai";
 import { getColor, imgSrcAtom, useSelector } from "../atoms/derived.js";
-import { annotAtom } from "./atom.js";
+import { annotBaseAtom } from "./atom.js";
 
 const Content = () => {
-  const type = useSelector(annotAtom, ({ type }) => type);
+  const type = useSelector(annotBaseAtom, ({ type }) => type);
   let content;
   switch (type) {
     case AnnotationType.highlight:
@@ -25,8 +25,8 @@ const Content = () => {
 };
 
 const TextExcerpt = () => {
-  const color = useSelector(annotAtom, getColor);
-  const text = useSelector(annotAtom, ({ text }) => text);
+  const color = useSelector(annotBaseAtom, getColor);
+  const text = useSelector(annotBaseAtom, ({ text }) => text);
   return (
     <blockquote style={{ borderColor: color ?? undefined }}>
       <p>{text}</p>
@@ -35,9 +35,9 @@ const TextExcerpt = () => {
 };
 const PicExcerpt = () => {
   const imgSrc = useAtomValue(imgSrcAtom);
-  const color = useSelector(annotAtom, getColor);
+  const color = useSelector(annotBaseAtom, getColor);
   const imgAlt = useSelector(
-    annotAtom,
+    annotBaseAtom,
     ({ text, pageLabel }) => text ?? `Area Excerpt for Page ${pageLabel}`,
   );
   return (

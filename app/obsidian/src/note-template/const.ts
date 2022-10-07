@@ -1,7 +1,16 @@
-import type { Annotation, GeneralItem, ItemFields } from "@obzt/zotero-type";
+import type {
+  Annotation as _Annotation,
+  GeneralItem,
+  ItemFields,
+  ItemTag,
+} from "@obzt/zotero-type";
 import endent from "endent";
 
 // #region type defs
+
+type Annotation = _Annotation & {
+  tags: ItemTag[];
+};
 
 export type ItemWithAnnots<I extends GeneralItem = GeneralItem> = I & {
   annotations?: Annotation[];
@@ -47,6 +56,8 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
             [Zotero]({{backlink}})
 
             {{#if text}}> {{text}}{{/if}}
+
+            {{#each tags}}#{{name}} {{/each}}
             `,
   mdCite: `[@{{citekey}}]`,
   altMdCite: `@{{citekey}}`,

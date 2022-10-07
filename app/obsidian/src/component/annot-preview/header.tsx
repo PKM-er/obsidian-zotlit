@@ -9,12 +9,12 @@ import { getColor, getIcon, useSelector } from "../atoms/derived";
 import { pluginAtom } from "../atoms/obsidian";
 import { useIconRef } from "../icon";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
-import { annotAtom } from "./atom";
+import { annotAtom, annotBaseAtom } from "./atom";
 
 const HeaderIcon = () => {
-  const icon = useSelector(annotAtom, (annot) => getIcon(annot));
-  const color = useSelector(annotAtom, getColor);
-  const type = useSelector(annotAtom, ({ type }) => type);
+  const icon = useSelector(annotBaseAtom, (annot) => getIcon(annot));
+  const color = useSelector(annotBaseAtom, getColor);
+  const type = useSelector(annotBaseAtom, ({ type }) => type);
   const dragProps = useDrag();
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
@@ -29,8 +29,8 @@ const HeaderIcon = () => {
   );
 };
 const Page = () => {
-  const page = useSelector(annotAtom, ({ pageLabel }) => pageLabel);
-  const backlink = useSelector(annotAtom, getBacklink);
+  const page = useSelector(annotBaseAtom, ({ pageLabel }) => pageLabel);
+  const backlink = useSelector(annotBaseAtom, getBacklink);
   const pageText = page ? `Page ${page}` : "";
 
   if (backlink)
@@ -53,18 +53,26 @@ const useDrag = () => {
   } = useAtomValue(pluginAtom);
   const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
     (evt) => {
-      evt.dataTransfer.setData(
-        "text/plain",
-        literatureNoteTemplate.render("annotation", annot),
-      );
-      evt.dataTransfer.dropEffect = "copy";
+      if (annot.state === "hasData") {
+        evt.dataTransfer.setData(
+          "text/plain",
+          literatureNoteTemplate.render("annotation", annot.data),
+        );
+        evt.dataTransfer.dropEffect = "copy";
+      } else {
+        evt.dataTransfer.dropEffect = "none";
+      }
     },
   );
-  return { draggable: true, onDragStart };
+  if (annot.state === "hasData") {
+    return { draggable: true, onDragStart };
+  } else {
+    return { draggable: false, onDragStart };
+  }
 };
 
 const Header = () => {
-  const annot = useAtomValue(annotAtom);
+  const annot = useAtomValue(annotBaseAtom);
   const openMenu = useMemoizedFn((evt: React.MouseEvent) => {
     moreOptionsMenuHandler(annot, evt);
   });
@@ -82,7 +90,7 @@ const Header = () => {
 };
 
 const MoreOptionsButton = () => {
-  const annot = useAtomValue(annotAtom);
+  const annot = useAtomValue(annotBaseAtom);
   const openMenu = useMemoizedFn(
     (evt: React.MouseEvent | React.KeyboardEvent) => {
       moreOptionsMenuHandler(annot, evt);
