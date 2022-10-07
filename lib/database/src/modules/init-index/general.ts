@@ -53,8 +53,8 @@ export const itemSQL = async (knex: Knex, libId: number) => {
   return result as unknown as Return[];
 };
 
-export const itemFieldsSQL = (knex: Knex, libId: number) =>
-  knex
+export const itemFieldsSQL = async (knex: Knex, libId: number) => {
+  const result = await knex
     .select("itemID", "fieldName", "value")
     .from("items")
     .join("itemData", (j) => j.using("itemID"))
@@ -62,5 +62,10 @@ export const itemFieldsSQL = (knex: Knex, libId: number) =>
     .join("fieldsCombined", (j) => j.using("fieldID"))
     .join("itemTypesCombined", (j) => j.using("itemTypeID"))
     .where("libraryID", libId)
+    .whereNotNull("itemID")
     .whereNotIn("typeName", nonRegularItemTypes)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
+  type Item = typeof result[0];
+  type Return = Item & { itemID: number };
+  return result as unknown as Return[];
+};

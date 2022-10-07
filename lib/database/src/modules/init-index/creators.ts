@@ -20,8 +20,8 @@
 
 import type { Knex } from "@knex";
 
-const sql = (knex: Knex, libId: number) =>
-  knex
+const sql = async (knex: Knex, libId: number) => {
+  const result = await knex
     .select(
       "itemID",
       "firstName",
@@ -35,6 +35,12 @@ const sql = (knex: Knex, libId: number) =>
     .join("creators", (j) => j.using("creatorID"))
     .join("creatorTypes", (j) => j.using("creatorTypeID"))
     .where("libraryID", libId)
+    .whereNotNull("itemID")
     .orderBy("itemID", "orderIndex");
+
+  type Item = typeof result[0];
+  type Return = Item & { itemID: number };
+  return result as unknown as Return[];
+};
 
 export default sql;
