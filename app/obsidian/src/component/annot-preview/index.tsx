@@ -1,6 +1,7 @@
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { Provider, useAtomValue } from "jotai";
+import { Suspense } from "react";
 import { renderHTMLReact } from "../../utils";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
@@ -17,7 +18,9 @@ export const AnnotationPreview = () => {
       <Header />
       <Content />
       <Comment />
-      <Tags />
+      <Suspense fallback={null}>
+        <Tags />
+      </Suspense>
       <AnnotDetailsView />
     </div>
   );

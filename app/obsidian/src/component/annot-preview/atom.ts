@@ -1,4 +1,3 @@
-import { get } from "http";
 import type { Annotation } from "@obzt/zotero-type";
 import { TagType } from "@obzt/zotero-type";
 import { atom, useAtom, useAtomValue } from "jotai";

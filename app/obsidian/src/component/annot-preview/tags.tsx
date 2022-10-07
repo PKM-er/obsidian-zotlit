@@ -4,7 +4,7 @@ import { tagsAtom } from "./atom";
 
 export const Tags = () => {
   const tags = useAtomValue(tagsAtom);
-  return (
+  return tags.length >= 1 ? (
     <div className="annot-tags-container">
       {tags.map(({ tagID, name }) => (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid
@@ -17,5 +17,5 @@ export const Tags = () => {
         </a>
       ))}
     </div>
-  );
+  ) : null;
 };
