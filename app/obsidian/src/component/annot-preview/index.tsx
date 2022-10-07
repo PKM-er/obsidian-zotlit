@@ -6,7 +6,7 @@ import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
 import { createInitialValues } from "../atoms/utils";
 import { AnnotDetailsView } from "./annot-details";
-import { annotAtom, useIsSelected } from "./atom";
+import { annotBaseAtom, useIsSelected } from "./atom";
 import Content from "./content";
 import Header from "./header.jsx";
 import { Tags } from "./tags";
@@ -24,7 +24,7 @@ export const AnnotationPreview = () => {
 };
 
 const Comment = () => {
-  const comment = useSelector(annotAtom, ({ comment }) => comment);
+  const comment = useSelector(annotBaseAtom, ({ comment }) => comment);
   return comment ? (
     <div className="annot-comment">
       <p {...renderHTMLReact(comment)} />
@@ -40,7 +40,7 @@ export const AnnotListItem = ({
   selectable: boolean;
 }) => {
   const initial = createInitialValues();
-  initial.set(annotAtom, data);
+  initial.set(annotBaseAtom, data);
   initial.set(pluginAtom, useAtomValue(pluginAtom));
   return (
     <Provider initialValues={initial.get()}>
