@@ -24,7 +24,7 @@ export interface ZoteroSettings {
   mutoolPath: string | null;
 }
 
-export const getDefaultSettings = (): ZoteroSettings => {
+export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
   // set inside logger.ts
   // log.setDefaultLevel(DEFAULT_LOG_LEVEL);
   const defaultRoot = join(homedir(), "Zotero");
@@ -40,7 +40,7 @@ export const getDefaultSettings = (): ZoteroSettings => {
       return join(this.zoteroDataDir, "cache");
     },
     literatureNoteFolder: new InVaultPath(),
-    literatureNoteTemplate: new NoteTemplate(),
+    literatureNoteTemplate: new NoteTemplate(plugin),
     logLevel: DEFAULT_LOGLEVEL,
     citationLibrary: 1,
     citationEditorSuggester: true,
