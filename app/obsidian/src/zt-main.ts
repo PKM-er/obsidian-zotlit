@@ -13,7 +13,7 @@ import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
 import NoteParser from "./note-parser";
 import PDFCache from "./pdf-outline";
-import { ZoteroSettingTab } from "./setting-tab.js";
+import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
 import ZoteroDb from "./zotero-db/index.js";

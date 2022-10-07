@@ -7,7 +7,7 @@ import { useAtomValue, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 import { annotBaseAtom } from "../annot-preview/atom";
-import { zoteroDataDirAtom } from "./obsidian";
+import { pluginAtom } from "./obsidian";
 
 export const useSelector = <Value, Slice>(
   anAtom: Atom<Value>,
@@ -27,7 +27,7 @@ export const imgSrcAtom = atom(
   (get) =>
     `app://local${getCacheImagePath(
       get(annotBaseAtom),
-      get(zoteroDataDirAtom),
+      get(pluginAtom).settings.zoteroDataDir,
     )}`,
 );
 

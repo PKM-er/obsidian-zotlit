@@ -24,6 +24,7 @@ const methods: DbWorkerAPI = {
   getItem,
   refreshDb,
   isUpToDate: () => databases.main.isUpToDate(),
+  checkDbStatus: (name) => databases[name].opened,
   /**
    * raw query on zotero database
    */

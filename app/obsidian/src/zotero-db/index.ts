@@ -12,7 +12,6 @@ import prettyHrtime from "pretty-hrtime";
 import log from "@log";
 
 import type ZoteroPlugin from "../zt-main.js";
-import NoticeBBTStatus from "./notice-bbt.js";
 
 export default class ZoteroDb extends Events {
   // itemMap: Record<string, RegularItem> = {};
@@ -95,25 +94,28 @@ export default class ZoteroDb extends Events {
         await this.#refreshDbConn();
       }
       this.watcher.main = watch(this.mainDbPath, this.#autoRefresh);
-      if (this.bbtDbPath) {
+      if (await this.checkDbStatus("bbt")) {
         this.watcher.bbt = watch(this.bbtDbPath, this.#autoRefresh);
       }
     }
   }
 
+  async checkDbStatus(name: "main" | "bbt"): Promise<boolean> {
+    const proxy = await this.#proxy;
+    return await proxy.checkDbStatus(name);
+  }
   /** calling this will reload database worker */
   async init() {
     const start = process.hrtime();
     const [mainOpened, bbtOpened] = await this.openDbConn();
-    if (this.bbtDbPath && !bbtOpened) {
-      log.warn("Better BibTex database not found");
-      new NoticeBBTStatus(this.#plugin);
-      return;
+    if (!bbtOpened) {
+      log.info("Failed to open Better BibTeX database, skipping...");
+      // return;
     }
     if (mainOpened) {
       await this.initIndex(true);
     } else {
-      log.error("Failed to init ZoteroDB");
+      throw new Error("Failed to init ZoteroDB");
     }
 
     new Notice("ZoteroDB Initialization complete.");

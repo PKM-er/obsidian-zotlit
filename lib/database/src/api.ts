@@ -20,10 +20,11 @@ export interface DbWorkerAPI {
   openDb(
     pluginDir: string,
     mainDbPath: string,
-    bbtDbPath: string | null,
+    bbtDbPath: string,
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
   isUpToDate(): Promise<boolean | null>;
   refreshDb(): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
+  checkDbStatus(name: "main" | "bbt"): boolean;
 
   /* start index for library, need to be called before query and after openDb */
   initIndex(libraryID: number): Promise<void>;

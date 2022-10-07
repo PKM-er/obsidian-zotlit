@@ -1,17 +1,19 @@
+import "./styles.less";
+
 import { constants } from "fs";
 import { access } from "fs/promises";
-import { dialog } from "@electron/remote";
 import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { DropdownComponent, TextAreaComponent } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
+import ReactDOM from "react-dom";
 import log from "@log";
 
-import type { SettingKeyWithType } from "./settings.js";
-import { getDefaultSettings } from "./settings.js";
-import { promptOpenLog } from "./utils/index.js";
-import type ZoteroPlugin from "./zt-main.js";
+import type { SettingKeyWithType } from "../settings.js";
+import { promptOpenLog } from "../utils/index.js";
+import type ZoteroPlugin from "../zt-main.js";
+import { DatabaseSetting } from "./database-path.js";
 
 type TextAreaSize = Partial<Record<"cols" | "rows", number>>;
 
@@ -31,8 +33,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
   general(): void {
     new Setting(this.containerEl).setHeading().setName("General");
 
-    this.setDatabasePath("Zotero Database", "zoteroDbPath");
-    this.setDatabasePath("BetterBibTex Database", "betterBibTexDbPath");
+    this.setDataDirPath();
     this.addToggle(this.containerEl, "autoRefresh", (val) =>
       this.plugin.db.setAutoRefresh(val),
     ).setName("Refresh automatically when Zotero updates database");
@@ -93,31 +94,11 @@ export class ZoteroSettingTab extends PluginSettingTab {
       { rows: 1 },
     ).setName("Literature Note Folder");
   }
-  setDatabasePath(name: string, key: "zoteroDbPath" | "betterBibTexDbPath") {
-    let pathEl: HTMLDivElement | null = null;
-    new Setting(this.containerEl)
-      .setName(name)
-      .then((setting) => {
-        pathEl = setting.controlEl.createDiv({
-          text: this.plugin.settings[key] ?? "Disabled",
-        });
-      })
-      .addButton((btn) =>
-        btn.setButtonText("select").onClick(async () => {
-          const { filePaths } = await dialog.showOpenDialog({
-            defaultPath: this.plugin.settings[key] ?? getDefaultSettings()[key],
-            filters: [{ name: "database", extensions: ["sqlite"] }],
-            properties: ["openFile"],
-          });
-          if (filePaths[0]) {
-            this.plugin.settings[key] = filePaths[0];
-            await this.plugin.saveSettings();
-            await this.plugin.db.init();
-            pathEl?.setText(filePaths[0]);
-            new Notice("Zotero database path updated.");
-          }
-        }),
-      );
+  setDataDirPath() {
+    ReactDOM.render(
+      <DatabaseSetting plugin={this.plugin} />,
+      new Setting(this.containerEl).settingEl,
+    );
   }
   setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;

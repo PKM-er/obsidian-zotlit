@@ -1,7 +1,6 @@
 import type { DbWorkerAPI } from "@api";
 import { databases } from "@init";
 import log from "@log";
-import Database from "./db/index.js";
 
 export const openDb: DbWorkerAPI["openDb"] = async (
   pluginDir,
@@ -11,40 +10,23 @@ export const openDb: DbWorkerAPI["openDb"] = async (
   log.debug("open database", pluginDir, mainDbPath, bbtDbPath);
   const mainOpened = databases.main.open(mainDbPath, pluginDir);
   let bbtOpened: Promise<boolean> | null = null;
-  if (bbtDbPath) {
-    databases.bbt = databases.bbt ?? new Database();
-    bbtOpened = databases.bbt.open(bbtDbPath, pluginDir);
-  }
-  const [main, bbt] = await Promise.allSettled([mainOpened, bbtOpened]);
+  bbtOpened = databases.bbt.open(bbtDbPath, pluginDir);
+  const [main, bbt] = await Promise.all([mainOpened, bbtOpened]);
 
-  return [logError("main", mainDbPath, main), logError("bbt", bbtDbPath, bbt)];
+  if (!main) {
+    log.error(
+      `Failed to open main database, no database found at ${mainDbPath}`,
+    );
+  }
+  if (!bbt) {
+    log.info(`Unable to open bbt database, no database found at ${mainDbPath}`);
+  }
+  return [main, bbt];
 };
 export const refreshDb: DbWorkerAPI["refreshDb"] = async () => {
   log.debug("refresh database");
   return await Promise.all([
     databases.main.refresh(),
-    databases.bbt?.refresh() ?? false,
+    databases.bbt.refresh() ?? false,
   ]);
-};
-/**
- * @returns true if opened successfully
- */
-const logError = (
-  name: "main" | "bbt",
-  path: string | null,
-  result: PromiseSettledResult<boolean | null> | undefined,
-): boolean => {
-  if (!result || !path) return false;
-  if (result.status === "fulfilled" && result.value === true) {
-    return true;
-  }
-  if (result.status === "rejected" || result.value === false) {
-    log.error(
-      `Failed to open ${name} database`,
-      result.status === "rejected"
-        ? result.reason
-        : "no database found at " + path,
-    );
-  }
-  return false;
 };

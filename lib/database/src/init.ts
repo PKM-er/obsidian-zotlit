@@ -2,7 +2,7 @@ import type { GeneralItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import Database from "./modules/db/index.js";
 
-export const databases: { main: Database; bbt: Database | null } = {
+export const databases = {
     main: new Database(),
     bbt: new Database(),
   },

@@ -10,8 +10,10 @@ import NoteTemplate from "./note-template/index.js";
 import type ZoteroPlugin from "./zt-main.js";
 
 export interface ZoteroSettings {
+  zoteroDataDir: string;
   zoteroDbPath: string;
-  betterBibTexDbPath: string | null;
+  betterBibTexDbPath: string;
+  zoteroCacheDirPath: string;
   literatureNoteFolder: InVaultPath;
   literatureNoteTemplate: NoteTemplate;
   logLevel: LogLevel;
@@ -22,16 +24,21 @@ export interface ZoteroSettings {
   mutoolPath: string | null;
 }
 
-export const getDefaultSettings = (): Omit<
-  ZoteroSettings,
-  "betterBibTexDbPath"
-> & { betterBibTexDbPath: string } => {
+export const getDefaultSettings = (): ZoteroSettings => {
   // set inside logger.ts
   // log.setDefaultLevel(DEFAULT_LOG_LEVEL);
   const defaultRoot = join(homedir(), "Zotero");
   return {
-    zoteroDbPath: join(defaultRoot, "zotero.sqlite"),
-    betterBibTexDbPath: join(defaultRoot, "better-bibtex-search.sqlite"),
+    zoteroDataDir: defaultRoot,
+    get zoteroDbPath(): string {
+      return join(this.zoteroDataDir, "zotero.sqlite");
+    },
+    get betterBibTexDbPath(): string {
+      return join(this.zoteroDataDir, "better-bibtex-search.sqlite");
+    },
+    get zoteroCacheDirPath(): string {
+      return join(this.zoteroDataDir, "cache");
+    },
     literatureNoteFolder: new InVaultPath(),
     literatureNoteTemplate: new NoteTemplate(),
     logLevel: DEFAULT_LOGLEVEL,
@@ -48,7 +55,9 @@ export type SettingKeyWithType<T> = {
 type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
 
 export async function loadSettings(this: ZoteroPlugin) {
-  const json = await this.loadData();
+  // ignore settings from previous version
+  const { zoteroDbPath, betterBibTexDbPath, zoteroCacheDirPath, ...json } =
+    (await this.loadData()) ?? {};
   const updateFromJSON = (...keys: RequireConvert[]) => {
     if (!json) return {};
     const obj = {} as any;
@@ -66,7 +75,9 @@ export async function loadSettings(this: ZoteroPlugin) {
 }
 
 export async function saveSettings(this: ZoteroPlugin) {
-  await this.saveData(this.settings);
+  const { betterBibTexDbPath, zoteroDbPath, zoteroCacheDirPath, ...settings } =
+    this.settings;
+  await this.saveData(settings);
 }
 
 export interface ClassInSettings<Out> {
