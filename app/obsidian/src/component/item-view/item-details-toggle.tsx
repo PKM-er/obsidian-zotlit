@@ -1,7 +1,6 @@
 import cls from "classnames";
 import { useAtom } from "jotai";
-import type { AnnotProps } from "../atoms/annotation";
-import { useShowDetails } from "../atoms/annotation";
+import { useShowDetails } from "../annot-preview/atom";
 import { useIconRef } from "../icon";
 import { showDocItemDetails } from ".";
 
@@ -32,8 +31,8 @@ export const DocItemDetailsToggle = () => {
   );
 };
 
-export const AnnotDetailsToggle = ({ annotAtom }: AnnotProps) => {
-  const [show, setShow] = useShowDetails(annotAtom);
+export const AnnotDetailsToggle = () => {
+  const [show, setShow] = useShowDetails();
   return (
     <ItemDetailsToggle
       className="annot-header-details-toggle"
