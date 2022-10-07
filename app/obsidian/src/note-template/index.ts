@@ -4,6 +4,7 @@ import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
+import type ZoteroPlugin from "../zt-main.js";
 import type {
   FieldsInFrontmatter,
   NoteTemplateJSON,
@@ -15,7 +16,7 @@ import {
   DEFAULT_TEMPLATE,
   ZOTERO_KEY_FIELDNAME,
 } from "./const.js";
-import { helpers, partial, renderFilename } from "./helper.js";
+import { getHelper, partial, renderFilename } from "./helper.js";
 
 const compileOptions: Parameters<typeof Handlebars.compile>[1] = {
     noEscape: true,
@@ -73,11 +74,11 @@ export default class NoteTemplate {
       this.compile(key, this[key]);
     }
   }
-  constructor() {
+  constructor(public plugin: ZoteroPlugin) {
     Object.assign(this, DEFAULT_TEMPLATE);
     this.frontmatter = { ...DEFAULT_FRONTMATTER_FIELD };
     Handlebars.registerPartial(partial as never);
-    Handlebars.registerHelper(helpers);
+    Handlebars.registerHelper(getHelper(plugin));
     this.complieAll();
   }
 

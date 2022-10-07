@@ -21,7 +21,7 @@ import ZoteroDb from "./zotero-db/index.js";
 checkLib();
 
 export default class ZoteroPlugin extends Plugin {
-  settings: ZoteroSettings = getDefaultSettings();
+  settings: ZoteroSettings = getDefaultSettings(this);
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
