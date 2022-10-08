@@ -3,10 +3,12 @@
 
 Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.
 
+[![Open In Obsidian](https://custom-icon-badges.demolab.com/badge/-Open%20In%20Obsidian-d4d4d4?style=for-the-badge&logo=obsidian-full)](https://obsidian.md/plugins?id=obsidian-zotero-plugin)
+
 ## Compatibility
 
 The required API feature is only available for:
-![minimal obsidian version](https://img.shields.io/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=v&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json)
+![minimal obsidian version](https://img.shields.io/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json)
 
 ## Installation
 
