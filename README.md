@@ -1,7 +1,7 @@
 
 # Obsidian Zotero Plugin
 
-[![GitHub stars](https://custom-icon-badges.demolab.com/github/stars/aidenlx/obsidian-zotero?logo=star)](https://github.com/aidenlx/obsidian-zotero/stargazers "GitHub stars") [![GitHub issues](https://custom-icon-badges.demolab.com/github/issues-raw/aidenlx/obsidian-zotero?logo=issue)](https://github.com/aidenlx/obsidian-zotero/issues "GitHub issues") [![repo license](https://custom-icon-badges.demolab.com/github/license/aidenlx/obsidian-zotero?logo=law&logoColor=white)](https://github.com/aidenlx/obsidian-zotero/blob/main/LICENSE "repo license") [![minimal obsidian version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://github.com/aidenlx/obsidian-zotero/tree/master/app/obsidian "open obsidian plugin page") [![supported zotero version](https://custom-icon-badges.demolab.com/badge/zotero-6-bc3a3c?logo=zotero-32)](https://github.com/aidenlx/obsidian-zotero/tree/master/app/zotero "open zotero plugin page")
+[![GitHub stars](https://custom-icon-badges.demolab.com/github/stars/aidenlx/obsidian-zotero?logo=star)](https://github.com/aidenlx/obsidian-zotero/stargazers "GitHub stars") [![GitHub issues](https://custom-icon-badges.demolab.com/github/issues-raw/aidenlx/obsidian-zotero?logo=issue)](https://github.com/aidenlx/obsidian-zotero/issues "GitHub issues") [![repo license](https://custom-icon-badges.demolab.com/github/license/aidenlx/obsidian-zotero?logo=law&logoColor=white)](https://github.com/aidenlx/obsidian-zotero/blob/main/LICENSE "repo license") [![current obsidian plugin version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian%20plugin&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://github.com/aidenlx/obsidian-zotero/tree/master/app/obsidian "open obsidian plugin page") [![current zotero plugin version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=bc3a3c&label=zotero%20plugin&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fpackage.json&logo=zotero-32)](https://github.com/aidenlx/obsidian-zotero/tree/master/app/zotero "open zotero plugin page")
 
 Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.
 
@@ -9,10 +9,10 @@ Obsidian.md plugin to integrate with Zotero, create literature notes and insert 
 
 ## Compatibility
 
-The required API feature for obsidian plugin is only available for:
+The required API feature for latest obsidian plugin is only available for:
 [![minimal obsidian version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://obsidian.md "minimanl obsidian version")
 
-The zotero plugin currently supports: 
+The latest zotero plugin currently supports: 
 [![supported zotero version](https://custom-icon-badges.demolab.com/badge/zotero-6-bc3a3c?logo=zotero-32)](https://github.com/aidenlx/obsidian-zotero/tree/master/app/zotero "supported zotero version")
 
 ## Installation
