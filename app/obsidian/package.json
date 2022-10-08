@@ -81,6 +81,7 @@
     "react-json-tree": "~0.17.0",
     "ahooks": "~3.7.1",
     "query-string": "~7.1.1",
-    "idb": "~7.1.0"
+    "idb": "~7.1.0",
+    "monkey-around": "^2.3.0"
   }
 }

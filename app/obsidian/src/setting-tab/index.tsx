@@ -5,6 +5,7 @@ import { access } from "fs/promises";
 import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
 import { assertNever } from "assert-never";
+import { around } from "monkey-around";
 import type { DropdownComponent, TextAreaComponent } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
@@ -24,6 +25,16 @@ export class ZoteroSettingTab extends PluginSettingTab {
 
   display(): void {
     this.containerEl.empty();
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const tab = this;
+    const unloadPatch = around(this.containerEl, {
+      empty: (next) =>
+        function (this: HTMLElement) {
+          tab.unmountDataDirSetting?.();
+          next.call(this);
+          unloadPatch();
+        },
+    });
     this.general();
     this.annotView();
     this.suggester();
@@ -94,11 +105,12 @@ export class ZoteroSettingTab extends PluginSettingTab {
       { rows: 1 },
     ).setName("Literature Note Folder");
   }
+
+  unmountDataDirSetting?: () => void;
   setDataDirPath() {
-    ReactDOM.render(
-      <DatabaseSetting plugin={this.plugin} />,
-      new Setting(this.containerEl).settingEl,
-    );
+    const el = new Setting(this.containerEl).settingEl;
+    ReactDOM.render(<DatabaseSetting plugin={this.plugin} />, el);
+    this.unmountDataDirSetting = () => ReactDOM.unmountComponentAtNode(el);
   }
   setCitationLibrary() {
     let dropdown: DropdownComponent | null = null;

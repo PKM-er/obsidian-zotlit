@@ -80,6 +80,7 @@
       "obsidian/note-index",
       "obsidian/suggester",
       "obsidian/template",
+      "obsidian/setting-tab",
       "zotero",
       "lib/database",
       "lib/note-parser",
