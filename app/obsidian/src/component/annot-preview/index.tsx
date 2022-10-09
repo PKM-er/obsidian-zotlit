@@ -1,7 +1,7 @@
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { Provider, useAtomValue } from "jotai";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { renderHTMLReact } from "../../utils";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
@@ -13,10 +13,11 @@ import Header from "./header.jsx";
 import { Tags } from "./tags";
 
 export const AnnotationPreview = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
   return (
     <div className="annot-preview">
-      <Header />
-      <Content />
+      <Header dragRef={contentRef} />
+      <Content ref={contentRef} />
       <Comment />
       <Suspense fallback={null}>
         <Tags />

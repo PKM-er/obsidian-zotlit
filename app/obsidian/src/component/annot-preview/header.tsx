@@ -5,17 +5,22 @@ import cls from "classnames";
 import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
 import { Menu } from "obsidian";
+import type { RefObject } from "react";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
 import { pluginAtom } from "../atoms/obsidian";
 import { useIconRef } from "../icon";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
 import { annotAtom, annotBaseAtom } from "./atom";
 
-const HeaderIcon = () => {
+const HeaderIcon = ({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLDivElement>;
+}) => {
   const icon = useSelector(annotBaseAtom, (annot) => getIcon(annot));
   const color = useSelector(annotBaseAtom, getColor);
   const type = useSelector(annotBaseAtom, ({ type }) => type);
-  const dragProps = useDrag();
+  const dragProps = useDrag(containerRef);
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
     <div
@@ -46,7 +51,7 @@ const Page = () => {
     );
   else return <span className="annot-page">{pageText}</span>;
 };
-const useDrag = () => {
+const useDrag = (containerRef: RefObject<HTMLDivElement>) => {
   const annot = useAtomValue(annotAtom);
   const {
     settings: { literatureNoteTemplate },
@@ -58,6 +63,9 @@ const useDrag = () => {
           "text/plain",
           literatureNoteTemplate.render("annotation", annot.data),
         );
+        if (containerRef.current) {
+          evt.dataTransfer.setDragImage(containerRef.current, 0, 0);
+        }
         evt.dataTransfer.dropEffect = "copy";
       } else {
         evt.dataTransfer.dropEffect = "none";
@@ -71,7 +79,11 @@ const useDrag = () => {
   }
 };
 
-const Header = () => {
+const Header = ({
+  dragRef: containerRef,
+}: {
+  dragRef: RefObject<HTMLDivElement>;
+}) => {
   const annot = useAtomValue(annotBaseAtom);
   const openMenu = useMemoizedFn((evt: React.MouseEvent) => {
     moreOptionsMenuHandler(annot, evt);
@@ -79,7 +91,7 @@ const Header = () => {
   return (
     <div className="annot-header" onContextMenu={openMenu}>
       <div className="annot-action-container">
-        <HeaderIcon />
+        <HeaderIcon containerRef={containerRef} />
         <AnnotDetailsToggle />
         <MoreOptionsButton />
       </div>
