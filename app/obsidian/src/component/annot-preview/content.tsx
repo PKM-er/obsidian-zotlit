@@ -1,10 +1,14 @@
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { useAtomValue } from "jotai";
+import { forwardRef } from "react";
 import { getColor, imgSrcAtom, useSelector } from "../atoms/derived.js";
 import { annotBaseAtom } from "./atom.js";
 
-const Content = () => {
+const Content = forwardRef<HTMLDivElement, unknown>(function Content(
+  _props,
+  ref,
+) {
   const type = useSelector(annotBaseAtom, ({ type }) => type);
   let content;
   switch (type) {
@@ -21,8 +25,12 @@ const Content = () => {
     default:
       assertNever(type);
   }
-  return <div className="annot-excerpt">{content}</div>;
-};
+  return (
+    <div className="annot-excerpt" ref={ref}>
+      {content}
+    </div>
+  );
+});
 
 const TextExcerpt = () => {
   const color = useSelector(annotBaseAtom, getColor);
