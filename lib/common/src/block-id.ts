@@ -95,8 +95,11 @@ export const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
   multipleAnnotKeyPagePattern = getRegExp()`(?:${annotKeyPageBase(false)}n?)+`;
 
 /** convert pagelabel to page interger */
-export const toPage = (pageLabel: string | null): number | null => {
-  if (!pageLabel) return null;
+export const toPage = (pageLabel: string | null | number): number | null => {
+  if (pageLabel === null) return null;
+  if (typeof pageLabel === "number") {
+    return Number.isInteger(pageLabel) ? pageLabel : null;
+  }
   const page = parseInt(pageLabel, 10);
   if (Number.isInteger(page)) {
     return page;

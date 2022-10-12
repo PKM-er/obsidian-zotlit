@@ -266,6 +266,7 @@ importers:
       '@aidenlx/better-sqlite3': '>=7.6.2-mod <7.6.2-mod0'
       '@aidenlx/eslint-config': 2.0.5
       '@aidenlx/knex': '>=2.3.0-mod <2.3.0-mod0'
+      '@log4js-node/log4js-api': ~1.0.2
       '@obzt/common': workspace:*
       '@rmp135/sql-ts': ~1.15.0
       '@types/eslint': ~8.4.6
@@ -274,6 +275,7 @@ importers:
       eslint: ~8.24.0
       typescript: ^4.8.3
     dependencies:
+      '@log4js-node/log4js-api': 1.0.2
       '@obzt/common': link:../common
     devDependencies:
       '@aidenlx/better-sqlite3': 7.6.2-mod.2
@@ -1018,6 +1020,10 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
+
+  /@log4js-node/log4js-api/1.0.2:
+    resolution: {integrity: sha512-6SJfx949YEWooh/CUPpJ+F491y4BYJmknz4hUN1+RHvKoUEynKbRmhnwbk/VLmh4OthLLDNCyWXfbh4DG1cTXA==}
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}

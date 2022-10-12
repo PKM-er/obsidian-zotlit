@@ -20,6 +20,7 @@
     "@types/eslint": "~8.4.6"
   },
   "dependencies": {
-    "@obzt/common": "workspace:*"
+    "@obzt/common": "workspace:*",
+    "@log4js-node/log4js-api": "~1.0.2"
   }
 }
