@@ -2,7 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { toPage } from "@obzt/common";
 import { getCacheImagePath } from "@obzt/database";
-import type { Annotation, GeneralItem } from "@obzt/zotero-type";
+import type { Annotation } from "@obzt/zotero-type";
 import {
   AnnotationType,
   isAnnotationItem,
@@ -10,6 +10,7 @@ import {
 } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { HelperDeclareSpec } from "handlebars";
+import { htmlToMarkdown } from "obsidian";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
 import type ZoteroPlugin from "../zt-main.js";
@@ -20,8 +21,7 @@ const isImageAnnot = (item: unknown): item is Annotation =>
   isAnnotationItem(item) && item.type === AnnotationType.image;
 
 export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  backlink(this: GeneralItem | Annotation | any): string {
+  backlink(this: unknown): string {
     return getBacklink(this);
   },
   coalesce() {
@@ -33,8 +33,7 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
     }
     return null;
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blockID(this: Annotation | any): string {
+  blockID(this: unknown): string {
     if (isAnnotationItem(this)) {
       let id = getItemKeyGroupID(this);
       const page = toPage(this.position.pageIndex, true);
@@ -42,13 +41,16 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
       return id;
     } else return "";
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  imgPath(this: Annotation | any) {
+  commentMd(this: unknown) {
+    if (isAnnotationItem(this) && this.comment) {
+      return htmlToMarkdown(this.comment);
+    } else return "";
+  },
+  imgPath(this: unknown) {
     if (isImageAnnot(this)) {
       return getCacheImagePath(this, plugin.settings.zoteroDataDir);
     } else return "";
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   imgUrl(this: unknown) {
     if (isImageAnnot(this)) {
       const path = getCacheImagePath(this, plugin.settings.zoteroDataDir),
@@ -66,7 +68,6 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
       return `[Annotation ${this.key}](${fileUrlMarkdown})`;
     } else return "";
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   imgEmbed(this: unknown) {
     if (isImageAnnot(this)) {
       const path = getCacheImagePath(this, plugin.settings.zoteroDataDir),

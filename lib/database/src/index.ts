@@ -30,12 +30,10 @@ export const getCacheImagePath = (
 /**
  * compare sortIndex in format of '123|455|789'
  */
-export const sortBySortIndex = (a: string, b: string) => {
-  const aIdx = a.split("|"),
-    bIdx = b.split("|");
+export const sortBySortIndex = (aIdx: number[], bIdx: number[]) => {
   for (let i = 0; i < aIdx.length; i++) {
     if (aIdx[i] !== bIdx[i]) {
-      return parseInt(aIdx[i]) - parseInt(bIdx[i]);
+      return aIdx[i] - bIdx[i];
     }
   }
   return 0;

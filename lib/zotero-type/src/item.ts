@@ -1,6 +1,7 @@
 import { enumerate } from "@obzt/common";
+import type { ItemAnnotations } from "./db-types.js";
 import { CreatorFieldMode } from "./misc.js";
-import type { AnnotationType, TagType } from "./misc.js";
+import type { TagType, AnnotationPosition } from "./misc.js";
 import type { AnnotationItem } from "./non-regular.js";
 
 export type Item = {
@@ -69,19 +70,13 @@ export const requiredKeys = new Set(
   ),
 );
 
-export type Annotation = AnnotationItem & {
-  type: AnnotationType;
-  authorName: string | null;
-  text: string | null;
-  comment: string | null;
-  color: string | null;
-  pageLabel: string | null;
-  sortIndex: string;
-  position: string;
-  parentItemID: number;
-  /** key of parent item (commonly attachment) */
-  parentItem: string;
-};
+export type Annotation = AnnotationItem &
+  Omit<Required<ItemAnnotations>, "position" | "sortIndex"> & {
+    sortIndex: number[];
+    position: AnnotationPosition;
+    /** key of parent item (commonly attachment) */
+    parentItem: string;
+  };
 
 export interface ItemTag {
   itemID: number;
