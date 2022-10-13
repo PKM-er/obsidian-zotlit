@@ -1,4 +1,4 @@
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { GeneralItemBase } from "@obzt/zotero-type";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
@@ -59,7 +59,7 @@ export default class NoteTemplate {
       };
     } else if (target === "filename") {
       renderer = (obj: TemplateItemTypeMap[typeof target]) => {
-        const filename = delegate({ annotations: obj });
+        const filename = delegate(obj);
         return renderFilename(filename);
       };
     } else {
@@ -89,7 +89,7 @@ export default class NoteTemplate {
     return this.templateInstances[target](obj);
   }
 
-  private renderFrontmatter<T extends GeneralItem>(target: T) {
+  private renderFrontmatter<T extends GeneralItemBase>(target: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {};
     let notEmpty = false;

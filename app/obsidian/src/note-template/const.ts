@@ -1,6 +1,7 @@
+import type { AttachmentInfo } from "@obzt/database";
 import type {
-  Annotation as _Annotation,
-  GeneralItem,
+  Annotation,
+  GeneralItemBase,
   ItemFields,
   ItemTag,
 } from "@obzt/zotero-type";
@@ -8,23 +9,25 @@ import endent from "endent";
 
 // #region type defs
 
-type Annotation = _Annotation & {
+export type AnnotationWithTags = Annotation & {
   tags: ItemTag[];
 };
 
-export type ItemWithAnnots<I extends GeneralItem = GeneralItem> = I & {
-  annotations?: Annotation[];
+export type ItemWithAnnots<I extends GeneralItemBase = GeneralItemBase> = I & {
+  annotations: AnnotationWithTags[];
+  attachments: AttachmentInfo[];
+  selectedAtch: AttachmentInfo | null;
 };
 export interface TemplateItemTypeMap {
   content: ItemWithAnnots;
-  filename: GeneralItem;
-  annotation: Annotation;
-  annots: Annotation[];
-  mdCite: GeneralItem;
-  altMdCite: GeneralItem;
+  filename: GeneralItemBase;
+  annotation: AnnotationWithTags;
+  annots: AnnotationWithTags[];
+  mdCite: GeneralItemBase;
+  altMdCite: GeneralItemBase;
 }
 export type FieldsInFrontmatter = {
-  [K in ItemFields | keyof GeneralItem]?: true | string[];
+  [K in ItemFields | keyof GeneralItemBase]?: true | string[];
 };
 
 export type TemplateInstances = {

@@ -1,6 +1,5 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
-import type { Annotation, GeneralItem } from "@obzt/zotero-type";
 import { BaseError } from "make-error";
 import type { TFile } from "obsidian";
 
@@ -75,13 +74,4 @@ export const openNote = async (
 
   await workspace.openLinkText(linktext, "", false);
   return true;
-};
-
-export const openOrCreateNote = async (
-  plugin: ZoteroPlugin,
-  item: ItemWithAnnots,
-) => {
-  if (await openNote(plugin, item, true)) return;
-  const note = await createNote(plugin, item);
-  await plugin.app.workspace.openLinkText(note.path, "", false);
 };
