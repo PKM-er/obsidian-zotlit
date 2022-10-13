@@ -2,6 +2,7 @@ import type { GeneralItemBase } from "@obzt/zotero-type";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
+import type { TFile } from "obsidian";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
 import type ZoteroPlugin from "../zt-main.js";
@@ -85,8 +86,9 @@ export default class NoteTemplate {
   public render<Target extends keyof NoteTemplateJSON>(
     target: Target,
     obj: TemplateItemTypeMap[Target],
+    source: TFile | null = null,
   ): string {
-    return this.templateInstances[target](obj);
+    return this.templateInstances[target]({ ...obj, source });
   }
 
   private renderFrontmatter<T extends GeneralItemBase>(target: T) {

@@ -1,3 +1,4 @@
+import type { AttachmentInfo } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import { TagType } from "@obzt/zotero-type";
 import { atom, useAtom, useAtomValue } from "jotai";

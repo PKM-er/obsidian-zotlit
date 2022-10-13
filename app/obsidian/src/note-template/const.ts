@@ -6,11 +6,13 @@ import type {
   ItemTag,
 } from "@obzt/zotero-type";
 import endent from "endent";
+import type { TFile } from "obsidian";
 
 // #region type defs
 
 export type AnnotationWithTags = Annotation & {
   tags: ItemTag[];
+  attachment: AttachmentInfo;
 };
 
 export type ItemWithAnnots<I extends GeneralItemBase = GeneralItemBase> = I & {
@@ -18,6 +20,11 @@ export type ItemWithAnnots<I extends GeneralItemBase = GeneralItemBase> = I & {
   attachments: AttachmentInfo[];
   selectedAtch: AttachmentInfo | null;
 };
+
+export type WithFileContext<I> = I & {
+  source: TFile | null;
+};
+
 export interface TemplateItemTypeMap {
   content: ItemWithAnnots;
   filename: GeneralItemBase;
@@ -31,7 +38,9 @@ export type FieldsInFrontmatter = {
 };
 
 export type TemplateInstances = {
-  [key in keyof TemplateItemTypeMap]: (obj: TemplateItemTypeMap[key]) => string;
+  [key in keyof TemplateItemTypeMap]: (
+    obj: WithFileContext<TemplateItemTypeMap[key]>,
+  ) => string;
 };
 export type NoteTemplateJSON = Record<keyof TemplateItemTypeMap, string>;
 // #endregion
@@ -44,7 +53,7 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
   content: endent`
             # {{title}}
 
-            [Zotero]({{backlink}})
+            [Zotero]({{backlink}}) {{fileLink}}
 
             {{> annots}}
             `,
@@ -56,7 +65,7 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 
             ## Annotation ^{{blockID}}
 
-            [Zotero]({{backlink}})
+            [Zotero]({{backlink}}) {{fileLink}}
 
             {{#if text}}> {{text}}{{/if}}
             {{#if imgEmbed}}{{imgEmbed}}{{/if}}

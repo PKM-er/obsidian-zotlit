@@ -37,9 +37,17 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       selectedAtch = attachments[0] ?? null;
     }
 
-    const annotations: AnnotationWithTags[] = selectedAtch
-      ? await this.plugin.db.getAnnotsWithTags(selectedAtch.itemID)
-      : [];
+    let annotations: AnnotationWithTags[] = [];
+    if (selectedAtch) {
+      const attachment = selectedAtch;
+      annotations = (
+        await this.plugin.db.getAnnotsWithTags(selectedAtch.itemID)
+      ).map((a) => {
+        const atch = a as AnnotationWithTags;
+        atch.attachment = attachment;
+        return atch;
+      });
+    }
 
     const itemWithAnnots: ItemWithAnnots = {
       ...item,

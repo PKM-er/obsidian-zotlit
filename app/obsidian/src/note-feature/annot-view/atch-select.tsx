@@ -1,11 +1,15 @@
 import type { AttachmentInfo } from "@obzt/database";
 import { useAtomValue, useSetAtom } from "jotai";
-import { activeAtchIdAtom, attachmentsAtom } from "@component/atoms/attachment";
+import {
+  activeAtchAtom,
+  activeAtchIdAtom,
+  attachmentsAtom,
+} from "@component/atoms/attachment";
 
 type Attachment = Omit<AttachmentInfo, "itemID"> & { itemID: number };
 export const AttachmentSelect = () => {
   const attachments = useAtomValue(attachmentsAtom);
-  const setAtchId = useSetAtom(activeAtchIdAtom);
+  const setAtchId = useSetAtom(activeAtchAtom);
   const atchId = useAtomValue(activeAtchIdAtom);
 
   if (!attachments || (attachments && attachments.length === 1)) {
