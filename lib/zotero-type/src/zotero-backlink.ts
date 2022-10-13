@@ -4,6 +4,9 @@ import { nonRegularItemTypes } from "./item";
 import log from "./logger";
 import type { AnnotationPosition } from "./misc";
 
+export const parseAnnotPos = (item: Annotation) =>
+  JSON.parse(item.position) as AnnotationPosition;
+
 export const isGeneralItem = (item: unknown): item is GeneralItem =>
   !nonRegularItemTypes.includes((item as Item).itemType as never) &&
   typeof (item as Item).key === "string";
@@ -20,13 +23,14 @@ export const getBacklink = (item: GeneralItem | Annotation) => {
     url = new URL(`zotero://open-pdf/${library}/items/${item.parentItem}`);
     let page: number | null;
     try {
-      const position = JSON.parse(item.position) as AnnotationPosition;
-      page = toPage(position.pageIndex);
+      const position = parseAnnotPos(item);
+      page = toPage(position.pageIndex, true);
     } catch (error) {
       log.warn(error);
       page = null;
     }
-    if (page) url.searchParams.append("page", page.toString());
+    if (typeof page === "number")
+      url.searchParams.append("page", page.toString());
     if (item.key) url.searchParams.append("annotation", item.key);
   } else return "";
   return url.toString();
