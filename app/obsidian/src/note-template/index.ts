@@ -1,4 +1,5 @@
-import type { GeneralItemBase } from "@obzt/zotero-type";
+import type { Creator, GeneralItemBase } from "@obzt/zotero-type";
+import { getCreatorName } from "@obzt/zotero-type";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
@@ -101,7 +102,10 @@ export default class NoteTemplate {
       if (!(k in target) || config === undefined) continue;
       const value = target[k as keyof T];
       if (config === true) {
-        data[k] = value;
+        // use full name for creators in frontmatter
+        if (k === "creators") {
+          data[k] = (value as Creator[]).map((c) => getCreatorName(c));
+        } else data[k] = value;
       } else if (Array.isArray(config)) {
         // map value to an alias name
         new Set(config).forEach((alias) => (data[alias] = value));

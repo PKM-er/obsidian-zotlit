@@ -6,6 +6,7 @@ import type { AttachmentInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import {
+  getCreatorName,
   AnnotationType,
   isAnnotationItem,
   getBacklink,
@@ -138,6 +139,9 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
       );
       return embed.replace(/^!/, "");
     }
+  },
+  fullname(this: unknown) {
+    return getCreatorName(this);
   },
 });
 
