@@ -48,7 +48,10 @@ export interface DbWorkerAPI {
     libraryID: number,
   ): Promise<Annotation[]>;
   getAttachments(docId: number, libraryID: number): Promise<AttachmentInfo[]>;
-  getTags(itemIds: number[], libraryID: number): Promise<ItemTag[]>;
+  getTags(
+    itemIds: number[],
+    libraryID: number,
+  ): Promise<Record<number, ItemTag[]>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   raw<R>(sql: string, args: any[]): Promise<R>;
 }
