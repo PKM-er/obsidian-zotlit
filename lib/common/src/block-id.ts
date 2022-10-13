@@ -94,16 +94,21 @@ export const // itemKeyPattern = getRegExp()`^{itemKeyBase}`,
    */
   multipleAnnotKeyPagePattern = getRegExp()`(?:${annotKeyPageBase(false)}n?)+`;
 
-/** convert pagelabel to page interger */
-export const toPage = (pageLabel: string | null | number): number | null => {
-  if (pageLabel === null) return null;
-  if (typeof pageLabel === "number") {
-    return Number.isInteger(pageLabel) ? pageLabel : null;
-  }
-  const page = parseInt(pageLabel, 10);
-  if (Number.isInteger(page)) {
-    return page;
+/**
+ * @param isIndex set to true if given page is 0-based
+ * @returns page number (positive interger)
+ */
+export const toPage = (
+  page: string | null | number,
+  isIndex: boolean,
+): number | null => {
+  if (page === null) return null;
+  let pageNum: number;
+  if (typeof page === "number") {
+    pageNum = page;
   } else {
-    return null;
+    pageNum = parseInt(page, 10);
   }
+  if (!Number.isInteger(pageNum)) return null;
+  return isIndex ? pageNum + 1 : pageNum;
 };
