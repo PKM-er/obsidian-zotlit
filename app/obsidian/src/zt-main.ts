@@ -16,6 +16,7 @@ import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
+import { ImgCacheImporter } from "./zotero-db/img-import";
 import ZoteroDb from "./zotero-db/index.js";
 
 checkLib();
@@ -26,6 +27,7 @@ export default class ZoteroPlugin extends Plugin {
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
   noteParser = new NoteParser(this);
+  imgCacheImporter = new ImgCacheImporter(this);
   pdfCache = new PDFCache(this);
   get db() {
     if (!this.#db) throw new Error("access database before load");

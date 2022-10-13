@@ -50,6 +50,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     ).setName("Refresh automatically when Zotero updates database");
 
     this.setLiteratureNoteFolder();
+    this.setImgExcerptFolder();
     this.setCitationLibrary();
   }
   suggester(): void {
@@ -104,6 +105,34 @@ export class ZoteroSettingTab extends PluginSettingTab {
       setter,
       { rows: 1 },
     ).setName("Literature Note Folder");
+  }
+
+  setImgExcerptFolder() {
+    const setVisible = (enabled: boolean) => {
+      const el = text.settingEl;
+      if (enabled) {
+        el.style.removeProperty("display");
+      } else {
+        el.style.setProperty("display", "none");
+      }
+    };
+    this.addToggle(this.containerEl, "symlinkImgExcerpt", setVisible).setName(
+      "Symlink Image Excerpt",
+    );
+    const setter = async (value: string, text: TextAreaComponent) => {
+      const { imgExcerptPath } = this.plugin.settings;
+      imgExcerptPath.path = value;
+      // correct with normalized path
+      if (imgExcerptPath.path !== value) text.setValue(imgExcerptPath.path);
+      await this.plugin.saveSettings();
+    };
+    const text = this.addTextComfirm(
+      this.containerEl,
+      () => this.plugin.settings.imgExcerptPath.path,
+      setter,
+      { rows: 1 },
+    ).setName("Image Excerpts Folder");
+    setVisible(this.plugin.settings.symlinkImgExcerpt);
   }
 
   unmountDataDirSetting?: () => void;

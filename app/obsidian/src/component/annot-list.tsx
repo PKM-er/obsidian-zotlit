@@ -36,15 +36,29 @@ const filteredAtom = atom((get) => {
 
 const useDragHandler = (): DragHandler => {
   const activeAtch = useAtomValue(activeAtchAtom);
-  const { literatureNoteTemplate } = useAtomValue(pluginAtom).settings;
+  const {
+    settings: { literatureNoteTemplate },
+    imgCacheImporter,
+  } = useAtomValue(pluginAtom);
   return useMemoizedFn((evt, annot) => {
     if (!activeAtch) return;
-    evt.dataTransfer.setData(
-      "text/plain",
-      literatureNoteTemplate.render("annotation", {
-        ...annot,
-        attachment: activeAtch,
-      }),
+    const data = literatureNoteTemplate.render("annotation", {
+      ...annot,
+      attachment: activeAtch,
+    });
+    evt.dataTransfer.setData("text/plain", data);
+    const evtRef = app.workspace.on("editor-drop", (evt) => {
+      if (evt.dataTransfer?.getData("text/plain") === data) {
+        imgCacheImporter.flush();
+      }
+      app.workspace.offref(evtRef);
+    });
+    window.addEventListener(
+      "dragend",
+      () => {
+        imgCacheImporter.cancel();
+      },
+      { once: true },
     );
   });
 };

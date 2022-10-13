@@ -22,6 +22,8 @@ export interface ZoteroSettings {
   showCitekeyInSuggester: boolean;
   autoRefresh: boolean;
   mutoolPath: string | null;
+  symlinkImgExcerpt: boolean;
+  imgExcerptPath: InVaultPath;
 }
 
 export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
@@ -47,6 +49,8 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     showCitekeyInSuggester: false,
     autoRefresh: true,
     mutoolPath: null,
+    symlinkImgExcerpt: false,
+    imgExcerptPath: new InVaultPath("img-excerpt"),
   };
 };
 export type SettingKeyWithType<T> = {
@@ -69,7 +73,11 @@ export async function loadSettings(this: ZoteroPlugin) {
   Object.assign(
     this.settings,
     json,
-    updateFromJSON("literatureNoteFolder", "literatureNoteTemplate"),
+    updateFromJSON(
+      "literatureNoteFolder",
+      "imgExcerptPath",
+      "literatureNoteTemplate",
+    ),
   );
   log.level = this.settings.logLevel;
 }
