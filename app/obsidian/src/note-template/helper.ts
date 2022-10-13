@@ -4,7 +4,6 @@ import { toPage } from "@obzt/common";
 import { getCacheImagePath } from "@obzt/database";
 import type { Annotation, GeneralItem } from "@obzt/zotero-type";
 import {
-  parseAnnotPos,
   AnnotationType,
   isAnnotationItem,
   getBacklink,
@@ -38,8 +37,7 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
   blockID(this: Annotation | any): string {
     if (isAnnotationItem(this)) {
       let id = getItemKeyGroupID(this);
-      const position = parseAnnotPos(this);
-      const page = toPage(position.pageIndex, true);
+      const page = toPage(this.position.pageIndex, true);
       if (typeof page === "number") id += `p${page}`;
       return id;
     } else return "";
