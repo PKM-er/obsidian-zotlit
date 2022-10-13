@@ -80,15 +80,18 @@ export const ItemDetails = ({
     />
   );
 };
+
 const shouldExpandNode = (
   keyPath: (string | number)[],
   data: unknown,
   level: number,
 ) => {
+  if (keyPath[0] === "sortIndex") return false;
   if (
     level < 1 ||
     (keyPath[1] === "creators" && level < 2) ||
-    (level < 2 && Array.isArray(data) && data.length > 1)
+    (level < 2 && Array.isArray(data) && data.length > 1) ||
+    keyPath[0] === "position"
   )
     return true;
   return false;
@@ -141,6 +144,10 @@ const getItemString = (
     } else if (isCreatorNameOnly(creator)) {
       return <span>{creator.lastName}</span>;
     }
+  }
+  if (keyPath[0] === "sortIndex" && keyPath.length === 2) {
+    const sortIndex = data as number[];
+    return <span>[{sortIndex.join(", ")}]</span>;
   }
   if (keyPath.length === 2 && Array.isArray(data) && data.length === 1) {
     return (
