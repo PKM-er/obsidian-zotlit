@@ -16,6 +16,7 @@ const queryAnnotations = (knex: Knex, attachmentId: number, libId: number) =>
       "pageLabel",
       "sortIndex",
       "position",
+      "isExternal",
     )
     .from("itemAnnotations")
     .join("items", (j) => j.using("itemID"))

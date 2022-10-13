@@ -25,12 +25,15 @@ const getAnnotations: DbWorkerAPI["getAnnotations"] = async (
   log.debug(
     `Finished reading Zotero database for annotations of attachment ${attachmentId}, count: ${annots.length}`,
   );
-  return annots.map((annot) => ({
+  console.log(annots.map((a) => a.sortIndex));
+  return annots.map(({ sortIndex, position, ...annot }) => ({
     ...annot,
     itemID: annot.itemID as number,
     itemType: "annotation",
     parentItemID: attachmentId,
     parentItem: attachmentKey,
+    sortIndex: sortIndex?.split("|").map((s) => parseInt(s, 10)) ?? [],
+    position: JSON.parse(position),
   }));
 };
 export default getAnnotations;

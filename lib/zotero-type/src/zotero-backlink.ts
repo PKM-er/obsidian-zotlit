@@ -2,10 +2,6 @@ import { toPage } from "@obzt/common";
 import type { Annotation, GeneralItem, Item } from "./item";
 import { nonRegularItemTypes } from "./item";
 import log from "./logger";
-import type { AnnotationPosition } from "./misc";
-
-export const parseAnnotPos = (item: Annotation) =>
-  JSON.parse(item.position) as AnnotationPosition;
 
 export const isGeneralItem = (item: unknown): item is GeneralItem =>
   !nonRegularItemTypes.includes((item as Item).itemType as never) &&
@@ -13,18 +9,20 @@ export const isGeneralItem = (item: unknown): item is GeneralItem =>
 export const isAnnotationItem = (item: unknown): item is Annotation =>
   (item as Item).itemType === "annotation" && !!(item as Annotation).parentItem;
 
-export const getBacklink = (item: GeneralItem | Annotation) => {
+const toLibraryID = (item: { groupID: number | null }) =>
+  typeof item.groupID === "number" ? `groups/${item.groupID}` : "library";
+
+export const getBacklink = (item: unknown) => {
   let url: URL;
-  const library =
-    typeof item.groupID === "number" ? `groups/${item.groupID}` : "library";
   if (isGeneralItem(item)) {
-    url = new URL(`zotero://select/${library}/items/${item.key}`);
+    url = new URL(`zotero://select/${toLibraryID(item)}/items/${item.key}`);
   } else if (isAnnotationItem(item)) {
-    url = new URL(`zotero://open-pdf/${library}/items/${item.parentItem}`);
+    url = new URL(
+      `zotero://open-pdf/${toLibraryID(item)}/items/${item.parentItem}`,
+    );
     let page: number | null;
     try {
-      const position = parseAnnotPos(item);
-      page = toPage(position.pageIndex, true);
+      page = toPage(item.position.pageIndex, true);
     } catch (error) {
       log.warn(error);
       page = null;
