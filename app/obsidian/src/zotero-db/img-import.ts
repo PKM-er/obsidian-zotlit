@@ -13,7 +13,9 @@ export class ImgCacheImporter {
   constructor(private readonly plugin: ZoteroPlugin) {}
 
   get imgExcerptPath() {
-    return this.plugin.settings.imgExcerptPath;
+    return this.plugin.settings.symlinkImgExcerpt
+      ? this.plugin.settings.imgExcerptPath.path
+      : null;
   }
 
   private queue = new Map<string, () => Promise<boolean>>();
