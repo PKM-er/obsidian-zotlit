@@ -35,16 +35,28 @@ export type CreatorNameOnly = {
   fieldMode: CreatorFieldMode.nameOnly;
 };
 
-export const isCreatorFullName = (
-  creator: Creator,
-): creator is CreatorFullName =>
-  creator.fieldMode === CreatorFieldMode.fullName &&
-  creator.firstName != null &&
-  creator.lastName != null;
-export const isCreatorNameOnly = (
-  creator: Creator,
-): creator is CreatorNameOnly =>
-  creator.fieldMode === CreatorFieldMode.nameOnly && creator.lastName !== null;
+export const getCreatorName = (creator: unknown): string | null => {
+  if (isCreatorFullName(creator)) {
+    return [creator.firstName, creator.lastName].join(" ");
+  } else if (isCreatorNameOnly(creator)) {
+    return creator.lastName;
+  } else return null;
+};
+
+export const isCreatorFullName = (item: unknown): item is CreatorFullName => {
+  const creator = item as Creator;
+  return (
+    creator.fieldMode === CreatorFieldMode.fullName &&
+    creator.firstName !== null &&
+    creator.lastName !== null
+  );
+};
+export const isCreatorNameOnly = (item: unknown): item is CreatorNameOnly => {
+  const creator = item as Creator;
+  return (
+    creator.fieldMode === CreatorFieldMode.nameOnly && creator.lastName !== null
+  );
+};
 
 export type ItemCitekey = {
   itemID: number;

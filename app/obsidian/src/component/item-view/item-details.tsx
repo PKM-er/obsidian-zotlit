@@ -1,9 +1,5 @@
-import {
-  requiredKeys,
-  isCreatorNameOnly,
-  isCreatorFullName,
-} from "@obzt/zotero-type";
-import type { Creator, GeneralItem, Annotation } from "@obzt/zotero-type";
+import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
+import type { GeneralItem, Annotation } from "@obzt/zotero-type";
 import { atom, useAtom } from "jotai";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect } from "react";
@@ -134,15 +130,9 @@ const getItemString = (
     );
   }
   if (keyPath[1] === "creators" && keyPath.length === 3) {
-    const creator = data as Creator;
-    if (isCreatorFullName(creator)) {
-      return (
-        <span>
-          {creator.firstName} {creator.lastName}
-        </span>
-      );
-    } else if (isCreatorNameOnly(creator)) {
-      return <span>{creator.lastName}</span>;
+    const name = getCreatorName(data);
+    if (name) {
+      return <span>{name}</span>;
     }
   }
   if (keyPath[0] === "sortIndex" && keyPath.length === 2) {

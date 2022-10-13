@@ -79,4 +79,5 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 export const DEFAULT_FRONTMATTER_FIELD: FieldsInFrontmatter = {
   title: true,
   citekey: true,
+  creators: true,
 };
