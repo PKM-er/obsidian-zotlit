@@ -22,6 +22,7 @@ export interface ZoteroSettings {
   showCitekeyInSuggester: boolean;
   autoRefresh: boolean;
   mutoolPath: string | null;
+  imgExcerptPath: string | null;
 }
 
 export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
@@ -47,6 +48,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     showCitekeyInSuggester: false,
     autoRefresh: true,
     mutoolPath: null,
+    imgExcerptPath: null,
   };
 };
 export type SettingKeyWithType<T> = {

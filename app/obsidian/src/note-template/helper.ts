@@ -28,8 +28,7 @@ import type {
 const toFileUrl = (path: string) => `file://${path}`;
 const toMdLinkComponent = (path: string): string => {
   const fileUrl = toFileUrl(path);
-  const encoded = encodeURI(fileUrl);
-  return encoded === fileUrl ? fileUrl : `<${fileUrl}>`;
+  return encodeURI(fileUrl) === fileUrl ? fileUrl : `<${fileUrl}>`;
 };
 
 const isItemWithAnnots = (
@@ -93,16 +92,12 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
     } else return "";
   },
   imgLink(this: unknown) {
-    if (isImageAnnot(this)) {
-      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
-      return `[Annotation ${this.key}](${toMdLinkComponent(path)})`;
-    } else return "";
+    const link = imgLink(this, plugin);
+    return link;
   },
   imgEmbed(this: unknown) {
-    if (isImageAnnot(this)) {
-      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
-      return `![Annotation ${this.key}](${toMdLinkComponent(path)})`;
-    } else return "";
+    const link = imgLink(this, plugin);
+    return link ? `!${link}` : null;
   },
   fileLink(this: unknown) {
     let attachment: AttachmentInfo | null = null,
@@ -119,9 +114,11 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
     if (!attachment?.path) return null;
     const hash = page ? `#page=${page}` : undefined,
       vaultPath = (app.vault.adapter as FileSystemAdapter).getBasePath(),
-      filePath = attachment.path.replace(
-        /^storage:/,
-        join(plugin.settings.zoteroDataDir, "storage", attachment.key) + "/",
+      filePath = join(
+        plugin.settings.zoteroDataDir,
+        "storage",
+        attachment.key,
+        attachment.path.replace(/^storage:/, ""),
       ),
       relativePath = relative(vaultPath, filePath);
     if (relativePath.startsWith("..")) {
@@ -147,3 +144,27 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
 
 export const renderFilename = (name: string) =>
   filenamify(name, { replacement: "_" });
+
+export const linktextToLink = (
+  linktext: string,
+  useMd: boolean,
+  alt?: string,
+) => {
+  if (useMd) {
+    return `[${alt ?? ""}](${toMdLinkComponent(linktext)})`;
+  } else {
+    return `[[${linktext}${alt ? "|" + alt : ""}]]`;
+  }
+};
+
+const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
+  if (isImageAnnot(item)) {
+    const linktext = plugin.imgCacheImporter.import(item);
+    if (!linktext) {
+      const path = plugin.imgCacheImporter.getCachePath(item);
+      return `[Annotation ${item.key}](${toMdLinkComponent(path)})`;
+    } else {
+      return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
+    }
+  } else return null;
+};

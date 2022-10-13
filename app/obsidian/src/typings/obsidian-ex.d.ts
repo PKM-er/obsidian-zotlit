@@ -7,6 +7,10 @@ declare module "obsidian" {
       disablePlugin(id: string): Promise<void>;
     };
   }
+
+  interface Vault {
+    getConfig(key: string): any;
+  }
   interface FileManager {
     createNewMarkdownFileFromLinktext(
       linktext: string,
