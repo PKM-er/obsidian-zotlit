@@ -1,34 +1,46 @@
+import type { AttachmentInfo } from "@obzt/database";
 import type {
-  Annotation as _Annotation,
-  GeneralItem,
+  Annotation,
+  GeneralItemBase,
   ItemFields,
   ItemTag,
 } from "@obzt/zotero-type";
 import endent from "endent";
+import type { TFile } from "obsidian";
 
 // #region type defs
 
-type Annotation = _Annotation & {
+export type AnnotationWithTags = Annotation & {
   tags: ItemTag[];
+  attachment: AttachmentInfo;
 };
 
-export type ItemWithAnnots<I extends GeneralItem = GeneralItem> = I & {
-  annotations?: Annotation[];
+export type ItemWithAnnots<I extends GeneralItemBase = GeneralItemBase> = I & {
+  annotations: AnnotationWithTags[];
+  attachments: AttachmentInfo[];
+  selectedAtch: AttachmentInfo | null;
 };
+
+export type WithFileContext<I> = I & {
+  source: TFile | null;
+};
+
 export interface TemplateItemTypeMap {
   content: ItemWithAnnots;
-  filename: GeneralItem;
-  annotation: Annotation;
-  annots: Annotation[];
-  mdCite: GeneralItem;
-  altMdCite: GeneralItem;
+  filename: GeneralItemBase;
+  annotation: AnnotationWithTags;
+  annots: AnnotationWithTags[];
+  mdCite: GeneralItemBase;
+  altMdCite: GeneralItemBase;
 }
 export type FieldsInFrontmatter = {
-  [K in ItemFields | keyof GeneralItem]?: true | string[];
+  [K in ItemFields | keyof GeneralItemBase]?: true | string[];
 };
 
 export type TemplateInstances = {
-  [key in keyof TemplateItemTypeMap]: (obj: TemplateItemTypeMap[key]) => string;
+  [key in keyof TemplateItemTypeMap]: (
+    obj: WithFileContext<TemplateItemTypeMap[key]>,
+  ) => string;
 };
 export type NoteTemplateJSON = Record<keyof TemplateItemTypeMap, string>;
 // #endregion
@@ -41,7 +53,7 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
   content: endent`
             # {{title}}
 
-            [Zotero]({{backlink}})
+            [Zotero]({{backlink}}) {{fileLink}}
 
             {{> annots}}
             `,
@@ -53,7 +65,7 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 
             ## Annotation ^{{blockID}}
 
-            [Zotero]({{backlink}})
+            [Zotero]({{backlink}}) {{fileLink}}
 
             {{#if text}}> {{text}}{{/if}}
             {{#if imgEmbed}}{{imgEmbed}}{{/if}}

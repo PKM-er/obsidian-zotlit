@@ -1,7 +1,8 @@
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { GeneralItemBase } from "@obzt/zotero-type";
 import { assertNever } from "assert-never";
 import { stringify } from "gray-matter";
 import Handlebars from "handlebars";
+import type { TFile } from "obsidian";
 
 import { getItemKeyGroupID } from "../note-index/index.js";
 import type ZoteroPlugin from "../zt-main.js";
@@ -59,7 +60,7 @@ export default class NoteTemplate {
       };
     } else if (target === "filename") {
       renderer = (obj: TemplateItemTypeMap[typeof target]) => {
-        const filename = delegate({ annotations: obj });
+        const filename = delegate(obj);
         return renderFilename(filename);
       };
     } else {
@@ -85,11 +86,12 @@ export default class NoteTemplate {
   public render<Target extends keyof NoteTemplateJSON>(
     target: Target,
     obj: TemplateItemTypeMap[Target],
+    source: TFile | null = null,
   ): string {
-    return this.templateInstances[target](obj);
+    return this.templateInstances[target]({ ...obj, source });
   }
 
-  private renderFrontmatter<T extends GeneralItem>(target: T) {
+  private renderFrontmatter<T extends GeneralItemBase>(target: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {};
     let notEmpty = false;

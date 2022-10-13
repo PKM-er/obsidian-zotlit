@@ -1,13 +1,17 @@
 import "./style.less";
 
+import { useMemoizedFn } from "ahooks";
 import cls from "classnames";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
+import type { DragHandler } from "./annot-preview";
 import { AnnotListItem } from "./annot-preview";
 import {
   stateAtomFamily,
   annotsAtom,
   isCollapsedAtom,
 } from "./atoms/annotation";
+import { activeAtchAtom } from "./atoms/attachment";
+import { pluginAtom } from "./atoms/obsidian";
 import { manualRefreshAtom } from "./atoms/refresh";
 import { useIconRef } from "./icon";
 
@@ -30,9 +34,26 @@ const filteredAtom = atom((get) => {
   }
 });
 
+const useDragHandler = (): DragHandler => {
+  const activeAtch = useAtomValue(activeAtchAtom);
+  const { literatureNoteTemplate } = useAtomValue(pluginAtom).settings;
+  return useMemoizedFn((evt, annot) => {
+    if (!activeAtch) return;
+    evt.dataTransfer.setData(
+      "text/plain",
+      literatureNoteTemplate.render("annotation", {
+        ...annot,
+        attachment: activeAtch,
+      }),
+    );
+  });
+};
+
 const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   const annots = useAtomValue(filteredAtom);
   const isCollapsed = useAtomValue(isCollapsedAtom);
+
+  const onDrag = useDragHandler();
   return (
     <div className={cls("annot-list", { "is-collapsed": isCollapsed })}>
       {annots?.map((annot) => (
@@ -40,6 +61,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
           selectable={selectable}
           data={annot}
           key={annot.itemID}
+          onDrag={onDrag}
         />
       ))}
     </div>

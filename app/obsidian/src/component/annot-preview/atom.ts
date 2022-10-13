@@ -1,3 +1,4 @@
+import type { AttachmentInfo } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import { TagType } from "@obzt/zotero-type";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -26,11 +27,11 @@ export const useIsSelected = () => {
   return useAtom(useAtomValue(myAtom));
 };
 
-export const tagsAtom = atom(async (get) =>
-  (await get(pluginAtom).db.getTags([get(annotBaseAtom).itemID])).filter(
-    (t) => t.type === TagType.manual,
-  ),
-);
+export const tagsAtom = atom(async (get) => {
+  const { itemID } = get(annotBaseAtom);
+  const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+  return tags.filter((t) => t.type === TagType.manual);
+});
 
 export const annotAtom = loadable(
   atom((get) => ({

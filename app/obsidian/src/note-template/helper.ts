@@ -1,6 +1,8 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
+import { join, relative } from "path";
 import { toPage } from "@obzt/common";
+import type { AttachmentInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import {
@@ -10,10 +12,42 @@ import {
 } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { HelperDeclareSpec } from "handlebars";
+import type { FileSystemAdapter } from "obsidian";
 import { htmlToMarkdown } from "obsidian";
 
+import log from "../logger.js";
 import { getItemKeyGroupID } from "../note-index/index.js";
 import type ZoteroPlugin from "../zt-main.js";
+import type {
+  AnnotationWithTags,
+  ItemWithAnnots,
+  WithFileContext,
+} from "./const.js";
+
+const toFileUrl = (path: string) => `file://${path}`;
+const toMdLinkComponent = (path: string): string => {
+  const fileUrl = toFileUrl(path);
+  const encoded = encodeURI(fileUrl);
+  return encoded === fileUrl ? fileUrl : `<${fileUrl}>`;
+};
+
+const isItemWithAnnots = (
+  item: unknown,
+): item is WithFileContext<ItemWithAnnots> => {
+  const ia = item as WithFileContext<ItemWithAnnots>;
+  return (
+    Array.isArray(ia.annotations) &&
+    Array.isArray(ia.attachments) &&
+    "source" in ia
+  );
+};
+
+const isAnnotWithTags = (
+  item: unknown,
+): item is WithFileContext<AnnotationWithTags> => {
+  const at = item as WithFileContext<AnnotationWithTags>;
+  return isAnnotationItem(at) && Array.isArray(at.tags) && "source" in at;
+};
 
 export const partial = {} as const;
 
@@ -53,29 +87,57 @@ export const getHelper = (plugin: ZoteroPlugin): HelperDeclareSpec => ({
   },
   imgUrl(this: unknown) {
     if (isImageAnnot(this)) {
-      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir),
-        fileUrl = `file://${path}`,
-        fileUrlEncoded = encodeURI(fileUrl);
-      return fileUrlEncoded;
+      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
+      return toFileUrl(path);
     } else return "";
   },
   imgLink(this: unknown) {
     if (isImageAnnot(this)) {
-      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir),
-        fileUrl = `file://${path}`,
-        fileUrlEncoded = encodeURI(fileUrl),
-        fileUrlMarkdown = fileUrl === fileUrlEncoded ? fileUrl : `<${fileUrl}>`;
-      return `[Annotation ${this.key}](${fileUrlMarkdown})`;
+      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
+      return `[Annotation ${this.key}](${toMdLinkComponent(path)})`;
     } else return "";
   },
   imgEmbed(this: unknown) {
     if (isImageAnnot(this)) {
-      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir),
-        fileUrl = `file://${path}`,
-        fileUrlEncoded = encodeURI(fileUrl),
-        fileUrlMarkdown = fileUrl === fileUrlEncoded ? fileUrl : `<${fileUrl}>`;
-      return `![Annotation ${this.key}](${fileUrlMarkdown})`;
+      const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
+      return `![Annotation ${this.key}](${toMdLinkComponent(path)})`;
     } else return "";
+  },
+  fileLink(this: unknown) {
+    let attachment: AttachmentInfo | null = null,
+      sourcePath = "",
+      page: number | null = null;
+    if (isItemWithAnnots(this) && this.selectedAtch?.path) {
+      attachment = this.selectedAtch;
+      sourcePath = this.source?.path ?? "";
+    } else if (isAnnotWithTags(this) && this.attachment) {
+      attachment = this.attachment;
+      sourcePath = this.source?.path ?? "";
+      page = toPage(this.position.pageIndex, true);
+    }
+    if (!attachment?.path) return null;
+    const hash = page ? `#page=${page}` : undefined,
+      vaultPath = (app.vault.adapter as FileSystemAdapter).getBasePath(),
+      filePath = attachment.path.replace(
+        /^storage:/,
+        join(plugin.settings.zoteroDataDir, "storage", attachment.key) + "/",
+      ),
+      relativePath = relative(vaultPath, filePath);
+    if (relativePath.startsWith("..")) {
+      return `[attachment](${toMdLinkComponent(filePath + (hash ?? ""))})`;
+    } else {
+      const file = app.metadataCache.getFirstLinkpathDest(relativePath, "");
+      if (!file) {
+        log.warn("fileLink: file not found", relativePath, filePath);
+        return null;
+      }
+      const embed = app.fileManager.generateMarkdownLink(
+        file,
+        sourcePath,
+        hash,
+      );
+      return embed.replace(/^!/, "");
+    }
   },
 });
 

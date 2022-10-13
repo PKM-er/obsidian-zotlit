@@ -1,3 +1,4 @@
+import type { ItemTag } from "@obzt/zotero-type";
 import type { DbWorkerAPI } from "@api";
 import { databases } from "@init";
 import log from "@log";
@@ -16,6 +17,9 @@ const getTags: DbWorkerAPI["getTags"] = async (itemIds, libId) => {
       ", ",
     )}, count: ${tags.length}`,
   );
-  return tags;
+  return tags.reduce(
+    (rec, tag) => (rec[tag.itemID].push(tag), rec),
+    Object.fromEntries(itemIds.map((id) => [id, [] as ItemTag[]] as const)),
+  );
 };
 export default getTags;

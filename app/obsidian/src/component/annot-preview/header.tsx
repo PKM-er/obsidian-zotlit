@@ -6,21 +6,24 @@ import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
 import { Menu } from "obsidian";
 import type { RefObject } from "react";
+import type { AnnotationWithTags } from "../../note-template/const";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
-import { pluginAtom } from "../atoms/obsidian";
 import { useIconRef } from "../icon";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
 import { annotAtom, annotBaseAtom } from "./atom";
+import type { DragHandler } from ".";
 
 const HeaderIcon = ({
   containerRef,
+  onDrag,
 }: {
   containerRef: RefObject<HTMLDivElement>;
+  onDrag: DragHandler;
 }) => {
   const icon = useSelector(annotBaseAtom, (annot) => getIcon(annot));
   const color = useSelector(annotBaseAtom, getColor);
   const type = useSelector(annotBaseAtom, ({ type }) => type);
-  const dragProps = useDrag(containerRef);
+  const dragProps = useDrag(containerRef, onDrag);
   const [iconRef] = useIconRef<HTMLDivElement>(icon);
   return (
     <div
@@ -51,18 +54,16 @@ const Page = () => {
     );
   else return <span className="annot-page">{pageText}</span>;
 };
-const useDrag = (containerRef: RefObject<HTMLDivElement>) => {
+const useDrag = (
+  containerRef: RefObject<HTMLDivElement>,
+  onDrag: DragHandler,
+) => {
   const annot = useAtomValue(annotAtom);
-  const {
-    settings: { literatureNoteTemplate },
-  } = useAtomValue(pluginAtom);
+
   const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
     (evt) => {
       if (annot.state === "hasData") {
-        evt.dataTransfer.setData(
-          "text/plain",
-          literatureNoteTemplate.render("annotation", annot.data),
-        );
+        onDrag(evt, annot.data);
         if (containerRef.current) {
           evt.dataTransfer.setDragImage(containerRef.current, 0, 0);
         }
@@ -81,8 +82,10 @@ const useDrag = (containerRef: RefObject<HTMLDivElement>) => {
 
 const Header = ({
   dragRef: containerRef,
+  onDrag,
 }: {
   dragRef: RefObject<HTMLDivElement>;
+  onDrag: DragHandler;
 }) => {
   const annot = useAtomValue(annotBaseAtom);
   const openMenu = useMemoizedFn((evt: React.MouseEvent) => {
@@ -91,7 +94,7 @@ const Header = ({
   return (
     <div className="annot-header" onContextMenu={openMenu}>
       <div className="annot-action-container">
-        <HeaderIcon containerRef={containerRef} />
+        <HeaderIcon containerRef={containerRef} onDrag={onDrag} />
         <AnnotDetailsToggle />
         <MoreOptionsButton />
       </div>

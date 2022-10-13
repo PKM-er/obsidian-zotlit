@@ -14,6 +14,10 @@ export const activeAtchIdAtomFamily = atomFamily(
 );
 
 export const activeAtchIdAtom = atom(
+  (get) => get(activeAtchAtom)?.itemID ?? null,
+);
+
+export const activeAtchAtom = atom(
   (get) => {
     const docItem = get(activeDocItemAtom);
     if (!docItem) return null;
@@ -21,12 +25,13 @@ export const activeAtchIdAtom = atom(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const attachments = get(attachmentsAtom)!;
     if (attachments.length === 0) return null;
+    let activeAtch;
     if (
       cachedAtchId !== null &&
-      attachments.find((a) => a.itemID === cachedAtchId)
+      (activeAtch = attachments.find((a) => a.itemID === cachedAtchId))
     )
-      return cachedAtchId;
-    else return attachments[0].itemID;
+      return activeAtch;
+    else return attachments[0];
   },
   async (get, set, evt: React.ChangeEvent<HTMLSelectElement>) => {
     const id = parseInt(evt.target.value, 10);

@@ -1,7 +1,12 @@
+import type { AttachmentInfo } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
 import { Provider, useAtomValue } from "jotai";
 import { Suspense, useRef } from "react";
+import type {
+  AnnotationWithTags,
+  WithFileContext,
+} from "../../note-template/const";
 import { renderHTMLReact } from "../../utils";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
@@ -12,11 +17,16 @@ import Content from "./content";
 import Header from "./header.jsx";
 import { Tags } from "./tags";
 
-export const AnnotationPreview = () => {
+export type DragHandler = (
+  e: React.DragEvent<HTMLDivElement>,
+  annot: Omit<AnnotationWithTags, "attachment">,
+) => void;
+
+export const AnnotationPreview = ({ onDrag }: { onDrag: DragHandler }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   return (
     <div className="annot-preview">
-      <Header dragRef={contentRef} />
+      <Header dragRef={contentRef} onDrag={onDrag} />
       <Content ref={contentRef} />
       <Comment />
       <Suspense fallback={null}>
@@ -39,8 +49,10 @@ const Comment = () => {
 export const AnnotListItem = ({
   data,
   selectable,
+  onDrag,
 }: {
   data: Annotation;
+  onDrag: DragHandler;
   selectable: boolean;
 }) => {
   const initial = createInitialValues();
@@ -55,7 +67,7 @@ export const AnnotListItem = ({
         tabIndex={0}
       >
         {selectable && <SelectCheckbox />}
-        <AnnotationPreview />
+        <AnnotationPreview onDrag={onDrag} />
       </div>
     </Provider>
   );
