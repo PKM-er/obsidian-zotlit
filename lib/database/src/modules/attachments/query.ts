@@ -1,7 +1,7 @@
 import type { Knex } from "@knex";
 
-const queryAttachments = (knex: Knex, itemId: number, libId: number) =>
-  knex
+const queryAttachments = async (knex: Knex, itemId: number, libId: number) => {
+  const result = await knex
     .select("itemAttachments.itemID" as "itemID", "path", "key")
     .count({ count: "itemAnnotations.itemID" })
     .from("itemAttachments")
@@ -11,10 +11,15 @@ const queryAttachments = (knex: Knex, itemId: number, libId: number) =>
     )
     .where("itemAttachments.parentItemID", itemId)
     .andWhere("libraryID", libId)
+    .whereNotNull("itemID")
     .whereNotIn(
       "itemAttachments.itemID",
       knex.select("itemID").from("deletedItems"),
     )
     .groupBy("itemAttachments.itemID");
+  type Item = typeof result[0];
+  type Return = Item & { itemID: number };
+  return result as unknown as Return[];
+};
 
 export default queryAttachments;

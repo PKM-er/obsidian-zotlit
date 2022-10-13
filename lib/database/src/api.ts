@@ -8,7 +8,7 @@ import type {
 import type Fuse from "fuse.js";
 
 export interface AttachmentInfo {
-  itemID: number | null;
+  itemID: number;
   key: string;
   path: string | null;
   count?: string | number;
