@@ -11,7 +11,7 @@ const queryAttachments = async (knex: Knex, itemId: number, libId: number) => {
     )
     .where("itemAttachments.parentItemID", itemId)
     .andWhere("libraryID", libId)
-    .whereNotNull("itemID")
+    .whereNotNull("itemAttachments.itemID")
     .whereNotIn(
       "itemAttachments.itemID",
       knex.select("itemID").from("deletedItems"),
