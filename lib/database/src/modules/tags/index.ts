@@ -17,10 +17,9 @@ const getTags: DbWorkerAPI["getTags"] = async (itemIds, libId) => {
       ", ",
     )}, count: ${tags.length}`,
   );
-  return tags.reduce((rec, tag) => {
-    rec[tag.itemID] = rec[tag.itemID] ?? [];
-    rec[tag.itemID].push(tag);
-    return rec;
-  }, {} as Record<number, ItemTag[]>);
+  return tags.reduce(
+    (rec, tag) => (rec[tag.itemID].push(tag), rec),
+    Object.fromEntries(itemIds.map((id) => [id, [] as ItemTag[]] as const)),
+  );
 };
 export default getTags;
