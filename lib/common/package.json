@@ -14,6 +14,7 @@
     "@types/eslint": "~8.4.6"
   },
   "dependencies": {
-    "log4js": "~6.6.1"
+    "log4js": "~6.6.1",
+    "monkey-around": "^2.3.0"
   }
 }
