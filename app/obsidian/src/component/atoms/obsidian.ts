@@ -26,6 +26,7 @@ export const activeFileAtom = atom(
       return;
     }
     set(_activeFileAtom, activeFile);
+    // trigger full refresh for new file
     if (prevFile !== activeFile) {
       set(attachmentsAtom, RESET);
       set(annotsAtom, RESET);

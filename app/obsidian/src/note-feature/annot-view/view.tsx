@@ -1,15 +1,22 @@
-import { Provider } from "jotai";
-import type { WorkspaceLeaf } from "obsidian";
-import { ItemView } from "obsidian";
+import { atom, Provider } from "jotai";
+import { createNanoEvents } from "nanoevents";
+import type { TFile, WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
 import { pluginAtom } from "@component/atoms/obsidian";
 import { createInitialValues } from "@component/atoms/utils";
 import type ZoteroPlugin from "../../zt-main";
 import { AnnotView } from "./annot-view";
+import { DerivedFileView } from "./derived-file-view";
 
 export const annotViewType = "zotero-annotation-view";
 
-export class AnnotationView extends ItemView {
+interface Events {
+  "load-file": (file: TFile) => void;
+}
+
+export const annotViewAtom = atom<AnnotationView>(null as never);
+
+export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
   }
@@ -30,10 +37,28 @@ export class AnnotationView extends ItemView {
     return "highlighter";
   }
 
+  emitter = createNanoEvents<Events>();
+
+  on<E extends keyof Events>(event: E, callback: Events[E]) {
+    return this.emitter.on(event, callback);
+  }
+
+  update() {
+    this.emitter.emit("load-file", this.file);
+  }
+  canAcceptExtension(_extension: string): boolean {
+    // accept all extensions
+    // otherwise the leaf will be re-opened with linked file
+    // whenever the linked file changes
+    // (default syncstate behavior for grouped leaves)
+    return true;
+  }
+
   protected async onOpen() {
     await super.onOpen();
     const initVals = createInitialValues();
     initVals.set(pluginAtom, this.plugin);
+    initVals.set(annotViewAtom, this);
     ReactDOM.render(
       <Provider initialValues={initVals.get()}>
         <AnnotView />
