@@ -15,8 +15,9 @@ export interface AnnotInfo {
   annotKey: string;
   fallback: string;
   url: string;
-  alt: string | null;
-  altType: "text" | "code";
+  /** if type = none, alt = raw linktext */
+  alt: string;
+  altType: "text" | "code" | "none";
 }
 
 type ToWorkpoolType<API extends AnnotBlockWorkerAPI> = {

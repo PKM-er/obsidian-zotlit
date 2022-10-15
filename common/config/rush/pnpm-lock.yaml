@@ -11,6 +11,7 @@ importers:
       '@aidenlx/esbuild-plugin-obsidian': ^0.1.4
       '@aidenlx/eslint-config': 2.0.5
       '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
+      '@obzt/annot-block': workspace:*
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
       '@obzt/note-parser': workspace:*
@@ -63,6 +64,7 @@ importers:
       typescript: ^4.8.3
     dependencies:
       '@aidenlx/workerpool': 6.2.1-mod.13
+      '@obzt/annot-block': link:../../lib/annot-block
       '@obzt/common': link:../../lib/common
       '@obzt/database': link:../../lib/database
       '@obzt/note-parser': link:../../lib/note-parser

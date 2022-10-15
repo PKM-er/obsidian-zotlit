@@ -85,6 +85,7 @@
       "obsidian/note-index",
       "obsidian/suggester",
       "obsidian/template",
+      "obsidian/annot-block",
       "obsidian/setting-tab",
       "zotero",
       "lib/database",

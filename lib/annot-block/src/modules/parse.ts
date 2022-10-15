@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import type { Content, InlineCode, Link, Paragraph } from "mdast";
+import type { Content, Link, Paragraph } from "mdast";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { selectAll } from "unist-util-select";
@@ -48,33 +48,38 @@ const parse: AnnotBlockWorkerAPI["parse"] = (markdown) => {
   );
   const annots: AnnotInfo[] = links.map((link) => {
     const { url, children } = link;
-    let code;
+    const first = children[0],
+      last = children[children.length - 1];
     const base = {
       annotKey: new URL(url).searchParams.get("annotation")!,
       url,
       fallback: fallbacks.get(link) ?? "",
     };
-    if (children.length <= 0) {
+    if (children.length === 1 && first.type === "inlineCode" && first.value) {
+      // if link text is one inline code
       return {
         ...base,
-        alt: null,
-        altType: "text",
+        alt: first.value,
+        altType: "code",
       };
     } else if (
-      children.length === 1 &&
-      children[0].type === "inlineCode" &&
-      (code = children[0] as InlineCode).value
+      children.length > 0 &&
+      first.type === "text" &&
+      first.value.startsWith("%%") &&
+      last.type === "text" &&
+      last.value.endsWith("%%")
     ) {
+      // if link text is wrapped by %% (e.g. %%raw.title%%)
       return {
         ...base,
-        alt: code.value,
-        altType: "code",
+        alt: getChildrenText(markdown, children).slice(2, -2),
+        altType: "text",
       };
     } else {
       return {
         ...base,
         alt: getChildrenText(markdown, children),
-        altType: "text",
+        altType: "none",
       };
     }
   });
@@ -93,6 +98,7 @@ const filterRanges = (text: string, ranges: [number, number][]) => {
 };
 
 const getChildrenText = (text: string, children: Content[]) => {
+  if (children.length === 0) return "";
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const start = children[0].position!.start.offset!,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
