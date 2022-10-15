@@ -54,6 +54,11 @@ export interface DbWorkerAPI {
   ): Promise<Record<number, ItemTag[]>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   raw<R>(sql: string, args: any[]): Promise<R>;
+
+  getAnnotFromKey(
+    keys: string[],
+    libraryID: number,
+  ): Promise<Record<string, Annotation>>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {

@@ -17,6 +17,10 @@
       "path": "lib/note-parser"
     },
     {
+      "name": "annot-block",
+      "path": "lib/annot-block"
+    },
+    {
       "name": "esbuild-inline-worker",
       "path": "lib/esbuild-inline-worker"
     },
@@ -66,6 +70,7 @@
       "./lib/common",
       "./lib/database",
       "./lib/note-parser",
+      "./lib/annot-block",
       "./lib/esbuild-inline-worker",
       "./lib/zotero-type"
     ],
@@ -80,10 +85,12 @@
       "obsidian/note-index",
       "obsidian/suggester",
       "obsidian/template",
+      "obsidian/annot-block",
       "obsidian/setting-tab",
       "zotero",
       "lib/database",
       "lib/note-parser",
+      "lib/annot-block",
       "lib/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type"

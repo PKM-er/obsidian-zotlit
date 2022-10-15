@@ -1,8 +1,12 @@
 import type { Knex } from "@knex";
 import type { Libraries } from "../../db-types";
 
-const queryAnnotations = (knex: Knex, attachmentId: number, libId: number) =>
-  knex
+const queryAnnotations = async (
+  knex: Knex,
+  attachmentId: number,
+  libId: number,
+) => {
+  const result = await knex
     .select(
       "itemID",
       "key",
@@ -26,5 +30,9 @@ const queryAnnotations = (knex: Knex, attachmentId: number, libId: number) =>
     .whereNotNull("itemID")
     .andWhere("libraryID", libId)
     .whereNotIn("itemID", knex.select("itemID").from("deletedItems"));
+  type Item = typeof result[0];
+  type Return = Item & { itemID: number };
+  return result as unknown as Return[];
+};
 
 export default queryAnnotations;

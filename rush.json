@@ -383,6 +383,10 @@
       "projectFolder": "lib/note-parser"
     },
     {
+      "packageName": "@obzt/annot-block",
+      "projectFolder": "lib/annot-block"
+    },
+    {
       "packageName": "@obzt/esbuild-plugin-inline-worker",
       "projectFolder": "lib/esbuild-inline-worker"
     },

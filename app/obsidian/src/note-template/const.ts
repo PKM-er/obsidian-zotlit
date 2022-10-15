@@ -67,7 +67,9 @@ export const DEFAULT_TEMPLATE: Record<keyof TemplateItemTypeMap, string> = {
 
             [Zotero]({{backlink}}) {{fileLink}}
 
-            {{#if text}}> {{text}}{{/if}}
+            {{#if text}}\`\`\`zotero-annot
+            > {{text}} [zotero]({{backlink}})
+            \`\`\`{{/if}}
             {{imgEmbed}}
             {{#if comment}}comment: {{commentMd}}{{/if}}
             {{#each tags}}#{{name}} {{/each}}

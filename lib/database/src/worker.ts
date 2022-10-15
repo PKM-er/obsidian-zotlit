@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { worker } from "@aidenlx/workerpool";
-import { around } from "monkey-around";
+import { logError } from "@obzt/common";
 import type { DbWorkerAPI } from "./api.js";
 import { databases } from "./init.js";
 import logger from "./logger.js";
-import getAnnotations from "./modules/annotation/index.js";
+import { getAnnotations, getAnnotFromKey } from "./modules/annotation/index.js";
 import getAttachments from "./modules/attachments/index.js";
 import getItem from "./modules/get-item.js";
 import getLibs from "./modules/get-libs/index.js";
@@ -21,6 +21,7 @@ const methods: DbWorkerAPI = {
   getTags,
   getAttachments,
   getAnnotations,
+  getAnnotFromKey,
   getItem,
   refreshDb,
   isUpToDate: () => databases.main.isUpToDate(),
@@ -40,24 +41,6 @@ const methods: DbWorkerAPI = {
   setLoglevel: (level) => {
     logger.level = level;
   },
-};
-
-const logError = (methods: DbWorkerAPI) => {
-  const logger =
-    (next: any) =>
-    async (...args: any[]) => {
-      try {
-        return await next(...args);
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    };
-  around(
-    methods,
-    Object.fromEntries(Object.keys(methods).map((name) => [name, logger])),
-  );
-  return methods as never;
 };
 
 worker(logError(methods));

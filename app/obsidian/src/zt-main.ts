@@ -3,6 +3,7 @@ import "./main.less";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
+import { AnnotBlockWorker } from "./annot-block";
 import { activeAtchIdAtomFamily } from "./component/atoms/attachment";
 import {
   CitationEditorSuggest,
@@ -29,6 +30,7 @@ export default class ZoteroPlugin extends Plugin {
   noteParser = new NoteParser(this);
   imgCacheImporter = new ImgCacheImporter(this);
   pdfCache = new PDFCache(this);
+  annotBlockWorker = new AnnotBlockWorker(this);
   get db() {
     if (!this.#db) throw new Error("access database before load");
     return this.#db;

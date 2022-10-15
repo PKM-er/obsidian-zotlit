@@ -27,7 +27,6 @@
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
     "esbuild": "^0.14.21",
-    "assert-never": "^1.2.1",
-    "monkey-around": "^2.3.0"
+    "assert-never": "^1.2.1"
   }
 }
