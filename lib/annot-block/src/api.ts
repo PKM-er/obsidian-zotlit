@@ -1,5 +1,22 @@
 export interface AnnotBlockWorkerAPI {
-  parse(markdown: string): void;
+  parse(markdown: string): BlockInfo;
+  stringify(spec: AnnotDetails[]): string;
+}
+
+export interface AnnotDetails extends AnnotInfo {
+  text: string;
+}
+
+export interface BlockInfo {
+  annots: AnnotInfo[];
+  withoutLinks: string;
+}
+export interface AnnotInfo {
+  annotKey: string;
+  fallback: string;
+  url: string;
+  alt: string | null;
+  altType: "text" | "code";
 }
 
 type ToWorkpoolType<API extends AnnotBlockWorkerAPI> = {

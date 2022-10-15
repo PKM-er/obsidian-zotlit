@@ -15,11 +15,16 @@
     "cross-env": "^7.0.3",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
     "esbuild": "^0.14.21",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@types/mdast": "~3.0.10"
   },
   "dependencies": {
     "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
     "assert-never": "^1.2.1",
-    "@obzt/common": "workspace:*"
+    "@obzt/common": "workspace:*",
+    "remark-parse": "~10.0.1",
+    "unified": "~10.1.2",
+    "unist-util-select": "~4.0.1",
+    "mdast-builder": "~1.1.1"
   }
 }
