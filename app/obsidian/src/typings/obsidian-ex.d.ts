@@ -8,6 +8,13 @@ declare module "obsidian" {
     };
   }
 
+  interface WorkspaceLeaf {
+    group: string | null;
+  }
+  interface Workspace {
+    getActiveFileView(): FileView | null;
+  }
+
   interface Vault {
     getConfig(key: string): any;
   }

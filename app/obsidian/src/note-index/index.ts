@@ -2,6 +2,7 @@ import type { ItemKeyGroup, KeyFileInfo } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
 import assertNever from "assert-never";
 import type {
+  BlockCache,
   CachedMetadata,
   MetadataCache,
   TAbstractFile,
@@ -54,6 +55,14 @@ export default class NoteIndex extends Events {
   getNoteFromItem(item: ItemKeyGroup): KeyFileInfo | undefined {
     log.debug("getNoteFromKey: ", item, getItemKeyGroupID(item, true));
     return this.keyFileMap.get(getItemKeyGroupID(item, true));
+  }
+  getBlockInfoFromItem(item: ItemKeyGroup): BlockCache | null {
+    const note = this.getNoteFromItem(item);
+    if (!note || !note.blockId) return null;
+    const cache = this.meta.getCache(note.file);
+    if (!cache) return null;
+    const block = cache?.blocks?.[note.blockId.toLowerCase()];
+    return block || null;
   }
 
   // buildFilemapWorker: PromiseWorker<Input, Output>;

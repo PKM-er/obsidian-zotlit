@@ -1,5 +1,4 @@
 import type { Atom } from "jotai";
-import { atom } from "jotai";
 
 type ShouldRemove<Param> = (createdAt: number, param: Param) => boolean;
 
