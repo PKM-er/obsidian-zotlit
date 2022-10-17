@@ -1,18 +1,14 @@
-import type { AttachmentInfo } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import cls from "classnames";
-import { Provider, useAtomValue } from "jotai";
-import { Suspense, useRef } from "react";
-import type {
-  AnnotationWithTags,
-  WithFileContext,
-} from "../../note-template/const";
+import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import type { AnnotationWithTags } from "../../note-template/const";
 import { renderHTMLReact } from "../../utils";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
-import { createInitialValues } from "../atoms/utils";
+import { createInitialValues, GLOBAL_SCOPE } from "../atoms/utils";
 import { AnnotDetailsView } from "./annot-details";
-import { annotBaseAtom, useIsSelected } from "./atom";
+import { annotAtomAtom, ANNOT_PREVIEW_SCOPE, useIsSelected } from "./atom";
 import Content from "./content";
 import Header from "./header.jsx";
 import { Tags } from "./tags";
@@ -22,11 +18,11 @@ export type DragHandler = (
   annot: Omit<AnnotationWithTags, "attachment">,
 ) => void;
 
-export const AnnotationPreview = ({ onDrag }: { onDrag: DragHandler }) => {
+export const AnnotationPreview = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   return (
     <div className="annot-preview">
-      <Header dragRef={contentRef} onDrag={onDrag} />
+      <Header dragRef={contentRef} />
       <Content ref={contentRef} />
       <Comment />
       <Suspense fallback={null}>
@@ -38,7 +34,7 @@ export const AnnotationPreview = ({ onDrag }: { onDrag: DragHandler }) => {
 };
 
 const Comment = () => {
-  const comment = useSelector(annotBaseAtom, ({ comment }) => comment);
+  const comment = useSelector(({ comment }) => comment);
   return comment ? (
     <div className="annot-comment">
       <p {...renderHTMLReact(comment)} />
@@ -49,17 +45,21 @@ const Comment = () => {
 export const AnnotListItem = ({
   data,
   selectable,
-  onDrag,
 }: {
   data: Annotation;
-  onDrag: DragHandler;
   selectable: boolean;
 }) => {
+  // create local atom that will update when props.data changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const myAtom = useMemo(() => atom(data), []);
+  const updateAtom = useSetAtom(myAtom);
+  useEffect(() => updateAtom(data), [data, updateAtom]);
+
   const initial = createInitialValues();
-  initial.set(annotBaseAtom, data);
-  initial.set(pluginAtom, useAtomValue(pluginAtom));
+  initial.set(annotAtomAtom, myAtom);
+  initial.set(pluginAtom, useAtomValue(pluginAtom, GLOBAL_SCOPE));
   return (
-    <Provider initialValues={initial.get()}>
+    <Provider initialValues={initial.get()} scope={ANNOT_PREVIEW_SCOPE}>
       <div
         key={data.itemID}
         className={cls("annot-list-item")}
@@ -67,7 +67,7 @@ export const AnnotListItem = ({
         tabIndex={0}
       >
         {selectable && <SelectCheckbox />}
-        <AnnotationPreview onDrag={onDrag} />
+        <AnnotationPreview />
       </div>
     </Provider>
   );

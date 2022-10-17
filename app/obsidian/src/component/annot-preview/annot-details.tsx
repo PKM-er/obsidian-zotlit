@@ -1,12 +1,10 @@
 import cls from "classnames";
-import { useAtomValue } from "jotai";
 import { ItemDetails } from "../item-view/item-details";
-import { annotBaseAtom, useShowDetails } from "./atom";
+import { useAnnotValue, useShowDetails } from "./atom";
 
 export const AnnotDetailsView = () => {
-  const annot = useAtomValue(annotBaseAtom);
+  const annot = useAnnotValue();
   const [showingDetails] = useShowDetails();
-
   return (
     <div
       className={cls("annot-details", {

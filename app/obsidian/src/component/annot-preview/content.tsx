@@ -3,13 +3,13 @@ import assertNever from "assert-never";
 import { useAtomValue } from "jotai";
 import { forwardRef } from "react";
 import { getColor, imgSrcAtom, useSelector } from "../atoms/derived.js";
-import { annotBaseAtom } from "./atom.js";
+import { ANNOT_PREVIEW_SCOPE } from "./atom.js";
 
 const Content = forwardRef<HTMLDivElement, unknown>(function Content(
   _props,
   ref,
 ) {
-  const type = useSelector(annotBaseAtom, ({ type }) => type);
+  const type = useSelector(({ type }) => type);
   let content;
   switch (type) {
     case AnnotationType.highlight:
@@ -33,8 +33,8 @@ const Content = forwardRef<HTMLDivElement, unknown>(function Content(
 });
 
 const TextExcerpt = () => {
-  const color = useSelector(annotBaseAtom, getColor);
-  const text = useSelector(annotBaseAtom, ({ text }) => text);
+  const color = useSelector(getColor);
+  const text = useSelector(({ text }) => text);
   return (
     <blockquote style={{ borderColor: color ?? undefined }}>
       <p>{text}</p>
@@ -42,10 +42,9 @@ const TextExcerpt = () => {
   );
 };
 const PicExcerpt = () => {
-  const imgSrc = useAtomValue(imgSrcAtom);
-  const color = useSelector(annotBaseAtom, getColor);
+  const imgSrc = useAtomValue(imgSrcAtom, ANNOT_PREVIEW_SCOPE);
+  const color = useSelector(getColor);
   const imgAlt = useSelector(
-    annotBaseAtom,
     ({ text, pageLabel }) => text ?? `Area Excerpt for Page ${pageLabel}`,
   );
   return (

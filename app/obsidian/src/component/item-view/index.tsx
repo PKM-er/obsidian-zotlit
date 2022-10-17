@@ -3,6 +3,7 @@ import cls from "classnames";
 import { atom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import { activeDocItemAtom } from "../atoms/obsidian";
+import { GLOBAL_SCOPE } from "../atoms/utils";
 import { ItemDetails } from "./item-details";
 
 export const docItemAtom = loadable(activeDocItemAtom);
@@ -10,8 +11,8 @@ export const docItemAtom = loadable(activeDocItemAtom);
 export const showDocItemDetails = atom(false);
 
 export const DocDetailsView = () => {
-  const activeDocItem = useAtomValue(docItemAtom);
-  const showingDetails = useAtomValue(showDocItemDetails);
+  const activeDocItem = useAtomValue(docItemAtom, GLOBAL_SCOPE);
+  const showingDetails = useAtomValue(showDocItemDetails, GLOBAL_SCOPE);
 
   let details;
   if (activeDocItem.state === "hasData") {

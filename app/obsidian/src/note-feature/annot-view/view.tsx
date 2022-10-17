@@ -3,7 +3,7 @@ import { createNanoEvents } from "nanoevents";
 import type { TFile, WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
 import { pluginAtom } from "@component/atoms/obsidian";
-import { createInitialValues } from "@component/atoms/utils";
+import { createInitialValues, GLOBAL_SCOPE } from "@component/atoms/utils";
 import type ZoteroPlugin from "../../zt-main";
 import { AnnotView } from "./annot-view";
 import { DerivedFileView } from "./derived-file-view";
@@ -60,7 +60,7 @@ export class AnnotationView extends DerivedFileView {
     initVals.set(pluginAtom, this.plugin);
     initVals.set(annotViewAtom, this);
     ReactDOM.render(
-      <Provider initialValues={initVals.get()}>
+      <Provider initialValues={initVals.get()} scope={GLOBAL_SCOPE}>
         <AnnotView />
       </Provider>,
       this.contentEl,

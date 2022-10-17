@@ -2,8 +2,9 @@ import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
 import type { GeneralItem, Annotation } from "@obzt/zotero-type";
 import { atom, useAtom } from "jotai";
 import { Menu, Notice } from "obsidian";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { JSONTree } from "react-json-tree";
+import { GLOBAL_SCOPE } from "../atoms/utils";
 import { useIconRef } from "../icon";
 
 const queryDarkMode = () => document.body.hasClass("theme-dark");
@@ -57,7 +58,7 @@ export const ItemDetails = ({
 }: {
   item: GeneralItem | Annotation | null;
 }) => {
-  const [isDarkMode, setDarkMode] = useAtom(darkModeAtom);
+  const [isDarkMode, setDarkMode] = useState(false);
   useEffect(() => {
     const listener = () => setDarkMode(queryDarkMode());
     app.workspace.on("css-change", listener);

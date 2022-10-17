@@ -5,12 +5,13 @@ import {
   activeAtchIdAtom,
   attachmentsAtom,
 } from "@component/atoms/attachment";
+import { GLOBAL_SCOPE } from "../../component/atoms/utils";
 
 type Attachment = Omit<AttachmentInfo, "itemID"> & { itemID: number };
 export const AttachmentSelect = () => {
-  const attachments = useAtomValue(attachmentsAtom);
-  const setAtchId = useSetAtom(activeAtchAtom);
-  const atchId = useAtomValue(activeAtchIdAtom);
+  const attachments = useAtomValue(attachmentsAtom, GLOBAL_SCOPE);
+  const setAtchId = useSetAtom(activeAtchAtom, GLOBAL_SCOPE);
+  const atchId = useAtomValue(activeAtchIdAtom, GLOBAL_SCOPE);
 
   if (!attachments || (attachments && attachments.length === 1)) {
     return null;
