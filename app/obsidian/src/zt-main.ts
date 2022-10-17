@@ -12,8 +12,8 @@ import {
 import checkLib from "./install-guide.js";
 import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
-import NoteParser from "./note-parser";
-import PDFCache from "./pdf-outline";
+// import NoteParser from "./note-parser";
+// import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
@@ -27,9 +27,9 @@ export default class ZoteroPlugin extends Plugin {
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
-  noteParser = new NoteParser(this);
+  // noteParser = new NoteParser(this);
   imgCacheImporter = new ImgCacheImporter(this);
-  pdfCache = new PDFCache(this);
+  // pdfCache = new PDFCache(this);
   annotBlockWorker = new AnnotBlockWorker(this);
   get db() {
     if (!this.#db) throw new Error("access database before load");

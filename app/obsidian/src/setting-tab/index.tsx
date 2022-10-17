@@ -64,7 +64,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   annotView(): void {
     new Setting(this.containerEl).setHeading().setName("Annotaion View");
-    this.setMutool();
+    // this.setMutool();
   }
   setMutool() {
     this.addTextComfirm(
