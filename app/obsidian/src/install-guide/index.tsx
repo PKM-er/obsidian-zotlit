@@ -5,7 +5,11 @@ import type { FileSystemAdapter, PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
 import { GoToDownloadModal } from "./guide";
 import type { PlatformDetails } from "./version";
-import { isElectronSupported, isPlatformSupported } from "./version";
+import {
+  getBinaryVersion,
+  isElectronSupported,
+  isPlatformSupported,
+} from "./version";
 
 const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
   const platform: PlatformDetails = {
@@ -37,8 +41,14 @@ const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
     } catch (e) {
       const error = e as NodeJS.ErrnoException;
       if (error.code === "ENOENT") {
+        const binaryVersion = getBinaryVersion(manifest);
+        if (!binaryVersion) {
+          throw new Error(
+            `Cannot find binary version for ${manifest.name} v${manifest.version}`,
+          );
+        }
         // if library file does not exist
-        new GoToDownloadModal(manifest, platform).open();
+        new GoToDownloadModal(manifest, platform, binaryVersion).open();
       } else {
         new Notice(error.toString());
       }

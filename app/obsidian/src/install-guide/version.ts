@@ -36,3 +36,16 @@ export interface PlatformDetails {
   modules: string;
   electron: string;
 }
+
+import binaryVersions from "@assets/better-sqlite3/versions.json";
+import type { PluginManifest } from "obsidian";
+
+export const getBinaryVersion = ({
+  version: pluginVersion,
+}: PluginManifest) => {
+  const version = binaryVersions[pluginVersion as keyof typeof binaryVersions];
+  if (!version) {
+    return null;
+  }
+  return version;
+};

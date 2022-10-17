@@ -18,16 +18,19 @@ declare module "obsidian" {
 }
 
 export class GoToDownloadModal extends Modal {
-  pluginId: string;
-  constructor(menifest: PluginManifest, private platform: PlatformDetails) {
+  constructor(
+    private menifest: PluginManifest,
+    private platform: PlatformDetails,
+    private binaryVersion: string,
+  ) {
     super(app);
-    this.pluginId = menifest.id;
     this.modalEl.addClass("zt-install-guide");
   }
 
   get downloadLink() {
     const { arch, platform, modules } = this.platform;
-    return `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}-${modules}.zip?raw=true`;
+    const filename = `${platform}-${arch}-${modules}`;
+    return `https://github.com/aidenlx/better-sqlite3/releases/download/${this.binaryVersion}/${filename}.zip`;
   }
   // root = createRoot(this.contentEl);
   onOpen() {
@@ -44,9 +47,9 @@ export class GoToDownloadModal extends Modal {
   }
 
   async reloadPlugin() {
-    await app.plugins.disablePlugin(this.pluginId);
+    await app.plugins.disablePlugin(this.menifest.id);
     this.close();
-    await app.plugins.enablePlugin(this.pluginId);
+    await app.plugins.enablePlugin(this.menifest.id);
   }
 }
 
