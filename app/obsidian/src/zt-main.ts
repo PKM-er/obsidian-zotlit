@@ -1,5 +1,6 @@
 import "./main.less";
 
+import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
@@ -9,7 +10,7 @@ import {
   CitationEditorSuggest,
   insertCitation,
 } from "./insert-citation/index.js";
-import checkLib from "./install-guide.js";
+import checkLib from "./install-guide/index.jsx";
 import registerNoteFeature from "./note-feature";
 import NoteIndex from "./note-index/index.js";
 // import NoteParser from "./note-parser";
@@ -20,9 +21,14 @@ import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
 import { ImgCacheImporter } from "./zotero-db/img-import";
 import ZoteroDb from "./zotero-db/index.js";
 
-checkLib();
-
 export default class ZoteroPlugin extends Plugin {
+  constructor(app: App, manifest: PluginManifest) {
+    super(app, manifest);
+    if (!checkLib(manifest)) {
+      throw new Error("Library check failed");
+    }
+  }
+
   settings: ZoteroSettings = getDefaultSettings(this);
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);

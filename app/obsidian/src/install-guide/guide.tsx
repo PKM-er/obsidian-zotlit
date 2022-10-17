@@ -1,90 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable @typescript-eslint/naming-convention */
-
-import { statSync } from "fs";
-import { join } from "path";
 import { constants } from "@obzt/common";
 import { fileDialog } from "file-select-dialog";
-import type { FileSystemAdapter } from "obsidian";
-import { Modal, Notice } from "obsidian";
+import type { PluginManifest } from "obsidian";
+import { Notice, Modal } from "obsidian";
 import { useState } from "react";
 import ReactDOM from "react-dom";
-import log from "@log";
-
-// #region check if compatible lib exists
-
-const {
-  arch,
-  platform,
-  versions: { modules, electron },
-} = process;
-
-type ModuleVersions = typeof moduleVersions[number];
-const moduleVersions = ["103"] as const;
-const PlatformSupported = {
-  "103": {
-    darwin: ["arm64", "x64"],
-    linux: ["x64"],
-    win32: ["x64", "ia32"],
-  },
-} as {
-  [moduleVersion in ModuleVersions]: {
-    [platform: string]: string[];
-  };
-};
-const showInstallGuide = (libPath: string) => {
-  if (!modules || !moduleVersions.includes(modules as any)) {
-    new Notice(
-      `The electron (electron: ${electron}, module version: ${modules}) ` +
-        `in current version of obsidian is not supported by obsidian-zotero-plugin,` +
-        ` please reinstall using latest obsidian installer from official website`,
-    );
-  }
-  if (
-    PlatformSupported[modules as ModuleVersions]?.[platform]?.includes(arch)
-  ) {
-    // if platform is supported
-    try {
-      if (!statSync(libPath).isFile()) {
-        new Notice(
-          `Path to database library occupied, please check the location manually: ` +
-            libPath,
-          2e3,
-        );
-      }
-    } catch (e) {
-      const error = e as NodeJS.ErrnoException;
-      if (error.code === "ENOENT") {
-        // if library file does not exist
-        new GoToDownloadModal().open();
-      } else {
-        new Notice(error.toString());
-      }
-    }
-  } else {
-    new Notice(
-      `Your device (${arch}-${platform}) is not supported by obsidian-zotero-plugin`,
-    );
-  }
-};
-
-const getConfigDirFunc = () =>
-  (app.vault.adapter as FileSystemAdapter).getFullPath(app.vault.configDir);
-
-const checkLib = () => {
-  const libPath = join(getConfigDirFunc(), constants.libName);
-  try {
-    require(libPath);
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException)?.code === "MODULE_NOT_FOUND") {
-      showInstallGuide(libPath);
-    }
-    throw err;
-  }
-};
-export default checkLib;
-// #endregion
+import log from "../logger";
+import type { PlatformDetails } from "./version";
 
 // #region Install Guide Modal
 const colorSuccess = "var(--background-modifier-success)",
@@ -95,17 +16,26 @@ declare module "obsidian" {
     openWithDefaultApp(path: string): void;
   }
 }
-const PLUGIN_ID = "obsidian-zotero-plugin";
 
-class GoToDownloadModal extends Modal {
-  constructor() {
+export class GoToDownloadModal extends Modal {
+  pluginId: string;
+  constructor(menifest: PluginManifest, private platform: PlatformDetails) {
     super(app);
+    this.pluginId = menifest.id;
     this.modalEl.addClass("zt-install-guide");
+  }
+
+  get downloadLink() {
+    const { arch, platform, modules } = this.platform;
+    return `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}-${modules}.zip?raw=true`;
   }
   // root = createRoot(this.contentEl);
   onOpen() {
     ReactDOM.render(
-      <GuideContent reloadPlugin={this.reloadPlugin.bind(this)} />,
+      <GuideContent
+        reloadPlugin={this.reloadPlugin.bind(this)}
+        downloadLink={this.downloadLink}
+      />,
       this.contentEl,
     );
   }
@@ -114,9 +44,9 @@ class GoToDownloadModal extends Modal {
   }
 
   async reloadPlugin() {
-    await app.plugins.disablePlugin(PLUGIN_ID);
+    await app.plugins.disablePlugin(this.pluginId);
     this.close();
-    await app.plugins.enablePlugin(PLUGIN_ID);
+    await app.plugins.enablePlugin(this.pluginId);
   }
 }
 
@@ -144,11 +74,12 @@ const importModule = async (): Promise<boolean> => {
 
 const GuideContent = ({
   reloadPlugin,
+  downloadLink,
 }: {
   reloadPlugin: () => Promise<void>;
+  downloadLink: string;
 }) => {
-  const downloadLink = `https://github.com/aidenlx/obsidian-zotero-plugin/blob/master/assets/better-sqlite3/${platform}-${arch}-${modules}.zip?raw=true`,
-    moduleFilename = <code>{constants.libName}</code>;
+  const moduleFilename = <code>{constants.libName}</code>;
 
   const [fileImported, setFileImported] = useState(false);
 
@@ -187,7 +118,7 @@ const SelectButton = ({
   onClick,
 }: {
   done: boolean;
-  onClick: () => any;
+  onClick: () => void;
 }) => {
   return (
     <button
@@ -204,7 +135,7 @@ const ReloadButton = ({
   onClick,
 }: {
   disabled: boolean;
-  onClick: () => any;
+  onClick: () => void;
 }) => {
   return (
     <button
