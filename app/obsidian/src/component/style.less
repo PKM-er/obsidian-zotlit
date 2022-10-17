@@ -93,7 +93,6 @@
 }
 
 .annot-view-header {
-  padding: 0 var(--size-4-2);
   flex-wrap: wrap;
   justify-content: space-around;
   display: flex;
@@ -127,10 +126,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  > *:not(:last-child) {
-    padding-bottom: var(--size-4-2);
-    &.doc-details:not(.showing) {
-      padding-bottom: 0;
+  > * {
+    padding: 0 var(--size-4-3);
+    &:not(:last-child) {
+      padding-bottom: var(--size-4-2);
+      &.doc-details:not(.showing) {
+        padding-bottom: 0;
+      }
     }
   }
   padding-top: var(--size-4-2);
