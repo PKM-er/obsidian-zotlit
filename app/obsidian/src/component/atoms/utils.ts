@@ -1,5 +1,7 @@
 import type { Atom } from "jotai";
 
+export const GLOBAL_SCOPE = Symbol("jotai-scope-global");
+
 export const createInitialValues = () => {
   const initialValues: (readonly [Atom<unknown>, unknown])[] = [];
   const get = () => initialValues;

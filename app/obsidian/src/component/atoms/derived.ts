@@ -2,23 +2,22 @@ import { getCacheImagePath } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
-import type { Atom } from "jotai";
 import { useAtomValue, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
-import { annotBaseAtom } from "../annot-preview/atom";
+import { annotAtomAtom, ANNOT_PREVIEW_SCOPE } from "../annot-preview/atom";
 import { pluginAtom } from "./obsidian";
 
-export const useSelector = <Value, Slice>(
-  anAtom: Atom<Value>,
-  selector: (v: Awaited<Value>) => Slice,
+export const useSelector = <Slice>(
+  selector: (v: Awaited<Annotation>) => Slice,
   equalityFn?: (a: Slice, b: Slice) => boolean,
 ) => {
-  const atom = useMemo(
-    () => selectAtom(anAtom, selector, equalityFn),
-    [anAtom],
+  const atom = useAtomValue(annotAtomAtom, ANNOT_PREVIEW_SCOPE);
+  const derivedAtom = useMemo(
+    () => selectAtom(atom, selector, equalityFn),
+    [atom],
   );
-  return useAtomValue(atom);
+  return useAtomValue(derivedAtom);
 };
 
 export const getColor = ({ color }: Annotation) => color ?? undefined;
@@ -26,7 +25,7 @@ export const getColor = ({ color }: Annotation) => color ?? undefined;
 export const imgSrcAtom = atom(
   (get) =>
     `app://local${getCacheImagePath(
-      get(annotBaseAtom),
+      get(get(annotAtomAtom)),
       get(pluginAtom).settings.zoteroDataDir,
     )}`,
 );

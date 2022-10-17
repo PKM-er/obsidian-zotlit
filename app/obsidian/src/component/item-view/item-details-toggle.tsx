@@ -1,6 +1,7 @@
 import cls from "classnames";
 import { useAtom } from "jotai";
 import { useShowDetails } from "../annot-preview/atom";
+import { GLOBAL_SCOPE } from "../atoms/utils";
 import { useIconRef } from "../icon";
 import { showDocItemDetails } from ".";
 
@@ -25,7 +26,7 @@ const ItemDetailsToggle = ({
 };
 
 export const DocItemDetailsToggle = () => {
-  const [show, setShow] = useAtom(showDocItemDetails);
+  const [show, setShow] = useAtom(showDocItemDetails, GLOBAL_SCOPE);
   return (
     <ItemDetailsToggle show={show} onClick={() => setShow((prev) => !prev)} />
   );

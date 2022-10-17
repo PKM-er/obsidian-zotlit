@@ -1,9 +1,9 @@
 import cls from "classnames";
 import { useAtomValue } from "jotai";
-import { tagsAtom } from "./atom";
+import { ANNOT_PREVIEW_SCOPE, tagsAtom } from "./atom";
 
 export const Tags = () => {
-  const tags = useAtomValue(tagsAtom);
+  const tags = useAtomValue(tagsAtom, ANNOT_PREVIEW_SCOPE);
   return tags.length >= 1 ? (
     <div className="annot-tags-container">
       {tags.map(({ tagID, name }) => (

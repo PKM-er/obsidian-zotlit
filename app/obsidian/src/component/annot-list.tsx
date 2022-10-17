@@ -13,6 +13,7 @@ import {
 import { activeAtchAtom } from "./atoms/attachment";
 import { pluginAtom } from "./atoms/obsidian";
 import { manualRefreshAtom } from "./atoms/refresh";
+import { GLOBAL_SCOPE } from "./atoms/utils";
 import { useIconRef } from "./icon";
 
 const filterAtom = atom("all");
@@ -34,40 +35,10 @@ const filteredAtom = atom((get) => {
   }
 });
 
-const useDragHandler = (): DragHandler => {
-  const activeAtch = useAtomValue(activeAtchAtom);
-  const {
-    settings: { literatureNoteTemplate },
-    imgCacheImporter,
-  } = useAtomValue(pluginAtom);
-  return useMemoizedFn((evt, annot) => {
-    if (!activeAtch) return;
-    const data = literatureNoteTemplate.render("annotation", {
-      ...annot,
-      attachment: activeAtch,
-    });
-    evt.dataTransfer.setData("text/plain", data);
-    const evtRef = app.workspace.on("editor-drop", (evt) => {
-      if (evt.dataTransfer?.getData("text/plain") === data) {
-        imgCacheImporter.flush();
-      }
-      app.workspace.offref(evtRef);
-    });
-    window.addEventListener(
-      "dragend",
-      () => {
-        imgCacheImporter.cancel();
-      },
-      { once: true },
-    );
-  });
-};
-
 const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
-  const annots = useAtomValue(filteredAtom);
-  const isCollapsed = useAtomValue(isCollapsedAtom);
+  const annots = useAtomValue(filteredAtom, GLOBAL_SCOPE);
+  const isCollapsed = useAtomValue(isCollapsedAtom, GLOBAL_SCOPE);
 
-  const onDrag = useDragHandler();
   return (
     <div className={cls("annot-list", { "is-collapsed": isCollapsed })}>
       {annots?.map((annot) => (
@@ -75,7 +46,6 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
           selectable={selectable}
           data={annot}
           key={annot.itemID}
-          onDrag={onDrag}
         />
       ))}
     </div>
@@ -84,7 +54,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
 export default AnnotationList;
 
 export const CollapseButton = () => {
-  const [isCollapsed, setCollapsed] = useAtom(isCollapsedAtom);
+  const [isCollapsed, setCollapsed] = useAtom(isCollapsedAtom, GLOBAL_SCOPE);
   const [ref] = useIconRef<HTMLButtonElement>(
     isCollapsed ? "chevrons-up-down" : "chevrons-down-up",
   );
@@ -99,7 +69,7 @@ export const CollapseButton = () => {
 };
 
 export const RefreshButton = () => {
-  const refresh = useSetAtom(manualRefreshAtom);
+  const refresh = useSetAtom(manualRefreshAtom, GLOBAL_SCOPE);
   const [ref] = useIconRef<HTMLButtonElement>("refresh-ccw");
   return (
     <button

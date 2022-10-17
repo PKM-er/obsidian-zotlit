@@ -9,13 +9,14 @@ import { activeFileAtom } from "@component/atoms/obsidian";
 import { autoRefreshAtom } from "@component/atoms/refresh";
 import { DocDetailsView } from "@component/item-view";
 import { DocItemDetailsToggle } from "@component/item-view/item-details-toggle";
+import { GLOBAL_SCOPE } from "../../component/atoms/utils";
 import { AttachmentSelect } from "./atch-select";
 import { annotViewAtom } from "./view";
 
 export const AnnotView = () => {
-  const [activeDoc, setActiveDoc] = useAtom(activeFileAtom);
-  const refresh = useSetAtom(autoRefreshAtom);
-  const view = useAtomValue(annotViewAtom);
+  const [activeDoc, setActiveDoc] = useAtom(activeFileAtom, GLOBAL_SCOPE);
+  const refresh = useSetAtom(autoRefreshAtom, GLOBAL_SCOPE);
+  const view = useAtomValue(annotViewAtom, GLOBAL_SCOPE);
 
   useEffect(() => {
     const updateActiveDoc = (activeFile: TFile) => {
