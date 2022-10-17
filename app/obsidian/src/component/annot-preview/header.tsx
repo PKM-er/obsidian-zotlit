@@ -4,8 +4,11 @@ import { useMemoizedFn } from "ahooks";
 import cls from "classnames";
 import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
-import { Menu } from "obsidian";
+import { MarkdownView, Menu, Notice } from "obsidian";
 import type { RefObject } from "react";
+import type { AnnotationView } from "../../note-feature/annot-view/view";
+import { annotViewAtom } from "../../note-feature/annot-view/view";
+import type ZoteroPlugin from "../../zt-main";
 import { activeAtchAtom } from "../atoms/attachment";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
 import { pluginAtom } from "../atoms/obsidian";
@@ -108,8 +111,26 @@ const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
 
 const useMoreOptionMenu = () => {
   const annot = useAnnotValue();
+  const view = useAtomValue(annotViewAtom, GLOBAL_SCOPE);
   return useMemoizedFn((evt: React.MouseEvent | React.KeyboardEvent) => {
-    moreOptionsMenuHandler(annot, evt);
+    const menu = new Menu();
+    const jumpToAnnotNote = getJumpToAnnotNoteFunc(annot, view);
+    menu.addItem((i) =>
+      i
+        .setTitle("Jump to Note")
+        .setIcon("links-going-out")
+        .onClick(jumpToAnnotNote),
+    );
+    app.workspace.trigger("zotero:open-annot-menu", annot, menu);
+    if (evt.nativeEvent instanceof MouseEvent)
+      menu.showAtMouseEvent(evt.nativeEvent);
+    else {
+      const rect = evt.currentTarget.getBoundingClientRect();
+      menu.showAtPosition({
+        x: rect.left,
+        y: rect.bottom,
+      });
+    }
   });
 };
 
@@ -149,20 +170,43 @@ const MoreOptionsButton = () => {
 };
 
 export default Header;
-
-const moreOptionsMenuHandler = (
-  annot: Annotation,
-  evt: React.MouseEvent | React.KeyboardEvent,
-) => {
-  const menu = new Menu();
-  app.workspace.trigger("zotero:open-annot-menu", annot, menu);
-  if (evt.nativeEvent instanceof MouseEvent)
-    menu.showAtMouseEvent(evt.nativeEvent);
-  else {
-    const rect = evt.currentTarget.getBoundingClientRect();
-    menu.showAtPosition({
-      x: rect.left,
-      y: rect.bottom,
-    });
-  }
-};
+const getJumpToAnnotNoteFunc =
+  (annot: Annotation, view: AnnotationView) => async () => {
+    const block = view.plugin.noteIndex.getBlockInfoFromItem(annot);
+    if (!block) {
+      new Notice("No note for this annotation");
+      return;
+    }
+    await sleep(10);
+    const { leaf } = view,
+      { workspace } = app;
+    // MobileDrawer.collapseFor(n);
+    let groupLeaves;
+    if (leaf.group) groupLeaves = app.workspace.getGroupLeaves(leaf.group);
+    else {
+      groupLeaves = [];
+      const activeFileView = workspace.getActiveFileView();
+      activeFileView && groupLeaves.push(activeFileView.leaf);
+    }
+    let hasMarkdownView = false;
+    const startLine = block.position.start.line;
+    for (const leaf of groupLeaves) {
+      if (
+        leaf &&
+        leaf.view instanceof MarkdownView &&
+        leaf.view.file === view.file
+      ) {
+        leaf.view.setEphemeralState({
+          line: startLine,
+        });
+        hasMarkdownView = !0;
+      }
+    }
+    if (!hasMarkdownView) {
+      workspace.getLeaf().openFile(view.file, {
+        eState: {
+          line: startLine,
+        },
+      });
+    }
+  };

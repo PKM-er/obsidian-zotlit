@@ -3,7 +3,7 @@ import { TagType } from "@obzt/zotero-type";
 import equal from "fast-deep-equal";
 import type { PrimitiveAtom } from "jotai";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { loadable, selectAtom } from "jotai/utils";
+import { loadable } from "jotai/utils";
 import { useMemo } from "react";
 import { stateAtomFamily } from "../atoms/annotation";
 import { useSelector } from "../atoms/derived";
