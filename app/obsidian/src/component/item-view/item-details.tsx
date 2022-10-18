@@ -5,7 +5,7 @@ import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
 import { JSONTree } from "react-json-tree";
 import { GLOBAL_SCOPE } from "../atoms/utils";
-import { useIconRef } from "../icon";
+import { useIconRef } from "../../utils/icon";
 
 const queryDarkMode = () => document.body.hasClass("theme-dark");
 

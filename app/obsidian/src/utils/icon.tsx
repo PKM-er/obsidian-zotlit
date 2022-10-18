@@ -25,5 +25,5 @@ export const useIconRef = <E extends HTMLElement = HTMLElement>(
     [icon, size],
   );
 
-  return [setRef];
+  return [setRef] as const;
 };

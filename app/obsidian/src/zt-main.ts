@@ -1,10 +1,10 @@
-import "./main.less";
+// import "./main.less";
 
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
-import { AnnotBlockWorker } from "./annot-block";
+import { AnnotBlockWorker, registerCodeBlock } from "./annot-block";
 import { activeAtchIdAtomFamily } from "./component/atoms/attachment";
 import {
   CitationEditorSuggest,
@@ -27,27 +27,32 @@ export default class ZoteroPlugin extends Plugin {
     if (!checkLib(manifest)) {
       throw new Error("Library check failed");
     }
+    this.imgCacheImporter = new ImgCacheImporter(this);
+    this.annotBlockWorker = new AnnotBlockWorker(this);
+    this.noteIndex = new NoteIndex(this);
+    // this.noteParser = new NoteParser(this);
+    // this.pdfCache = new PDFCache(this);
   }
 
   settings: ZoteroSettings = getDefaultSettings(this);
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
   #db?: ZoteroDb;
-  // noteParser = new NoteParser(this);
-  imgCacheImporter = new ImgCacheImporter(this);
-  // pdfCache = new PDFCache(this);
-  annotBlockWorker = new AnnotBlockWorker(this);
+  // noteParser: NoteParser;
+  imgCacheImporter: ImgCacheImporter;
+  // pdfCache: PDFCache;
+  annotBlockWorker: AnnotBlockWorker;
+  noteIndex: NoteIndex;
+
   get db() {
     if (!this.#db) throw new Error("access database before load");
     return this.#db;
   }
-
-  noteIndex: NoteIndex = new NoteIndex(this);
-
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
     await this.loadSettings();
     this.#db = new ZoteroDb(this);
+    registerCodeBlock(this);
     this.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",

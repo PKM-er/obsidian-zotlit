@@ -1,9 +1,10 @@
+import { createInitialValues } from "@utils/create-initial";
 import { atom, Provider } from "jotai";
 import { createNanoEvents } from "nanoevents";
 import type { TFile, WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
 import { pluginAtom } from "@component/atoms/obsidian";
-import { createInitialValues, GLOBAL_SCOPE } from "@component/atoms/utils";
+import { GLOBAL_SCOPE } from "@component/atoms/utils";
 import type ZoteroPlugin from "../../zt-main";
 import { AnnotView } from "./annot-view";
 import { DerivedFileView } from "./derived-file-view";

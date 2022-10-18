@@ -60,20 +60,27 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
   }
 }
 
+export const registerCodeBlock = (plugin: ZoteroPlugin) => {
+  plugin.registerMarkdownCodeBlockProcessor(
+    "zotero-annot",
+    (source, el, ctx) => {
+      const child = new AnnotBlockRenderChild(
+        el,
+        plugin.db,
+        plugin.annotBlockWorker,
+      );
+      ctx.addChild(child);
+      child.load();
+      child.render([source, ctx.sourcePath]);
+    },
+  );
+};
+
 export class AnnotBlockWorker {
   pool: workerpool.WorkerPool;
   proxy: workerpool.Promise<workerpool.Proxy<AnnotBlockWorkerAPI>, Error>;
 
   constructor(public plugin: ZoteroPlugin) {
-    plugin.registerMarkdownCodeBlockProcessor(
-      "zotero-annot",
-      (source, el, ctx) => {
-        const child = new AnnotBlockRenderChild(el, plugin.db, this);
-        ctx.addChild(child);
-        child.load();
-        child.render([source, ctx.sourcePath]);
-      },
-    );
     this.pool = workerpool.pool(annotBlockWorker(), {
       workerType: "web",
     });

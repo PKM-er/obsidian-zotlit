@@ -21,6 +21,9 @@ const opts = {
   mainFields: ["browser", "module", "main"],
   sourcemap: isProd ? false : "inline",
   minify: isProd,
+  loader: {
+    ".svg": "text",
+  },
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
   },

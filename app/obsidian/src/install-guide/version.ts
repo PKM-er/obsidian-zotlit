@@ -37,8 +37,24 @@ export interface PlatformDetails {
   electron: string;
 }
 
-import binaryVersions from "@assets/better-sqlite3/versions.json";
+export const getPlatformDetails = () => {
+  if (Platform.isDesktopApp) {
+    return {
+      arch: process.arch,
+      platform: process.platform,
+      modules: process.versions.modules,
+      electron: process.versions.electron,
+    };
+  } else {
+    return null;
+  }
+};
+
+import { join } from "path/posix";
+import { betterSqlite3 } from "@obzt/common";
 import type { PluginManifest } from "obsidian";
+import { FileSystemAdapter, Platform } from "obsidian";
+import binaryVersions from "@assets/better-sqlite3/versions.json";
 
 export const getBinaryVersion = ({
   version: pluginVersion,
@@ -48,4 +64,23 @@ export const getBinaryVersion = ({
     return null;
   }
   return version;
+};
+
+export const getBinaryPath = (manifest: PluginManifest) => {
+  const binaryVersion = getBinaryVersion(manifest);
+  if (!binaryVersion) {
+    return null;
+  }
+  return join(app.vault.configDir, betterSqlite3(binaryVersion));
+};
+
+export const getBinaryFullPath = (manifest: PluginManifest): string | null => {
+  const binaryPath = getBinaryPath(manifest);
+  if (!binaryPath) {
+    return null;
+  }
+  if (!(app.vault.adapter instanceof FileSystemAdapter)) {
+    return null;
+  }
+  return app.vault.adapter.getFullPath(binaryPath);
 };

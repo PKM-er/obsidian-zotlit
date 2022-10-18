@@ -7,10 +7,11 @@ import dbWorker from "@obzt/database";
 import type { GeneralItem, LibraryInfo } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import type { EventRef } from "obsidian";
-import { Events, debounce, FileSystemAdapter, Notice } from "obsidian";
+import { Events, debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import log from "@log";
 
+import { getBinaryFullPath } from "../install-guide/version.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 export default class ZoteroDb extends Events {
@@ -47,14 +48,14 @@ export default class ZoteroDb extends Events {
     }
   }
 
-  #configPath?: string;
-  get configPath(): string {
-    if (this.#configPath) return this.#configPath;
-    const { adapter, configDir } = this.#plugin.app.vault;
-    if (adapter instanceof FileSystemAdapter) {
-      this.#configPath = adapter.getFullPath(configDir);
-      return this.#configPath;
-    } else throw new Error("Unsupported adapter");
+  #nativeBinding?: string;
+  get nativeBinding(): string {
+    if (this.#nativeBinding) return this.#nativeBinding;
+    const binaryFullPath = getBinaryFullPath(this.#plugin.manifest);
+    if (binaryFullPath) {
+      this.#nativeBinding = binaryFullPath;
+      return this.#nativeBinding;
+    } else throw new Error("Failed to get native binding path");
   }
   get defaultLibId() {
     return this.#plugin.settings.citationLibrary;
@@ -158,7 +159,7 @@ export default class ZoteroDb extends Events {
     if (this.#dbInited) {
       log.debug(
         `Database already initialized, reopen with new params: ${[
-          this.configPath,
+          this.nativeBinding,
           this.mainDbPath,
           this.bbtDbPath,
         ]}`,
@@ -166,7 +167,7 @@ export default class ZoteroDb extends Events {
     }
     const proxy = await this.#proxy;
     const result = await proxy.openDb(
-      this.configPath,
+      this.nativeBinding,
       this.mainDbPath,
       this.bbtDbPath,
     );

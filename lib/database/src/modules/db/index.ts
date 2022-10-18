@@ -1,6 +1,4 @@
 import { promises as fs } from "fs";
-import { join } from "path";
-import { constants } from "@obzt/common";
 import type { Knex } from "@knex";
 import knex, { getKnexOptions } from "@knex";
 import log from "@log";
@@ -37,11 +35,11 @@ export default class Database {
   opened = false;
   /**
    * set new database path and open connection
-   * @param dbPath
+   * @param nativeBinding path to better-sqlite3.node
    * @returns false if no file found on given path
    */
-  public async open(dbPath: string, pluginDir: string): Promise<boolean> {
-    this.#nativeBinding = join(pluginDir, constants.libName);
+  public async open(dbPath: string, nativeBinding: string): Promise<boolean> {
+    this.#nativeBinding = nativeBinding;
     try {
       if (this.#database?.db) {
         log.info("Database opened before, closing: ", this.#database.db.name);

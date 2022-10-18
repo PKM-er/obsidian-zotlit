@@ -1,20 +1,16 @@
 import "./style.less";
 
-import { useMemoizedFn } from "ahooks";
 import cls from "classnames";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
-import type { DragHandler } from "./annot-preview";
+import { useIconRef } from "../utils/icon";
 import { AnnotListItem } from "./annot-preview";
 import {
   stateAtomFamily,
   annotsAtom,
   isCollapsedAtom,
 } from "./atoms/annotation";
-import { activeAtchAtom } from "./atoms/attachment";
-import { pluginAtom } from "./atoms/obsidian";
 import { manualRefreshAtom } from "./atoms/refresh";
 import { GLOBAL_SCOPE } from "./atoms/utils";
-import { useIconRef } from "./icon";
 
 const filterAtom = atom("all");
 

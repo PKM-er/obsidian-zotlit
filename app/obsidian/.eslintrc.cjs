@@ -44,6 +44,7 @@ module.exports = {
           "react-dom",
           "dompurify",
           "^@assets/",
+          "^@utils",
         ],
       },
     ],

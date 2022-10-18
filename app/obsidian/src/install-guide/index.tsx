@@ -1,23 +1,21 @@
 import { statSync } from "fs";
-import { join } from "path";
-import { constants } from "@obzt/common";
-import type { FileSystemAdapter, PluginManifest } from "obsidian";
+import type { PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
+import log from "../logger";
 import { GoToDownloadModal } from "./guide";
-import type { PlatformDetails } from "./version";
 import {
+  getBinaryFullPath,
   getBinaryVersion,
+  getPlatformDetails,
   isElectronSupported,
   isPlatformSupported,
 } from "./version";
 
 const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
-  const platform: PlatformDetails = {
-    arch: process.arch,
-    platform: process.platform,
-    modules: process.versions.modules,
-    electron: process.versions.electron,
-  };
+  const platform = getPlatformDetails();
+  if (!platform) {
+    throw new Error("Not in desktop app");
+  }
   if (!isElectronSupported(platform)) {
     new Notice(
       `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
@@ -56,22 +54,25 @@ const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
   }
 };
 
-const getConfigDirFunc = () =>
-  (app.vault.adapter as FileSystemAdapter).getFullPath(app.vault.configDir);
-
 const checkLib = (manifest: PluginManifest): boolean => {
   if (!Platform.isDesktopApp) {
     throw new Error("Not in desktop app");
   }
-  const libPath = join(getConfigDirFunc(), constants.libName);
+  const binaryPath = getBinaryFullPath(manifest);
+  if (!binaryPath) {
+    throw new Error(
+      `Cannot find binary version for ${manifest.name} v${manifest.version}`,
+    );
+  }
   try {
-    require(libPath);
+    require(binaryPath);
     return true;
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code === "MODULE_NOT_FOUND") {
-      showInstallGuide(libPath, manifest);
+      showInstallGuide(binaryPath, manifest);
     } else {
       new Notice(`Failed to load database library: ${err}`);
+      log.error("Failed to load database library", err);
     }
     return false;
   }

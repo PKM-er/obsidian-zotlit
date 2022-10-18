@@ -3,14 +3,14 @@ import { databases } from "@init";
 import log from "@log";
 
 export const openDb: DbWorkerAPI["openDb"] = async (
-  pluginDir,
+  nativeBinding,
   mainDbPath,
   bbtDbPath,
 ) => {
-  log.debug("open database", pluginDir, mainDbPath, bbtDbPath);
-  const mainOpened = databases.main.open(mainDbPath, pluginDir);
+  log.debug("open database", nativeBinding, mainDbPath, bbtDbPath);
+  const mainOpened = databases.main.open(mainDbPath, nativeBinding);
   let bbtOpened: Promise<boolean> | null = null;
-  bbtOpened = databases.bbt.open(bbtDbPath, pluginDir);
+  bbtOpened = databases.bbt.open(bbtDbPath, nativeBinding);
   const [main, bbt] = await Promise.all([mainOpened, bbtOpened]);
 
   if (!main) {

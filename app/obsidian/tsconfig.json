@@ -12,6 +12,8 @@
       "@log": ["./logger.ts"],
       "@component/*": ["./component/*"],
       "@assets/*": ["../assets/*"],
+      "@utils/*": ["./utils/*"],
+      "@utils": ["./utils"],
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
