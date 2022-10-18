@@ -17,35 +17,42 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     super(container);
   }
 
-  private cache: [info: AnnotInfo[], sourcePath: string] | null = null;
+  private cache:
+    | [info: AnnotInfo[], sourcePath: string, source: string]
+    | null = null;
   async render(spec?: [source: string, sourcePath: string]) {
     this.containerEl.empty();
-    let info: AnnotInfo[], sourcePath: string;
+    let info: AnnotInfo[], sourcePath: string, source: string;
     if (spec) {
-      const [source, _sourcePath] = spec;
+      [source, sourcePath] = spec;
       this.cache = null;
       info = (await this.worker.parse(source)).annots;
-      sourcePath = _sourcePath;
-      this.cache = [info, sourcePath];
+      this.cache = [info, sourcePath, source];
     } else if (this.cache) {
-      [info, sourcePath] = this.cache;
+      [info, sourcePath, source] = this.cache;
     } else {
       log.debug("Cannot render without spec or cache");
       return;
     }
-    const annotations = await this.db.getAnnotFromKey(
-      info.map(({ annotKey }) => annotKey),
-    );
-    const markdown = await this.worker.stringify(
-      info.map(({ annotKey, ...props }) => ({
-        ...props,
-        annotKey,
-        text:
-          annotations[annotKey]?.type === AnnotationType.highlight
-            ? annotations[annotKey].text ?? ""
-            : "",
-      })),
-    );
+    let markdown: string;
+    try {
+      const annotations = await this.db.getAnnotFromKey(
+        info.map(({ annotKey }) => annotKey),
+      );
+      markdown = await this.worker.stringify(
+        info.map(({ annotKey, ...props }) => ({
+          ...props,
+          annotKey,
+          text:
+            annotations[annotKey]?.type === AnnotationType.highlight
+              ? annotations[annotKey].text ?? ""
+              : "",
+        })),
+      );
+    } catch (error) {
+      log.error("Failed to stringify annots", error);
+      markdown = source;
+    }
     await MarkdownRenderer.renderMarkdown(
       markdown,
       this.containerEl,
