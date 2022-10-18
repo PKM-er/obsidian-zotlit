@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "obsidian";
 declare module "obsidian" {
@@ -13,6 +14,12 @@ declare module "obsidian" {
   }
   interface Workspace {
     getActiveFileView(): FileView | null;
+  }
+
+  interface PluginManifest {
+    versions?: {
+      "better-sqlite3": string;
+    };
   }
 
   interface Vault {
