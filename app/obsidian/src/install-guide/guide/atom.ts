@@ -1,8 +1,8 @@
 import { atom } from "jotai";
 import { getBinaryFullPath, getBinaryPath } from "../version";
-import type { GoToDownloadModal } from ".";
+import type { InstallGuideModal } from ".";
 
-export const modalAtom = atom<GoToDownloadModal>(null as never);
+export const modalAtom = atom<InstallGuideModal>(null as never);
 
 export const binaryNameAtom = atom((get) => {
   const { arch, platform, modules } = get(modalAtom).platform;
@@ -27,3 +27,7 @@ export const binaryPathAtom = atom((get) =>
 export const binaryFullPathAtom = atom((get) =>
   getBinaryFullPath(get(modalAtom).manifest),
 );
+
+export const guideModeAtom = atom<GuideMode>((get) => get(modalAtom).mode);
+
+export type GuideMode = "install" | "reset";

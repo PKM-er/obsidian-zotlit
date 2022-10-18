@@ -4,6 +4,7 @@ import { Modal } from "obsidian";
 import ReactDOM from "react-dom";
 import { createInitialValues } from "@utils/create-initial";
 import type { PlatformDetails } from "../version";
+import type { GuideMode } from "./atom";
 import { modalAtom } from "./atom";
 import { InstallGuide } from "./content";
 
@@ -13,11 +14,12 @@ declare module "obsidian" {
   }
 }
 
-export class GoToDownloadModal extends Modal {
+export class InstallGuideModal extends Modal {
   constructor(
     public manifest: PluginManifest,
     public platform: PlatformDetails,
     public binaryVersion: string,
+    public mode: GuideMode,
   ) {
     super(app);
     this.titleEl.setText("Setup Obsidian Zotero Plugin");

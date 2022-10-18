@@ -50,8 +50,9 @@ const ManualInstallGuide = () => {
         <a href={downloadLink}>GitHub</a>.
       </li>
       <li>
-        Select downloaded <code>{filename}</code> or{" "}
-        <code>{filename.replace(/\.gz$/, "")}</code> to install:
+        Select downloaded <code>{filename}</code> or uncompressed{" "}
+        <code>better-sqlite3.node</code>
+        to install:
         <SelectButton onClick={onSelectFileClicked} done={fileImported} />
       </li>
       <li>

@@ -1,5 +1,31 @@
+import assertNever from "assert-never";
+import { useAtomValue } from "jotai";
+import { guideModeAtom } from "./atom";
 import { AutoInstall } from "./auto";
 import { ManualInstall } from "./manual";
+
+const InstallGuideDesc = () => {
+  const mode = useAtomValue(guideModeAtom);
+  switch (mode) {
+    case "install":
+      return (
+        <>
+          Obsidian Zotero Plugin requires latest version of{" "}
+          <code>better-sqlite3</code> to be installed. Use one of the method
+          below to install or update it.
+        </>
+      );
+    case "reset":
+      return (
+        <>
+          <code>better-sqlite3</code> seems to be broken and failed to load. you
+          can try to use one of the method below to reinstall it.
+        </>
+      );
+    default:
+      assertNever(mode);
+  }
+};
 
 export const InstallGuide = () => {
   return (
@@ -51,8 +77,7 @@ export const InstallGuide = () => {
 }
       `}</style>
       <div className="zt-install-desc">
-        Obsidian Zotero Plugin requires <code>better-sqlite3</code> to be
-        installed. Use one of the method below to install it.
+        <InstallGuideDesc />
       </div>
       <div className="zt-install-methods">
         <AutoInstall />

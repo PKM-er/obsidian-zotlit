@@ -2,7 +2,8 @@ import { statSync } from "fs";
 import type { PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
 import log from "../logger";
-import { GoToDownloadModal } from "./guide";
+import { InstallGuideModal } from "./guide";
+import type { GuideMode } from "./guide/atom";
 import {
   getBinaryFullPath,
   getBinaryVersion,
@@ -11,7 +12,11 @@ import {
   isPlatformSupported,
 } from "./version";
 
-const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
+const showInstallGuide = (
+  libPath: string,
+  manifest: PluginManifest,
+  mode: GuideMode,
+) => {
   const platform = getPlatformDetails();
   if (!platform) {
     throw new Error("Not in desktop app");
@@ -27,28 +32,37 @@ const showInstallGuide = (libPath: string, manifest: PluginManifest) => {
       `Your device (${platform.arch}-${platform.platform}) is not supported by obsidian-zotero-plugin`,
     );
   } else {
+    const binaryVersion = getBinaryVersion(manifest);
+    if (!binaryVersion) {
+      throw new Error(
+        `Cannot find binary version for ${manifest.name} v${manifest.version}`,
+      );
+    }
     // if platform is supported
     try {
       if (!statSync(libPath).isFile()) {
+        // if path occupied by something that is not a file
         new Notice(
           `Path to database library occupied, please check the location manually: ` +
             libPath,
           2e3,
         );
+      } else if (mode === "reset") {
+        // if path occupied by a file, open modal to reset it
+        new InstallGuideModal(manifest, platform, binaryVersion, mode).open();
       }
     } catch (e) {
       const error = e as NodeJS.ErrnoException;
       if (error.code === "ENOENT") {
-        const binaryVersion = getBinaryVersion(manifest);
-        if (!binaryVersion) {
-          throw new Error(
-            `Cannot find binary version for ${manifest.name} v${manifest.version}`,
-          );
-        }
-        // if library file does not exist
-        new GoToDownloadModal(manifest, platform, binaryVersion).open();
+        // if path not occupied
+        new InstallGuideModal(manifest, platform, binaryVersion, mode).open();
       } else {
-        new Notice(error.toString());
+        // unexpected error when checking path
+        new Notice(
+          `Unexpected error while checking path, please check the location manually: ${libPath}, error: ${error}`,
+          2e3,
+        );
+        log.error("Unexpected error while checking path", libPath, error);
       }
     }
   }
@@ -69,10 +83,11 @@ const checkLib = (manifest: PluginManifest): boolean => {
     return true;
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code === "MODULE_NOT_FOUND") {
-      showInstallGuide(binaryPath, manifest);
+      showInstallGuide(binaryPath, manifest, "install");
     } else {
       new Notice(`Failed to load database library: ${err}`);
       log.error("Failed to load database library", err);
+      showInstallGuide(binaryPath, manifest, "reset");
     }
     return false;
   }
