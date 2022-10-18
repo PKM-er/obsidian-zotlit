@@ -1,5 +1,12 @@
 
 
+## [0.3.1](https://github.com/aidenlx/obsidian-zotero/compare/0.3.0...0.3.1) (2022-10-18)
+
+
+### Bug Fixes
+
+* **obsidian:** fix out-of-date better-sqlite3 version ([f74a5e8](https://github.com/aidenlx/obsidian-zotero/commit/f74a5e8e5f6653da21475160d457d868948d5dc4))
+
 # [0.3.0](https://github.com/aidenlx/obsidian-zotero/compare/0.2.0...0.3.0) (2022-10-18)
 
 
