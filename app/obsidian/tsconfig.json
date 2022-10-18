@@ -10,7 +10,10 @@
     "jsx": "react-jsx",
     "paths": {
       "@log": ["./logger.ts"],
-      "@component/*": ["./component/*"]
+      "@component/*": ["./component/*"],
+      "@assets/*": ["../assets/*"],
+      "@utils/*": ["./utils/*"],
+      "@utils": ["./utils"],
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

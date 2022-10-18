@@ -1,4 +1,5 @@
 import { dialog } from "@electron/remote";
+import { createInitialValues } from "@utils/create-initial";
 import { useMemoizedFn } from "ahooks";
 import cls from "classnames";
 import type { Atom, Getter } from "jotai";
@@ -6,7 +7,6 @@ import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { Notice } from "obsidian";
 import { pluginAtom } from "../component/atoms/obsidian";
-import { createInitialValues } from "../component/atoms/utils";
 import type ZoteroPlugin from "../zt-main";
 
 export function atomWithRefresh<T>(fn: (get: Getter) => T) {

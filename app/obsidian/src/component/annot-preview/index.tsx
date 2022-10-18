@@ -1,12 +1,13 @@
 import type { Annotation } from "@obzt/zotero-type";
+import { renderHTMLReact } from "@utils";
+import { createInitialValues } from "@utils/create-initial";
 import cls from "classnames";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import type { AnnotationWithTags } from "../../note-template/const";
-import { renderHTMLReact } from "../../utils";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
-import { createInitialValues, GLOBAL_SCOPE } from "../atoms/utils";
+import { GLOBAL_SCOPE } from "../atoms/utils";
 import { AnnotDetailsView } from "./annot-details";
 import { annotAtomAtom, ANNOT_PREVIEW_SCOPE, useIsSelected } from "./atom";
 import Content from "./content";

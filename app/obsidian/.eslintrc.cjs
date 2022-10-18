@@ -43,6 +43,8 @@ module.exports = {
           "@electron/remote",
           "react-dom",
           "dompurify",
+          "^@assets/",
+          "^@utils",
         ],
       },
     ],

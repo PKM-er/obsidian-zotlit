@@ -18,7 +18,7 @@ export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
   /* open new database, return true if successful */
   openDb(
-    pluginDir: string,
+    nativeBinding: string,
     mainDbPath: string,
     bbtDbPath: string,
   ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
