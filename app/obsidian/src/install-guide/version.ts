@@ -54,17 +54,9 @@ import { join } from "path/posix";
 import { betterSqlite3 } from "@obzt/common";
 import type { PluginManifest } from "obsidian";
 import { FileSystemAdapter, Platform } from "obsidian";
-import binaryVersions from "@assets/better-sqlite3/versions.json";
 
-export const getBinaryVersion = ({
-  version: pluginVersion,
-}: PluginManifest) => {
-  const version = binaryVersions[pluginVersion as keyof typeof binaryVersions];
-  if (!version) {
-    return null;
-  }
-  return version;
-};
+export const getBinaryVersion = (manifest: PluginManifest) =>
+  manifest.versions?.["better-sqlite3"];
 
 export const getBinaryPath = (manifest: PluginManifest) => {
   const binaryVersion = getBinaryVersion(manifest);
