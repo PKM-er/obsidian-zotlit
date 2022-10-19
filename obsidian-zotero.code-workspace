@@ -92,7 +92,7 @@
       "obsidian/template",
       "obsidian/annot-block",
       "obsidian/setting-tab",
-      "docs",
+      "docs-site",
       "zotero",
       "lib/database",
       "lib/note-parser",
