@@ -1,5 +1,5 @@
 import { useMemoizedFn } from "ahooks";
-import cls from "classnames";
+import clsx from "clsx";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import log from "../../logger";
 import { useIconRef } from "../../utils/icon";
@@ -103,7 +103,7 @@ export const AutoInstall = () => {
       />
       {installState !== InstallState.Idle && (
         <ListItem
-          className={cls("zt-auto-install-status", {
+          className={clsx("zt-auto-install-status", {
             "mod-warning": installState === InstallState.Failed,
             "mod-success": installState === InstallState.Success,
           })}

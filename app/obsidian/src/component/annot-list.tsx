@@ -1,6 +1,6 @@
 import "./style.less";
 
-import cls from "classnames";
+import clsx from "clsx";
 import { useAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { useIconRef } from "../utils/icon";
 import { AnnotListItem } from "./annot-preview";
@@ -36,7 +36,7 @@ const AnnotationList = ({ selectable = false }: { selectable?: boolean }) => {
   const isCollapsed = useAtomValue(isCollapsedAtom, GLOBAL_SCOPE);
 
   return (
-    <div className={cls("annot-list", { "is-collapsed": isCollapsed })}>
+    <div className={clsx("annot-list", { "is-collapsed": isCollapsed })}>
       {annots?.map((annot) => (
         <AnnotListItem
           selectable={selectable}

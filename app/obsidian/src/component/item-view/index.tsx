@@ -1,5 +1,5 @@
 import assertNever from "assert-never";
-import cls from "classnames";
+import clsx from "clsx";
 import { atom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import { activeDocItemAtom } from "../atoms/obsidian";
@@ -25,7 +25,7 @@ export const DocDetailsView = () => {
 
   return (
     <div
-      className={cls("doc-details", {
+      className={clsx("doc-details", {
         loading: activeDocItem.state === "loading",
         showing: showingDetails,
       })}
