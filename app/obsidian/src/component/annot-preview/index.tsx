@@ -1,9 +1,9 @@
 import type { Annotation } from "@obzt/zotero-type";
-import { renderHTMLReact } from "@utils";
-import { createInitialValues } from "@utils/create-initial";
-import cls from "classnames";
+import clsx from "clsx";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect, useMemo, useRef } from "react";
+import { renderHTMLReact } from "@utils";
+import { createInitialValues } from "@utils/create-initial";
 import type { AnnotationWithTags } from "../../note-template/const";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
@@ -63,7 +63,7 @@ export const AnnotListItem = ({
     <Provider initialValues={initial.get()} scope={ANNOT_PREVIEW_SCOPE}>
       <div
         key={data.itemID}
-        className={cls("annot-list-item")}
+        className={clsx("annot-list-item")}
         role="menuitem"
         tabIndex={0}
       >

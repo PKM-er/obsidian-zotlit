@@ -1,7 +1,7 @@
 import { dialog } from "@electron/remote";
 import { createInitialValues } from "@utils/create-initial";
 import { useMemoizedFn } from "ahooks";
-import cls from "classnames";
+import clsx from "clsx";
 import type { Atom, Getter } from "jotai";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
@@ -63,7 +63,7 @@ const DataDirPath = () => {
 
   return (
     <div
-      className={cls("zotero-data-dir-path", {
+      className={clsx("zotero-data-dir-path", {
         success: success === true,
         failed: success === false,
       })}
@@ -118,7 +118,7 @@ const DBStatus = ({
   return (
     <div className="setting-item-description">
       {name}: {failed && "(Failed to load)"}
-      <div className={cls("zotero-db-path", { success, failed })}>{path}</div>
+      <div className={clsx("zotero-db-path", { success, failed })}>{path}</div>
     </div>
   );
 };

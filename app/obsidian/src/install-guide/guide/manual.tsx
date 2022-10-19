@@ -1,4 +1,4 @@
-import cls from "classnames";
+import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { Notice } from "obsidian";
 import { useState } from "react";
@@ -90,7 +90,7 @@ const SelectButton = ({
   onClick: () => void;
 }) => {
   return (
-    <button className={cls({ "zt-import-done": done })} onClick={onClick}>
+    <button className={clsx({ "zt-import-done": done })} onClick={onClick}>
       {!done ? "Select" : "Library file imported"}
     </button>
   );

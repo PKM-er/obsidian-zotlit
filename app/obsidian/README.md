@@ -1,22 +1,10 @@
-# Obsidian Zotero Plugin
-
-Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.
-
-## Intro
-
-<!-- TODO -->
-
-## How to use
-
-<!-- TODO -->
-
-## Compatibility
-
-The required API feature is only available for Obsidian v0.16.0+.
+# Obsidian Plugin
 
 ## Installation
 
 ### From BRAT
+
+> Not yet available
 
 To install a pre-release, download and enable the [Obsidian42 BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin, add the beta repository `aidenlx/obsidian-zotero-plugin`, and then have BRAT check for updates.
 
@@ -37,7 +25,6 @@ enable the plugin from there.
 
 1. Open `Settings` > `Third-party plugin`
 2. Make sure Safe mode is **off**
-3. Click `Browse community plugins`
-4. Search for this plugin
-5. Click `Install`
-6. Once installed, close the community plugins window and the plugin is ready to use.
+3. Open [plugin page](https://obsidian.md/plugins?id=obsidian-zotero-plugin) in obsidian
+4. Click `Install`
+5. Once installed, close the community plugins window and the plugin is ready to use.

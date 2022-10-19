@@ -1,7 +1,7 @@
 import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType, getBacklink } from "@obzt/zotero-type";
 import { useMemoizedFn } from "ahooks";
-import cls from "classnames";
+import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { startCase } from "lodash-es";
 import { MarkdownView, Menu, Notice } from "obsidian";
@@ -45,7 +45,7 @@ const Page = () => {
   if (backlink)
     return (
       <a
-        className={cls("annot-page", "external-link")}
+        className={clsx("annot-page", "external-link")}
         href={backlink}
         aria-label={`Open Annotation In Zotero at Page ${page}`}
         aria-label-delay="500"

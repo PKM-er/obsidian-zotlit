@@ -1,4 +1,4 @@
-import cls from "classnames";
+import clsx from "clsx";
 import React from "react";
 
 export const ListItem = ({
@@ -17,7 +17,7 @@ export const ListItem = ({
   icon?: JSX.Element;
 } & React.HtmlHTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cls("setting-item", className)} {...rest}>
+    <div className={clsx("setting-item", className)} {...rest}>
       {icon && <div className="setting-icon">{icon}</div>}
       <div className="setting-item-info">
         <div className="setting-item-name">{name}</div>

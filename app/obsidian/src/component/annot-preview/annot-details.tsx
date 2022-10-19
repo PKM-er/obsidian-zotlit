@@ -1,4 +1,4 @@
-import cls from "classnames";
+import clsx from "clsx";
 import { ItemDetails } from "../item-view/item-details";
 import { useAnnotValue, useShowDetails } from "./atom";
 
@@ -7,7 +7,7 @@ export const AnnotDetailsView = () => {
   const [showingDetails] = useShowDetails();
   return (
     <div
-      className={cls("annot-details", {
+      className={clsx("annot-details", {
         showing: showingDetails,
       })}
     >

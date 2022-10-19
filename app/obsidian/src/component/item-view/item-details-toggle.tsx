@@ -1,8 +1,8 @@
-import cls from "classnames";
+import clsx from "clsx";
 import { useAtom } from "jotai";
+import { useIconRef } from "../../utils/icon";
 import { useShowDetails } from "../annot-preview/atom";
 import { GLOBAL_SCOPE } from "../atoms/utils";
-import { useIconRef } from "../../utils/icon";
 import { showDocItemDetails } from ".";
 
 const ItemDetailsToggle = ({
@@ -18,7 +18,7 @@ const ItemDetailsToggle = ({
   return (
     <button
       ref={ref}
-      className={cls("clickable-icon", { "is-active": show }, className)}
+      className={clsx("clickable-icon", { "is-active": show }, className)}
       onClick={onClick}
       aria-label={`${show ? "Hide" : "Show"} details`}
     />
