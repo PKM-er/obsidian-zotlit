@@ -397,6 +397,10 @@
     {
       "packageName": "@obzt/common",
       "projectFolder": "lib/common"
+    },
+    {
+      "packageName": "@obzt/docs",
+      "projectFolder": "docs"
     }
   ]
 }

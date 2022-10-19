@@ -21,12 +21,16 @@
       "path": "lib/annot-block"
     },
     {
-      "name": "esbuild-inline-worker",
-      "path": "lib/esbuild-inline-worker"
-    },
-    {
       "name": "common",
       "path": "lib/common"
+    },
+    {
+      "name": "docs",
+      "path": "docs"
+    },
+    {
+      "name": "esbuild-inline-worker",
+      "path": "lib/esbuild-inline-worker"
     },
     {
       "name": "zotero-type",
@@ -72,7 +76,8 @@
       "./lib/note-parser",
       "./lib/annot-block",
       "./lib/esbuild-inline-worker",
-      "./lib/zotero-type"
+      "./lib/zotero-type",
+      "./docs"
     ],
     "[shellscript]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
@@ -87,6 +92,7 @@
       "obsidian/template",
       "obsidian/annot-block",
       "obsidian/setting-tab",
+      "docs",
       "zotero",
       "lib/database",
       "lib/note-parser",
