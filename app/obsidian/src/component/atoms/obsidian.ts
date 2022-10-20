@@ -1,6 +1,6 @@
 import type { GeneralItem } from "@obzt/zotero-type";
 import { atom } from "jotai";
-import { RESET } from "jotai/utils";
+import { loadable, RESET } from "jotai/utils";
 import { getItemKeyFromFrontmatter } from "../../note-index/ztkey-file-map";
 import type { Context } from "../../template/helper";
 import type ZoteroPlugin from "../../zt-main";
@@ -50,3 +50,12 @@ export const activeDocItemAtom = atom(async (get) => {
   if (!item) return null;
   return item as DocItem;
 });
+
+export const tagsAtom = atom(async (get) => {
+    const item = get(activeDocItemAtom);
+    if (!item) return null;
+    const { itemID } = item;
+    const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+    return tags; // .filter((t) => t.type === TagType.manual);
+  }),
+  loadableTagsAtom = loadable(tagsAtom);

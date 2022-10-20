@@ -1,5 +1,4 @@
 import type { Annotation } from "@obzt/zotero-type";
-import { TagType } from "@obzt/zotero-type";
 import equal from "fast-deep-equal";
 import type { PrimitiveAtom } from "jotai";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -44,7 +43,7 @@ export const useIsSelected = () => {
 export const tagsAtom = atom(async (get) => {
     const { itemID } = get(annotAtom);
     const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
-    return tags.filter((t) => t.type === TagType.manual);
+    return tags; // .filter((t) => t.type === TagType.manual);
   }),
   loadableTagsAtom = loadable(tagsAtom);
 

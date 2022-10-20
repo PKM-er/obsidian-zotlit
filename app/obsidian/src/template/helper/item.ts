@@ -11,33 +11,33 @@ import { fileLink } from "./utils";
 export type GeneralItemHelper = ReturnType<typeof withItemHelper>;
 export type GeneralItemExtra = {
   attachment: AttachmentInfo | null;
-  annotations: [data: Annotation, extra: AnnotationExtra][];
+  annotations?: [data: Annotation, extra: AnnotationExtra][];
   allAttachments: AttachmentInfo[];
   tags: ItemTag[];
 };
 export const withItemHelper = (
   { creators, ...data }: GeneralItem,
-  { annotations, ...extra }: GeneralItemExtra,
+  { annotations, ..._extra }: GeneralItemExtra,
   ctx: Context,
 ) => {
-  const proxiedAnnots = annotations.map(([a, e]) => withAnnotHelper(a, e, ctx));
+  const proxiedAnnots =
+    annotations?.map(([a, e]) => withAnnotHelper(a, e, ctx)) ?? null;
+  const extra = proxiedAnnots
+    ? { ..._extra, annotations: proxiedAnnots }
+    : _extra;
   const proxiedCreators = creators.map((c) => withCreatorHelper(c));
-  const proxy = withHelper(
-    { ...data, creators: proxiedCreators },
-    { ...extra, annotations: proxiedAnnots },
-    {
-      backlink(): string {
-        return getBacklink(this);
-      },
-      fileLink(): string {
-        return fileLink(
-          ctx.plugin.settings.zoteroDataDir,
-          ctx.sourcePath,
-          extra.attachment,
-        );
-      },
+  const proxy = withHelper({ ...data, creators: proxiedCreators }, extra, {
+    backlink(): string {
+      return getBacklink(this);
     },
-  );
-  bindRevoke(proxy, ...proxiedAnnots, ...proxiedCreators);
+    fileLink(): string {
+      return fileLink(
+        ctx.plugin.settings.zoteroDataDir,
+        ctx.sourcePath,
+        _extra.attachment,
+      );
+    },
+  });
+  bindRevoke(proxy, ...proxiedCreators, ...(proxiedAnnots ?? []));
   return proxy;
 };

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ItemTag } from "@obzt/zotero-type";
 import {
   requiredKeys,
   getCreatorName,
   AnnotationType,
+  TagType,
 } from "@obzt/zotero-type";
 import endent from "endent";
 import { Menu, Notice } from "obsidian";
@@ -106,31 +108,47 @@ const valueRenderer = (
       </span>
     );
   }
-  if (
-    keyPath[0] === "type" &&
-    typeof value === "number" &&
-    AnnotationType[value]
-  ) {
-    return (
-      <>
-        {valueAsString} <span>({AnnotationType[value]})</span>
-      </>
-    );
+  if (keyPath[0] === "type" && typeof value === "number") {
+    let type = "";
+    if (keyPath.length === 2 && AnnotationType[value]) {
+      type = AnnotationType[value];
+    } else if (
+      keyPath.length === 4 &&
+      typeof keyPath[1] === "number" &&
+      keyPath[2] === "tags" &&
+      TagType[value]
+    ) {
+      type = TagType[value];
+    }
+    if (type) {
+      return (
+        <>
+          {valueAsString} <span>({type})</span>
+        </>
+      );
+    }
   }
   return valueAsString;
 };
 
+const neverExpand = new Set(["sortIndex"]),
+  noExpandIfLarge = new Set(["creators", "tags"]),
+  alwaysExpand = new Set(["position"]);
 const shouldExpandNode = (
   keyPath: (string | number)[],
   data: unknown,
   level: number,
 ) => {
-  if (keyPath[0] === "sortIndex") return false;
+  const first = keyPath[0] as never;
   if (
+    neverExpand.has(first) ||
+    (noExpandIfLarge.has(first) && Array.isArray(data) && data.length > 6)
+  )
+    return false;
+  if (
+    alwaysExpand.has(first) ||
     level < 1 ||
-    (keyPath[1] === "creators" && level < 2) ||
-    (level < 2 && Array.isArray(data) && data.length > 1) ||
-    keyPath[0] === "position"
+    (level < 2 && Array.isArray(data) && data.length > 1)
   )
     return true;
   return false;
@@ -178,14 +196,24 @@ const getItemString = (
       return <span>{name}</span>;
     }
   }
+  if (keyPath[1] === "tags" && keyPath.length === 3) {
+    const tag = data as ItemTag;
+    return (
+      <span>
+        "{tag.name}"" ({TagType[tag.type]})
+      </span>
+    );
+  }
   if (keyPath[0] === "sortIndex" && keyPath.length === 2) {
     const sortIndex = data as number[];
     return <span>[{sortIndex.join(", ")}]</span>;
   }
   if (keyPath.length === 2 && Array.isArray(data) && data.length === 1) {
+    // show first item of array if it contains only one
+    const text = JSON.stringify(data[0]);
     return (
       <span>
-        {itemType} {JSON.stringify(data[0])}
+        {itemType} {text.length > 100 ? text.slice(0, 100) + "..." : text}
       </span>
     );
   }

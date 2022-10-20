@@ -47,7 +47,7 @@ export const withHelper = <
       const keys = Reflect.ownKeys(target);
       if (extra) keys.push(...Reflect.ownKeys(extra));
       if (getters) keys.push(...Reflect.ownKeys(getters));
-      keys.sort();
+      // keys.sort();
       return keys;
     },
   });
