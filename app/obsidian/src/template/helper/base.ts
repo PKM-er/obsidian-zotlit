@@ -43,6 +43,13 @@ export const withHelper = <
       // @ts-ignore
       return Reflect.get(...arguments); // ?? context[prop];
     },
+    ownKeys(target) {
+      const keys = Reflect.ownKeys(target);
+      if (extra) keys.push(...Reflect.ownKeys(extra));
+      if (getters) keys.push(...Reflect.ownKeys(getters));
+      keys.sort();
+      return keys;
+    },
   });
   helperRevokeMap.set(proxy, revoke);
   return proxy as D & E & { [key in keyof G]: ReturnType<G[key]> }; // & Context;

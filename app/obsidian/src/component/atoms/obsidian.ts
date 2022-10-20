@@ -2,9 +2,15 @@ import type { GeneralItem } from "@obzt/zotero-type";
 import { atom } from "jotai";
 import { RESET } from "jotai/utils";
 import { getItemKeyFromFrontmatter } from "../../note-index/ztkey-file-map";
+import type { Context } from "../../template/helper";
 import type ZoteroPlugin from "../../zt-main";
 import { annotsAtom } from "./annotation";
 import { attachmentsAtom } from "./attachment";
+
+export const helperContextAtom = atom<Context>((get) => ({
+  plugin: get(pluginAtom),
+  sourcePath: get(activeFileAtom),
+}));
 
 export const pluginAtom = atom<ZoteroPlugin>(null as never);
 

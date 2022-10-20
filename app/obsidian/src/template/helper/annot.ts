@@ -75,7 +75,7 @@ export const withAnnotHelper = (
       \`\`\``;
     },
     colorName() {
-      switch (this.color) {
+      switch (this.color?.toUpperCase()) {
         // from zotero.tagColorChooser
         case "#FF6666":
           return "red";

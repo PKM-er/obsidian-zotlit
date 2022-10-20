@@ -9,17 +9,11 @@ import type { RefObject } from "react";
 import type { AnnotationView } from "../../note-feature/annot-view/view";
 import { annotViewAtom } from "../../note-feature/annot-view/view";
 import { useIconRef } from "../../utils/icon";
-import { activeAtchAtom } from "../atoms/attachment";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
-import { activeFileAtom, pluginAtom } from "../atoms/obsidian";
+import { pluginAtom } from "../atoms/obsidian";
 import { GLOBAL_SCOPE } from "../atoms/utils";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
-import {
-  annotAtom,
-  ANNOT_PREVIEW_SCOPE,
-  loadableTagsAtom,
-  useAnnotValue,
-} from "./atom";
+import { useAnnotHelperArgs, useAnnotValue } from "./atom";
 const HeaderIcon = ({
   containerRef,
 }: {
@@ -61,25 +55,17 @@ const Page = () => {
 };
 
 const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
-  const tags = useAtomValue(loadableTagsAtom, ANNOT_PREVIEW_SCOPE),
-    annot = useAtomValue(annotAtom, ANNOT_PREVIEW_SCOPE),
-    attachment = useAtomValue(activeAtchAtom, GLOBAL_SCOPE),
-    plugin = useAtomValue(pluginAtom, GLOBAL_SCOPE),
-    sourcePath = useAtomValue(activeFileAtom, GLOBAL_SCOPE);
+  const plugin = useAtomValue(pluginAtom, GLOBAL_SCOPE);
+  const helperArgs = useAnnotHelperArgs();
 
   const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
     (evt) => {
-      if (tags.state === "hasData") {
-        if (!attachment) return;
+      if (helperArgs) {
         const {
           settings: { template },
           imgCacheImporter,
         } = plugin;
-        const str = template.renderAnnot(
-          annot,
-          { attachment, tags: tags.data },
-          { plugin, sourcePath },
-        );
+        const str = template.renderAnnot(...helperArgs);
         evt.dataTransfer.setData("text/plain", str);
         const evtRef = app.workspace.on("editor-drop", (evt) => {
           if (evt.dataTransfer?.getData("text/plain") === str) {
@@ -87,13 +73,9 @@ const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
           }
           app.workspace.offref(evtRef);
         });
-        window.addEventListener(
-          "dragend",
-          () => {
-            imgCacheImporter.cancel();
-          },
-          { once: true },
-        );
+        window.addEventListener("dragend", () => imgCacheImporter.cancel(), {
+          once: true,
+        });
         if (containerRef.current) {
           evt.dataTransfer.setDragImage(containerRef.current, 0, 0);
         }
@@ -103,11 +85,7 @@ const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
       }
     },
   );
-  if (tags.state === "hasData") {
-    return { draggable: true, onDragStart };
-  } else {
-    return { draggable: false, onDragStart };
-  }
+  return { draggable: !!helperArgs, onDragStart };
 };
 
 const useMoreOptionMenu = () => {
