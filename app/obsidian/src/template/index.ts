@@ -161,10 +161,22 @@ export default class NoteTemplate {
     }
   }
 
+  cacheReady = new Promise<void>((resolve) => {
+    if (app.metadataCache.initialized) {
+      resolve();
+    } else {
+      const ref = app.metadataCache.on("finished", () => {
+        resolve();
+        app.metadataCache.offref(ref);
+      });
+    }
+  });
+
   async load(name: EjectableTemplate) {
     if (!this.ejected) {
       throw new Error("Attempt to load template from file when not ejected");
     }
+    await this.cacheReady;
     const filePath = join(this.folder.path, TEMPLATE_FILES[name]);
     const af = app.vault.getAbstractFileByPath(filePath);
     if (af && !(af instanceof TFile)) {
@@ -176,6 +188,7 @@ export default class NoteTemplate {
     let file = af;
     let content;
     if (!file) {
+      log.info("Template file not found, creating new file...", filePath);
       file = await app.fileManager.createNewMarkdownFileFromLinktext(
         filePath,
         "",
