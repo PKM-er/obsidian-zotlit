@@ -41,7 +41,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     get zoteroCacheDirPath(): string {
       return join(this.zoteroDataDir, "cache");
     },
-    literatureNoteFolder: new InVaultPath(),
+    literatureNoteFolder: new InVaultPath("LiteratureNotes"),
     template: new NoteTemplate(plugin),
     logLevel: DEFAULT_LOGLEVEL,
     citationLibrary: 1,
@@ -50,7 +50,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     autoRefresh: true,
     mutoolPath: null,
     symlinkImgExcerpt: false,
-    imgExcerptPath: new InVaultPath("img-excerpt"),
+    imgExcerptPath: new InVaultPath("ZtImgExcerpt"),
   };
 };
 export type SettingKeyWithType<T> = {
