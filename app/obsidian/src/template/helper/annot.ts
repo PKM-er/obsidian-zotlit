@@ -74,6 +74,31 @@ export const withAnnotHelper = (
       > ${this.text} [zotero](${getBacklink(this)})
       \`\`\``;
     },
+    colorName() {
+      switch (this.color) {
+        // from zotero.tagColorChooser
+        case "#FF6666":
+          return "red";
+        case "#FF8C19":
+          return "orange";
+        case "#999999":
+          return "gray";
+        case "#5FB236":
+          return "green";
+        case "#009980":
+          return "cyan";
+        case "#2EA8E5":
+          return "blue";
+        case "#576DD9":
+          return "navy";
+        case "#A28AE5":
+          return "purple";
+        case "#A6507B":
+          return "brown";
+        default:
+          return this.color;
+      }
+    },
   });
 
 const isImageAnnot = (item: unknown): item is Annotation =>
