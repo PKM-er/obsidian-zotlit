@@ -1,17 +1,20 @@
 import clsx from "clsx";
+import { withAnnotHelper } from "../../template/helper/annot";
 import { ItemDetails } from "../item-view/item-details";
-import { useAnnotValue, useShowDetails } from "./atom";
+import { useAnnotHelperArgs, useShowDetails } from "./atom";
 
 export const AnnotDetailsView = () => {
-  const annot = useAnnotValue();
   const [showingDetails] = useShowDetails();
-  return (
-    <div
-      className={clsx("annot-details", {
-        showing: showingDetails,
-      })}
-    >
-      <ItemDetails item={annot} />
-    </div>
-  );
+  const args = useAnnotHelperArgs();
+  if (args)
+    return (
+      <div
+        className={clsx("annot-details", {
+          showing: showingDetails,
+        })}
+      >
+        <ItemDetails item={withAnnotHelper(...args)} />
+      </div>
+    );
+  else return null;
 };

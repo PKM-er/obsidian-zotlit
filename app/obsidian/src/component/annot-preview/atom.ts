@@ -1,13 +1,16 @@
 import type { Annotation } from "@obzt/zotero-type";
-import { TagType } from "@obzt/zotero-type";
 import equal from "fast-deep-equal";
 import type { PrimitiveAtom } from "jotai";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import { useMemo } from "react";
+import type { AnnotationExtra, Context } from "../../template/helper";
+import { withAnnotHelper } from "../../template/helper/annot";
 import { stateAtomFamily } from "../atoms/annotation";
+import { activeAtchAtom } from "../atoms/attachment";
 import { useSelector } from "../atoms/derived";
-import { pluginAtom } from "../atoms/obsidian";
+import { helperContextAtom, pluginAtom } from "../atoms/obsidian";
+import { GLOBAL_SCOPE } from "../atoms/utils";
 
 /** annotations atom */
 
@@ -38,14 +41,27 @@ export const useIsSelected = () => {
 };
 
 export const tagsAtom = atom(async (get) => {
-  const { itemID } = get(get(annotAtomAtom));
-  const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
-  return tags.filter((t) => t.type === TagType.manual);
-});
+    const { itemID } = get(annotAtom);
+    const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+    return tags; // .filter((t) => t.type === TagType.manual);
+  }),
+  loadableTagsAtom = loadable(tagsAtom);
 
-export const annotAtom = loadable(
-  atom((get) => ({
-    ...get(get(annotAtomAtom)),
-    tags: get(tagsAtom),
-  })),
-);
+export const annotAtom = atom((get) => get(get(annotAtomAtom)));
+
+export const useAnnotHelperArgs = ():
+  | [Annotation, AnnotationExtra, Context]
+  | null => {
+  const annot = useAtomValue(annotAtom, ANNOT_PREVIEW_SCOPE),
+    tags = useAtomValue(loadableTagsAtom, ANNOT_PREVIEW_SCOPE),
+    attachment = useAtomValue(activeAtchAtom, GLOBAL_SCOPE),
+    ctx = useAtomValue(helperContextAtom, GLOBAL_SCOPE);
+  if (tags.state === "hasData" && attachment)
+    return [annot, { attachment, tags: tags.data }, ctx];
+  else return null;
+};
+
+export const useAnnotHelper = () => {
+  const args = useAnnotHelperArgs();
+  return args ? withAnnotHelper(...args) : null;
+};

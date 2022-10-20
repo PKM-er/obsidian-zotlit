@@ -1,11 +1,11 @@
 import { dialog } from "@electron/remote";
-import { createInitialValues } from "@utils/create-initial";
 import { useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import type { Atom, Getter } from "jotai";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { Notice } from "obsidian";
+import { createInitialValues } from "@utils/create-initial";
 import { pluginAtom } from "../component/atoms/obsidian";
 import type ZoteroPlugin from "../zt-main";
 

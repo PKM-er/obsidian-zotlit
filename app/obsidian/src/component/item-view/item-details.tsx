@@ -1,15 +1,18 @@
-import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
-import type { GeneralItem, Annotation } from "@obzt/zotero-type";
-import { atom, useAtom } from "jotai";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ItemTag } from "@obzt/zotero-type";
+import {
+  requiredKeys,
+  getCreatorName,
+  AnnotationType,
+  TagType,
+} from "@obzt/zotero-type";
+import endent from "endent";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
 import { JSONTree } from "react-json-tree";
-import { GLOBAL_SCOPE } from "../atoms/utils";
 import { useIconRef } from "../../utils/icon";
 
 const queryDarkMode = () => document.body.hasClass("theme-dark");
-
-const darkModeAtom = atom(queryDarkMode());
 
 const themeLight = {
   scheme: "Solarized Light",
@@ -53,11 +56,10 @@ const themeDark = {
   base0F: "#d33682",
 };
 
-export const ItemDetails = ({
-  item,
-}: {
-  item: GeneralItem | Annotation | null;
-}) => {
+// matches #RGB, #RGBA, #RRGGBB, #RRGGBBAA
+const hex = /^#(?:[\dA-F]{3}){1,2}$|^#(?:[\dA-F]{4}){1,2}$/i;
+
+export const ItemDetails = ({ item }: { item: any }) => {
   const [isDarkMode, setDarkMode] = useState(false);
   useEffect(() => {
     const listener = () => setDarkMode(queryDarkMode());
@@ -74,21 +76,79 @@ export const ItemDetails = ({
       keyPath={["Zotero Item Data"]}
       shouldExpandNode={shouldExpandNode}
       getItemString={getItemString}
+      valueRenderer={valueRenderer}
     />
   );
 };
 
+/** @see https://stackoverflow.com/a/41491220 */
+const shouldBlack = (bgHex: string) => {
+  const color = bgHex.charAt(0) === "#" ? bgHex.substring(1, 7) : bgHex;
+  const r = parseInt(color.substring(0, 2), 16); // hexToR
+  const g = parseInt(color.substring(2, 4), 16); // hexToG
+  const b = parseInt(color.substring(4, 6), 16); // hexToB
+  return r * 0.299 + g * 0.587 + b * 0.114 > 186;
+};
+
+const valueRenderer = (
+  valueAsString: string,
+  value: unknown,
+  ...keyPath: (string | number)[]
+): React.ReactNode => {
+  if (typeof value === "string" && hex.test(value)) {
+    return (
+      <span
+        style={{
+          backgroundColor: value,
+          padding: "0 0.5em",
+          color: shouldBlack(value) ? "black" : "white",
+        }}
+      >
+        {value}
+      </span>
+    );
+  }
+  if (keyPath[0] === "type" && typeof value === "number") {
+    let type = "";
+    if (keyPath.length === 2 && AnnotationType[value]) {
+      type = AnnotationType[value];
+    } else if (
+      keyPath.length === 4 &&
+      typeof keyPath[1] === "number" &&
+      keyPath[2] === "tags" &&
+      TagType[value]
+    ) {
+      type = TagType[value];
+    }
+    if (type) {
+      return (
+        <>
+          {valueAsString} <span>({type})</span>
+        </>
+      );
+    }
+  }
+  return valueAsString;
+};
+
+const neverExpand = new Set(["sortIndex"]),
+  noExpandIfLarge = new Set(["creators", "tags"]),
+  alwaysExpand = new Set(["position"]);
 const shouldExpandNode = (
   keyPath: (string | number)[],
   data: unknown,
   level: number,
 ) => {
-  if (keyPath[0] === "sortIndex") return false;
+  const first = keyPath[0] as never;
   if (
+    neverExpand.has(first) ||
+    (noExpandIfLarge.has(first) && Array.isArray(data) && data.length > 6)
+  )
+    return false;
+  if (
+    alwaysExpand.has(first) ||
     level < 1 ||
-    (keyPath[1] === "creators" && level < 2) ||
-    (level < 2 && Array.isArray(data) && data.length > 1) ||
-    keyPath[0] === "position"
+    (level < 2 && Array.isArray(data) && data.length > 1)
   )
     return true;
   return false;
@@ -136,14 +196,24 @@ const getItemString = (
       return <span>{name}</span>;
     }
   }
+  if (keyPath[1] === "tags" && keyPath.length === 3) {
+    const tag = data as ItemTag;
+    return (
+      <span>
+        "{tag.name}"" ({TagType[tag.type]})
+      </span>
+    );
+  }
   if (keyPath[0] === "sortIndex" && keyPath.length === 2) {
     const sortIndex = data as number[];
     return <span>[{sortIndex.join(", ")}]</span>;
   }
   if (keyPath.length === 2 && Array.isArray(data) && data.length === 1) {
+    // show first item of array if it contains only one
+    const text = JSON.stringify(data[0]);
     return (
       <span>
-        {itemType} {JSON.stringify(data[0])}
+        {itemType} {text.length > 100 ? text.slice(0, 100) + "..." : text}
       </span>
     );
   }
@@ -154,14 +224,7 @@ const getItemString = (
   );
 };
 const getKeyName = (keyPath: (string | number)[]) =>
-  keyPath
-    .map((v) => {
-      if (typeof v === "number" || v.includes("-") || v.includes(" "))
-        return `[${v}]`;
-      else return v;
-    })
-    .reverse()
-    .join(".");
+  "it" + keyPath.map(toPropName).reverse().join("");
 const labelRenderer = (
   keyPathWithRoot: (string | number)[],
   nodeType: string,
@@ -174,31 +237,55 @@ const labelRenderer = (
   const handler = (evt: React.MouseEvent<HTMLSpanElement>) => {
     const menu = new Menu().addItem((i) =>
       i.setTitle("Copy Template").onClick(() => {
-        navigator.clipboard.writeText("{{" + path + "}}");
+        navigator.clipboard.writeText(`<%= ${path} %>`);
       }),
     );
 
     if (expandable && nodeType !== "Array") {
       menu.addItem((i) =>
-        i.setTitle("Copy Template (using {{#with}})").onClick(() => {
-          navigator.clipboard.writeText(
-            "{{#with " + path + "}}" + " " + "{{/with}}",
-          );
+        i.setTitle("Copy Template (using with)").onClick(() => {
+          const [toPick, ...rest] = keyPath;
+          const destruct =
+            typeof toPick === "string" && identifiers.test(toPick)
+              ? toPick
+              : `'${toPick}'`;
+          navigator.clipboard.writeText(endent`
+          <% { const { ${destruct}: $it } = ${getKeyName(rest)}; %>
+            <%= $it %>
+          <% } %>`);
         }),
       );
     }
     if (nodeType === "Array") {
       menu
         .addItem((i) =>
-          i.setTitle("Copy Template (using {{#each}})").onClick(() => {
+          i.setTitle("Copy Template (using for-of loop)").onClick(() => {
             navigator.clipboard.writeText(
-              "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
+              endent`
+              <% for (const $it of ${path}) { %>
+                <%= $it %>
+              <% } %>`,
+            );
+          }),
+        )
+        .addItem((i) =>
+          i.setTitle("Copy Template (using forEach)").onClick(() => {
+            navigator.clipboard.writeText(
+              endent`
+              <% ${path}.forEach(($it, i) => { %>
+                <%= $it %>
+              <% }) %>`,
             );
           }),
         )
         .addItem((i) =>
           i.setTitle("Copy Template (pick first element)").onClick(() => {
-            navigator.clipboard.writeText("{{" + path + ".[0]}}");
+            navigator.clipboard.writeText(`<%= ${path}.first() %>`);
+          }),
+        )
+        .addItem((i) =>
+          i.setTitle("Copy Template (pick last element)").onClick(() => {
+            navigator.clipboard.writeText(`<%= ${path}.last() %>`);
           }),
         );
     }
@@ -206,7 +293,10 @@ const labelRenderer = (
       menu.addItem((i) =>
         i.setTitle("Copy Template (render when present)").onClick(() => {
           navigator.clipboard.writeText(
-            "{{#if " + path + "}}" + "{{this}}" + "{{/if}}",
+            endent`
+            <% if ${path} { %>
+              <%= ${path} %>
+            <% } %>`,
           );
         }),
       );
@@ -222,4 +312,12 @@ const labelRenderer = (
       }
     : undefined;
   return <span {...props}>{keyPathWithRoot[0]}: </span>;
+};
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
+const identifiers = /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u;
+const toPropName = (key: string | number) => {
+  if (typeof key === "number") return `[${key}]`;
+  if (identifiers.test(key)) return `.${key}`;
+  return `[${JSON.stringify(key)}]`;
 };

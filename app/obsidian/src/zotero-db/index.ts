@@ -273,12 +273,6 @@ export default class ZoteroDb extends Events {
     const proxy = await this.#proxy;
     return await proxy.getAnnotFromKey(keys, libId);
   }
-  async getAnnotsWithTags(attachmentId: number, libId = this.defaultLibId) {
-    const proxy = await this.#proxy;
-    const annots = await proxy.getAnnotations(attachmentId, libId);
-    const tags = await this.getTags(annots.map((a) => a.itemID));
-    return annots.map((a) => ({ ...a, tags: tags[a.itemID] }));
-  }
   async getTags(itemIDs: number[], libId = this.defaultLibId) {
     const proxy = await this.#proxy;
     return await proxy.getTags(itemIDs, libId);
