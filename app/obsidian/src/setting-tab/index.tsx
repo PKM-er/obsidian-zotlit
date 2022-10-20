@@ -12,6 +12,7 @@ import ReactDOM from "react-dom";
 import log from "@log";
 
 import type { SettingKeyWithType } from "../settings.js";
+import { TEMPLATE_NAMES } from "../template";
 import { promptOpenLog } from "../utils/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { DatabaseSetting } from "./database-path.js";
@@ -181,13 +182,13 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   templates(): void {
     new Setting(this.containerEl).setHeading().setName("Templates");
-    const template = this.plugin.settings.literatureNoteTemplate;
-    for (const key of template.getAllTemplatePropNames()) {
+    const { template } = this.plugin.settings;
+    for (const key of TEMPLATE_NAMES) {
       let title: string,
         size: TextAreaSize | undefined = undefined;
       const desc: string | DocumentFragment = "";
       switch (key) {
-        case "content":
+        case "note":
           title = "Note Content";
           break;
         case "filename":
@@ -200,11 +201,11 @@ export class ZoteroSettingTab extends PluginSettingTab {
         case "annots":
           title = "Annotations";
           break;
-        case "mdCite":
+        case "citation":
           title = "Markdown primary citation template";
           size = { rows: 2 };
           break;
-        case "altMdCite":
+        case "altCitation":
           title = "Markdown secondary citation template";
           size = { rows: 2 };
           break;
@@ -213,8 +214,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
       }
       const setting = this.addTextField(
         this.containerEl,
-        () => template[key],
-        (value) => (template[key] = value),
+        () => template.getTemplate(key),
+        (value) => template.complie(key, value),
         size,
       ).setName(title);
       if (desc) setting.setDesc(desc);

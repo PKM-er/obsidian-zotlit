@@ -1,8 +1,5 @@
 import type { AttachmentInfo } from "@obzt/database";
-import type {
-  AnnotationWithTags,
-  ItemWithAnnots,
-} from "../note-template/const.js";
+import type { Annotation } from "@obzt/zotero-type";
 import { ZoteroItemSuggestModal } from "../suggester/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { AttachmentSelectModal } from "./atch-select.js";
@@ -26,37 +23,35 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
     const { item } = result.value;
     if (await openNote(this.plugin, item, true)) return true;
 
-    const attachments = await this.plugin.db.getAttachments(item.itemID);
-    let selectedAtch: AttachmentInfo | null = null;
-    if (attachments.length > 1) {
+    const allAttachments = await this.plugin.db.getAttachments(item.itemID);
+    let attachment: AttachmentInfo | null = null;
+    if (allAttachments.length > 1) {
       // prompt for attachment selection
-      selectedAtch =
-        (await new AttachmentSelectModal(attachments).open())?.value.item ??
+      attachment =
+        (await new AttachmentSelectModal(allAttachments).open())?.value.item ??
         null;
     } else {
-      selectedAtch = attachments[0] ?? null;
+      attachment = allAttachments[0] ?? null;
     }
 
-    let annotations: AnnotationWithTags[] = [];
-    if (selectedAtch) {
-      const attachment = selectedAtch;
-      annotations = (
-        await this.plugin.db.getAnnotsWithTags(selectedAtch.itemID)
-      ).map((a) => {
-        const atch = a as AnnotationWithTags;
-        atch.attachment = attachment;
-        return atch;
-      });
-    }
+    const annotations: Annotation[] = attachment
+      ? await this.plugin.db.getAnnotations(attachment.itemID)
+      : [];
 
-    const itemWithAnnots: ItemWithAnnots = {
-      ...item,
-      attachments,
-      selectedAtch,
-      annotations,
-    };
+    const tagsRecord = await this.plugin.db.getTags([
+      item.itemID,
+      ...annotations.map((i) => i.itemID),
+    ]);
 
-    const note = await createNote(this.plugin, itemWithAnnots);
+    const note = await createNote(this.plugin, item, {
+      attachment,
+      tags: tagsRecord[item.itemID],
+      allAttachments,
+      annotations: annotations.map((a) => [
+        a,
+        { attachment, tags: tagsRecord[a.itemID] },
+      ]),
+    });
     await app.workspace.openLinkText(note.path, "", false);
     return true;
   }

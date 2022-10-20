@@ -7,13 +7,13 @@ import type {
   EditorSuggestTriggerInfo,
 } from "obsidian";
 
-import type NoteTemplate from "../note-template/index.js";
 import type { FuzzyMatch } from "../suggester/index.js";
 import {
   isAlternative,
   ZoteroItemEditorSuggest,
   ZoteroItemSuggestModal,
 } from "../suggester/index.js";
+import type NoteTemplate from "../template/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 const instructions = [
@@ -38,7 +38,7 @@ class CitationSuggestModal extends ZoteroItemSuggestModal {
       { item: result.value.item, alt: isAlternative(result.evt) },
       undefined,
       editor,
-      this.plugin.settings.literatureNoteTemplate,
+      this.plugin.settings.template,
     );
     return true;
   }
@@ -81,7 +81,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
       { item, alt: isAlternative(evt) },
       this.context,
       this.context.editor,
-      this.plugin.settings.literatureNoteTemplate,
+      this.plugin.settings.template,
     );
   }
 }
@@ -94,7 +94,7 @@ const insertCitationTo = (
 ) => {
   const cursor = editor.getCursor();
   range = range ?? { start: cursor, end: cursor };
-  const citation = template.render(alt ? "altMdCite" : "mdCite", item);
+  const citation = template.renderCitation(item, alt);
   editor.replaceRange(citation, range.start, range.end);
   editor.setCursor(
     editor.offsetToPos(editor.posToOffset(range.start) + citation.length),

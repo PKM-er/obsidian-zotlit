@@ -4,7 +4,6 @@ import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { renderHTMLReact } from "@utils";
 import { createInitialValues } from "@utils/create-initial";
-import type { AnnotationWithTags } from "../../note-template/const";
 import { useSelector } from "../atoms/derived.js";
 import { pluginAtom } from "../atoms/obsidian";
 import { GLOBAL_SCOPE } from "../atoms/utils";
@@ -13,11 +12,6 @@ import { annotAtomAtom, ANNOT_PREVIEW_SCOPE, useIsSelected } from "./atom";
 import Content from "./content";
 import Header from "./header.jsx";
 import { Tags } from "./tags";
-
-export type DragHandler = (
-  e: React.DragEvent<HTMLDivElement>,
-  annot: Omit<AnnotationWithTags, "attachment">,
-) => void;
 
 export const AnnotationPreview = () => {
   const contentRef = useRef<HTMLDivElement>(null);

@@ -1,12 +1,13 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
+import type { GeneralItem } from "@obzt/zotero-type";
 import { BaseError } from "make-error";
 import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/index.js";
-import type { ItemWithAnnots } from "../note-template/const.js";
-import { ZOTERO_KEY_FIELDNAME } from "../note-template/const.js";
+import { ZOTERO_KEY_FIELDNAME } from "../template/defaults.js";
+import type { GeneralItemExtra } from "../template/helper/item.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 export class NoteExistsError extends BaseError {
@@ -18,7 +19,8 @@ export class NoteExistsError extends BaseError {
 
 export const createNote = async (
   plugin: ZoteroPlugin,
-  item: ItemWithAnnots,
+  item: GeneralItem,
+  extra: GeneralItemExtra,
 ): Promise<TFile> => {
   const info = plugin.noteIndex.getNoteFromItem(item);
   if (info) {
@@ -27,9 +29,8 @@ export const createNote = async (
   }
 
   const { vault, fileManager, metadataCache: meta } = plugin.app,
-    { literatureNoteFolder: folder, literatureNoteTemplate: template } =
-      plugin.settings;
-  const filepath = join(folder.path, template.render("filename", item));
+    { literatureNoteFolder: folder, template } = plugin.settings;
+  const filepath = join(folder.path, template.renderFilename(item));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {
     const metadata = meta.getCache(existingFile.path);
@@ -42,12 +43,17 @@ export const createNote = async (
       throw new NoteExistsError(filepath, item.key);
     }
   }
+  const content = template.renderNote(item, extra, {
+    plugin,
+    sourcePath: filepath,
+  });
+
   // filepath with suffix if file already exists
   const note = await fileManager.createNewMarkdownFileFromLinktext(
     filepath,
     "",
   );
-  await vault.modify(note, template.render("content", item));
+  await vault.modify(note, content);
   return note;
 };
 

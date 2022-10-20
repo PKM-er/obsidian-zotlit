@@ -25,7 +25,7 @@ export default class NoteIndex extends Events {
     return this.plugin.app.vault;
   }
   get template() {
-    return this.plugin.settings.literatureNoteTemplate;
+    return this.plugin.settings.template;
   }
 
   keyFileMap: Map<string, KeyFileInfo> = new Map();

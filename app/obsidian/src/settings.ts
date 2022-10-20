@@ -6,7 +6,7 @@ import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
 import log, { DEFAULT_LOGLEVEL } from "@log";
 
-import NoteTemplate from "./note-template/index.js";
+import NoteTemplate from "./template/index.js";
 import type ZoteroPlugin from "./zt-main.js";
 
 export interface ZoteroSettings {
@@ -15,7 +15,7 @@ export interface ZoteroSettings {
   betterBibTexDbPath: string;
   zoteroCacheDirPath: string;
   literatureNoteFolder: InVaultPath;
-  literatureNoteTemplate: NoteTemplate;
+  template: NoteTemplate;
   logLevel: LogLevel;
   citationLibrary: number;
   citationEditorSuggester: boolean;
@@ -42,7 +42,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
       return join(this.zoteroDataDir, "cache");
     },
     literatureNoteFolder: new InVaultPath(),
-    literatureNoteTemplate: new NoteTemplate(plugin),
+    template: new NoteTemplate(plugin),
     logLevel: DEFAULT_LOGLEVEL,
     citationLibrary: 1,
     citationEditorSuggester: true,
@@ -73,11 +73,7 @@ export async function loadSettings(this: ZoteroPlugin) {
   Object.assign(
     this.settings,
     json,
-    updateFromJSON(
-      "literatureNoteFolder",
-      "imgExcerptPath",
-      "literatureNoteTemplate",
-    ),
+    updateFromJSON("literatureNoteFolder", "imgExcerptPath", "template"),
   );
   log.level = this.settings.logLevel;
 }

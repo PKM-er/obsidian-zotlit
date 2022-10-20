@@ -38,14 +38,10 @@ export const useIsSelected = () => {
 };
 
 export const tagsAtom = atom(async (get) => {
-  const { itemID } = get(get(annotAtomAtom));
-  const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
-  return tags.filter((t) => t.type === TagType.manual);
-});
+    const { itemID } = get(annotAtom);
+    const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+    return tags.filter((t) => t.type === TagType.manual);
+  }),
+  loadableTagsAtom = loadable(tagsAtom);
 
-export const annotAtom = loadable(
-  atom((get) => ({
-    ...get(get(annotAtomAtom)),
-    tags: get(tagsAtom),
-  })),
-);
+export const annotAtom = atom((get) => get(get(annotAtomAtom)));

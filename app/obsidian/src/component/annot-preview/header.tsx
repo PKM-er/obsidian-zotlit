@@ -11,11 +11,15 @@ import { annotViewAtom } from "../../note-feature/annot-view/view";
 import { useIconRef } from "../../utils/icon";
 import { activeAtchAtom } from "../atoms/attachment";
 import { getColor, getIcon, useSelector } from "../atoms/derived";
-import { pluginAtom } from "../atoms/obsidian";
+import { activeFileAtom, pluginAtom } from "../atoms/obsidian";
 import { GLOBAL_SCOPE } from "../atoms/utils";
 import { AnnotDetailsToggle } from "../item-view/item-details-toggle";
-import { annotAtom, ANNOT_PREVIEW_SCOPE, useAnnotValue } from "./atom";
-import type { DragHandler } from ".";
+import {
+  annotAtom,
+  ANNOT_PREVIEW_SCOPE,
+  loadableTagsAtom,
+  useAnnotValue,
+} from "./atom";
 const HeaderIcon = ({
   containerRef,
 }: {
@@ -56,42 +60,40 @@ const Page = () => {
   else return <span className="annot-page">{pageText}</span>;
 };
 
-const useDragHandler = (): DragHandler => {
-  const activeAtch = useAtomValue(activeAtchAtom, GLOBAL_SCOPE);
-  const {
-    settings: { literatureNoteTemplate },
-    imgCacheImporter,
-  } = useAtomValue(pluginAtom, GLOBAL_SCOPE);
-  return useMemoizedFn((evt, annot) => {
-    if (!activeAtch) return;
-    const data = literatureNoteTemplate.render("annotation", {
-      ...annot,
-      attachment: activeAtch,
-    });
-    evt.dataTransfer.setData("text/plain", data);
-    const evtRef = app.workspace.on("editor-drop", (evt) => {
-      if (evt.dataTransfer?.getData("text/plain") === data) {
-        imgCacheImporter.flush();
-      }
-      app.workspace.offref(evtRef);
-    });
-    window.addEventListener(
-      "dragend",
-      () => {
-        imgCacheImporter.cancel();
-      },
-      { once: true },
-    );
-  });
-};
-
 const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
-  const annot = useAtomValue(annotAtom, ANNOT_PREVIEW_SCOPE);
-  const handler = useDragHandler();
+  const tags = useAtomValue(loadableTagsAtom, ANNOT_PREVIEW_SCOPE),
+    annot = useAtomValue(annotAtom, ANNOT_PREVIEW_SCOPE),
+    attachment = useAtomValue(activeAtchAtom, GLOBAL_SCOPE),
+    plugin = useAtomValue(pluginAtom, GLOBAL_SCOPE),
+    sourcePath = useAtomValue(activeFileAtom, GLOBAL_SCOPE);
+
   const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
     (evt) => {
-      if (annot.state === "hasData") {
-        handler(evt, annot.data);
+      if (tags.state === "hasData") {
+        if (!attachment) return;
+        const {
+          settings: { template },
+          imgCacheImporter,
+        } = plugin;
+        const str = template.renderAnnot(
+          annot,
+          { attachment, tags: tags.data },
+          { plugin, sourcePath },
+        );
+        evt.dataTransfer.setData("text/plain", str);
+        const evtRef = app.workspace.on("editor-drop", (evt) => {
+          if (evt.dataTransfer?.getData("text/plain") === str) {
+            imgCacheImporter.flush();
+          }
+          app.workspace.offref(evtRef);
+        });
+        window.addEventListener(
+          "dragend",
+          () => {
+            imgCacheImporter.cancel();
+          },
+          { once: true },
+        );
         if (containerRef.current) {
           evt.dataTransfer.setDragImage(containerRef.current, 0, 0);
         }
@@ -101,7 +103,7 @@ const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
       }
     },
   );
-  if (annot.state === "hasData") {
+  if (tags.state === "hasData") {
     return { draggable: true, onDragStart };
   } else {
     return { draggable: false, onDragStart };
