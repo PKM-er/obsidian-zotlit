@@ -20,6 +20,7 @@ import type {
   TemplateName,
 } from "./defaults";
 import {
+  EJECTABLE_TEMPLATE_NAMES,
   TEMPLATE_FILES,
   ZOTERO_KEY_FIELDNAME,
   DEFAULT_FRONTMATTER_FIELD,
@@ -31,7 +32,7 @@ import { withAnnotHelper } from "./helper/annot";
 import type { Context } from "./helper/base";
 import { revokeHelper } from "./helper/base";
 import { withItemHelper } from "./helper/item";
-import { renderFilename } from "./helper/utils";
+import { isEtaFile, renderFilename } from "./helper/utils";
 
 Eta.configure({ autoEscape: false });
 const grayMatterOptions = {};
@@ -155,9 +156,10 @@ export default class NoteTemplate {
           break;
       }
       Eta.templates.define(name, full);
-      log.info(`Template "${name}" complie success`, converted);
+      log.debug(`Template "${name}" complie success`, converted);
     } catch (error) {
       log.error("Error compling template", name, converted, error);
+      new Notice(`Error compling template "${name}", error: ${error}`);
     }
   }
 
@@ -188,7 +190,7 @@ export default class NoteTemplate {
     let file = af;
     let content;
     if (!file) {
-      log.info("Template file not found, creating new file...", filePath);
+      log.debug("Template file not found, creating new file...", filePath);
       file = await app.fileManager.createNewMarkdownFileFromLinktext(
         filePath,
         "",
@@ -233,6 +235,32 @@ export default class NoteTemplate {
         Object.assign(this.rawTemplates, { altCitation, citation, filename });
       }
     }
+    this.plugin.registerEvent(
+      app.vault.on("modify", (file) => {
+        if (
+          !this.ejected ||
+          !(file instanceof TFile) ||
+          !file.path.startsWith(this.folder.path) ||
+          !isEtaFile(file) ||
+          EJECTABLE_TEMPLATE_NAMES.every(
+            (n) => this.getTemplateFile(n) !== file.path,
+          )
+        ) {
+          return;
+        }
+        const name = Object.entries(TEMPLATE_FILES).find(
+          ([, filename]) => filename === file.name,
+        )?.[0];
+        if (!name) {
+          log.error(
+            "Failed to match eta file with template: unexpected file name",
+            file.name,
+          );
+          return;
+        }
+        this.load(name as EjectableTemplate);
+      }),
+    );
     await this.loadAll();
     return this;
   }

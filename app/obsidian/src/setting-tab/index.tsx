@@ -203,7 +203,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       { rows: 1 },
     )
       .setName("Template Folder")
-      .setDesc("The folder which templates are ejected into and saved");
+      .setDesc("The folder which templates are ejected into and stored");
     this.addToggle(this.containerEl, "autoPairEta", (val) => {
       this.plugin.editorExtensions.length = 0;
       if (val) {
