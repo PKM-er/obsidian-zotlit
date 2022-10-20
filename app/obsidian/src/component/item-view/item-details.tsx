@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
-import type { GeneralItem, Annotation } from "@obzt/zotero-type";
 import endent from "endent";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
@@ -50,11 +50,10 @@ const themeDark = {
   base0F: "#d33682",
 };
 
-export const ItemDetails = ({
-  item,
-}: {
-  item: GeneralItem | Annotation | null;
-}) => {
+// matches #RGB, #RGBA, #RRGGBB, #RRGGBBAA
+const hex = /^#(?:[\dA-F]{3}){1,2}$|^#(?:[\dA-F]{4}){1,2}$/i;
+
+export const ItemDetails = ({ item }: { item: any }) => {
   const [isDarkMode, setDarkMode] = useState(false);
   useEffect(() => {
     const listener = () => setDarkMode(queryDarkMode());
@@ -71,8 +70,39 @@ export const ItemDetails = ({
       keyPath={["Zotero Item Data"]}
       shouldExpandNode={shouldExpandNode}
       getItemString={getItemString}
+      valueRenderer={valueRenderer}
     />
   );
+};
+
+/** @see https://stackoverflow.com/a/41491220 */
+const shouldBlack = (bgHex: string) => {
+  const color = bgHex.charAt(0) === "#" ? bgHex.substring(1, 7) : bgHex;
+  const r = parseInt(color.substring(0, 2), 16); // hexToR
+  const g = parseInt(color.substring(2, 4), 16); // hexToG
+  const b = parseInt(color.substring(4, 6), 16); // hexToB
+  return r * 0.299 + g * 0.587 + b * 0.114 > 186;
+};
+
+const valueRenderer = (
+  valueAsString: string,
+  value: unknown,
+  ..._keyPath: (string | number)[]
+): React.ReactNode => {
+  if (typeof value === "string" && hex.test(value)) {
+    return (
+      <span
+        style={{
+          backgroundColor: value,
+          padding: "0 0.5em",
+          color: shouldBlack(value) ? "black" : "white",
+        }}
+      >
+        {value}
+      </span>
+    );
+  }
+  return valueAsString;
 };
 
 const shouldExpandNode = (
