@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
+import {
+  requiredKeys,
+  getCreatorName,
+  AnnotationType,
+} from "@obzt/zotero-type";
 import endent from "endent";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
@@ -87,7 +91,7 @@ const shouldBlack = (bgHex: string) => {
 const valueRenderer = (
   valueAsString: string,
   value: unknown,
-  ..._keyPath: (string | number)[]
+  ...keyPath: (string | number)[]
 ): React.ReactNode => {
   if (typeof value === "string" && hex.test(value)) {
     return (
@@ -100,6 +104,17 @@ const valueRenderer = (
       >
         {value}
       </span>
+    );
+  }
+  if (
+    keyPath[0] === "type" &&
+    typeof value === "number" &&
+    AnnotationType[value]
+  ) {
+    return (
+      <>
+        {valueAsString} <span>({AnnotationType[value]})</span>
+      </>
     );
   }
   return valueAsString;
