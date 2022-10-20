@@ -21,6 +21,7 @@ export interface ZoteroSettings {
   citationLibrary: number;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
+  autoPairEta: boolean;
   autoRefresh: boolean;
   mutoolPath: string | null;
   symlinkImgExcerpt: boolean;
@@ -49,6 +50,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
     autoRefresh: true,
+    autoPairEta: true,
     mutoolPath: null,
     symlinkImgExcerpt: false,
     imgExcerptPath: new InVaultPath("ZtImgExcerpt"),

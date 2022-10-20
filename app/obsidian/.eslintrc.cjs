@@ -34,6 +34,7 @@ module.exports = {
   rules: {
     "react/no-unknown-property": ["error", { ignore: ["aria-label-delay"] }],
     "jsx-a11y/aria-props": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "import/no-unresolved": [
       2,
       {

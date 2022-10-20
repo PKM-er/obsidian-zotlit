@@ -46,7 +46,9 @@
     "@types/dompurify": "~2.3.4",
     "@types/react": "~17.0.8",
     "@types/lodash-es": "~4.17.6",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@codemirror/autocomplete": "~6.3.0",
+    "@codemirror/state": "~6.1.2"
   },
   "config": {
     "commitizen": {

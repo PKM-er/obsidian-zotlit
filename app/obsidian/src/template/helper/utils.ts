@@ -1,7 +1,7 @@
 import { join, relative } from "path";
 import type { AttachmentInfo } from "@obzt/database";
 import filenamify from "filenamify";
-import type { FileSystemAdapter } from "obsidian";
+import type { FileSystemAdapter, TFile } from "obsidian";
 import log from "../../logger";
 
 export const toFileUrl = (path: string) => `file://${path}`;
@@ -9,6 +9,8 @@ export const toMdLinkComponent = (path: string): string => {
   const fileUrl = toFileUrl(path);
   return encodeURI(fileUrl) === fileUrl ? fileUrl : `<${fileUrl}>`;
 };
+
+export const isEtaFile = (file: TFile) => file.name.endsWith(".eta.md");
 
 export const fileLink = (
   dataDir: string,

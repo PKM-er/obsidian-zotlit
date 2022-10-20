@@ -1,5 +1,6 @@
 // import "./main.less";
 
+import type { Extension } from "@codemirror/state";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
@@ -18,6 +19,7 @@ import NoteIndex from "./note-index/index.js";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
+import registerEtaEditorHelper from "./template/editor";
 import { ImgCacheImporter } from "./zotero-db/img-import";
 import ZoteroDb from "./zotero-db/index.js";
 
@@ -48,11 +50,13 @@ export default class ZoteroPlugin extends Plugin {
     if (!this.#db) throw new Error("access database before load");
     return this.#db;
   }
+  editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
     await this.loadSettings();
     this.#db = new ZoteroDb(this);
     registerCodeBlock(this);
+    registerEtaEditorHelper(this);
     this.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",
