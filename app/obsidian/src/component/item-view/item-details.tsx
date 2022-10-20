@@ -1,15 +1,12 @@
 import { requiredKeys, getCreatorName } from "@obzt/zotero-type";
 import type { GeneralItem, Annotation } from "@obzt/zotero-type";
-import { atom, useAtom } from "jotai";
+import endent from "endent";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
 import { JSONTree } from "react-json-tree";
-import { GLOBAL_SCOPE } from "../atoms/utils";
 import { useIconRef } from "../../utils/icon";
 
 const queryDarkMode = () => document.body.hasClass("theme-dark");
-
-const darkModeAtom = atom(queryDarkMode());
 
 const themeLight = {
   scheme: "Solarized Light",
@@ -154,14 +151,7 @@ const getItemString = (
   );
 };
 const getKeyName = (keyPath: (string | number)[]) =>
-  keyPath
-    .map((v) => {
-      if (typeof v === "number" || v.includes("-") || v.includes(" "))
-        return `[${v}]`;
-      else return v;
-    })
-    .reverse()
-    .join(".");
+  "it" + keyPath.map(toPropName).reverse().join("");
 const labelRenderer = (
   keyPathWithRoot: (string | number)[],
   nodeType: string,
@@ -174,31 +164,55 @@ const labelRenderer = (
   const handler = (evt: React.MouseEvent<HTMLSpanElement>) => {
     const menu = new Menu().addItem((i) =>
       i.setTitle("Copy Template").onClick(() => {
-        navigator.clipboard.writeText("{{" + path + "}}");
+        navigator.clipboard.writeText(`<%= ${path} %>`);
       }),
     );
 
     if (expandable && nodeType !== "Array") {
       menu.addItem((i) =>
-        i.setTitle("Copy Template (using {{#with}})").onClick(() => {
-          navigator.clipboard.writeText(
-            "{{#with " + path + "}}" + " " + "{{/with}}",
-          );
+        i.setTitle("Copy Template (using with)").onClick(() => {
+          const [toPick, ...rest] = keyPath;
+          const destruct =
+            typeof toPick === "string" && identifiers.test(toPick)
+              ? toPick
+              : `'${toPick}'`;
+          navigator.clipboard.writeText(endent`
+          <% { const { ${destruct}: $it } = ${getKeyName(rest)}; %>
+            <%= $it %>
+          <% } %>`);
         }),
       );
     }
     if (nodeType === "Array") {
       menu
         .addItem((i) =>
-          i.setTitle("Copy Template (using {{#each}})").onClick(() => {
+          i.setTitle("Copy Template (using for-of loop)").onClick(() => {
             navigator.clipboard.writeText(
-              "{{#each " + path + "}}" + "{{this}}" + "{{/each}}",
+              endent`
+              <% for (const $it of ${path}) { %>
+                <%= $it %>
+              <% } %>`,
+            );
+          }),
+        )
+        .addItem((i) =>
+          i.setTitle("Copy Template (using forEach)").onClick(() => {
+            navigator.clipboard.writeText(
+              endent`
+              <% ${path}.forEach(($it, i) => { %>
+                <%= $it %>
+              <% }) %>`,
             );
           }),
         )
         .addItem((i) =>
           i.setTitle("Copy Template (pick first element)").onClick(() => {
-            navigator.clipboard.writeText("{{" + path + ".[0]}}");
+            navigator.clipboard.writeText(`<%= ${path}.first() %>`);
+          }),
+        )
+        .addItem((i) =>
+          i.setTitle("Copy Template (pick last element)").onClick(() => {
+            navigator.clipboard.writeText(`<%= ${path}.last() %>`);
           }),
         );
     }
@@ -206,7 +220,10 @@ const labelRenderer = (
       menu.addItem((i) =>
         i.setTitle("Copy Template (render when present)").onClick(() => {
           navigator.clipboard.writeText(
-            "{{#if " + path + "}}" + "{{this}}" + "{{/if}}",
+            endent`
+            <% if ${path} { %>
+              <%= ${path} %>
+            <% } %>`,
           );
         }),
       );
@@ -222,4 +239,12 @@ const labelRenderer = (
       }
     : undefined;
   return <span {...props}>{keyPathWithRoot[0]}: </span>;
+};
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
+const identifiers = /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u;
+const toPropName = (key: string | number) => {
+  if (typeof key === "number") return `[${key}]`;
+  if (identifiers.test(key)) return `.${key}`;
+  return `[${JSON.stringify(key)}]`;
 };
