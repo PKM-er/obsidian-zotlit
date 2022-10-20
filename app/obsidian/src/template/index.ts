@@ -1,3 +1,4 @@
+import { join } from "path/posix";
 import { getItemKeyGroupID } from "@obzt/common";
 import type {
   Annotation,
@@ -8,14 +9,18 @@ import type {
 import { getCreatorName } from "@obzt/zotero-type";
 import * as Eta from "eta";
 import { stringify } from "gray-matter";
+import { Notice, TFile } from "obsidian";
 import log from "../logger";
+import { InVaultPath } from "../settings";
 import type ZoteroPlugin from "../zt-main";
 import type {
-  NoteTemplateJSON,
+  EjectableTemplate,
+  NonEjectableTemplate,
   TemplateDataMap,
   TemplateName,
 } from "./defaults";
 import {
+  TEMPLATE_FILES,
   ZOTERO_KEY_FIELDNAME,
   DEFAULT_FRONTMATTER_FIELD,
   DEFAULT_TEMPLATE,
@@ -31,75 +36,25 @@ import { renderFilename } from "./helper/utils";
 Eta.configure({ autoEscape: false });
 const grayMatterOptions = {};
 
-// templates
-// ├─ zt-annot
-// │   ├─ template0.md
-// │   └─ ...
-// ├─ zt-annots
-// │   ├─ template0.md
-// │   └─ ...
-// └─ zt-note
-//     ├─ template0.md
-//     └─ ...
-
 export { TEMPLATE_NAMES, ZOTERO_KEY_FIELDNAME } from "./defaults";
 
 export default class NoteTemplate {
   private rawTemplates = { ...DEFAULT_TEMPLATE };
   private frontmatter = { ...DEFAULT_FRONTMATTER_FIELD };
-  constructor(public plugin: ZoteroPlugin) {
-    this.complieAll();
-  }
+  constructor(public plugin: ZoteroPlugin) {}
+
+  /** use default template or use template file */
+  ejected = false;
+  folder = new InVaultPath("ZtTemplates");
+  ready = false;
 
   getTemplate(name: TemplateName) {
     return this.rawTemplates[name];
   }
+  getTemplateFile(name: EjectableTemplate) {
+    return join(this.folder.path, TEMPLATE_FILES[name]);
+  }
 
-  complie(name: TemplateName, template?: string) {
-    try {
-      if (template) {
-        // update saved template str and complie
-        if (this.rawTemplates[name] === template) {
-          return;
-        }
-        this.rawTemplates[name] = template;
-      } else {
-        // (re)complie existing template str
-        template = this.rawTemplates[name];
-      }
-      const compiled = Eta.compile(template, { name });
-      let full: typeof compiled;
-      switch (name) {
-        case "filename":
-          full = (data, opts) => renderFilename(compiled(data, opts));
-          break;
-        case "note":
-          full = (data, opts) => {
-            const content = compiled(data, opts);
-            const frontmatterData = this.toFrontmatterData(
-              data as unknown as TemplateDataMap["note"],
-            );
-            if (frontmatterData)
-              return stringify(content, frontmatterData, grayMatterOptions);
-            else return content;
-          };
-          break;
-        default:
-          full = compiled;
-          break;
-      }
-      Eta.templates.define(name, full);
-      log.info(`Template "${name}" complie success`, template);
-    } catch (error) {
-      log.error("Error compling template", name, template, error);
-    }
-  }
-  complieAll() {
-    Eta.templates.reset();
-    for (const name of TEMPLATE_NAMES) {
-      this.complie(name);
-    }
-  }
   private render<T extends TemplateName>(target: T, obj: TemplateDataMap[T]) {
     return Eta.templates.get(target)(obj, Eta.config);
   }
@@ -161,16 +116,120 @@ export default class NoteTemplate {
     return notEmpty ? data : null;
   }
 
-  toJSON(): NoteTemplateJSON {
-    return this.rawTemplates;
+  toJSON(): TemplateJSON {
+    const { altCitation, citation, filename } = this.rawTemplates;
+    return {
+      ejected: this.ejected,
+      folder: this.folder.path,
+      templates: { altCitation, citation, filename },
+    };
   }
-  updateFromJSON(json: NoteTemplateJSON | undefined): this {
-    if (json) {
-      Object.assign(this.rawTemplates, json, {
-        // additional fields that need to be manually converted
-      });
+
+  complie(name: TemplateName, template: string) {
+    const converted = acceptLineBreak(template);
+    try {
+      if (!!Eta.templates.get(name) && this.rawTemplates[name] === template) {
+        return;
+      }
+      // update saved template str and complie
+      this.rawTemplates[name] = template;
+      const compiled = Eta.compile(converted, { name });
+      let full: typeof compiled;
+      switch (name) {
+        case "filename":
+          full = (data, opts) => renderFilename(compiled(data, opts));
+          break;
+        case "note":
+          full = (data, opts) => {
+            const content = compiled(data, opts);
+            const frontmatterData = this.toFrontmatterData(
+              data as unknown as TemplateDataMap["note"],
+            );
+            if (frontmatterData)
+              return stringify(content, frontmatterData, grayMatterOptions);
+            else return content;
+          };
+          break;
+        default:
+          full = compiled;
+          break;
+      }
+      Eta.templates.define(name, full);
+      log.info(`Template "${name}" complie success`, converted);
+    } catch (error) {
+      log.error("Error compling template", name, converted, error);
     }
-    this.complieAll();
+  }
+
+  async load(name: EjectableTemplate) {
+    if (!this.ejected) {
+      throw new Error("Attempt to load template from file when not ejected");
+    }
+    const filePath = join(this.folder.path, TEMPLATE_FILES[name]);
+    const af = app.vault.getAbstractFileByPath(filePath);
+    if (af && !(af instanceof TFile)) {
+      const msg = `Template file location occupied by a folder: ${filePath}, skipping...`;
+      new Notice(msg);
+      log.error(msg);
+      return;
+    }
+    let file = af;
+    let content;
+    if (!file) {
+      file = await app.fileManager.createNewMarkdownFileFromLinktext(
+        filePath,
+        "",
+      );
+      content = DEFAULT_TEMPLATE[name];
+      await app.vault.modify(file, content);
+    } else {
+      content = await app.vault.cachedRead(file);
+    }
+    this.complie(name, content);
+  }
+
+  async loadAll() {
+    this.ready = false;
+    if (!this.ejected) {
+      for (const name of TEMPLATE_NAMES) {
+        this.complie(name, DEFAULT_TEMPLATE[name]);
+      }
+    } else {
+      await Promise.all(
+        TEMPLATE_NAMES.map(async (name) =>
+          name in TEMPLATE_FILES
+            ? this.load(name as EjectableTemplate)
+            : this.complie(name, this.rawTemplates[name]),
+        ),
+      );
+    }
+    this.ready = true;
+  }
+
+  // load settings from JSON
+  async updateFromJSON(json: TemplateJSON | undefined) {
+    if (json) {
+      if (typeof json.ejected === "boolean") {
+        this.ejected = json.ejected ?? false;
+      }
+      if (json.folder && typeof json.folder === "string") {
+        this.folder.path = json.folder;
+      }
+      if (json.templates) {
+        const { altCitation, citation, filename } = json.templates;
+        Object.assign(this.rawTemplates, { altCitation, citation, filename });
+      }
+    }
+    await this.loadAll();
     return this;
   }
 }
+type TemplateJSON = {
+  ejected: boolean;
+  folder: string;
+  templates: Record<NonEjectableTemplate, string>;
+};
+
+/** allow to use \n in file */
+const acceptLineBreak = (str: string) =>
+  str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n");

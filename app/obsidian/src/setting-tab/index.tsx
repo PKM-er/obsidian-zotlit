@@ -6,13 +6,18 @@ import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
 import { assertNever } from "assert-never";
 import { around } from "monkey-around";
-import type { DropdownComponent, TextAreaComponent } from "obsidian";
+import type {
+  DropdownComponent,
+  ExtraButtonComponent,
+  TextAreaComponent,
+} from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
 import log from "@log";
 
 import type { SettingKeyWithType } from "../settings.js";
 import { TEMPLATE_NAMES } from "../template";
+import { EJECTABLE_TEMPLATE_NAMES } from "../template/defaults";
 import { promptOpenLog } from "../utils/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { DatabaseSetting } from "./database-path.js";
@@ -181,44 +186,144 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .then(renderDropdown);
   }
   templates(): void {
-    new Setting(this.containerEl).setHeading().setName("Templates");
     const { template } = this.plugin.settings;
+
+    new Setting(this.containerEl).setHeading().setName("Templates");
+    // template folder
+    this.addTextComfirm(
+      this.containerEl,
+      () => template.folder.path,
+      async (value: string, text: TextAreaComponent) => {
+        template.folder.path = value;
+        // correct with normalized path
+        if (template.folder.path !== value) text.setValue(template.folder.path);
+        await this.plugin.saveSettings();
+      },
+      { rows: 1 },
+    )
+      .setName("Template Folder")
+      .setDesc("The folder which templates are ejected into and saved");
+
+    new Setting(this.containerEl).setHeading().setName("Simple");
     for (const key of TEMPLATE_NAMES) {
-      let title: string,
-        size: TextAreaSize | undefined = undefined;
+      let title: string;
       const desc: string | DocumentFragment = "";
       switch (key) {
-        case "note":
-          title = "Note Content";
-          break;
         case "filename":
           title = "Note Filename";
-          size = { rows: 2 };
-          break;
-        case "annotation":
-          title = "Annotation";
-          break;
-        case "annots":
-          title = "Annotations";
           break;
         case "citation":
           title = "Markdown primary citation template";
-          size = { rows: 2 };
           break;
         case "altCitation":
           title = "Markdown secondary citation template";
-          size = { rows: 2 };
           break;
         default:
-          assertNever(key);
+          continue;
       }
       const setting = this.addTextField(
         this.containerEl,
         () => template.getTemplate(key),
         (value) => template.complie(key, value),
-        size,
+        { rows: 2 },
       ).setName(title);
       if (desc) setting.setDesc(desc);
+    }
+    let ejectButton: ExtraButtonComponent = {} as never;
+    const setting = new Setting(this.containerEl)
+      .setHeading()
+      .setName("Ejectable")
+      .setDesc("These templates can be customized once ejected into vault");
+
+    const labelEl = setting.controlEl.createDiv();
+    setting.addExtraButton((btn) => {
+      ejectButton = btn;
+    });
+
+    const setEjectButton = () => {
+      let icon, text, desc;
+      if (!template.ejected) {
+        icon = "folder-input";
+        text = "Eject";
+        desc = "Eject templates into vault";
+      } else {
+        icon = "x-circle";
+        text = "Revert";
+        desc = "Revert templates to default";
+      }
+      ejectButton.setIcon(icon).setTooltip(desc);
+      labelEl.setText(text);
+    };
+    setEjectButton();
+    ejectButton.onClick(async () => {
+      template.ejected = !template.ejected;
+      await this.plugin.saveSettings();
+      await template.loadAll();
+      setEjectButton();
+      this.setEjectableTemplates(ejectableContainer);
+    });
+
+    const ejectableContainer = this.containerEl.createDiv();
+    this.setEjectableTemplates(ejectableContainer);
+  }
+  setEjectableTemplates(container: HTMLElement) {
+    container.empty();
+    const { template } = this.plugin.settings;
+    for (const name of EJECTABLE_TEMPLATE_NAMES) {
+      let title,
+        desc: string | DocumentFragment = "";
+      switch (name) {
+        case "note":
+          title = "Note Content";
+          desc = "Used to render created literature note";
+          break;
+        case "annotation":
+          title = "Annotaion";
+          desc = "Used to render single annotation";
+          break;
+        case "annots":
+          title = "Annotations";
+          desc = "Used to render annotation list when batch importing";
+          break;
+        default:
+          assertNever(name);
+      }
+      if (template.ejected) {
+        new Setting(container)
+          .setName(name)
+          .setDesc(desc)
+          .then((setting) =>
+            setting.controlEl.createDiv("", (el) => {
+              el.createEl("code", { text: template.getTemplateFile(name) });
+            }),
+          )
+          .addButton((btn) =>
+            btn
+              .setIcon("arrow-up-right")
+              .setTooltip("Open Template File")
+              .onClick(async () => {
+                if (!template.ejected) {
+                  new Notice("Cannot open file, templates are not ejected");
+                  return;
+                }
+                await app.workspace.openLinkText(
+                  template.getTemplateFile(name),
+                  "",
+                );
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (this as any).setting.close();
+              }),
+          );
+      } else {
+        this.addTextField(
+          container,
+          () => template.getTemplate(name),
+          (value) => template.complie(name, value),
+        )
+          .setName(title)
+          .setDesc(desc)
+          .setDisabled(true);
+      }
     }
   }
   logLevel = () => {

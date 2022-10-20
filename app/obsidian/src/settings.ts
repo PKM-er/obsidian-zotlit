@@ -2,6 +2,7 @@
 import { homedir } from "os";
 import { join } from "path";
 import type { LogLevel } from "@obzt/common";
+import { enumerate } from "@obzt/common";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
 import log, { DEFAULT_LOGLEVEL } from "@log";
@@ -58,22 +59,33 @@ export type SettingKeyWithType<T> = {
 }[keyof ZoteroSettings];
 type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
 
+const requireConvert = new Set(
+  enumerate<RequireConvert>()(
+    "imgExcerptPath",
+    "literatureNoteFolder",
+    "template",
+  ),
+);
+const getters = new Set([
+  "zoteroDbPath",
+  "betterBibTexDbPath",
+  "zoteroCacheDirPath",
+] as const);
+const isRequireConvert = (key: string): key is RequireConvert =>
+  requireConvert.has(key as RequireConvert);
 export async function loadSettings(this: ZoteroPlugin) {
-  // ignore settings from previous version
-  const { zoteroDbPath, betterBibTexDbPath, zoteroCacheDirPath, ...json } =
-    (await this.loadData()) ?? {};
-  const updateFromJSON = (...keys: RequireConvert[]) => {
-    if (!json) return {};
-    const obj = {} as any;
-    for (const key of keys) {
-      obj[key] = this.settings[key].updateFromJSON(json[key]);
-    }
-    return obj;
-  };
-  Object.assign(
-    this.settings,
-    json,
-    updateFromJSON("literatureNoteFolder", "imgExcerptPath", "template"),
+  const json = (await this.loadData()) ?? {};
+  await Promise.all(
+    Object.keys(this.settings).map(async (k) => {
+      const key = k as keyof ZoteroSettings;
+      // don't load settings to getters
+      if (getters.has(key as never)) return;
+      if (isRequireConvert(key)) {
+        await this.settings[key].updateFromJSON(json[key]);
+      } else if (json[key] !== undefined) {
+        this.settings[key] = json[key] as never;
+      }
+    }),
   );
   log.level = this.settings.logLevel;
 }
@@ -85,11 +97,11 @@ export async function saveSettings(this: ZoteroPlugin) {
 }
 
 export interface ClassInSettings<Out> {
-  updateFromJSON(json: Out | undefined): this;
+  updateFromJSON(json: Out | undefined): Promise<this> | this;
   toJSON(): Out;
 }
 
-class InVaultPath implements ClassInSettings<string> {
+export class InVaultPath implements ClassInSettings<string> {
   static defaultPath = "/";
   constructor(path?: string) {
     this.path = path ?? InVaultPath.defaultPath;
