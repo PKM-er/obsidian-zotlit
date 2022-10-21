@@ -23,7 +23,6 @@ module.exports = {
   },
   ignorePatterns: [...getDefaultIgnorePatterns()],
   extends: [
-    "@aidenlx/eslint-config/typescript",
     "@aidenlx/eslint-config/regexp",
     // Apply prettier and disable incompatible rules
     "@aidenlx/eslint-config/prettier",
@@ -39,4 +38,17 @@ module.exports = {
       typescript: typescriptOptions,
     },
   },
+  overrides: [
+    {
+      files: ["*.mdx"],
+      extends: ["plugin:mdx/recommended"],
+      rules: {
+        "prettier/prettier": "off",
+      },
+    },
+    {
+      files: ["*.ts", "*.tsx", "*.js", "*.jsx", "*.cjs"],
+      extends: ["@aidenlx/eslint-config/typescript"],
+    },
+  ],
 };

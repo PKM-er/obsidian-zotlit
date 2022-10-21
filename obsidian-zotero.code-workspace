@@ -52,6 +52,14 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
     },
+    "[mdx]": {
+      "editor.formatOnSave": false,
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+      "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": false
+      }
+    },
+
     // Disable vscode formatting for js,jsx,ts,tsx files
     // to allow dbaeumer.vscode-eslint to format them
     "[javascript]": {
@@ -79,6 +87,26 @@
       "./lib/zotero-type",
       "./docs"
     ],
+    "eslint.validate": [
+      "markdown",
+      "mdx",
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "eslint.options": {
+      "extensions": [
+        ".js",
+        ".cjs",
+        ".mjs",
+        ".jsx",
+        ".md",
+        ".mdx",
+        ".ts",
+        ".tsx"
+      ]
+    },
     "[shellscript]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
     },
