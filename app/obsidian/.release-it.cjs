@@ -1,7 +1,9 @@
 module.exports = {
   hooks: {
     // "before:init": ["npm run eslint"],
-    "after:bump": ["node ../../common/scripts/install-run-rush.js rebuild --verbose"],
+    "after:bump": [
+      "node ../../common/scripts/install-run-rush.js rebuild --verbose",
+    ],
     "after:release":
       "echo Successfully released ${name} v${version} to ${repo.repository}.",
   },
@@ -26,7 +28,12 @@ module.exports = {
   },
   github: {
     release: true,
-    assets: ["build/main.js", "build/manifest.json", "build/styles.css"],
+    assets: [
+      "build/main.js",
+      "build/manifest.json",
+      "build/styles.css",
+      "build/obsidian-zotero-plugin.zip",
+    ],
     proxy: process.env.HTTPS_PROXY,
     releaseName: "${version}",
   },
