@@ -18,5 +18,5 @@ The latest zotero plugin currently supports:
 
 ## Installation
 
-- [obsidian plugin install guide](https://obzt.aidenlx.top/getting-started/installation/obsidian)
-- [zotero plugin install guide](https://obzt.aidenlx.top/getting-started/installation/zotero)
+- [obsidian plugin install guide](https://obzt.aidenlx.top/getting-started/install/obsidian)
+- [zotero plugin install guide](https://obzt.aidenlx.top/getting-started/install/zotero)
