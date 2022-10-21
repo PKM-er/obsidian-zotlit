@@ -1,5 +1,3 @@
 # Zotero plugin
 
-## Installation
-
-WIP
+[Installation](https://obzt.aidenlx.top/getting-started/install-zotero)

@@ -1,0 +1,68 @@
+---
+sidebar_position: 1
+---
+
+# Obsidian
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import ObAvailable from "@site/src/components/ob-check";
+import BRATAvailable from "@site/src/components/brat-check";
+
+## Install Plugin
+
+<Tabs>
+  <TabItem value="obsidian" label="via Obsidian">
+    <ObAvailable />
+
+This is the recommended way to install the plugin.
+
+1. Open `Settings` > `Community plugin`
+2. Turn on community plugin
+3. Open [plugin page](https://obsidian.md/plugins?id=obsidian-zotero-plugin) in obsidian
+4. Click `Install`
+5. Wait for installation to complete
+6. Click `Enable`
+7. Follow the [setup instructions](#setup)
+
+
+  </TabItem>
+  <TabItem value="brat" label="via BRAT" default>
+    <BRATAvailable />
+
+You can use the Beta Reviewers Auto-update Tester (BRAT) plugin to install a pre-release version of the plugin.
+
+1. Download and enable [plugin page](https://obsidian.md/plugins?id=obsidian42-brat)
+2. Open the command palette and run the command `BRAT: Add a beta plugin for testing`
+    - If you want the plugin version to be frozen, use the command `BRAT: Add a beta plugin with frozen version based on a release tag`.
+3. Copy `aidenlx/obsidian-zotero` into the modal that opens up
+4. Click on `Add Plugin` -- wait a few seconds and BRAT will tell you what is going on
+5. After BRAT confirms the installation, Open `Settings` > `Community plugin`
+6. Refresh the list of plugins
+7. Find the beta plugin you just installed and Enable it.
+8. Follow the [setup instructions](#setup)
+
+To install a pre-release, download and enable the [Obsidian42 BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin, , and then have BRAT check for updates.
+
+  </TabItem>
+  <TabItem value="manual" label="Manual Install">
+
+1. Go to [Releases section of the GitHub Repository](https://github.com/aidenlx/obsidian-zotero/releases)
+2. Download the `obsidian-zotero-plugin` from the `Assets` section of the latest release
+    - You should find version tagged without `zotero` prefix, something like `0.3.1`
+3. Put files to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-zotero-plugin`
+5. Open `Settings` > `Community plugin`
+6. Turn on community plugin
+4. Refresh the list of plugins
+7. Find `Zotero Plugin` in the list
+8. Enable the plugin using toggle
+9. Follow the [setup instructions](#setup)
+
+> Note: The `.obsidian` folder may be hidden. On macOS, you should be able to press `Command+Shift+Dot` to show the folder in Finder.
+
+  </TabItem>
+</Tabs>
+
+## Setup
+
+WIP
