@@ -30,3 +30,7 @@
   --ifm-color-primary-lightest: #ffbfbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+img[alt="latest zotero plugin version"] {
+  vertical-align: text-top;
+}

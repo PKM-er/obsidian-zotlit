@@ -40,7 +40,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["*.mdx"],
+      files: ["*.mdx", "*.md"],
       extends: ["plugin:mdx/recommended"],
       rules: {
         "prettier/prettier": "off",
