@@ -11,7 +11,7 @@ Disclaimer: The plugins in this project is manitained by third-party developer, 
 ## Compatibility
 
 The required API feature for latest obsidian plugin is only available for:
-[![minimal obsidian version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://obsidian.md "minimanl obsidian version")
+[![minimal obsidian version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=8b6cef&label=obsidian&prefix=^&query=minAppVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fobsidian%2Fmanifest.json&logo=obsidian-full)](https://obsidian.md "minimal obsidian version")
 
 The latest zotero plugin currently supports:
 [![supported zotero version](https://custom-icon-badges.demolab.com/badge/zotero-6-bc3a3c?logo=zotero-32)](https://www.zotero.org/download/ "supported zotero version")
