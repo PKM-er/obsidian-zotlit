@@ -4,6 +4,7 @@ export * from "./zotero-date.js";
 export * from "./logger.js";
 export * from "./must-include.js";
 export * from "./worker.js";
+export * from "./qs.js";
 
 /**
  * @returns native binding basename for given version of better-sqlite3

@@ -1,12 +1,11 @@
 {
   "name": "zotero-obsidian-note",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Zotero plugin to integrate with Obsidian.md",
   "scripts": {
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",
     "prebuild": "npm run lint",
-    "build": "tsc --noEmit && node esbuild.js",
-    "postbuild": "zotero-plugin-zipup build zotero-obsidian-note",
+    "build": "tsc --noEmit && node esbuild.js && zotero-plugin-zipup build zotero-obsidian-note",
     "release": "zotero-plugin-release",
     "postversion": "git push --follow-tags"
   },
@@ -26,7 +25,8 @@
     "lodash-es": "~4.17.21",
     "monkey-around": "^2.3.0",
     "zotero-plugin": "^1.0.62",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@obzt/common": "workspace:*"
   },
   "xpi": {
     "name": "Obsidian Note for Zotero",
@@ -38,7 +38,6 @@
     "@types/lodash-es": "~4.17.6",
     "assert-never": "^1.2.1",
     "cz-conventional-changelog": "^3.3.0",
-    "js-base64": "^3.7.2",
     "@types/mocha": "^9.0.0",
     "esbuild": "^0.14.21",
     "eslint": "~8.24.0",
