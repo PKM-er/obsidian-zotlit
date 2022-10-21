@@ -1,5 +1,27 @@
 
 
+# [0.4.0](https://github.com/aidenlx/obsidian-zotero/compare/0.3.1...0.4.0) (2022-10-21)
+
+
+### Bug Fixes
+
+* **obsidian/template:** fix template file fail to load on obsidian init ([5e3e406](https://github.com/aidenlx/obsidian-zotero/commit/5e3e406b9cbec136e75743e01d0f6b1e1eb3bba8))
+
+
+### Features
+
+* **docs:** scallfold for document website ([9bad04e](https://github.com/aidenlx/obsidian-zotero/commit/9bad04edaf1dd7b7d4de1161acca67702eb06f63))
+* **obsidian/annot-view:** fields with hex color is now rendered with background in item details ([9b6a287](https://github.com/aidenlx/obsidian-zotero/commit/9b6a287a956db8c55a66f0e9a57712c88c324034))
+* **obsidian/annot-view:** item details for annot now shows helper values ([f561479](https://github.com/aidenlx/obsidian-zotero/commit/f561479944fcff8cd494b0ea3631bff4e25bd198))
+* **obsidian/annot-view:** item details for annot now shows meaning of enum `type` ([1dff520](https://github.com/aidenlx/obsidian-zotero/commit/1dff5201a7af6f67fb1f96543f2a242d6a9c8d4e))
+* **obsidian/annot-view:** item details for docItem now shows helper values ([ab6a18c](https://github.com/aidenlx/obsidian-zotero/commit/ab6a18cc0281b4396c330a87b93df636056983b2))
+* **obsidian/annot-view:** update template helper for eta ([710ff5b](https://github.com/aidenlx/obsidian-zotero/commit/710ff5bd8fd61fd0511c0ae5a7c5b9bdbec4f078))
+* **obsidian/template:** add annot helper to get color name ([7e1b2c8](https://github.com/aidenlx/obsidian-zotero/commit/7e1b2c8f8fd32aaba2f1a68a1af70f62696d2fe8))
+* **obsidian/template:** add auto recomplie for template file; add notice for template complie error ([a047a73](https://github.com/aidenlx/obsidian-zotero/commit/a047a739e04a8ff5588bfb220d00f813ca0a117c))
+* **obsidian/template:** basic editor helper for eta template ([ca121a1](https://github.com/aidenlx/obsidian-zotero/commit/ca121a17dca805c92990de3172f691e34cfe6d6b))
+* **obsidian/template:** complex template can now be ejected into template files ([b21a915](https://github.com/aidenlx/obsidian-zotero/commit/b21a915733a7f406ecc4525edadebe04bd8f6e57)), closes [#52](https://github.com/aidenlx/obsidian-zotero/issues/52)
+* **obsidian/template:** migrate from handlebars to eta ([1bb5f24](https://github.com/aidenlx/obsidian-zotero/commit/1bb5f24d08832972d8c64712babbd6f54df6d1fb))
+
 ## [0.3.1](https://github.com/aidenlx/obsidian-zotero/compare/0.3.0...0.3.1) (2022-10-18)
 
 

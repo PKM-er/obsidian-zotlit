@@ -17,6 +17,8 @@ module.exports = {
     },
     "./scripts/ob-bumper.mjs": {
       indent: 2,
+      beta: process.argv.includes("--beta"),
+      copyTo: "../..",
     },
   },
   npm: {

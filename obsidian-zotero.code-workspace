@@ -93,6 +93,7 @@
       "obsidian/annot-block",
       "obsidian/setting-tab",
       "docs-site",
+      "getting-started",
       "zotero",
       "lib/database",
       "lib/note-parser",
