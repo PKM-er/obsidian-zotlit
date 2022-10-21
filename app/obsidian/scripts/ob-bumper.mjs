@@ -66,8 +66,15 @@ class ObsidianVersionBump extends Plugin {
       if (beta) {
         // copy manifest.json to root
         const target = join(copyTo, mainManifest);
-        this.log.exec(`Copied ${mainManifest} to ${resolve(target)}`, isDryRun);
         !isDryRun && (await copyFile(mainManifest, target));
+        this.log.exec(`Copied ${mainManifest} to ${resolve(target)}`, isDryRun);
+        // replace build/manifest.json with beta manifest
+        const buildManifestPath = join("build", mainManifest);
+        !isDryRun && (await copyFile(mainManifest, buildManifestPath));
+        this.log.exec(
+          `Replaced ${buildManifestPath} with ${betaManifest}`,
+          isDryRun,
+        );
       } else {
         try {
           await stat(betaManifest);
