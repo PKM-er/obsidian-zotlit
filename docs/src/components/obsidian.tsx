@@ -28,6 +28,35 @@ export const ObInfo = ({
   );
 };
 
+export const ObInfoWithDownload = ({ info }: { info: ObsidianInfo }) => {
+  if (!info) return null;
+  const [version, obVersion] = info;
+  return (
+    <Admonition type="info">
+      <div>
+        Latest Version:
+        <code className={clsx(styles.version)}>{version}</code>
+      </div>
+      <div>
+        Required Obsidian Version:
+        <code className={clsx(styles.version)}>{obVersion}</code>
+      </div>
+      <div>
+        Download Link:
+        <a className={clsx(styles.badge)} href={toDownloadLink(version)}>
+          <img
+            src="https://custom-icon-badges.demolab.com/badge/zotero--plugin-latest-8b6cef?logo=obsidian-full"
+            alt="Latest Release"
+          />
+        </a>
+      </div>
+    </Admonition>
+  );
+};
+
+const toDownloadLink = (ver: string) =>
+  `https://github.com/aidenlx/obsidian-zotero/releases/download/${ver}/obsidian-zotero-plugin.zip`;
+
 export const useManifest = (url: string) => {
   const [versions, setVersions] = useState<ObsidianInfo | null>(null);
   const [available, setAvailable] = useState(Availablity.checking);
