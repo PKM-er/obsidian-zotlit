@@ -15,6 +15,10 @@ export interface AvailablityTagProps<I> {
   beta?: boolean;
 }
 
+export const LoadingInfo = () => (
+  <Admonition type="info">Loading Download Info...</Admonition>
+);
+
 export const AvailablityTag = <I,>({
   available,
   infoComponent,
@@ -23,7 +27,7 @@ export const AvailablityTag = <I,>({
 }: AvailablityTagProps<I>) => {
   switch (available) {
     case Availablity.checking:
-      return null;
+      return <LoadingInfo />;
     case Availablity.yes:
     case Availablity.unknown: {
       return infoComponent({ info, beta });
