@@ -1,7 +1,8 @@
 app/*/build
 
 app/zotero/wiki
-app/zotero/gen
+app/zotero/gen/*
+!app/zotero/gen/version.js
 app/zotero/build
 app/zotero/**/*.swp
 app/zotero/**/*.debug

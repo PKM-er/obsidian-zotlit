@@ -4,11 +4,9 @@
   "description": "Zotero plugin to integrate with Obsidian.md",
   "scripts": {
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",
-    "prebuild": "npm run lint",
     "build": "tsc --noEmit && node esbuild.js && zotero-plugin-zipup build zotero-obsidian-note",
     "dev": "python3 start.py",
-    "release": "zotero-plugin-release",
-    "postversion": "git push --follow-tags"
+    "release": "release-it"
   },
   "repository": {
     "type": "git",
@@ -25,16 +23,15 @@
   "dependencies": {
     "lodash-es": "~4.17.21",
     "monkey-around": "^2.3.0",
-    "zotero-plugin": "^1.0.62",
-    "@types/eslint": "~8.4.6",
-    "@obzt/common": "workspace:*"
+    "@obzt/common": "workspace:*",
+    "@release-it/bumper": "^4.0.0"
   },
   "xpi": {
     "name": "Obsidian Note for Zotero",
     "updateLink": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
     "updateInfoURL": "https://github.com/aidenlx/obsidian-zotero/releases/latest",
     "iconURL": "chrome://zotero-obsidian-note/skin/logo.svg",
-    "releaseURL": "https://github.com/aidenlx/obsidian-zotero/releases/download/release/"
+    "releaseURL": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "2.0.5",
@@ -43,12 +40,13 @@
     "cz-conventional-changelog": "^3.3.0",
     "@types/mocha": "^9.0.0",
     "esbuild": "^0.14.21",
+    "zotero-plugin": "1.4.8",
+    "@types/eslint": "~8.4.6",
     "eslint": "~8.24.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",
-    "typescript": "^4.8.3",
-    "@types/eslint": "~8.4.6"
+    "typescript": "^4.8.3"
   },
   "config": {
     "commitizen": {
