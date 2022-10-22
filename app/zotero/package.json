@@ -31,7 +31,9 @@
   },
   "xpi": {
     "name": "Obsidian Note for Zotero",
-    "updateLink": "https://github.com/aidenlx/obsidian-zotero/releases/download/v{version}/zotero-obsidian-note-{version}.xpi",
+    "updateLink": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
+    "updateInfoURL": "https://github.com/aidenlx/obsidian-zotero/releases/latest",
+    "iconURL": "chrome://zotero-obsidian-note/skin/logo.svg",
     "releaseURL": "https://github.com/aidenlx/obsidian-zotero/releases/download/release/"
   },
   "devDependencies": {
