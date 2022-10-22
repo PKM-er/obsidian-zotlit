@@ -6,6 +6,7 @@
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",
     "prebuild": "npm run lint",
     "build": "tsc --noEmit && node esbuild.js && zotero-plugin-zipup build zotero-obsidian-note",
+    "dev": "python3 start.py",
     "release": "zotero-plugin-release",
     "postversion": "git push --follow-tags"
   },
