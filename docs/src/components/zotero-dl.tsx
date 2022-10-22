@@ -2,20 +2,18 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import React from "react";
 import { Availablity, AvailablityTag } from "./available";
-import { mainManifest, ObInfo, useManifest, usePluginList } from "./obsidian";
+import { releaseURL, useUpdateRDF, ZtInfo } from "./zotero";
 
-export default function ObsidianAvailable() {
+export default function ZoteroDownload() {
   return (
     <BrowserOnly fallback={<span>{Availablity.checking}</span>}>
       {() => {
-        const available = usePluginList();
-        const [, versions] = useManifest(mainManifest);
-
+        const [available, info] = useUpdateRDF(releaseURL);
         return (
           <AvailablityTag
             available={available}
-            info={versions}
-            infoComponent={ObInfo}
+            info={info}
+            infoComponent={ZtInfo}
           />
         );
       }}
