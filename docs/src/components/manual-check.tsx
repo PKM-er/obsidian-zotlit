@@ -2,7 +2,7 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import React from "react";
 import { Availablity, AvailablityTag } from "./available";
-import { mainManifest, ObInfoWithDownload, useManifest } from "./obsidian";
+import { mainManifest, ObInfo, useManifest } from "./obsidian";
 
 export default function ManualAvailable() {
   return (
@@ -13,7 +13,7 @@ export default function ManualAvailable() {
           <AvailablityTag
             available={available}
             info={versions}
-            infoComponent={ObInfoWithDownload}
+            infoComponent={ObInfo}
           />
         );
       }}
