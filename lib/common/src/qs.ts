@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import assertNever from "assert-never";
+import { assertNever } from "assert-never";
 import type { ParseOptions, StringifyOptions } from "query-string";
 import { stringifyUrl } from "query-string";
 export { parseUrl, stringifyUrl, parse } from "query-string";
