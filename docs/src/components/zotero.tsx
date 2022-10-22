@@ -21,10 +21,7 @@ export const ZtInfo = ({ info, beta }: { info: ZoteroInfo; beta: boolean }) => {
       <div>
         Download Link:
         <a className={clsx(styles.badge)} href={updateLink}>
-          <img
-            src="https://custom-icon-badges.demolab.com/badge/obsidian--note-latest-bc3a3c?logo=zotero-32"
-            alt="Latest Release"
-          />
+          <img src="/img/zotero-download-badge.svg" alt="Latest Release" />
         </a>
       </div>
     </Admonition>
