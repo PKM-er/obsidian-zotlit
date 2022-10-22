@@ -13,7 +13,5 @@ Install by downloading the [latest release](https://github.com/aidenlx/obsidian-
 5. Restart Zotero
 
 :::note
-This plugin doesn't support auto-update yet, if you've found issues, please check if there is any update available and update manually first.
+After the initial installation, the plugin will auto-update to newer releases, so you should need to perform the process described here only once.
 :::
-
-<!-- After the initial installation, the plugin will auto-update to newer releases, so you should need to perform the process described here only once. -->
