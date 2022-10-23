@@ -2,3 +2,8 @@
   margin-left: 8px;
   vertical-align: top;
 }
+
+.badge {
+  /* margin-left: 8px; */
+  vertical-align: text-top;
+}

@@ -1,7 +1,7 @@
 import { toPage } from "@obzt/common";
-import type { Annotation, GeneralItem, Item } from "./item";
-import { nonRegularItemTypes } from "./item";
-import log from "./logger";
+import type { Annotation, GeneralItem, Item } from "./item.js";
+import { nonRegularItemTypes } from "./item.js";
+import log from "./logger.js";
 
 export const isGeneralItem = (item: unknown): item is GeneralItem =>
   !nonRegularItemTypes.includes((item as Item).itemType as never) &&

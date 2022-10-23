@@ -3,14 +3,15 @@ module.exports = {
     // "before:init": ["npm run eslint"],
     "after:bump": [
       "node ../../common/scripts/install-run-rush.js rebuild --verbose",
+      "node ./scripts/zip.mjs",
     ],
     "after:release":
-      "echo Successfully released ${name} v${version} to ${repo.repository}.",
+      "echo Successfully released obsidian plugin ${name} v${version} to ${repo.repository}.",
   },
   git: {
-    commitMessage: "chore: release v${version}",
+    commitMessage: "chore: release obsidian plugin v${version}",
     tagName: "${version}",
-    tagAnnotation: "Release v${version}",
+    tagAnnotation: "Release Obsidian Plugin v${version}",
   },
   plugins: {
     "@release-it/conventional-changelog": {

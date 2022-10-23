@@ -22,25 +22,10 @@ module.exports = {
     ...typescriptOptions,
   },
   ignorePatterns: [...getDefaultIgnorePatterns()],
-  extends: [
-    "@aidenlx/eslint-config/regexp",
-    // Apply prettier and disable incompatible rules
-    "@aidenlx/eslint-config/prettier",
-    "@aidenlx/eslint-config/react",
-    "plugin:@docusaurus/recommended",
-  ],
   plugins: ["@docusaurus"],
-  rules: {
-    "import/no-unresolved": "off",
-  },
-  settings: {
-    "import/resolver": {
-      typescript: typescriptOptions,
-    },
-  },
   overrides: [
     {
-      files: ["*.mdx"],
+      files: ["*.mdx", "*.md"],
       extends: ["plugin:mdx/recommended"],
       rules: {
         "prettier/prettier": "off",
@@ -48,7 +33,22 @@ module.exports = {
     },
     {
       files: ["*.ts", "*.tsx", "*.js", "*.jsx", "*.cjs"],
-      extends: ["@aidenlx/eslint-config/typescript"],
+      extends: [
+        "@aidenlx/eslint-config/typescript",
+        "@aidenlx/eslint-config/regexp",
+        // Apply prettier and disable incompatible rules
+        "@aidenlx/eslint-config/prettier",
+        "@aidenlx/eslint-config/react",
+        "plugin:@docusaurus/recommended",
+      ],
+      rules: {
+        "import/no-unresolved": "off",
+      },
+      settings: {
+        "import/resolver": {
+          typescript: typescriptOptions,
+        },
+      },
     },
   ],
 };

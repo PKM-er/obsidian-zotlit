@@ -388,7 +388,7 @@
     },
     {
       "packageName": "@obzt/esbuild-plugin-inline-worker",
-      "projectFolder": "lib/esbuild-inline-worker"
+      "projectFolder": "utils/esbuild-inline-worker"
     },
     {
       "packageName": "@obzt/zotero-type",

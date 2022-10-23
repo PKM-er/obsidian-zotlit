@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },
@@ -15,6 +16,8 @@
   },
   "dependencies": {
     "log4js": "~6.6.1",
-    "monkey-around": "^2.3.0"
+    "monkey-around": "^2.3.0",
+    "query-string": "~7.1.1",
+    "assert-never": "^1.2.1"
   }
 }

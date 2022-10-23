@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" width="141" height="20" role="img" aria-label="zotero-plugin: latest">
+  <title>zotero-plugin: latest</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r">
+    <rect width="141" height="20" rx="3" fill="#fff"/>
+  </clipPath>
+  <g clip-path="url(#r)">
+    <rect width="100" height="20" fill="#555"/>
+    <rect x="100" width="41" height="20" fill="#8b6cef"/>
+    <rect width="141" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+    <image x="5" y="3" width="14" height="14" xlink:href="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjgyLjg1IiB5MT0iMzAuNDEiIHgyPSI1MS4yNiIgeTI9IjEwNS45IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIC0xLCAtMjIuNDEsIDExMC45NykiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNmM1NmNjIj48L3N0b3A+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzk3ODVlNSI+PC9zdG9wPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBvbHlnb24gcG9pbnRzPSI2Mi42MSwwIDMwLjkxLDE3LjUyIDE4LDQ1LjQ1IDM3LjU3LDkwLjQ3IDY1LjM1LDEwMCA3MC40NCw4OS44IDgxLDI2LjM5IDYyLjYxLDAiIGZpbGw9IiMzNDIwOGMiPjwvcG9seWdvbj4KICA8cG9seWdvbiBwb2ludHM9IjgxLDI2LjM5IDYxLjQ0LDE0LjQxIDM0LjQzLDM1LjcgNjUuMzUsMTAwIDcwLjQ0LDg5LjggODEsMjYuMzkiIGZpbGw9InVybCgjYSkiPjwvcG9seWdvbj4KICA8cG9seWdvbiBwb2ludHM9IjgxLDI2LjM5IDgxLDI2LjM5IDYyLjYxLDAgNjEuNDQsMTQuNDEgODEsMjYuMzkiIGZpbGw9IiNhZjlmZjQiPjwvcG9seWdvbj4KICA8cG9seWdvbiBwb2ludHM9IjYxLjQ0LDE0LjQxIDYyLjYxLDAgMzAuOTEsMTcuNTIgMzQuNDMsMzUuNyA2MS40NCwxNC40MSIgZmlsbD0iIzRhMzdhMCI+PC9wb2x5Z29uPgogIDxwb2x5Z29uIHBvaW50cz0iMzQuNDMsMzUuNyAzNy41Nyw5MC40NyA2NS4zNSwxMDAgMzQuNDMsMzUuNyIgZmlsbD0iIzRhMzdhMCI+PC9wb2x5Z29uPgo8L3N2Zz4K"/>
+    <text aria-hidden="true" x="595" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="730">zotero-plugin</text>
+    <text x="595" y="140" transform="scale(.1)" fill="#fff" textLength="730">zotero-plugin</text>
+    <text aria-hidden="true" x="1195" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="310">latest</text>
+    <text x="1195" y="140" transform="scale(.1)" fill="#fff" textLength="310">latest</text>
+  </g>
+</svg>

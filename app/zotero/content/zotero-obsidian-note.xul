@@ -27,6 +27,7 @@
     })
   </script>
   <popup id="zotero-itemmenu">
-    <menuitem class="menu-iconic" id="zotero-itemmenu-obsidiannote-pdf-openinob" label="&obsidiannote-pdf-openinob-label;" oncommand="Zotero.ObsidianNote.handleSelectedItems()"/>
+    <menuitem class="menu-iconic" id="zotero-itemmenu-obsidiannote-pdf-openinob" label="&obsidiannote-pdf-openinob-label;" oncommand="Zotero.ObsidianNote.handleSelectedItems('open')"/>
+    <menuitem class="menu-iconic" id="zotero-itemmenu-obsidiannote-pdf-exporttoob" label="&obsidiannote-pdf-exporttoob-label;" oncommand="Zotero.ObsidianNote.handleSelectedItems('export')"/>
   </popup>
 </overlay>

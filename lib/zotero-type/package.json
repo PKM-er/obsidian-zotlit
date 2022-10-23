@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "db-type": "node --experimental-import-meta-resolve scripts/db-type.mjs && pnpm eslint src/knex.d.ts src/db-types.ts --fix",

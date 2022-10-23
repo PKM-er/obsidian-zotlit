@@ -30,7 +30,7 @@
     },
     {
       "name": "esbuild-inline-worker",
-      "path": "lib/esbuild-inline-worker"
+      "path": "utils/esbuild-inline-worker"
     },
     {
       "name": "zotero-type",
@@ -83,7 +83,7 @@
       "./lib/database",
       "./lib/note-parser",
       "./lib/annot-block",
-      "./lib/esbuild-inline-worker",
+      "./utils/esbuild-inline-worker",
       "./lib/zotero-type",
       "./docs"
     ],
@@ -126,7 +126,7 @@
       "lib/database",
       "lib/note-parser",
       "lib/annot-block",
-      "lib/esbuild-inline-worker",
+      "utils/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type",
       "readme"

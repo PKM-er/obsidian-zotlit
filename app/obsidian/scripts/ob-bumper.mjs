@@ -1,103 +1,123 @@
 import { promises } from "fs";
 import { copyFile } from "fs/promises";
-import { join, resolve } from "path";
-const { readFile, writeFile, stat } = promises;
+import { join } from "path";
+const { readFile, writeFile } = promises;
 import { Plugin } from "release-it";
+import semverPrerelease from "semver/functions/prerelease.js";
 
-const noop = Promise.resolve();
+const mainManifest = "manifest.json",
+  betaManifest = "manifest-beta.json",
+  versionsList = "versions.json";
+const targets = [mainManifest, betaManifest, versionsList];
+
+const isPreRelease = (version) => semverPrerelease(version) !== null;
 
 class ObsidianVersionBump extends Plugin {
-  async bump(targetVersion) {
-    let { indent = 4, beta = false, copyTo } = this.getContext();
+  async readJson(path) {
+    // const { isDryRun } = this.config;
+    try {
+      const result = JSON.parse(await readFile(path, "utf8"));
+      return result;
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return null;
+      }
+      throw error;
+    }
+  }
+  async writeJson(file, data) {
+    // const { isDryRun } = this.config;
+    const { indent = 4 } = this.getContext();
+    await writeFile(file, JSON.stringify(data, null, indent));
+    // this.log.exec(`Write to ${file}`, isDryRun);
+  }
+
+  /**
+   * always read from previous version of manifest
+   */
+  async readManifest() {
     const { isDryRun } = this.config;
+    const latest = isPreRelease(this.config.contextOptions.latestVersion);
+    let manifestToRead = this.getManifest(latest);
+    this.log.exec(`Reading manifest from ${manifestToRead}`, isDryRun);
+    let manifest;
+    if (!(manifest = await this.readJson(manifestToRead))) {
+      manifestToRead = this.getManifest(!latest);
+      this.log.exec(`retry reading manifest from ${manifestToRead}`, isDryRun);
+      manifest = await this.readJson(manifestToRead);
+    }
+    if (!manifest) throw new Error("Missing manifest data");
+    return manifest;
+  }
 
-    const mainManifest = "manifest.json",
-      betaManifest = "manifest-beta.json",
-      targetManifest = beta ? betaManifest : mainManifest;
+  async writeManifest(targetVersion, manifest) {
+    const { isDryRun } = this.config;
+    const manifestToWrite = this.getManifest(isPreRelease(targetVersion));
+    const updatedMainfest = { ...manifest, version: targetVersion };
+    !isDryRun && (await this.writeJson(manifestToWrite, updatedMainfest));
+    this.log.exec(
+      `Wrote version ${targetVersion} to ${manifestToWrite}`,
+      isDryRun,
+    );
+    await this.syncManifest(targetVersion);
+  }
 
-    const readJson = async (path) => {
-      try {
-        const result = JSON.parse(await readFile(path, "utf8"));
-        this.log.exec(`Reading manifest from ${path}`, isDryRun);
-        return result;
-      } catch (error) {
-        if (error.code === "ENOENT") {
-          return null;
-        }
-        throw error;
-      }
-    };
+  /**
+   * if bump to official release
+   * sync manifest-beta.json with manifest.json
+   */
+  async syncManifest(targetVersion) {
+    const target = isPreRelease(targetVersion);
+    const { isDryRun } = this.config;
+    if (!target) {
+      !isDryRun && (await copyFile(mainManifest, betaManifest));
+      this.log.exec(`Syncing ${betaManifest} with ${mainManifest}`, isDryRun);
+    }
+  }
 
-    let manifest = await readJson(targetManifest);
-    if (!manifest && targetManifest === betaManifest) {
-      this.log.exec(
-        `failed to find ${betaManifest}, read from ${mainManifest} instead`,
-        isDryRun,
+  async copyToRoot() {
+    const { copyTo } = this.getContext();
+    if (!copyTo) return;
+    const { isDryRun } = this.config;
+    if (isDryRun) {
+      await Promise.all(
+        targets.map((file) =>
+          copyFile(file, join(copyTo, file)).catch((err) => {
+            if (err.code !== "ENOENT") throw err;
+          }),
+        ),
       );
-      manifest = await readJson(mainManifest);
     }
-    if (!manifest) {
-      throw new Error("manifest.json not found");
-    }
+    this.log.exec(`Copied ${targets.join(", ")} to ${copyTo}`, isDryRun);
+  }
 
+  /**
+   * update versions.json with target version and minAppVersion from manifest.json
+   */
+  async writeVersion(targetVersion, { minAppVersion }) {
+    const { isDryRun } = this.config;
+    const versions = await this.readJson(versionsList);
+    versions[targetVersion] = minAppVersion;
+    !isDryRun && (await this.writeJson(versionsList, versions));
+    this.log.exec(
+      `Wrote version ${targetVersion} to ${versionsList}`,
+      isDryRun,
+    );
+  }
+
+  getManifest(isPreRelease) {
+    return isPreRelease ? betaManifest : mainManifest;
+  }
+
+  async bump(targetVersion) {
     // read minAppVersion from manifest and bump version to target version
-    const { minAppVersion } = manifest;
-    this.log.info(`min obsidian app version: ${minAppVersion}`);
-
-    const write = async (file, content) => {
-      const tasks = [];
-      !isDryRun && tasks.push(writeFile(file, content));
-      this.log.exec(`Write to ${resolve(file)}`, isDryRun);
-      if (copyTo) {
-        const target = join(copyTo, file);
-        this.log.exec(`Copied to ${resolve(target)}`, isDryRun);
-        !isDryRun && tasks.push(writeFile(target, content));
-      }
-      await Promise.all(tasks);
-    };
-
-    const writeManifest = async () => {
-      // update version
-      manifest.version = targetVersion;
-      const manifestContent = JSON.stringify(manifest, null, indent);
-      this.log.exec(`Writing version to ${targetManifest}`, isDryRun);
-      await write(targetManifest, manifestContent);
-
-      if (beta) {
-        // copy manifest.json to root
-        const target = join(copyTo, mainManifest);
-        !isDryRun && (await copyFile(mainManifest, target));
-        this.log.exec(`Copied ${mainManifest} to ${resolve(target)}`, isDryRun);
-        // replace build/manifest.json with beta manifest
-        const buildManifestPath = join("build", mainManifest);
-        !isDryRun && (await copyFile(mainManifest, buildManifestPath));
-        this.log.exec(
-          `Replaced ${buildManifestPath} with ${betaManifest}`,
-          isDryRun,
-        );
-      } else {
-        try {
-          await stat(betaManifest);
-        } catch (error) {
-          if (error.code !== "ENOENT") throw error;
-          return noop;
-        }
-        this.log.exec(`Sync ${betaManifest} with ${mainManifest}`, isDryRun);
-        await write(betaManifest, manifestContent);
-      }
-    };
-
-    /**
-     * update versions.json with target version and minAppVersion from manifest.json
-     */
-    const writeVersion = async () => {
-      let versions = JSON.parse(await readFile("versions.json", "utf-8"));
-      versions[targetVersion] = minAppVersion;
-      this.log.exec(`Writing version to versions.json`, isDryRun);
-      await write("versions.json", JSON.stringify(versions, null, indent));
-    };
-
-    return Promise.all([writeManifest(), writeVersion()]);
+    const manifest = await this.readManifest(targetVersion);
+    this.log.info(`min obsidian app version: ${manifest.minAppVersion}`);
+    await Promise.all([
+      this.writeManifest(targetVersion, manifest),
+      this.writeVersion(targetVersion, manifest),
+    ]);
+    await this.copyToRoot();
   }
 }
 export default ObsidianVersionBump;

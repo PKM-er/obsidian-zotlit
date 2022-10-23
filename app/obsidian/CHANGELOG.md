@@ -1,5 +1,13 @@
 
 
+# [1.0.0-beta.0](https://github.com/aidenlx/obsidian-zotero/compare/release...1.0.0-beta.0) (2022-10-23)
+
+
+### Features
+
+* **zotero:** add version to url query ([4a56cab](https://github.com/aidenlx/obsidian-zotero/commit/4a56cabcd1c3915d13720bf1f4ab42103a877660))
+* **zotero:** open and export are now different command ([45da55c](https://github.com/aidenlx/obsidian-zotero/commit/45da55cbfbaa78c77a290050a3140dab39afefc9))
+
 # [0.4.0](https://github.com/aidenlx/obsidian-zotero/compare/0.3.1...0.4.0) (2022-10-21)
 
 

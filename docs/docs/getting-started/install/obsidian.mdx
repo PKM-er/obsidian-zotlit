@@ -1,13 +1,15 @@
 ---
 sidebar_position: 1
+sidebar_label: Obsidian
 ---
 
-# Obsidian
+# Obsidian Plugin Setup
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Image from "@theme/IdealImage";
 import ObAvailable from "@site/src/components/ob-check";
+import { ManualAvailable, ReleaseLink } from "@site/src/components/manual-check";
 import BRATAvailable from "@site/src/components/brat-check";
 import { useDefaultMethod } from "@site/src/components/available";
 
@@ -61,20 +63,20 @@ Only try manual install if you have trouble with all other methods.
 
 :::
 
-1. Go to [Releases section of the GitHub Repository](https://github.com/aidenlx/obsidian-zotero/releases)
-2. Download the `obsidian-zotero-plugin.zip` from the `Assets` section of the latest release
-   - You should find version tagged without `zotero` prefix, something like `0.3.1`
-3. Open `Settings` > `Community plugin`
-4. Turn on community plugin
-5. Open plugin folder
+<ManualAvailable />
+
+1. Download `obsidian-zotero-plugin.zip` from GitHub Release: <ReleaseLink />
+2. Open `Settings` > `Community plugin`
+3. Turn on community plugin
+4. Open plugin folder
     - If you haven't installed any plugin before, you need to open the plugin folder manually: `<vault>/.obsidian/plugins`
     - If you have installed other plugins, you can use `Open plugin folder` button on the right of the `Installed plugins` section
-6. Create a new folder `obsidian-zotero-plugin` and put files from `obsidian-zotero-plugin.zip` into the folder
+5. Create a new folder `obsidian-zotero-plugin` and put files from `obsidian-zotero-plugin.zip` into the folder
     - There should be three files in the folder: `main.js`, `manifest.json` and `styles.css`
-7. Refresh the list of plugins or restart Obsidian if you have installed other plugins
-8. Open `Settings` > `Community plugin` and find `Zotero Plugin` in the list
-9. Enable the plugin using toggle
-10. Follow the [setup instructions](#basic-setup)
+6. Refresh the list of plugins or restart Obsidian if you have installed other plugins
+7. Open `Settings` > `Community plugin` and find `Zotero Plugin` in the list
+8. Enable the plugin using toggle
+9. Follow the [setup instructions](#basic-setup)
 
 :::note
 
@@ -97,7 +99,7 @@ To use this plugin, some additional setup is required:
 The plugin requires a binary (`better-sqlite3`) to connect to Zotero's database. Normally,
 a modal will pop up the first time you open the plugin, and ask you to download the binary. Follow the instructions in the modal to download the binary.
 
-<Image img={require("/img/binary-install-guide.png")} alt="Binary Install Guide" />
+<Image img={require("./binary-install-guide.png")} alt="Binary Install Guide" />
 
 This modal will also show up if the binary is broken or outdated, so that you can reset or update the binary.
 
@@ -105,9 +107,9 @@ This modal will also show up if the binary is broken or outdated, so that you ca
 
 The plugin needs to know where Zotero's database is located. If you haven't moved your Zotero's database to a different location, the plugin should be able to locate it automatically. In the Settings, you should see a path to your Zotero's database marked green. (If you've installed Better BibTex in Zotero, the path will also be green.)
 
-<Image img={require("/img/zotero-db-location-config.png")} alt="Zotero Database Location Config" />
+<Image img={require("./zotero-db-location-config.png")} alt="Zotero Database Location Config" />
 
 If you have moved your Zotero's database, you need to tell the plugin where it is. You can find the path to your Zotero's data directory by opening Zotero, and go to `Preference` > `Advanced` > `Data Directory Location`. 
 
-<Image img={require("/img/zotero-data-dir.png")} alt="Zotero Database Location" />
+<Image img={require("./zotero-data-dir.png")} alt="Zotero Database Location" />
 

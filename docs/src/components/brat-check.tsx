@@ -1,22 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import BrowserOnly from "@docusaurus/BrowserOnly";
 import React from "react";
-import {
-  Availablity,
-  AvailablityTag,
-  betaManifest,
-  useManifest,
-} from "./available";
+import { AvailablityTag } from "./available";
+import { betaManifest, ObInfo, useManifest } from "./obsidian";
 
 export default function BRATAvailable() {
+  const [available, versions] = useManifest(betaManifest);
   return (
-    <BrowserOnly fallback={<span>{Availablity.checking}</span>}>
-      {() => {
-        const [available, versions] = useManifest(betaManifest);
-        return (
-          <AvailablityTag available={available} versions={versions} beta />
-        );
-      }}
-    </BrowserOnly>
+    <AvailablityTag
+      available={available}
+      info={versions}
+      infoComponent={ObInfo}
+    />
   );
 }
