@@ -8,12 +8,13 @@ const noop = Promise.resolve();
 
 class ObsidianVersionBump extends Plugin {
   async bump(targetVersion) {
-    let { indent = 4, beta = false, copyTo } = this.getContext();
+    let { indent = 4, copyTo } = this.getContext();
     const { isDryRun } = this.config;
+    const { isPreRelease } = this.config.options.version;
 
     const mainManifest = "manifest.json",
       betaManifest = "manifest-beta.json",
-      targetManifest = beta ? betaManifest : mainManifest;
+      targetManifest = isPreRelease ? betaManifest : mainManifest;
 
     const readJson = async (path) => {
       try {
@@ -29,15 +30,30 @@ class ObsidianVersionBump extends Plugin {
     };
 
     let manifest = await readJson(targetManifest);
-    if (!manifest && targetManifest === betaManifest) {
-      this.log.exec(
-        `failed to find ${betaManifest}, read from ${mainManifest} instead`,
-        isDryRun,
-      );
-      manifest = await readJson(mainManifest);
-    }
     if (!manifest) {
-      throw new Error("manifest.json not found");
+      if (isPreRelease) {
+        this.log.exec(
+          `failed to find ${betaManifest}, read from ${mainManifest} instead`,
+          isDryRun,
+        );
+        manifest = await readJson(mainManifest);
+        if (!manifest) {
+          throw new Error(
+            `failed to generate ${betaManifest}, ${mainManifest} not found`,
+          );
+        }
+      } else {
+        this.log.exec(
+          `no main manifest available, read from ${betaManifest} instead`,
+          isDryRun,
+        );
+        manifest = await readJson(betaManifest);
+        if (!manifest) {
+          throw new Error(
+            `failed to generate ${mainManifest}, ${betaManifest} not found`,
+          );
+        }
+      }
     }
 
     // read minAppVersion from manifest and bump version to target version
@@ -63,11 +79,23 @@ class ObsidianVersionBump extends Plugin {
       this.log.exec(`Writing version to ${targetManifest}`, isDryRun);
       await write(targetManifest, manifestContent);
 
-      if (beta) {
+      if (isPreRelease) {
         // copy manifest.json to root
         const target = join(copyTo, mainManifest);
-        !isDryRun && (await copyFile(mainManifest, target));
-        this.log.exec(`Copied ${mainManifest} to ${resolve(target)}`, isDryRun);
+        try {
+          !isDryRun && (await copyFile(mainManifest, target));
+          this.log.exec(
+            `Copied ${mainManifest} to ${resolve(target)}`,
+            isDryRun,
+          );
+        } catch (error) {
+          if (error.code !== "ENOENT") {
+            throw error;
+          }
+          this.log.info(
+            `${mainManifest} not found, skip copying to ${resolve(target)}`,
+          );
+        }
         // replace build/manifest.json with beta manifest
         const buildManifestPath = join("build", mainManifest);
         !isDryRun && (await copyFile(mainManifest, buildManifestPath));
