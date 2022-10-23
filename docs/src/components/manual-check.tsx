@@ -1,22 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import BrowserOnly from "@docusaurus/BrowserOnly";
 import React from "react";
-import { Availablity, AvailablityTag } from "./available";
+import { AvailablityTag } from "./available";
 import { mainManifest, ObInfo, useManifest } from "./obsidian";
 
 export default function ManualAvailable() {
+  const [available, versions] = useManifest(mainManifest);
   return (
-    <BrowserOnly fallback={<span>{Availablity.checking}</span>}>
-      {() => {
-        const [available, versions] = useManifest(mainManifest);
-        return (
-          <AvailablityTag
-            available={available}
-            info={versions}
-            infoComponent={ObInfo}
-          />
-        );
-      }}
-    </BrowserOnly>
+    <AvailablityTag
+      available={available}
+      info={versions}
+      infoComponent={ObInfo}
+    />
   );
 }

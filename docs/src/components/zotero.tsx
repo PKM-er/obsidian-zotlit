@@ -1,3 +1,4 @@
+import useIsBrowser from "@docusaurus/useIsBrowser";
 import Admonition from "@theme/Admonition";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -32,7 +33,9 @@ export const useUpdateRDF = (url: string) => {
   const [info, setInfo] = useState<ZoteroInfo | null>(null);
   const [available, setAvailable] = useState(Availablity.checking);
 
+  const isBrowser = useIsBrowser();
   useEffect(() => {
+    if (!isBrowser) return;
     const controller = new AbortController();
     const signal = controller.signal;
     fetch(url, { signal })
@@ -69,6 +72,6 @@ export const useUpdateRDF = (url: string) => {
 
       setInfo(null);
     };
-  }, [url]);
+  }, [isBrowser, url]);
   return [available, info] as const;
 };
