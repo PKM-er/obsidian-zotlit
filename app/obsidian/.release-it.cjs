@@ -4,6 +4,7 @@ module.exports = {
     "after:bump": [
       "node ../../common/scripts/install-run-rush.js rebuild --verbose",
       "node ./scripts/zip.mjs",
+      "git add ../../.",
     ],
     "after:release":
       "echo Successfully released obsidian plugin ${name} v${version} to ${repo.repository}.",
@@ -12,6 +13,7 @@ module.exports = {
     commitMessage: "chore: release obsidian plugin v${version}",
     tagName: "${version}",
     tagAnnotation: "Release Obsidian Plugin v${version}",
+    addUntrackedFiles: true,
   },
   plugins: {
     "@release-it/conventional-changelog": {
@@ -20,7 +22,6 @@ module.exports = {
     },
     "./scripts/ob-bumper.mjs": {
       indent: 2,
-      beta: process.argv.includes("--beta"),
       copyTo: "../..",
     },
   },

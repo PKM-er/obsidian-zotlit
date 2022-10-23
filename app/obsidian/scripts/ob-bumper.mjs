@@ -79,7 +79,7 @@ class ObsidianVersionBump extends Plugin {
     const { copyTo } = this.getContext();
     if (!copyTo) return;
     const { isDryRun } = this.config;
-    if (isDryRun) {
+    if (!isDryRun) {
       await Promise.all(
         targets.map((file) =>
           copyFile(file, join(copyTo, file)).catch((err) => {
