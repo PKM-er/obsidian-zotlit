@@ -31,6 +31,7 @@ export const ReleaseLink = () => {
     <LatestBadge
       href={toDownloadLink("obsidian-zotero-plugin.zip", version)}
       type="obsidian"
+      newPage
     />
   );
 };

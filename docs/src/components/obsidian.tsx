@@ -2,7 +2,7 @@ import useIsBrowser from "@docusaurus/useIsBrowser";
 import Admonition from "@theme/Admonition";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
-import { Availablity } from "./available";
+import { Availablity, releaseUrl } from "./available";
 import styles from "./available.module.css";
 
 type ObsidianInfo = [ver: string, obVer: string];
@@ -23,10 +23,15 @@ export const ObInfo = ({ info }: { info: ObsidianInfo }) => {
   );
 };
 
-export const toDownloadLink = (file: string, ver = "latest") =>
-  ver === "latest"
-    ? `https://github.com/aidenlx/obsidian-zotero/releases/latest/download/${file}`
-    : `https://github.com/aidenlx/obsidian-zotero/releases/download/${ver}/${file}`;
+export const toDownloadLink = (file: string, ver: string | null = null) => {
+  if (ver === "latest") {
+    return `${releaseUrl}/latest/download/${file}`;
+  } else if (ver) {
+    return `${releaseUrl}/download/${ver}/${file}`;
+  } else {
+    return releaseUrl;
+  }
+};
 
 export const useManifest = (...urls: string[]) => {
   const [versions, setVersions] = useState<ObsidianInfo | null>(null);

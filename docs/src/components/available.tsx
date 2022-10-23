@@ -31,10 +31,10 @@ export const AvailablityTag = <I,>({
       return infoComponent({ info });
     }
     case Availablity.no:
-      return (
-        <Admonition type="caution">This method is not yet available</Admonition>
-      );
+      return <Admonition type="caution">Not Yet Available</Admonition>;
     default:
       break;
   }
 };
+
+export const releaseUrl = "https://github.com/aidenlx/obsidian-zotero/releases";

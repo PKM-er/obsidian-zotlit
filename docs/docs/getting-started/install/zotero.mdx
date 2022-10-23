@@ -3,20 +3,18 @@ sidebar_position: 2
 sidebar_label: Zotero
 ---
 
-import ZtDownload from "@site/src/components/zotero-dl";
-
+import { ZoteroDownload, ReleaseLink, ReleaseTag } from "@site/src/components/zotero-dl";
 
 # Zotero Plugin Setup
 
-<ZtDownload />
+<ZoteroDownload />
 
-Install by downloading the [latest release](https://github.com/aidenlx/obsidian-zotero/releases) with tag: ![latest zotero plugin version](https://custom-icon-badges.demolab.com/badge/dynamic/json?color=bc3a3c&label=&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2Faidenlx%2Fobsidian-zotero%2Fmaster%2Fapp%2Fzotero%2Fpackage.json&logo=zotero-32&prefix=zt)
-
-1. In the main menu go to `Tools` > `Add-ons`
-2. Select `Extensions`
-3. Click on the gear in the top-right corner and choose `Install Add-on From File...`
-4. Choose .xpi that you've just downloaded, click `Install`
-5. Restart Zotero
+1. Download `zotero-obsidian-note-*.xpi` from GitHub Release: <ReleaseLink /> (with tag <ReleaseTag />)
+2. In the main menu go to `Tools` > `Add-ons`
+3. Select `Extensions`
+4. Click on the gear in the top-right corner and choose `Install Add-on From File...`
+5. Choose `.xpi` that you've just downloaded, click `Install`
+6. Restart Zotero
 
 :::note
 After the initial installation, the plugin will auto-update to newer releases, so you should need to perform the process described here only once.

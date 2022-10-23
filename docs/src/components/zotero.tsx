@@ -4,16 +4,15 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { Availablity } from "./available";
 import styles from "./available.module.css";
-import LatestBadge from "./latest-badge";
 
-export const releaseURL =
+export const updateInfoUrl =
   "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/aidenlx/master/app/zotero/update.rdf";
 
 export type ZoteroInfo = [version: string, updateLink: string];
 
 export const ZtInfo = ({ info }: { info: ZoteroInfo }) => {
   if (!info) return null;
-  const [version, updateLink] = info;
+  const [version] = info;
   return (
     <Admonition type="info">
       <div>
@@ -21,8 +20,8 @@ export const ZtInfo = ({ info }: { info: ZoteroInfo }) => {
         <code className={clsx(styles.version)}>{version}</code>
       </div>
       <div>
-        Download Link:
-        <LatestBadge type="zotero" href={updateLink} />
+        Support:
+        <code className={clsx(styles.version)}>Zotero 6</code>
       </div>
     </Admonition>
   );
