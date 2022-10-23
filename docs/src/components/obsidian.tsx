@@ -24,7 +24,9 @@ export const ObInfo = ({ info }: { info: ObsidianInfo }) => {
 };
 
 export const toDownloadLink = (file: string, ver = "latest") =>
-  `https://github.com/aidenlx/obsidian-zotero/releases/download/${ver}/${file}`;
+  ver === "latest"
+    ? `https://github.com/aidenlx/obsidian-zotero/releases/latest/download/${file}`
+    : `https://github.com/aidenlx/obsidian-zotero/releases/download/${ver}/${file}`;
 
 export const useManifest = (...urls: string[]) => {
   const [versions, setVersions] = useState<ObsidianInfo | null>(null);
