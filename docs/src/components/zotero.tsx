@@ -6,7 +6,7 @@ import { Availablity } from "./available";
 import styles from "./available.module.css";
 
 export const updateInfoUrl =
-  "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/aidenlx/master/app/zotero/update.rdf";
+  "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.rdf";
 
 export type ZoteroInfo = [version: string, updateLink: string];
 
