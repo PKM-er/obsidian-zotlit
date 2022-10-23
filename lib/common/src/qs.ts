@@ -20,12 +20,14 @@ export const stringifyQuery = (
 ) => {
   if (obj.type === "item") {
     const query = {
+      version: obj.version,
       type: obj.type,
       items: obj.items.map((i) => JSON.stringify(i)),
     };
     return stringifyUrl({ url, query }, stringifyOptions);
   } else if (obj.type === "annotation") {
     const query = {
+      version: obj.version,
       type: obj.type,
       annots: obj.annots.map((i) => JSON.stringify(i)),
       parent: JSON.stringify(obj.parent),
@@ -53,11 +55,13 @@ export const parseQuery = (
 ): AnnotationsQuery | ItemsQuery => {
   if (query.type === "item") {
     return {
+      version: query.version,
       type: query.type,
       items: toItems(query, "items"),
     };
   } else if (query.type === "annotation") {
     return {
+      version: query.version,
       type: query.type,
       annots: toItems(query, "annots"),
       parent: JSON.parse(query.parent),
@@ -74,12 +78,14 @@ export interface ItemQuery {
   groupID?: number;
 }
 export interface AnnotationsQuery {
+  version: string;
   type: "annotation";
   annots: ItemQuery[];
   parent: ItemQuery;
 }
 
 export interface ItemsQuery {
+  version: string;
   type: "item";
   items: ItemQuery[];
 }

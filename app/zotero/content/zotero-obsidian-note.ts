@@ -2,6 +2,7 @@ import type { AnnotationsQuery, ItemQuery, ItemsQuery } from "@obzt/common";
 import { stringifyQuery } from "@obzt/common";
 import assertNever from "assert-never";
 import { uniqBy } from "lodash-es";
+import version from "../gen/version.js";
 
 // import { debug } from "./debug";
 import patchReaderInstance from "./patch-annot";
@@ -114,11 +115,13 @@ class ObsidianNote {
       type === "annotation" ? items[0].parentItem?.parentItem : items[0];
     if (type === "item") {
       query = {
+        version,
         type,
         items: items.map(buildItemRecord),
       };
     } else if (type === "annotation") {
       query = {
+        version,
         type,
         annots: items.map(buildItemRecord),
         parent: buildItemRecord(infoItem),
