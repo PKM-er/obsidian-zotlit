@@ -1,6 +1,6 @@
 {
   "name": "zotero-obsidian-note",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zotero plugin to integrate with Obsidian.md",
   "scripts": {
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",
