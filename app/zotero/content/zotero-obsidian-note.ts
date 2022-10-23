@@ -1,4 +1,9 @@
-import type { AnnotationsQuery, ItemQuery, ItemsQuery } from "@obzt/common";
+import type {
+  AnnotationsQuery,
+  ItemQuery,
+  ItemsQuery,
+  QueryAction,
+} from "@obzt/common";
 import { stringifyQuery } from "@obzt/common";
 import assertNever from "assert-never";
 import { uniqBy } from "lodash-es";
@@ -42,33 +47,26 @@ class ObsidianNote {
 
     this._unloadAnnotPatch = patchReaderInstance(
       {
-        label: this.getString("pdfReader.toObsidian"),
-        condition: (_data, _getAnnotations) => {
-          return true;
-        },
+        label: this.getString("pdfReader.openInObsidian"),
+        condition: (_data, getAnnotations) => getAnnotations().length === 1,
         /**
-         * open notes of annotation exported to obsidian before
+         * open notes of annotation
          */
         action: (_data, getAnnotations) => {
-          this.sendToObsidian("annotation", getAnnotations());
+          this.sendToObsidian("annotation", "open", getAnnotations());
         },
       },
-      // {
-      //   // only work if there is more than one annotation selected
-      //   // not implemented yet
-      //   label: this.getString("pdfReader.exportToObsidian"),
-      //   condition: (_data, getAnnotations) =>
-      //     getAnnotations().some((annot) => !annot.hasTag("OB_NOTE")),
-      //   /**
-      //    * export annotation to obsidian
-      //    */
-      //   action: (_data, getAnnotations) => {
-      //     const items = getAnnotations().filter(
-      //       (annot) => !annot.hasTag("OB_NOTE"),
-      //     );
-      //     this.sendToObsidian("annotation", "export", items);
-      //   },
-      // },
+      {
+        // only work if there is more than one annotation selected
+        label: this.getString("pdfReader.exportToObsidian"),
+        condition: (_data, getAnnotations) => getAnnotations().length > 1,
+        /**
+         * export annotation to obsidian
+         */
+        action: (_data, getAnnotations) => {
+          this.sendToObsidian("annotation", "export", getAnnotations());
+        },
+      },
     );
   }
   unload() {
@@ -88,7 +86,7 @@ class ObsidianNote {
   //   }
   // }
 
-  handleSelectedItems() {
+  handleSelectedItems(action: QueryAction) {
     const isVaild = (item): boolean =>
       item.isRegularItem() || // !note && !annotation && !attachment
       (item.isAttachment() && !!item?.parentItem?.isRegularItem());
@@ -100,14 +98,18 @@ class ObsidianNote {
     items = items.filter(isVaild).map(getInfoItem);
     if (items.length === 0) return;
     items = uniqBy(items, "id");
-    this.sendToObsidian("item", items);
+    this.sendToObsidian("item", action, items);
   }
 
   /**
    * @param items should all be Regular Items / Annotation Items
    * @returns if url is sent to obsidian successfully
    */
-  sendToObsidian(type: "item" | "annotation", items: any[]): boolean {
+  sendToObsidian(
+    type: "item" | "annotation",
+    action: QueryAction,
+    items: any[],
+  ): boolean {
     if (items.length === 0) return false;
 
     let query: AnnotationsQuery | ItemsQuery;
@@ -131,7 +133,7 @@ class ObsidianNote {
     }
 
     // use this as a patch to fix the url
-    const url = stringifyQuery(`obsidian://zotero/selected`, query);
+    const url = stringifyQuery(`obsidian://zotero/${action}`, query);
     Zotero.launchURL(url.toString());
     return true;
   }

@@ -14,8 +14,10 @@ export const stringifyOptions: StringifyOptions = {
   arrayFormat: "index",
 };
 
-export const stringifyQuery = (
-  url: string,
+export type QueryAction = "open" | "export";
+
+export const stringifyQuery = <A extends QueryAction>(
+  url: `obsidian://zotero/${A}`,
   obj: ItemsQuery | AnnotationsQuery,
 ) => {
   if (obj.type === "item") {
