@@ -10,7 +10,6 @@ export default function BRATAvailable() {
       available={available}
       info={versions}
       infoComponent={ObInfo}
-      beta
     />
   );
 }

@@ -12,7 +12,6 @@ export interface AvailablityTagProps<I> {
   available: Availablity;
   info?: I | null;
   infoComponent: React.FC<{ info: I | null; beta?: boolean }>;
-  beta?: boolean;
 }
 
 export const LoadingInfo = () => (
@@ -22,7 +21,6 @@ export const LoadingInfo = () => (
 export const AvailablityTag = <I,>({
   available,
   infoComponent,
-  beta,
   info,
 }: AvailablityTagProps<I>) => {
   switch (available) {
@@ -30,7 +28,7 @@ export const AvailablityTag = <I,>({
       return <LoadingInfo />;
     case Availablity.yes:
     case Availablity.unknown: {
-      return infoComponent({ info, beta });
+      return infoComponent({ info });
     }
     case Availablity.no:
       return (

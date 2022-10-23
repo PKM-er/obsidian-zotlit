@@ -6,19 +6,13 @@ import { Availablity } from "./available";
 import styles from "./available.module.css";
 
 type ObsidianInfo = [ver: string, obVer: string];
-export const ObInfo = ({
-  info,
-  beta,
-}: {
-  info: ObsidianInfo;
-  beta: boolean;
-}) => {
+export const ObInfo = ({ info }: { info: ObsidianInfo }) => {
   if (!info) return null;
   const [version, obVersion] = info;
   return (
     <Admonition type="info">
       <div>
-        Latest {beta && "Beta "}Version:
+        Latest Version:
         <code className={clsx(styles.version)}>{version}</code>
       </div>
       <div>
@@ -32,7 +26,7 @@ export const ObInfo = ({
 export const toDownloadLink = (file: string, ver = "latest") =>
   `https://github.com/aidenlx/obsidian-zotero/releases/download/${ver}/${file}`;
 
-export const useManifest = (url: string) => {
+export const useManifest = (...urls: string[]) => {
   const [versions, setVersions] = useState<ObsidianInfo | null>(null);
   const [available, setAvailable] = useState(Availablity.checking);
   const isBrowser = useIsBrowser();
@@ -40,16 +34,26 @@ export const useManifest = (url: string) => {
     if (!isBrowser) return;
     const controller = new AbortController();
     const signal = controller.signal;
-    fetch(url, { signal })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (!json) {
+
+    const request = (url: string) =>
+      fetch(url, { signal })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json) => {
+          if (!json) {
+            return null;
+          } else {
+            const { version, minAppVersion } = json;
+            return [version, minAppVersion] as [string, string];
+          }
+        });
+    request(urls[0])
+      .then((info) => {
+        if (!info) {
           setAvailable(Availablity.no);
           setVersions(null);
         } else {
           setAvailable(Availablity.yes);
-          const { version, minAppVersion } = json;
-          setVersions([version, minAppVersion]);
+          setVersions(info);
         }
       })
       .catch((err) => {
@@ -57,12 +61,35 @@ export const useManifest = (url: string) => {
         setAvailable(Availablity.unknown);
         setVersions(null);
       });
+
+    (async () => {
+      try {
+        let info: [string, string] | null;
+        for (const url of urls) {
+          info = await request(url);
+          if (info) break;
+        }
+
+        if (info) {
+          setAvailable(Availablity.yes);
+          setVersions(info);
+        } else {
+          setAvailable(Availablity.no);
+          setVersions(null);
+        }
+      } catch (err) {
+        console.error(err);
+        setAvailable(Availablity.unknown);
+        setVersions(null);
+      }
+    })();
     return () => {
       controller.abort();
       setAvailable(Availablity.unknown);
       setVersions(null);
     };
-  }, [isBrowser, url]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBrowser, urls.toString()]);
   return [available, versions] as const;
 };
 

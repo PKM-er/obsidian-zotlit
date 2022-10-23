@@ -10,13 +10,13 @@ export const releaseURL =
 
 export type ZoteroInfo = [version: string, updateLink: string];
 
-export const ZtInfo = ({ info, beta }: { info: ZoteroInfo; beta: boolean }) => {
+export const ZtInfo = ({ info }: { info: ZoteroInfo }) => {
   if (!info) return null;
   const [version, updateLink] = info;
   return (
     <Admonition type="info">
       <div>
-        Latest {beta && "Beta "}Version:
+        Latest Version:
         <code className={clsx(styles.version)}>{version}</code>
       </div>
       <div>
