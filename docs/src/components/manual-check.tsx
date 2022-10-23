@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import clsx from "clsx";
 import React from "react";
 import { AvailablityTag } from "./available";
-import styles from "./available.module.css";
+import LatestBadge from "./latest-badge";
 import {
   betaManifest,
   mainManifest,
@@ -29,11 +28,9 @@ export const ReleaseLink = () => {
     [version] = versions;
   }
   return (
-    <a
-      className={clsx(styles.badge)}
+    <LatestBadge
       href={toDownloadLink("obsidian-zotero-plugin.zip", version)}
-    >
-      <img src="/img/obsidian-download-badge.svg" alt="Latest Release" />
-    </a>
+      type="obsidian"
+    />
   );
 };

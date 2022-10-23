@@ -4,6 +4,7 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { Availablity } from "./available";
 import styles from "./available.module.css";
+import LatestBadge from "./latest-badge";
 
 export const releaseURL =
   "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/aidenlx/master/app/zotero/update.rdf";
@@ -21,9 +22,7 @@ export const ZtInfo = ({ info }: { info: ZoteroInfo }) => {
       </div>
       <div>
         Download Link:
-        <a className={clsx(styles.badge)} href={updateLink}>
-          <img src="/img/zotero-download-badge.svg" alt="Latest Release" />
-        </a>
+        <LatestBadge type="zotero" href={updateLink} />
       </div>
     </Admonition>
   );
