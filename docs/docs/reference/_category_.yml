@@ -1,7 +1,7 @@
 position: 2
 label: "Reference"
-collapsible: true # make the category collapsible
-collapsed: false # keep the category open by default
+collapsible: true
+collapsed: false
 link:
   type: generated-index
   slug: reference
