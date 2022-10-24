@@ -51,10 +51,14 @@ const config = {
         },
         items: [
           {
-            type: "doc",
-            docId: "index",
+            to: "overview",
             position: "left",
             label: "Overview",
+          },
+          {
+            to: "reference",
+            position: "left",
+            label: "Reference",
           },
           // { to: "/blog", label: "Blog", position: "left" },
           {

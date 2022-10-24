@@ -2,6 +2,6 @@
 sidebar_position: 1
 ---
 
-# Introduction
+# Advanced Features
 
 WIP

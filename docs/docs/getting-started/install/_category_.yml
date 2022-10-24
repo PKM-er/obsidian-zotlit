@@ -1,7 +1,7 @@
-position: 2
+position: 1
 label: 'Installation'
-collapsible: false # make the category collapsible
-collapsed: false # keep the category open by default
+collapsible: true
+collapsed: true
 # link:
   # type: generated-index
   # description: 5 minutes to learn the most important Docusaurus concepts.
