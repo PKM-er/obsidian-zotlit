@@ -49,6 +49,7 @@ export const Loading = ({
   delay = 0,
   height = 16,
   width = 16,
+  style,
   ...restProps
 }: LoadingProps) => {
   const [delayed, setDelayed] = useState(delay > 0);
@@ -67,6 +68,7 @@ export const Loading = ({
   return (
     <div
       style={{
+        ...style,
         fill: color,
         height: Number(height) || height,
         width: Number(width) || width,
