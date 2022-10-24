@@ -129,7 +129,8 @@
       "utils/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type",
-      "readme"
+      "readme",
+      "overview"
     ],
     "[sql]": {
       "editor.defaultFormatter": "lea21st.vscode-sql-formatter"

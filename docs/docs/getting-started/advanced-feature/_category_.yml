@@ -1,7 +1,4 @@
 position: 3
-label: 'Advanced Features'
+label: "Advanced Features"
 collapsible: true
 collapsed: true
-# link:
-  # type: generated-index
-  # description: 5 minutes to learn the most important Docusaurus concepts.
