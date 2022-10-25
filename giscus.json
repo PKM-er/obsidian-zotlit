@@ -1,0 +1,4 @@
+{
+  "origins": ["https://obzt.aidenlx.top"],
+  "originsRegex": ["http://localhost:[0-9]+"]
+}
