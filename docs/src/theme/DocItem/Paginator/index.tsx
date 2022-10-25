@@ -21,17 +21,16 @@ export default function PaginatorWrapper(props) {
   return (
     <>
       <Paginator {...props} />
-      <br />
       <Giscus
         repo="aidenlx/obsidian-zotero"
         repoId="R_kgDOGy2_uA"
         category="Docs Comments"
-        category-id="DIC_kwDOGy2_uM4CSEbI"
+        categoryId="DIC_kwDOGy2_uM4CSEbI"
         mapping="pathname"
-        strict="0"
-        reactions-enabled="1"
-        emit-metadata="0"
-        input-position="top"
+        strict="1"
+        reactionsEnabled="1"
+        emitMetadata="0"
+        inputPosition="top"
         theme={colorMode}
         lang={lang}
         loading="lazy"

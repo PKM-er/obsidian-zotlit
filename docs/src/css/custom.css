@@ -34,3 +34,10 @@
 img[alt="latest zotero plugin version"] {
   vertical-align: text-top;
 }
+
+giscus-widget {
+  display: flex;
+  margin: auto;
+  margin-top: 2rem;
+  max-width: 640px;
+}
