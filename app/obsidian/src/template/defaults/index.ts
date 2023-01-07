@@ -1,6 +1,6 @@
 import type { GeneralItemBase, ItemFields } from "@obzt/zotero-type";
-import type { AnnotationHelper } from "./helper/annot";
-import type { GeneralItemHelper } from "./helper/item";
+import type { AnnotationHelper } from "../helper/annot";
+import type { GeneralItemHelper } from "../helper/item";
 
 export interface TemplateDataMap {
   note: GeneralItemHelper;
@@ -32,29 +32,10 @@ export const EJECTABLE_TEMPLATE_NAMES = Object.keys(
   TEMPLATE_FILES,
 ) as EjectableTemplate[];
 
-const note = `# <%= it.title %>
-\\n
-[Zotero](<%= it.backlink %>) <%= it.fileLink %>
-\\n
-<%~ include("annots", it.annotations) %>`,
-  annots = `<% for (const annotation of it) { %>
-<%~ include("annotation", annotation) %>
-<% } %>`,
-  annotation = `
-## Page <%= it.pageLabel %> ^<%= it.blockID %>
-\\n
-[Zotero](<%= it.backlink %>) <%= it.fileLink %>
-\\n
-<%= it.textBlock %>
-<%= it.imgEmbed %>
-\\n
-<% if (it.comment) { %>
-comment: <%= it.commentMd %>
-<% } %>
-\\n
-<% if (it.tags.length > 0) { %>
-tags: <%= it.tags.map((tag) => tag.name).join(", ") %>
-<% } %>`;
+import annots from "./zt-annot.ejs";
+import annotation from "./zt-annots.ejs";
+import note from "./zt-note.ejs";
+
 export const DEFAULT_TEMPLATE: Record<TemplateName, string> = {
   filename:
     "<%= it.citekey ?? it.DOI ?? it.title ?? it.key ?? it.citekey %>.md",

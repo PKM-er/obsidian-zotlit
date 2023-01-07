@@ -6,7 +6,7 @@ import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/index.js";
-import { ZOTERO_KEY_FIELDNAME } from "../template/defaults.js";
+import { ZOTERO_KEY_FIELDNAME } from "../template/defaults/index.js";
 import type { GeneralItemExtra } from "../template/helper/item.js";
 import type ZoteroPlugin from "../zt-main.js";
 

@@ -35,6 +35,7 @@ const opts = {
   minify: isProd,
   loader: {
     ".svg": "text",
+    ".ejs": "text",
   },
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
