@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
+import { join } from "path/posix";
+import { betterSqlite3 } from "@obzt/common";
+import type { PluginManifest } from "obsidian";
+import { FileSystemAdapter, Platform } from "obsidian";
+import _PLATFORM_SUPPORT from "support-platform";
+
 export const {
   arch,
   platform,
@@ -6,14 +13,6 @@ export const {
 } = process;
 
 export type ModuleVersions = keyof typeof _PLATFORM_SUPPORT;
-
-const _PLATFORM_SUPPORT = {
-  "103": {
-    darwin: ["arm64", "x64"],
-    linux: ["x64"],
-    win32: ["x64", "ia32"],
-  },
-};
 
 export const PLATFORM_SUPPORT = _PLATFORM_SUPPORT as Record<
   ModuleVersions,
@@ -66,11 +65,6 @@ export const getPlatformDetails = () => {
     return null;
   }
 };
-
-import { join } from "path/posix";
-import { betterSqlite3 } from "@obzt/common";
-import type { PluginManifest } from "obsidian";
-import { FileSystemAdapter, Platform } from "obsidian";
 
 export const getBinaryVersion = (manifest: PluginManifest) =>
   manifest.versions?.["better-sqlite3"];

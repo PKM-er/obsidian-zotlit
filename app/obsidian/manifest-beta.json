@@ -2,9 +2,9 @@
   "id": "obsidian-zotero-plugin",
   "name": "Zotero Plugin",
   "version": "1.0.0-beta.0",
-  "minAppVersion": "0.16.0",
+  "minAppVersion": "1.1.9",
   "versions": {
-    "better-sqlite3": "7.6.2-mod.2"
+    "better-sqlite3": "8.0.1-mod.1"
   },
   "description": "Plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
   "author": "AidenLx",

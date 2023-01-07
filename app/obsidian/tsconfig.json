@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "paths": {
       "@log": ["./logger.ts"],
+      "support-platform": ["./platform.json"],
       "@component/*": ["./component/*"],
       "@assets/*": ["../assets/*"],
       "@utils/*": ["./utils/*"],
