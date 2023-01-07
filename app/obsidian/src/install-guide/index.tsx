@@ -8,7 +8,7 @@ import {
   getBinaryFullPath,
   getBinaryVersion,
   getPlatformDetails,
-  isElectronSupported,
+  compareElectronVer,
   isPlatformSupported,
 } from "./version";
 
@@ -21,11 +21,19 @@ const showInstallGuide = (
   if (!platform) {
     throw new Error("Not in desktop app");
   }
-  if (!isElectronSupported(platform)) {
+  const compared = compareElectronVer(platform);
+  // if electron version is not supported
+  if (compared < 0) {
     new Notice(
       `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
         `in current version of obsidian is not supported by obsidian-zotero-plugin,` +
         ` please reinstall using latest obsidian installer from official website`,
+    );
+  } else if (compared > 0) {
+    new Notice(
+      `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
+        `in current version of obsidian is newer than the one supported by installed obsidian-zotero-plugin,` +
+        ` please update obsidian-zotero-plugin to the latest version`,
     );
   } else if (!isPlatformSupported(platform)) {
     new Notice(

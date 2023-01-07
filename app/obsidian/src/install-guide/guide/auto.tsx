@@ -6,7 +6,7 @@ import { useIconRef } from "../../utils/icon";
 import { binaryFullPathAtom, binaryLinkAtom, modalAtom } from "./atom";
 import { ListItem } from "./list-item";
 import { Loading } from "./loading";
-import { downloadModule, importModule } from "./utils";
+import { checkModuleStatus, downloadModule, importModule } from "./utils";
 
 enum InstallState {
   Idle,
@@ -72,6 +72,12 @@ const useInstallModule = () => {
     setInstallState(InstallState.Downloading);
     let binary;
     try {
+      const status = await checkModuleStatus(downloadUrl);
+      if (status === 404) {
+        throw new Error(
+          `Requested module not available (${downloadUrl}), please open an issue on GitHub`,
+        );
+      }
       binary = await downloadModule(downloadUrl);
     } catch (error) {
       setError([InstallState.Downloading, error]);

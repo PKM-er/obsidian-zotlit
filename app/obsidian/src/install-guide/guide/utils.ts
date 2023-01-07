@@ -34,8 +34,13 @@ export const uploadModule = async () => {
     strict: true,
   });
   if (!file) return null;
-  const decompressed = file.name.endsWith(".node");
+  const decompressed = !file.name.endsWith(".gz");
   return { decompressed, arrayBuffer: await file.arrayBuffer() };
+};
+
+export const checkModuleStatus = async (url: string): Promise<number> => {
+  const response = await fetch(url, { method: "HEAD" });
+  return response.status;
 };
 
 export const downloadModule = async (url: string): Promise<ArrayBuffer> => {
