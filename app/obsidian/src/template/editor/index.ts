@@ -3,10 +3,11 @@ import { bracketExtension } from "./bracket";
 import { EtaSuggest } from "./suggester";
 
 const registerEtaEditorHelper = (plugin: ZoteroPlugin) => {
-  if (plugin.settings.autoPairEta) {
-    enableBracketExtension(plugin);
-  }
-  plugin.registerEditorExtension(plugin.editorExtensions);
+  // cause issue with canvas, disable for now
+  // if (plugin.settings.autoPairEta) {
+  //   enableBracketExtension(plugin);
+  // }
+  // plugin.registerEditorExtension(plugin.editorExtensions);
   plugin.registerEditorSuggest(new EtaSuggest(plugin.app));
 };
 
