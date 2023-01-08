@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { LogLevel } from "@obzt/common";
 import { enumerate } from "@obzt/common";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
-import log, { DEFAULT_LOGLEVEL } from "@log";
+import { LogSettings, applyLoglevel } from "@log";
 
 import NoteTemplate from "./template/index.js";
 import { WatcherSettings } from "./zotero-db/auto-refresh/settings.js";
@@ -15,9 +14,9 @@ export interface ZoteroSettings {
   database: DatabaseSettings;
   watcher: WatcherSettings;
   imgImporter: ImgImporterSettings;
+  log: LogSettings;
   literatureNoteFolder: InVaultPath;
   template: NoteTemplate;
-  logLevel: LogLevel;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
   // autoPairEta: boolean;
@@ -31,9 +30,9 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     database: plugin.use(DatabaseSettings),
     watcher: plugin.use(WatcherSettings),
     imgImporter: plugin.use(ImgImporterSettings),
+    log: plugin.use(LogSettings),
     literatureNoteFolder: new InVaultPath("LiteratureNotes"),
     template: new NoteTemplate(plugin),
-    logLevel: DEFAULT_LOGLEVEL,
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
     // autoPairEta: true,
@@ -56,6 +55,7 @@ export async function loadSettings(this: ZoteroPlugin) {
   this.settings.database.fromJSON(json);
   this.settings.watcher.fromJSON(json);
   this.settings.imgImporter.fromJSON(json);
+  this.settings.log.fromJSON(json);
   await Promise.all(
     Object.keys(this.settings).map(async (k) => {
       const key = k as keyof ZoteroSettings;
@@ -66,15 +66,16 @@ export async function loadSettings(this: ZoteroPlugin) {
       }
     }),
   );
-  log.level = this.settings.logLevel;
+  applyLoglevel(this.databaseAPI, this.settings.log.level);
 }
 
 export async function saveSettings(this: ZoteroPlugin) {
-  const { database, watcher, imgImporter, ...regular } = this.settings;
+  const { database, watcher, imgImporter, log, ...regular } = this.settings;
   await this.saveData({
     ...database.toJSON(),
     ...watcher.toJSON(),
     ...imgImporter.toJSON(),
+    ...log.toJSON(),
     ...regular,
   });
 }

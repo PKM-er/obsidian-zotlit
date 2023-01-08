@@ -58,6 +58,7 @@ export default class ZoteroPlugin extends Plugin {
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
     await this.loadSettings();
+
     registerCodeBlock(this);
     registerEtaEditorHelper(this);
     this.addCommand({

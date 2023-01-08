@@ -2,7 +2,7 @@ import workerpool from "@aidenlx/workerpool";
 import type { DbWorkerAPI } from "@obzt/database";
 import dbWorker from "@obzt/database";
 import { Service } from "@ophidian/core";
-import logger from "@log";
+import logger, { LogSettings } from "@log";
 
 const createWorkerProxy = (pool: workerpool.WorkerPool) => {
   const placeholder = {} as Record<string, any>;
@@ -24,6 +24,7 @@ const createWorkerProxy = (pool: workerpool.WorkerPool) => {
 };
 
 export default class DatabaseWorker extends Service {
+  logSettings = this.use(LogSettings);
   onload() {
     logger.debug("loading DatabaseWorker");
   }

@@ -27,6 +27,7 @@
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
     "assert-never": "^1.2.1",
-    "@mobily/ts-belt": "~3.13.1"
+    "@mobily/ts-belt": "~3.13.1",
+    "localforage": "~1.10.0"
   }
 }

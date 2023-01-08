@@ -13,7 +13,7 @@ import type {
 } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
-import log from "@log";
+import log, { applyLoglevel } from "@log";
 
 import type { SettingKeyWithType } from "../settings.js";
 import { TEMPLATE_NAMES } from "../template";
@@ -372,7 +372,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         createFragment((frag) => {
           frag.appendText("Change level of logs output to the console.");
           frag.createEl("br");
-          frag.appendText("Set to DEBUG if debug is required");
+          frag.appendText("Set to DEBUG if you need to report a issue");
           frag.createEl("br");
           frag.appendText("To check console, " + promptOpenLog());
         }),
@@ -383,9 +383,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setValue(log.level.toString())
           .onChange(async (val) => {
             const level = val as LogLevel;
-            log.level = level;
-            // await this.plugin.database.setLoglevel(level);
-            this.plugin.settings.logLevel = level;
+            this.plugin.settings.log.level = level;
+            await applyLoglevel(this.plugin.databaseAPI, level);
             await this.plugin.saveSettings();
           }),
       );

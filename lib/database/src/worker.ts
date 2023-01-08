@@ -1,9 +1,10 @@
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
+import localforage from "localforage";
 import { AnnotByKeys, AnnotByParent, Attachements, Tags } from "@query/sql";
 import type { DbWorkerAPI } from "./api.js";
 import { databases, getGroupID, getLibInfo } from "./init.js";
-import logger from "./logger.js";
+import logger, { storageKey } from "./logger.js";
 import getItem from "./modules/get-item.js";
 import { openDb, refreshDb } from "./modules/init-conn.js";
 import initIndex from "./modules/init-index.js";
@@ -63,6 +64,7 @@ const methods: DbWorkerAPI = {
   },
   setLoglevel: (level) => {
     logger.level = level;
+    localforage.setItem(storageKey, level);
   },
 };
 
