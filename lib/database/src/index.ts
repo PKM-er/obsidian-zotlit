@@ -38,5 +38,3 @@ export const sortBySortIndex = (aIdx: number[], bIdx: number[]) => {
   }
   return 0;
 };
-
-export * from "db-types";
