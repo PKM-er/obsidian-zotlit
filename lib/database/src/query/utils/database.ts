@@ -35,7 +35,10 @@ export default class Database {
     return new DatabaseConstructor(`file:${filename}?mode=ro&immutable=1`, {
       nativeBinding: binding,
       uriPath: true,
-      verbose: isDev ? console.log : undefined,
+      verbose: isDev
+        ? (message?: any, ...additionalArgs: any[]) =>
+            log.trace(`SQL: ${message}`, ...additionalArgs)
+        : undefined,
     });
   }
 

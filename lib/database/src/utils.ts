@@ -15,7 +15,7 @@ export function attachLogger<F extends (...args: any[]) => any>(
     // eslint-disable-next-line prefer-spread
     const result = fn.apply(null, args);
     Promise.resolve(result).then((val) =>
-      log.info(
+      log.debug(
         `Finished reading Zotero database for ${
           typeof task === "string" ? task : task(val, ...args)
         }`,
