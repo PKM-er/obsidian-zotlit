@@ -58,7 +58,7 @@ importers:
       make-error: ^1.3.6
       monkey-around: ^2.3.0
       nanoevents: ~7.0.1
-      obsidian: 0.16.3
+      obsidian: github:obsidianmd/obsidian-api
       pretty-hrtime: ^1.0.3
       query-string: ~7.1.1
       react: ~17.0.2
@@ -97,7 +97,7 @@ importers:
       make-error: 1.3.6
       monkey-around: 2.3.0
       nanoevents: 7.0.1
-      obsidian: 0.16.3_ebfztrivxsawr3nzgdquexqq6q
+      obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_ebfztrivxsawr3nzgdquexqq6q
       pretty-hrtime: 1.0.3
       query-string: 7.1.1
       react: 17.0.2
@@ -4194,7 +4194,7 @@ packages:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
     dependencies:
       '@types/eslint': 8.4.7
-      '@types/estree': 0.0.51
+      '@types/estree': 1.0.0
 
   /@types/eslint/8.4.7:
     resolution: {integrity: sha512-ehM7cCt2RSFs42mb+lcmhFT9ouIlV92PuaeRGn8N8c98oMjG4Z5pJHA9b1QiCcuqnbPSHcyfiD3mlhqMaHsQIw==}
@@ -11546,18 +11546,6 @@ packages:
   /objectorarray/1.0.5:
     resolution: {integrity: sha512-eJJDYkhJFFbBBAxeh8xW+weHlkI28n2ZdQV/J/DNfWfSKlGEf2xcfAbZTv3riEXHAhL9SVOTs2pRmXiSTf78xg==}
 
-  /obsidian/0.16.3_ebfztrivxsawr3nzgdquexqq6q:
-    resolution: {integrity: sha512-hal9qk1A0GMhHSeLr2/+o3OpLmImiP+Y+sx2ewP13ds76KXsziG96n+IPFT0mSkup1zSwhEu+DeRhmbcyCCXWw==}
-    peerDependencies:
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
-    dependencies:
-      '@codemirror/state': 6.1.2
-      '@codemirror/view': 6.4.0
-      '@types/codemirror': 0.0.108
-      moment: 2.29.4
-    dev: false
-
   /obuf/1.1.2:
     resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
     dev: false
@@ -15729,3 +15717,18 @@ packages:
 
   /zwitch/2.0.2:
     resolution: {integrity: sha512-JZxotl7SxAJH0j7dN4pxsTV6ZLXoLdGME+PsjkL/DaBrVryK9kTGq06GfKrwcSOqypP+fdXGoCHE36b99fWVoA==}
+
+  github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_ebfztrivxsawr3nzgdquexqq6q:
+    resolution: {tarball: https://codeload.github.com/obsidianmd/obsidian-api/tar.gz/38dd22168d2925086371bfc59e36fd9121527a39}
+    id: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39
+    name: obsidian
+    version: 1.1.7
+    peerDependencies:
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
+    dependencies:
+      '@codemirror/state': 6.1.2
+      '@codemirror/view': 6.4.0
+      '@types/codemirror': 0.0.108
+      moment: 2.29.4
+    dev: false

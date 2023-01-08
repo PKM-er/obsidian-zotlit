@@ -27,10 +27,10 @@ export const AttachmentSelect = () => {
     >
       {attachments
         .filter((item): item is Attachment => item.itemID !== null)
-        .map(({ itemID, path, count }) => {
+        .map(({ itemID, path, annotCount }) => {
           return (
             <option key={itemID} value={itemID}>
-              ({count}) {path?.replace(/^storage:/, "")}
+              ({annotCount}) {path?.replace(/^storage:/, "")}
             </option>
           );
         })}

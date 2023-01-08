@@ -13,7 +13,7 @@ export const bracketExtension = Prec.highest(
     pm && brackets.push("*", "_", "`", "```");
     // custom match '<' & '%' on eta files
     const { file } = state.field(editorInfoField);
-    if (isEtaFile(file)) {
+    if (file && isEtaFile(file)) {
       brackets.push("<", "%");
     }
     const closeBrackets: CloseBracketConfig = {
