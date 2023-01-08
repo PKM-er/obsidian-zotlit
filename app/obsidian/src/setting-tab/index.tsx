@@ -52,9 +52,16 @@ export class ZoteroSettingTab extends PluginSettingTab {
     new Setting(this.containerEl).setHeading().setName("General");
 
     this.setDataDirPath();
-    this.addToggle(this.containerEl, "autoRefresh", (val) =>
-      this.plugin.db.setAutoRefresh(val),
-    ).setName("Refresh automatically when Zotero updates database");
+    new Setting(this.containerEl)
+      .addToggle((toggle) => {
+        const settings = this.plugin.settings.watcher;
+        toggle.setValue(settings.autoRefresh).onChange(async (value) => {
+          settings.autoRefresh = value;
+          await this.plugin.dbWatcher.setAutoRefresh(value);
+          await this.plugin.saveSettings();
+        });
+      })
+      .setName("Refresh automatically when Zotero updates database");
 
     this.setLiteratureNoteFolder();
     this.setImgExcerptFolder();
@@ -123,11 +130,19 @@ export class ZoteroSettingTab extends PluginSettingTab {
         el.style.setProperty("display", "none");
       }
     };
-    this.addToggle(this.containerEl, "symlinkImgExcerpt", setVisible).setName(
-      "Symlink Image Excerpt",
-    );
+    new Setting(this.containerEl)
+      .addToggle((toggle) => {
+        const settings = this.plugin.settings.imgImporter;
+        toggle.setValue(settings.symlinkImgExcerpt).onChange(async (value) => {
+          settings.symlinkImgExcerpt = value;
+          setVisible(value);
+          await this.plugin.saveSettings();
+        });
+      })
+      .setName("Symlink Image Excerpt");
+    const settings = this.plugin.settings.imgImporter;
     const setter = async (value: string, text: TextAreaComponent) => {
-      const { imgExcerptPath } = this.plugin.settings;
+      const { imgExcerptPath } = settings;
       imgExcerptPath.path = value;
       // correct with normalized path
       if (imgExcerptPath.path !== value) text.setValue(imgExcerptPath.path);
@@ -135,11 +150,11 @@ export class ZoteroSettingTab extends PluginSettingTab {
     };
     const text = this.addTextComfirm(
       this.containerEl,
-      () => this.plugin.settings.imgExcerptPath.path,
+      () => settings.imgExcerptPath.path,
       setter,
       { rows: 1 },
     ).setName("Image Excerpts Folder");
-    setVisible(this.plugin.settings.symlinkImgExcerpt);
+    setVisible(settings.symlinkImgExcerpt);
   }
 
   unmountDataDirSetting?: () => void;
@@ -152,7 +167,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     let dropdown: DropdownComponent | null = null;
     const renderDropdown = async (s: Setting) => {
       dropdown && dropdown.selectEl.remove();
-      const libs = await this.plugin.db.getLibs();
+      const libs = await this.plugin.databaseAPI.getLibs();
       s.addDropdown((dd) => {
         dropdown = dd;
         for (const { libraryID, name, groupID } of libs) {
@@ -166,11 +181,12 @@ export class ZoteroSettingTab extends PluginSettingTab {
               : `Library ${libraryID}`,
           );
         }
-        dd.setValue(this.plugin.settings.citationLibrary.toString()).onChange(
+        const settings = this.plugin.settings.database;
+        dd.setValue(settings.citationLibrary.toString()).onChange(
           async (val) => {
             const level = +val;
-            this.plugin.settings.citationLibrary = level;
-            await this.plugin.db.initIndex();
+            settings.citationLibrary = level;
+            await this.plugin.database.initIndex();
             new Notice("Zotero database updated.");
             await this.plugin.saveSettings();
           },
@@ -184,7 +200,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setIcon("switch")
           .setTooltip("Refresh")
           .onClick(async () => {
-            await this.plugin.db.fullRefresh();
+            await this.plugin.database.fullRefresh();
             renderDropdown(setting);
           }),
       )
@@ -368,7 +384,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .onChange(async (val) => {
             const level = val as LogLevel;
             log.level = level;
-            await this.plugin.db.setLoglevel(level);
+            // await this.plugin.database.setLoglevel(level);
             this.plugin.settings.logLevel = level;
             await this.plugin.saveSettings();
           }),
@@ -378,26 +394,26 @@ export class ZoteroSettingTab extends PluginSettingTab {
   addToggle(
     addTo: HTMLElement,
     key: SettingKeyWithType<boolean>,
-    set?: (value: boolean) => void,
+    set?: (value: boolean) => void | Promise<void>,
   ): Setting {
     return new Setting(addTo).addToggle((toggle) => {
-      toggle.setValue(this.plugin.settings[key]).onChange((value) => {
+      toggle.setValue(this.plugin.settings[key]).onChange(async (value) => {
         this.plugin.settings[key] = value;
-        set?.(value);
-        this.plugin.saveSettings();
+        await set?.(value);
+        await this.plugin.saveSettings();
       });
     });
   }
   addTextField(
     addTo: HTMLElement,
     get: () => string,
-    set: (value: string) => void,
+    set: (value: string) => void | Promise<void>,
     size: TextAreaSize = {},
     timeout = 500,
   ): Setting {
     return new Setting(addTo).addTextArea((text) => {
       const onChange = async (value: string) => {
-        set(value);
+        await set(value);
         await this.plugin.saveSettings();
       };
       text.setValue(get()).onChange(debounce(onChange, timeout, true));

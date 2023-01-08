@@ -13,11 +13,13 @@ importers:
       '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
       '@codemirror/autocomplete': ~6.3.0
       '@codemirror/state': ~6.1.2
+      '@mobily/ts-belt': ~3.13.1
       '@obzt/annot-block': workspace:*
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
       '@obzt/note-parser': workspace:*
       '@obzt/zotero-type': workspace:*
+      '@ophidian/core': workspace:*
       '@release-it/bumper': ^4.0.0
       '@release-it/conventional-changelog': ^5.1.0
       '@types/dompurify': ~2.3.4
@@ -72,11 +74,13 @@ importers:
       typescript: ^4.8.3
     dependencies:
       '@aidenlx/workerpool': 6.2.1-mod.13
+      '@mobily/ts-belt': 3.13.1
       '@obzt/annot-block': link:../../lib/annot-block
       '@obzt/common': link:../../lib/common
       '@obzt/database': link:../../lib/database
       '@obzt/note-parser': link:../../lib/note-parser
       '@obzt/zotero-type': link:../../lib/zotero-type
+      '@ophidian/core': link:../../lib/ophidian-lib-core
       ahooks: 3.7.2_react@17.0.2
       assert-never: 1.2.1
       clsx: 1.2.1
@@ -352,6 +356,21 @@ importers:
       cross-env: 7.0.3
       esbuild: 0.14.54
       eslint: 8.24.0
+      typescript: 4.8.4
+
+  ../../lib/ophidian-lib-core:
+    specifiers:
+      i18next: ^20.3.2
+      monkey-around: ^2.3.0
+      obsidian: github:obsidianmd/obsidian-api
+      to-use: ^0.2.1
+      typescript: ^4.8.3
+    dependencies:
+      i18next: 20.6.1
+      monkey-around: 2.3.0
+      obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_ebfztrivxsawr3nzgdquexqq6q
+      to-use: 0.2.1
+    devDependencies:
       typescript: 4.8.4
 
   ../../lib/zotero-type:
@@ -9373,6 +9392,12 @@ packages:
     resolution: {integrity: sha512-rQLskxnM/5OCldHo+wNXbpVgDn5A17CUoKX+7Sokwaknlq7CdSnphy0W39GU8dw59XiCXmFXDg4fRuckQRKewQ==}
     engines: {node: '>=12.20.0'}
 
+  /i18next/20.6.1:
+    resolution: {integrity: sha512-yCMYTMEJ9ihCwEQQ3phLo7I/Pwycf8uAx+sRHwwk5U9Aui/IZYgQRyMqXafQOw5QQ7DM1Z+WyEXWIqSuJHhG2A==}
+    dependencies:
+      '@babel/runtime': 7.19.4
+    dev: false
+
   /iconv-lite/0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
     engines: {node: '>=0.10.0'}
@@ -14490,6 +14515,10 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /to-use/0.2.1:
+    resolution: {integrity: sha512-FwF0QIePeaY/Wk2thTjjV41KltJZsMTidH33R64u76Ai+IDyXI4cLYA5PH2PjQRyxAKVtDgcN1ZPK5JJh102Vw==}
+    dev: false
 
   /toidentifier/1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}

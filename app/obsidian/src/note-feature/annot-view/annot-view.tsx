@@ -30,10 +30,9 @@ export const AnnotView = () => {
     return view.on("load-file", updateActiveDoc);
   }, [setActiveDoc, view]);
   useEffect(() => {
-    const { db } = view.plugin;
-    const ref = db.on("refresh", refresh);
+    const ref = app.vault.on("zotero:db-refresh", refresh);
     return () => {
-      db.offref(ref);
+      app.vault.offref(ref);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.plugin, refresh]);

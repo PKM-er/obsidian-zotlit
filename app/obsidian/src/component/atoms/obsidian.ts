@@ -40,13 +40,16 @@ export const activeFileAtom = atom(
   },
 );
 export const activeDocItemAtom = atom(async (get) => {
-  const { db } = get(pluginAtom);
+  const { database } = get(pluginAtom);
   const activeFile = get(_activeFileAtom);
 
   if (!activeFile) return null;
   const key = getItemKeyFromFrontmatter(app.metadataCache.getCache(activeFile));
   if (!key) return null;
-  const item = await db.getItem(key);
+  const item = await database.api.getItem(
+    key,
+    database.settings.citationLibrary,
+  );
   if (!item) return null;
   return item as DocItem;
 });
@@ -55,7 +58,10 @@ export const tagsAtom = atom(async (get) => {
     const item = get(activeDocItemAtom);
     if (!item) return null;
     const { itemID } = item;
-    const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+    const { database } = get(pluginAtom);
+    const tags = (
+      await database.api.getTags([itemID], database.settings.citationLibrary)
+    )[itemID];
     return tags; // .filter((t) => t.type === TagType.manual);
   }),
   loadableTagsAtom = loadable(tagsAtom);

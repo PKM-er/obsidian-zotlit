@@ -1,6 +1,7 @@
 // import "./main.less";
 
 import type { Extension } from "@codemirror/state";
+import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
@@ -20,16 +21,19 @@ import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
 import registerEtaEditorHelper from "./template/editor";
-import { ImgCacheImporter } from "./zotero-db/img-import";
-import ZoteroDb from "./zotero-db/index.js";
+import DatabaseWatcher from "./zotero-db/auto-refresh/service";
+import DatabaseWorker from "./zotero-db/connector/service";
+import { ZoteroDatabase } from "./zotero-db/database";
+import { ImgCacheImporter } from "./zotero-db/img-import/service";
 
 export default class ZoteroPlugin extends Plugin {
+  use = use.plugin(this);
+
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
     if (!checkLib(manifest)) {
       throw new Error("Library check failed");
     }
-    this.imgCacheImporter = new ImgCacheImporter(this);
     this.annotBlockWorker = new AnnotBlockWorker(this);
     this.noteIndex = new NoteIndex(this);
     // this.noteParser = new NoteParser(this);
@@ -39,22 +43,21 @@ export default class ZoteroPlugin extends Plugin {
   settings: ZoteroSettings = getDefaultSettings(this);
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
-  #db?: ZoteroDb;
+
+  databaseAPI = this.use(DatabaseWorker).api;
+  imgCacheImporter = this.use(ImgCacheImporter);
+  dbWatcher = this.use(DatabaseWatcher);
+  database = this.use(ZoteroDatabase);
+
   // noteParser: NoteParser;
-  imgCacheImporter: ImgCacheImporter;
   // pdfCache: PDFCache;
   annotBlockWorker: AnnotBlockWorker;
   noteIndex: NoteIndex;
 
-  get db() {
-    if (!this.#db) throw new Error("access database before load");
-    return this.#db;
-  }
   editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
     await this.loadSettings();
-    this.#db = new ZoteroDb(this);
     registerCodeBlock(this);
     registerEtaEditorHelper(this);
     this.addCommand({
@@ -67,7 +70,7 @@ export default class ZoteroPlugin extends Plugin {
       id: "refresh-zotero-data",
       name: "Refresh Zotero Data",
       callback: async () => {
-        await this.db.fullRefresh();
+        await this.database.fullRefresh();
         new Notice("Zotero data is now up-to-date");
       },
     });
@@ -84,7 +87,6 @@ export default class ZoteroPlugin extends Plugin {
     //   this.registerObsidianProtocolHandler(...args),
     // );
 
-    await this.db.init();
     registerNoteFeature(this);
   }
 

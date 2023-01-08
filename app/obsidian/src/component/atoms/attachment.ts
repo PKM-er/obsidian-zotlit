@@ -43,11 +43,11 @@ export const activeAtchAtom = atom(
 
 export const getAttachments = async (get: Getter) => {
   const item = get(activeDocItemAtom),
-    { db } = get(pluginAtom);
+    { database } = get(pluginAtom);
   // no active note for literature
   if (!item) return null;
   log.trace("fetching attachments for", item);
-  return db.getAttachments(item.itemID, item.libraryID);
+  return database.api.getAttachments(item.itemID, item.libraryID);
 };
 
 export const attachmentsAtom = atomWithDefault(getAttachments);

@@ -22,13 +22,13 @@ export const getSuggestions = async (
   plugin: ZoteroPlugin,
 ): Promise<FuzzyMatch<GeneralItem>[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
-    return await plugin.db.search(
+    return await plugin.database.search(
       input.replace(/^\+|\+$/g, "").split(/\+/),
       PRIMARY_MATCH_FIELD,
       50,
     );
   } else {
-    return await plugin.db.getAll(50);
+    return await plugin.database.getAll(50);
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions

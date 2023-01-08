@@ -22,8 +22,12 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
     if (!result) return false;
     const { item } = result.value;
     if (await openNote(this.plugin, item, true)) return true;
-
-    const allAttachments = await this.plugin.db.getAttachments(item.itemID);
+    const { database } = this.plugin;
+    const defaultLibId = database.settings.citationLibrary;
+    const allAttachments = await database.api.getAttachments(
+      item.itemID,
+      defaultLibId,
+    );
     let attachment: AttachmentInfo | null = null;
     if (allAttachments.length > 1) {
       // prompt for attachment selection
@@ -35,13 +39,13 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
     }
 
     const annotations: Annotation[] = attachment
-      ? await this.plugin.db.getAnnotations(attachment.itemID)
+      ? await database.api.getAnnotations(attachment.itemID, defaultLibId)
       : [];
 
-    const tagsRecord = await this.plugin.db.getTags([
-      item.itemID,
-      ...annotations.map((i) => i.itemID),
-    ]);
+    const tagsRecord = await database.api.getTags(
+      [item.itemID, ...annotations.map((i) => i.itemID)],
+      defaultLibId,
+    );
 
     const note = await createNote(this.plugin, item, {
       attachment,

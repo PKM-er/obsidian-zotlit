@@ -32,7 +32,7 @@ export const withItemHelper = (
     },
     fileLink(): string {
       return fileLink(
-        ctx.plugin.settings.zoteroDataDir,
+        ctx.plugin.settings.database.zoteroDataDir,
         ctx.sourcePath,
         _extra.attachment,
       );

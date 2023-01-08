@@ -42,12 +42,15 @@ export const withAnnotHelper = (
     },
     imgPath(): string {
       if (isImageAnnot(this)) {
-        return getCacheImagePath(this, plugin.settings.zoteroDataDir);
+        return getCacheImagePath(this, plugin.settings.database.zoteroDataDir);
       } else return "";
     },
     imgUrl(): string {
       if (isImageAnnot(this)) {
-        const path = getCacheImagePath(this, plugin.settings.zoteroDataDir);
+        const path = getCacheImagePath(
+          this,
+          plugin.settings.database.zoteroDataDir,
+        );
         return toFileUrl(path);
       } else return "";
     },
@@ -61,7 +64,7 @@ export const withAnnotHelper = (
     },
     fileLink(): string {
       return fileLink(
-        plugin.settings.zoteroDataDir,
+        plugin.settings.database.zoteroDataDir,
         sourcePath,
         extra.attachment,
         toPage(this.position.pageIndex, true),

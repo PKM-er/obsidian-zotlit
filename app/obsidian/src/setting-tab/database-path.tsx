@@ -23,7 +23,7 @@ export function atomWithRefresh<T>(fn: (get: Getter) => T) {
 }
 
 const zoteroDataDirAtom = atomWithRefresh(
-  (get) => get(pluginAtom).settings.zoteroDataDir,
+  (get) => get(pluginAtom).settings.database.zoteroDataDir,
 );
 
 const successAtom = atom<boolean | null>(null);
@@ -38,13 +38,13 @@ const SetDataDirButton = () => {
       const {
         filePaths: [newFolder],
       } = await dialog.showOpenDialog({
-        defaultPath: plugin.settings.zoteroDataDir,
+        defaultPath: plugin.settings.database.zoteroDataDir,
         properties: ["openDirectory"],
       });
-      if (newFolder && plugin.settings.zoteroDataDir !== newFolder) {
-        plugin.settings.zoteroDataDir = newFolder;
+      if (newFolder && plugin.settings.database.zoteroDataDir !== newFolder) {
+        plugin.settings.database.zoteroDataDir = newFolder;
         await plugin.saveSettings();
-        await plugin.db.init();
+        await plugin.database.init();
         refresh();
         new Notice("Zotero database path updated.");
         setSuccess(true);
@@ -77,13 +77,14 @@ const bbtAtoms = {
   statusAtom: loadable(
     atom(
       async (get) => (
-        get(zoteroDataDirAtom), get(pluginAtom).db.checkDbStatus("bbt")
+        get(zoteroDataDirAtom), get(pluginAtom).databaseAPI.checkDbStatus("bbt")
       ),
     ),
   ),
   pathAtom: atom(
     (get) => (
-      get(zoteroDataDirAtom), get(pluginAtom).settings.betterBibTexDbPath
+      get(zoteroDataDirAtom),
+      get(pluginAtom).settings.database.betterBibTexDbPath
     ),
   ),
 };
@@ -91,12 +92,15 @@ const mainAtoms = {
   statusAtom: loadable(
     atom(
       async (get) => (
-        get(zoteroDataDirAtom), get(pluginAtom).db.checkDbStatus("main")
+        get(zoteroDataDirAtom),
+        get(pluginAtom).databaseAPI.checkDbStatus("main")
       ),
     ),
   ),
   pathAtom: atom(
-    (get) => (get(zoteroDataDirAtom), get(pluginAtom).settings.zoteroDbPath),
+    (get) => (
+      get(zoteroDataDirAtom), get(pluginAtom).settings.database.zoteroDbPath
+    ),
   ),
 };
 

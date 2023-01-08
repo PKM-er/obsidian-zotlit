@@ -37,6 +37,10 @@
       "path": "lib/zotero-type"
     },
     {
+      "name": "ophidian-lib/core",
+      "path": "lib/ophidian-lib-core"
+    },
+    {
       "name": "root",
       "path": "."
     }

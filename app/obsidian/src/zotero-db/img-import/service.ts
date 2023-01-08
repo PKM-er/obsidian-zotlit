@@ -4,34 +4,38 @@ import { join } from "path/posix";
 import { getCacheImagePath } from "@obzt/database";
 import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
+import { Service } from "@ophidian/core";
 import type { FileSystemAdapter } from "obsidian";
 import { Notice, TFile } from "obsidian";
-import log from "../logger";
-import type ZoteroPlugin from "../zt-main";
+import log from "@log";
+import { DatabaseSettings } from "../connector/settings";
+import { ImgImporterSettings } from "./settings";
 
-export class ImgCacheImporter {
-  constructor(private readonly plugin: ZoteroPlugin) {}
-
-  get imgExcerptPath() {
-    return this.plugin.settings.symlinkImgExcerpt
-      ? this.plugin.settings.imgExcerptPath.path
-      : null;
+export class ImgCacheImporter extends Service {
+  onload() {
+    log.debug("loading ImgCacheImporter");
   }
+  async onunload() {
+    await Promise.all(this.flush());
+  }
+
+  databaseSettings = this.use(DatabaseSettings);
+  settings = this.use(ImgImporterSettings);
 
   private queue = new Map<string, () => Promise<boolean>>();
 
   getCachePath(annot: Annotation) {
-    return getCacheImagePath(annot, this.plugin.settings.zoteroDataDir);
+    return getCacheImagePath(annot, this.databaseSettings.zoteroDataDir);
   }
 
   getInVaultPath(annot: Annotation): string | null {
-    if (!this.imgExcerptPath || annot.type !== AnnotationType.image)
+    if (!this.settings.imgExcerptDir || annot.type !== AnnotationType.image)
       return null;
     const cachePath = getCacheImagePath(
       annot,
-      this.plugin.settings.zoteroDataDir,
+      this.databaseSettings.zoteroDataDir,
     );
-    return getInVaultPath(annot, cachePath, this.imgExcerptPath);
+    return getInVaultPath(annot, cachePath, this.settings.imgExcerptDir);
   }
 
   import(annot: Annotation): string | null {

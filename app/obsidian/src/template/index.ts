@@ -232,7 +232,7 @@ export default class NoteTemplate {
   }
 
   // load settings from JSON
-  async updateFromJSON(json: TemplateJSON | undefined) {
+  async fromJSON(json: TemplateJSON | undefined) {
     if (json) {
       if (typeof json.ejected === "boolean") {
         this.ejected = json.ejected ?? false;

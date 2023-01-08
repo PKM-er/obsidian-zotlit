@@ -5,13 +5,13 @@ import type { AnnotDetails, AnnotInfo } from "@obzt/annot-block/dist/api";
 import { AnnotationType } from "@obzt/zotero-type";
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 import log from "../logger";
-import type ZoteroDb from "../zotero-db";
+import type { ZoteroDatabase } from "../zotero-db/database";
 import type ZoteroPlugin from "../zt-main";
 
 class AnnotBlockRenderChild extends MarkdownRenderChild {
   constructor(
     container: HTMLElement,
-    private db: ZoteroDb,
+    private db: ZoteroDatabase,
     private worker: AnnotBlockWorkerAPI,
   ) {
     super(container);
@@ -36,8 +36,9 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     }
     let markdown: string;
     try {
-      const annotations = await this.db.getAnnotFromKey(
+      const annotations = await this.db.api.getAnnotFromKey(
         info.map(({ annotKey }) => annotKey),
+        this.db.settings.citationLibrary,
       );
       markdown = await this.worker.stringify(
         info.map(({ annotKey, ...props }) => ({
@@ -63,7 +64,9 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
   onload(): void {
     // safe to load this before first render
     // if db refresh before first render, render will be skipped
-    this.registerEvent(this.db.on("refresh", this.render.bind(this)));
+    this.registerEvent(
+      app.vault.on("zotero:db-refresh", this.render.bind(this)),
+    );
   }
 }
 
@@ -73,7 +76,7 @@ export const registerCodeBlock = (plugin: ZoteroPlugin) => {
     (source, el, ctx) => {
       const child = new AnnotBlockRenderChild(
         el,
-        plugin.db,
+        plugin.database,
         plugin.annotBlockWorker,
       );
       ctx.addChild(child);

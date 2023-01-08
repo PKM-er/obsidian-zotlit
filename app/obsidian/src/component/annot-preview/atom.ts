@@ -42,7 +42,10 @@ export const useIsSelected = () => {
 
 export const tagsAtom = atom(async (get) => {
     const { itemID } = get(annotAtom);
-    const tags = (await get(pluginAtom).db.getTags([itemID]))[itemID];
+    const { database } = get(pluginAtom);
+    const tags = (
+      await database.api.getTags([itemID], database.settings.citationLibrary)
+    )[itemID];
     return tags; // .filter((t) => t.type === TagType.manual);
   }),
   loadableTagsAtom = loadable(tagsAtom);

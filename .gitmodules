@@ -1,0 +1,3 @@
+[submodule "lib/ophidian-lib-core"]
+	path = lib/ophidian-lib-core
+	url = https://github.com/aidenlx/ophidian-lib-core

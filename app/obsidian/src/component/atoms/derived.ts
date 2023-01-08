@@ -26,7 +26,7 @@ export const imgSrcAtom = atom(
   (get) =>
     `app://local${getCacheImagePath(
       get(get(annotAtomAtom)),
-      get(pluginAtom).settings.zoteroDataDir,
+      get(pluginAtom).settings.database.zoteroDataDir,
     )}`,
 );
 

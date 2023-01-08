@@ -154,7 +154,7 @@ const shouldExpandNode = (
   return false;
 };
 const CopyJSONIcon = () => {
-  const [iconRef] = useIconRef<HTMLSpanElement>("clipboard-copy", 8);
+  const [iconRef] = useIconRef<HTMLSpanElement>("clipboard-copy");
   return <span ref={iconRef} />;
 };
 const getItemString = (

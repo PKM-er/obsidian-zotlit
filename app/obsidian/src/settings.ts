@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { homedir } from "os";
-import { join } from "path";
 import type { LogLevel } from "@obzt/common";
 import { enumerate } from "@obzt/common";
 import type { TAbstractFile, Vault } from "obsidian";
@@ -8,52 +6,38 @@ import { normalizePath } from "obsidian";
 import log, { DEFAULT_LOGLEVEL } from "@log";
 
 import NoteTemplate from "./template/index.js";
+import { WatcherSettings } from "./zotero-db/auto-refresh/settings.js";
+import { DatabaseSettings } from "./zotero-db/connector/settings.js";
+import { ImgImporterSettings } from "./zotero-db/img-import/settings.js";
 import type ZoteroPlugin from "./zt-main.js";
 
 export interface ZoteroSettings {
-  zoteroDataDir: string;
-  zoteroDbPath: string;
-  betterBibTexDbPath: string;
-  zoteroCacheDirPath: string;
+  database: DatabaseSettings;
+  watcher: WatcherSettings;
+  imgImporter: ImgImporterSettings;
   literatureNoteFolder: InVaultPath;
   template: NoteTemplate;
   logLevel: LogLevel;
-  citationLibrary: number;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
   // autoPairEta: boolean;
-  autoRefresh: boolean;
   mutoolPath: string | null;
-  symlinkImgExcerpt: boolean;
-  imgExcerptPath: InVaultPath;
 }
 
 export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
   // set inside logger.ts
   // log.setDefaultLevel(DEFAULT_LOG_LEVEL);
-  const defaultRoot = join(homedir(), "Zotero");
   return {
-    zoteroDataDir: defaultRoot,
-    get zoteroDbPath(): string {
-      return join(this.zoteroDataDir, "zotero.sqlite");
-    },
-    get betterBibTexDbPath(): string {
-      return join(this.zoteroDataDir, "better-bibtex-search.sqlite");
-    },
-    get zoteroCacheDirPath(): string {
-      return join(this.zoteroDataDir, "cache");
-    },
+    database: plugin.use(DatabaseSettings),
+    watcher: plugin.use(WatcherSettings),
+    imgImporter: plugin.use(ImgImporterSettings),
     literatureNoteFolder: new InVaultPath("LiteratureNotes"),
     template: new NoteTemplate(plugin),
     logLevel: DEFAULT_LOGLEVEL,
-    citationLibrary: 1,
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
-    autoRefresh: true,
     // autoPairEta: true,
     mutoolPath: null,
-    symlinkImgExcerpt: false,
-    imgExcerptPath: new InVaultPath("ZtImgExcerpt"),
   };
 };
 export type SettingKeyWithType<T> = {
@@ -62,28 +46,21 @@ export type SettingKeyWithType<T> = {
 type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
 
 const requireConvert = new Set(
-  enumerate<RequireConvert>()(
-    "imgExcerptPath",
-    "literatureNoteFolder",
-    "template",
-  ),
+  enumerate<RequireConvert>()("literatureNoteFolder", "template"),
 );
-const getters = new Set([
-  "zoteroDbPath",
-  "betterBibTexDbPath",
-  "zoteroCacheDirPath",
-] as const);
+
 const isRequireConvert = (key: string): key is RequireConvert =>
   requireConvert.has(key as RequireConvert);
 export async function loadSettings(this: ZoteroPlugin) {
   const json = (await this.loadData()) ?? {};
+  this.settings.database.fromJSON(json);
+  this.settings.watcher.fromJSON(json);
+  this.settings.imgImporter.fromJSON(json);
   await Promise.all(
     Object.keys(this.settings).map(async (k) => {
       const key = k as keyof ZoteroSettings;
-      // don't load settings to getters
-      if (getters.has(key as never)) return;
       if (isRequireConvert(key)) {
-        await this.settings[key].updateFromJSON(json[key]);
+        await this.settings[key].fromJSON(json[key]);
       } else if (json[key] !== undefined) {
         this.settings[key] = json[key] as never;
       }
@@ -93,13 +70,17 @@ export async function loadSettings(this: ZoteroPlugin) {
 }
 
 export async function saveSettings(this: ZoteroPlugin) {
-  const { betterBibTexDbPath, zoteroDbPath, zoteroCacheDirPath, ...settings } =
-    this.settings;
-  await this.saveData(settings);
+  const { database, watcher, imgImporter, ...regular } = this.settings;
+  await this.saveData({
+    ...database.toJSON(),
+    ...watcher.toJSON(),
+    ...imgImporter.toJSON(),
+    ...regular,
+  });
 }
 
 export interface ClassInSettings<Out> {
-  updateFromJSON(json: Out | undefined): Promise<this> | this;
+  fromJSON(json: Out | undefined): Promise<this> | this;
   toJSON(): Out;
 }
 
@@ -122,7 +103,7 @@ export class InVaultPath implements ClassInSettings<string> {
     return vault.getAbstractFileByPath(this.vaildPath);
   }
 
-  updateFromJSON(json: string | undefined) {
+  fromJSON(json: string | undefined) {
     if (json) this.vaildPath = json;
     return this;
   }
