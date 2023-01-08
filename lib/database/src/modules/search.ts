@@ -1,10 +1,10 @@
 import type { GeneralItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
-import { fuseIndex } from "@init";
+import { cache } from "@init";
 
-const query: DbWorkerAPI["query"] = async (libId, pattern, options) => {
-  const fuse = fuseIndex[libId];
+const query: DbWorkerAPI["query"] = (libId, pattern, options) => {
+  const fuse = cache.items.get(libId)?.fuse;
   if (!fuse) {
     throw new Error("Query before init");
   }

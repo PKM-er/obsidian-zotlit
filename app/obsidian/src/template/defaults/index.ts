@@ -32,8 +32,8 @@ export const EJECTABLE_TEMPLATE_NAMES = Object.keys(
   TEMPLATE_FILES,
 ) as EjectableTemplate[];
 
-import annots from "./zt-annot.ejs";
-import annotation from "./zt-annots.ejs";
+import annotation from "./zt-annot.ejs";
+import annots from "./zt-annots.ejs";
 import note from "./zt-note.ejs";
 
 export const DEFAULT_TEMPLATE: Record<TemplateName, string> = {

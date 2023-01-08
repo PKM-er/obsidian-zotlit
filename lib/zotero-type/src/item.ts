@@ -110,7 +110,7 @@ export const nonRegularItemTypes = [
 ] as const;
 
 export interface LibraryInfo {
-  libraryID: number | null;
-  type: string;
+  libraryID: number;
+  name: string | null;
   groupID: number | null;
 }

@@ -1,7 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import log from "@log";
 
-export type FromKnex<Q extends (...args: any[]) => any> = Awaited<
-  ReturnType<Q>
-> extends (infer V)[]
-  ? V
-  : never;
+export function attachLogger<F extends (...args: any[]) => any>(
+  fn: F,
+  task:
+    | string
+    | ((val: Awaited<ReturnType<F>> | null, ...args: Parameters<F>) => string),
+): F {
+  return ((...args: Parameters<F>) => {
+    log.debug(
+      `Reading Zotero database for ${
+        typeof task === "string" ? task : task(null, ...args)
+      }`,
+    );
+    // eslint-disable-next-line prefer-spread
+    const result = fn.apply(null, args);
+    Promise.resolve(result).then((val) =>
+      log.info(
+        `Finished reading Zotero database for ${
+          typeof task === "string" ? task : task(val, ...args)
+        }`,
+      ),
+    );
+    return result;
+  }) as F;
+}

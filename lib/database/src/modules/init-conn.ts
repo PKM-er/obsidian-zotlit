@@ -1,32 +1,30 @@
 import type { DbWorkerAPI } from "@api";
 import { databases } from "@init";
 import log from "@log";
+import { loadLibraryInfo } from "./load-lib";
 
-export const openDb: DbWorkerAPI["openDb"] = async (
+export const openDb: DbWorkerAPI["openDb"] = (
   nativeBinding,
   mainDbPath,
   bbtDbPath,
 ) => {
   log.debug("open database", nativeBinding, mainDbPath, bbtDbPath);
   const mainOpened = databases.main.open(mainDbPath, nativeBinding);
-  let bbtOpened: Promise<boolean> | null = null;
-  bbtOpened = databases.bbt.open(bbtDbPath, nativeBinding);
-  const [main, bbt] = await Promise.all([mainOpened, bbtOpened]);
-
-  if (!main) {
+  if (!mainOpened) {
     log.error(
       `Failed to open main database, no database found at ${mainDbPath}`,
     );
   }
-  if (!bbt) {
-    log.info(`Unable to open bbt database, no database found at ${mainDbPath}`);
+  const bbtOpened = databases.bbt.open(bbtDbPath, nativeBinding);
+  if (!bbtOpened) {
+    log.debug(
+      `Unable to open bbt database, no database found at ${mainDbPath}`,
+    );
   }
-  return [main, bbt];
+  loadLibraryInfo();
+  return [mainOpened, bbtOpened];
 };
-export const refreshDb: DbWorkerAPI["refreshDb"] = async () => {
+export const refreshDb: DbWorkerAPI["refreshDb"] = () => {
   log.debug("refresh database");
-  return await Promise.all([
-    databases.main.refresh(),
-    databases.bbt.refresh() ?? false,
-  ]);
+  return [databases.main.refresh(), databases.bbt.refresh() ?? false];
 };

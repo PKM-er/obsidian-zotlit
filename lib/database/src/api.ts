@@ -7,12 +7,8 @@ import type {
 } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
-export interface AttachmentInfo {
-  itemID: number;
-  key: string;
-  path: string | null;
-  count?: string | number;
-}
+import type { AttachmentInfo } from "./query/sql";
+export type { AttachmentInfo } from "./query/sql";
 
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
@@ -21,44 +17,37 @@ export interface DbWorkerAPI {
     nativeBinding: string,
     mainDbPath: string,
     bbtDbPath: string,
-  ): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
-  isUpToDate(): Promise<boolean | null>;
-  refreshDb(): Promise<[mainDbResult: boolean, bbtDbResult: boolean]>;
+  ): [mainDbResult: boolean, bbtDbResult: boolean];
+  isUpToDate(): boolean | null;
+  refreshDb(): [mainDbResult: boolean, bbtDbResult: boolean];
   checkDbStatus(name: "main" | "bbt"): boolean;
 
   /* start index for library, need to be called before query and after openDb */
-  initIndex(libraryID: number): Promise<void>;
+  initIndex(libraryID: number): void;
 
   query(
     libraryID: number,
     pattern: string | Fuse.Expression | null,
     options?: Fuse.FuseSearchOptions,
-  ): Promise<Fuse.FuseResult<GeneralItem>[]>;
+  ): Fuse.FuseResult<GeneralItem>[];
   /**
    * @param item item key or item id
    */
-  getItem(
-    item: string | number,
-    libraryID: number,
-  ): Promise<GeneralItem | null>;
+  getItem(item: string | number, libraryID: number): GeneralItem | null;
 
-  getLibs(): Promise<LibraryInfo[]>;
-  getAnnotations(
-    attachmentId: number,
-    libraryID: number,
-  ): Promise<Annotation[]>;
-  getAttachments(docId: number, libraryID: number): Promise<AttachmentInfo[]>;
-  getTags(
-    itemIds: number[],
-    libraryID: number,
-  ): Promise<Record<number, ItemTag[]>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  raw<R>(sql: string, args: any[]): Promise<R>;
+  getLibs(): LibraryInfo[];
+  getAnnotations(attachmentId: number, libraryID: number): Annotation[];
+  getAttachments(docId: number, libraryID: number): AttachmentInfo[];
+  getTags(itemIds: number[], libraryID: number): Record<number, ItemTag[]>;
+
+  raw<R>(mode: "get", sql: string, args: any[]): R;
+  raw<R>(mode: "all", sql: string, args: any[]): R[];
+  raw<R>(mode: "get" | "all", sql: string, args: any[]): R | R[];
 
   getAnnotFromKey(
     keys: string[],
     libraryID: number,
-  ): Promise<Record<string, Annotation>>;
+  ): Record<string, Annotation>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {

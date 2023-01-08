@@ -1,27 +1,52 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
+import { AnnotByKeys, AnnotByParent, Attachements, Tags } from "@query/sql";
 import type { DbWorkerAPI } from "./api.js";
-import { databases } from "./init.js";
+import { databases, getGroupID, getLibInfo } from "./init.js";
 import logger from "./logger.js";
-import { getAnnotations, getAnnotFromKey } from "./modules/annotation/index.js";
-import getAttachments from "./modules/attachments/index.js";
 import getItem from "./modules/get-item.js";
-import getLibs from "./modules/get-libs/index.js";
 import { openDb, refreshDb } from "./modules/init-conn.js";
-import initIndex from "./modules/init-index/index.js";
-import query from "./modules/query.js";
-import getTags from "./modules/tags/index.js";
+import initIndex from "./modules/init-index.js";
+import query from "./modules/search.js";
+import { attachLogger } from "./utils.js";
 
 const methods: DbWorkerAPI = {
-  getLibs,
+  getLibs: () => Object.values(getLibInfo()),
   initIndex,
   openDb,
   query,
-  getTags,
-  getAttachments,
-  getAnnotations,
-  getAnnotFromKey,
+  getTags: attachLogger(
+    (itemIds: number[], libId: number) =>
+      databases.main.prepare(Tags).query({ itemIds, libId }),
+    "tags",
+  ),
+  getAttachments: attachLogger(
+    (docId: number, libId: number) =>
+      databases.main.prepare(Attachements).query({ itemId: docId, libId }),
+    (attachments, docId) =>
+      `attachments of item ${docId}` +
+      (attachments ? `, count: ${attachments.length}` : ""),
+  ),
+  getAnnotations: attachLogger(
+    (attachmentId, libId) =>
+      databases.main.prepare(AnnotByParent).query({
+        attachmentId,
+        libId,
+        groupID: getGroupID(libId),
+      }),
+    (annots, attachmentId) =>
+      `annotations of attachment ${attachmentId}` +
+      (annots ? `, count: ${annots.length}` : ""),
+  ),
+  getAnnotFromKey: attachLogger(
+    (annotKeys, libId) =>
+      databases.main
+        .prepare(AnnotByKeys)
+        .query({ annotKeys, libId, groupID: getGroupID(libId) }),
+    (annots, annotKeys) =>
+      `annotations with keys: ${annotKeys.join(",")}` +
+      (annots ? `, count: ${annots.length}` : ""),
+  ),
   getItem,
   refreshDb,
   isUpToDate: () => databases.main.isUpToDate(),
@@ -29,14 +54,12 @@ const methods: DbWorkerAPI = {
   /**
    * raw query on zotero database
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  raw: async <R>(sql: string, args: any[]) => {
-    const { db } = databases.main;
+  raw<R>(mode: "get" | "all", sql: string, args: any[]): R | R[] {
+    const { instance: db } = databases.main;
     if (!db) {
       throw new Error("failed to query raw: no main database opened");
     }
-    const result = await db.raw(sql, ...args);
-    return result as R;
+    return db.prepare(sql)[mode](...args);
   },
   setLoglevel: (level) => {
     logger.level = level;

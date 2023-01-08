@@ -19,7 +19,7 @@ export class AttachmentSelectModal extends FuzzySuggestModalWithPromise<Attachme
     super.renderSuggestion(item, contentEl);
     auxEl
       .createEl("kbd", "suggestion-hotkey")
-      .setText((item.item.count ?? 0).toString());
+      .setText((item.item.annotCount ?? 0).toString());
   }
 
   getItemText(item: AttachmentInfo): string {

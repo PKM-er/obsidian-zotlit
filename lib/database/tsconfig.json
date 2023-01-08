@@ -15,7 +15,7 @@
       "@log": ["./logger.ts"],
       "@api": ["./api.ts"],
       "@init": ["./init.ts"],
-      "@knex": ["./modules/db/knex.config.ts"]
+      "@query/*": ["./query/*"]
     }
   },
   "include": ["src/**/*.ts", "scripts/sql-type.ts"]

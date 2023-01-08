@@ -1,20 +1,10 @@
 import { getItemKeyGroupID, multipartToSQL } from "@obzt/common";
-import type {
-  Item,
-  ItemField,
-  ItemCitekey,
-  ItemCreator,
-  GeneralItem,
-  GeneralItemBase,
-} from "@obzt/zotero-type";
+import type { GeneralItem, GeneralItemBase } from "@obzt/zotero-type";
 import Fuse from "fuse.js";
 import type { DbWorkerAPI } from "@api";
-import { databases, fuseIndex, itemIdIndex, itemKeyIndex } from "@init";
+import { databases, cache } from "@init";
 import log from "@log";
-
-import sql from "./better-bibtex.js";
-import creatorsSql from "./creators.js";
-import { itemFieldsSQL, itemSQL } from "./general.js";
+import { Items, ItemFields, Creators, BetterBibtex } from "@query/sql";
 
 const fuseOptions: Fuse.IFuseOptions<GeneralItem> = {
   keys: ["title"],
@@ -24,16 +14,20 @@ const fuseOptions: Fuse.IFuseOptions<GeneralItem> = {
   shouldSort: true,
 };
 
-const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
-  const { items, itemFields, creators } = await readMainDb(libraryID);
-  const citekeyMap = await readBbtDb();
+const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
+  if (!cache.libraries) throw new Error("Library info not loaded");
+  const libInfo = cache.libraries;
+
+  const { items, itemFields, creators } = readMainDb(libraryID);
+  const citekeyMap = readBbtDb();
 
   // prepare for fuse index
-
   const entries = items.reduce((rec, { itemID, ...props }) => {
     if (itemID) {
       const item: GeneralItemBase = {
         ...props,
+        libraryID,
+        groupID: libInfo[libraryID].groupID,
         itemID,
         creators: [],
         citekey: null,
@@ -78,54 +72,44 @@ const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
   log.trace("Start fuse indexing");
   const generalItems = Object.values(entries);
 
-  fuseIndex[libraryID] = new Fuse(generalItems, fuseOptions);
-  log.info("Library index initialized");
-
-  itemKeyIndex[libraryID] = generalItems.reduce(
-    (record, item) => ((record[getItemKeyGroupID(item, true)] = item), record),
-    {} as Record<string, GeneralItem>,
-  );
-  itemIdIndex[libraryID] = generalItems.reduce(
-    (record, item) => (
-      item.itemID !== null && (record[item.itemID] = item), record
+  cache.items.set(libraryID, {
+    fuse: new Fuse(generalItems, fuseOptions),
+    byKey: generalItems.reduce(
+      (record, item) => (
+        (record[getItemKeyGroupID(item, true)] = item), record
+      ),
+      {} as Record<string, GeneralItem>,
     ),
-    {} as Record<string, GeneralItem>,
-  );
+    byId: generalItems.reduce(
+      (record, item) => (
+        item.itemID !== null && (record[item.itemID] = item), record
+      ),
+      {} as Record<string, GeneralItem>,
+    ),
+  });
+  log.info("Library citation index initialized");
 };
 
 export default initIndex;
 
-const readMainDb = async (
-  libraryID: number,
-): Promise<{
-  items: Item[];
-  itemFields: ItemField[];
-  creators: ItemCreator[];
-}> => {
+const readMainDb = (libId: number) => {
   log.debug("Reading main Zotero database for index");
-  const db = databases.main.db;
-  if (!db) {
-    throw new Error("failed to init index: no main database opened");
-  }
+  const db = databases.main;
   const result = {
-    items: await itemSQL(db, libraryID),
-    itemFields: await itemFieldsSQL(db, libraryID),
-    creators: await creatorsSql(db, libraryID),
+    items: db.prepare(Items).query({ libId }),
+    itemFields: db.prepare(ItemFields).query({ libId }),
+    creators: db.prepare(Creators).query({ libId }),
   };
   log.info("Finished reading main Zotero database for index");
   return result;
 };
-const readBbtDb = async (): Promise<ItemCitekey[]> => {
+const readBbtDb = () => {
   log.debug("Reading Better BibTex database");
   if (!databases.bbt.opened) {
     log.info("Better BibTex database not enabled, skipping...");
     return [];
   }
-  const db = databases.bbt.db;
-  if (!db) {
-    throw new Error("failed to init index: no Better BibTex database opened");
-  }
-  const result = await sql(db);
+  const result = databases.bbt.prepare(BetterBibtex).query();
   log.info("Finished reading Better BibTex");
   return result;
 };

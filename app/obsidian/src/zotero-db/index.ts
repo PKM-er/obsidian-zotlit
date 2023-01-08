@@ -87,7 +87,7 @@ export default class ZoteroDb extends Events {
   }
   async setAutoRefresh(val: boolean, force = false) {
     if (val === this.#autoRefreshEnabled && !force) return;
-    log.info("Auto refresh set to " + val);
+    log.debug("Auto refresh set to " + val);
     this.#autoRefreshEnabled = val;
     this.#unloadWatchers();
     if (val) {
@@ -110,7 +110,7 @@ export default class ZoteroDb extends Events {
     const start = process.hrtime();
     const [mainOpened, bbtOpened] = await this.openDbConn();
     if (!bbtOpened) {
-      log.info("Failed to open Better BibTeX database, skipping...");
+      log.debug("Failed to open Better BibTeX database, skipping...");
       // return;
     }
     if (mainOpened) {
@@ -293,15 +293,20 @@ export default class ZoteroDb extends Events {
     await this.initIndex();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async raw<R>(sql: string, args: any[]): Promise<R> {
+  async raw<R>(mode: "get", sql: string, args: any[]): Promise<R>;
+  async raw<R>(mode: "all", sql: string, args: any[]): Promise<R[]>;
+  async raw<R>(
+    mode: "get" | "all",
+    sql: string,
+    args: any[],
+  ): Promise<R | R[]> {
     // wait for db refresh
     if (this.#initDbTask) {
       await this.#initDbTask;
     }
     const proxy = await this.#proxy;
-    const result = await proxy.raw(sql, args);
-    return result as R;
+    const result = await proxy.raw(mode, sql, args);
+    return result as R | R[];
   }
 
   async search(
@@ -338,7 +343,7 @@ export default class ZoteroDb extends Events {
       }
     } catch (error) {
       if (!this.#libs)
-        this.#libs = [{ libraryID: 1, type: "user", groupID: null }];
+        this.#libs = [{ libraryID: 1, name: "My Library", groupID: null }];
       log.error(error);
     }
     return this.#libs;

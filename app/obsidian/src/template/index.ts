@@ -57,7 +57,17 @@ export default class NoteTemplate {
   }
 
   private render<T extends TemplateName>(target: T, obj: TemplateDataMap[T]) {
-    return Eta.templates.get(target)(obj, Eta.config);
+    try {
+      return Eta.templates.get(target)(obj, Eta.config);
+    } catch (error) {
+      console.error(
+        "Error while rendering",
+        target,
+        JSON.stringify(obj),
+        error,
+      );
+      throw error;
+    }
   }
   renderAnnot(...args: Parameters<typeof withAnnotHelper>) {
     const data = withAnnotHelper(...args);

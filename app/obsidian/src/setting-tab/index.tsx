@@ -155,11 +155,15 @@ export class ZoteroSettingTab extends PluginSettingTab {
       const libs = await this.plugin.db.getLibs();
       s.addDropdown((dd) => {
         dropdown = dd;
-        for (const { libraryID, type, groupID } of libs) {
+        for (const { libraryID, name, groupID } of libs) {
           if (!libraryID) continue;
           dd.addOption(
             libraryID.toString(),
-            type === "user" ? "My Library" : `Group ${groupID}`,
+            name
+              ? groupID
+                ? `${name} (Group)`
+                : name
+              : `Library ${libraryID}`,
           );
         }
         dd.setValue(this.plugin.settings.citationLibrary.toString()).onChange(

@@ -16,17 +16,17 @@
     "@rmp135/sql-ts": "~1.15.0",
     "endent": "~2.1.0",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "esbuild": "^0.14.21"
   },
   "dependencies": {
-    "@aidenlx/better-sqlite3": ">=7.6.2-mod <7.6.2-mod0",
-    "@aidenlx/knex": ">=2.3.0-mod <2.3.0-mod0",
+    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
     "fuse.js": "^6.5.3",
     "@obzt/zotero-type": "workspace:*",
     "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
-    "esbuild": "^0.14.21",
-    "assert-never": "^1.2.1"
+    "assert-never": "^1.2.1",
+    "@mobily/ts-belt": "~3.13.1"
   }
 }
