@@ -19,18 +19,25 @@ const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
   const libInfo = cache.libraries;
 
   const { items, itemFields, creators } = readMainDb(libraryID);
-  const citekeyMap = readBbtDb();
+  const citekeyMap = readCitekeys(
+    libraryID,
+    items.map((v) => v.itemID),
+  );
 
   // prepare for fuse index
   const entries = items.reduce((rec, { itemID, ...props }) => {
     if (itemID) {
+      const citekey = citekeyMap[itemID];
+      if (!citekey) {
+        log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
+      }
       const item: GeneralItemBase = {
         ...props,
         libraryID,
         groupID: libInfo[libraryID].groupID,
         itemID,
         creators: [],
-        citekey: null,
+        citekey: citekeyMap[itemID],
       };
       rec[itemID] = item as GeneralItem;
     }
@@ -47,25 +54,14 @@ const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
         entries[itemID][fieldName] || []);
       values.push(value);
     } else {
-      console.error(
-        `Field: No item found for itemID ${itemID}`,
-        fieldName,
-        value,
-      );
+      log.error(`Field: No item found for itemID ${itemID}`, fieldName, value);
     }
   }
   for (const { itemID, ...creator } of creators) {
     if (itemID in entries) {
       entries[itemID].creators.push(creator);
     } else {
-      console.error(`Creator: No item found for itemID ${itemID}`, creator);
-    }
-  }
-  for (const { itemID, citekey } of citekeyMap) {
-    if (itemID in entries) {
-      entries[itemID].citekey = citekey;
-    } else {
-      console.error(`Citekey: No item found for itemID ${itemID}`, citekey);
+      log.error(`Creator: No item found for itemID ${itemID}`, creator);
     }
   }
 
@@ -103,13 +99,13 @@ const readMainDb = (libId: number) => {
   log.info("Finished reading main Zotero database for index");
   return result;
 };
-const readBbtDb = () => {
+const readCitekeys = (libId: number, itemIDs: number[]) => {
   log.debug("Reading Better BibTex database");
   if (!databases.bbt.opened) {
     log.info("Better BibTex database not enabled, skipping...");
     return [];
   }
-  const result = databases.bbt.prepare(BetterBibtex).query();
+  const result = databases.bbt.prepare(BetterBibtex).query({ libId, itemIDs });
   log.info("Finished reading Better BibTex");
   return result;
 };
