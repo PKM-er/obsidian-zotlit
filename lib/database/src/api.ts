@@ -1,14 +1,7 @@
 import type { LogLevel } from "@obzt/common";
-import type {
-  Annotation,
-  ItemTag,
-  LibraryInfo,
-  GeneralItem,
-} from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
-
-import type { AttachmentInfo } from "./query/sql";
-export type { AttachmentInfo } from "./query/sql";
+import type { AnnotationInfo, RegularItemInfo } from "./item.js";
+import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
@@ -27,18 +20,18 @@ export interface DbWorkerAPI {
 
   query(
     libraryID: number,
-    pattern: string | Fuse.Expression | null,
-    options?: Fuse.FuseSearchOptions,
-  ): Fuse.FuseResult<GeneralItem>[];
+    pattern: string | Fuse.default.Expression | null,
+    options?: Fuse.default.FuseSearchOptions,
+  ): Fuse.default.FuseResult<RegularItemInfo>[];
   /**
    * @param item item key or item id
    */
-  getItem(item: string | number, libraryID: number): GeneralItem | null;
+  getItem(item: string | number, libraryID: number): RegularItemInfo | null;
 
   getLibs(): LibraryInfo[];
-  getAnnotations(attachmentId: number, libraryID: number): Annotation[];
+  getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];
   getAttachments(docId: number, libraryID: number): AttachmentInfo[];
-  getTags(itemIds: number[], libraryID: number): Record<number, ItemTag[]>;
+  getTags(itemIds: number[], libraryID: number): Record<number, TagInfo[]>;
 
   raw<R>(mode: "get", sql: string, args: any[]): R;
   raw<R>(mode: "all", sql: string, args: any[]): R[];
@@ -47,7 +40,7 @@ export interface DbWorkerAPI {
   getAnnotFromKey(
     keys: string[],
     libraryID: number,
-  ): Record<string, Annotation>;
+  ): Record<string, AnnotationInfo>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {

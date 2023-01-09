@@ -1,13 +1,13 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { RegularItemInfo } from "@obzt/database";
 import { BaseError } from "make-error";
 import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/index.js";
 import { ZOTERO_KEY_FIELDNAME } from "../template/defaults/index.js";
-import type { GeneralItemExtra } from "../template/helper/item.js";
+import type { RegularItemInfoExtra } from "../template/helper/item.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 export class NoteExistsError extends BaseError {
@@ -19,8 +19,8 @@ export class NoteExistsError extends BaseError {
 
 export const createNote = async (
   plugin: ZoteroPlugin,
-  item: GeneralItem,
-  extra: GeneralItemExtra,
+  item: RegularItemInfo,
+  extra: RegularItemInfoExtra,
 ): Promise<TFile> => {
   const info = plugin.noteIndex.getNoteFromItem(item);
   if (info) {

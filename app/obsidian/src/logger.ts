@@ -1,6 +1,6 @@
 import { initLogger } from "@obzt/common";
 import type { LogLevel } from "@obzt/common";
-import type { DbWorkerAPI } from "@obzt/database";
+import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import log4js, { levels } from "log4js";
 import Settings from "./zotero-db/settings-base";
 

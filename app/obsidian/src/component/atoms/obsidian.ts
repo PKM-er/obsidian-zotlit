@@ -1,4 +1,4 @@
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { RegularItemInfo } from "@obzt/database";
 import { atom } from "jotai";
 import { loadable, RESET } from "jotai/utils";
 import { getItemKeyFromFrontmatter } from "../../note-index/ztkey-file-map";
@@ -14,8 +14,8 @@ export const helperContextAtom = atom<Context>((get) => ({
 
 export const pluginAtom = atom<ZoteroPlugin>(null as never);
 
-export type DocItem = GeneralItem & {
-  itemID: Exclude<GeneralItem["itemID"], null>;
+export type DocItem = RegularItemInfo & {
+  itemID: Exclude<RegularItemInfo["itemID"], null>;
 };
 
 /** update when active leaf changes */

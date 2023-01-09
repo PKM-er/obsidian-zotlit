@@ -1,12 +1,11 @@
 import { getItemKeyGroupID, toPage } from "@obzt/common";
-import type { AttachmentInfo } from "@obzt/database";
-import { getCacheImagePath } from "@obzt/database";
-import type { ItemTag, Annotation } from "@obzt/zotero-type";
+import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
 import {
-  getBacklink,
-  AnnotationType,
   isAnnotationItem,
-} from "@obzt/zotero-type";
+  getBacklink,
+  getCacheImagePath,
+} from "@obzt/database";
+import { AnnotationType } from "@obzt/zotero-type";
 import endent from "endent";
 import { htmlToMarkdown } from "obsidian";
 
@@ -18,10 +17,10 @@ import { fileLink, toFileUrl, toMdLinkComponent } from "./utils.js";
 export type AnnotationHelper = ReturnType<typeof withAnnotHelper>;
 export type AnnotationExtra = {
   attachment: AttachmentInfo | null;
-  tags: ItemTag[];
+  tags: TagInfo[];
 };
 export const withAnnotHelper = (
-  data: Annotation,
+  data: AnnotationInfo,
   extra: AnnotationExtra,
   { plugin, sourcePath }: Context,
 ) =>
@@ -104,7 +103,7 @@ export const withAnnotHelper = (
     },
   });
 
-const isImageAnnot = (item: unknown): item is Annotation =>
+const isImageAnnot = (item: unknown): item is AnnotationInfo =>
   isAnnotationItem(item) && item.type === AnnotationType.image;
 
 export const linktextToLink = (

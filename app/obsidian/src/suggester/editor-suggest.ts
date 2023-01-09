@@ -1,4 +1,4 @@
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { RegularItemInfo } from "@obzt/database";
 import type {
   Editor,
   EditorPosition,
@@ -12,7 +12,7 @@ import type { FuzzyMatch, SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 
 export default abstract class ZoteroItemEditorSuggest
-  extends EditorSuggest<FuzzyMatch<GeneralItem>>
+  extends EditorSuggest<FuzzyMatch<RegularItemInfo>>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {
@@ -30,7 +30,7 @@ export default abstract class ZoteroItemEditorSuggest
   renderSuggestion = renderSuggestion.bind(this);
 
   abstract selectSuggestion(
-    suggestion: FuzzyMatch<GeneralItem>,
+    suggestion: FuzzyMatch<RegularItemInfo>,
     evt: MouseEvent | KeyboardEvent,
   ): void;
 }

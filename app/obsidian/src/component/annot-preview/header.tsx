@@ -1,5 +1,6 @@
-import type { Annotation } from "@obzt/zotero-type";
-import { AnnotationType, getBacklink } from "@obzt/zotero-type";
+import type { AnnotationInfo } from "@obzt/database";
+import { getBacklink } from "@obzt/database";
+import { AnnotationType } from "@obzt/zotero-type";
 import { useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
@@ -150,7 +151,7 @@ const MoreOptionsButton = () => {
 
 export default Header;
 const getJumpToAnnotNoteFunc =
-  (annot: Annotation, view: AnnotationView) => async () => {
+  (annot: AnnotationInfo, view: AnnotationView) => async () => {
     const block = view.plugin.noteIndex.getBlockInfoFromItem(annot);
     if (!block) {
       new Notice("No note for this annotation");

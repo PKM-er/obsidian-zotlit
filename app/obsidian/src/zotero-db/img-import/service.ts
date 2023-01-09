@@ -1,8 +1,8 @@
 import { mkdir, stat, symlink } from "fs/promises";
 import { basename, dirname } from "path";
 import { join } from "path/posix";
+import type { AnnotationInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
-import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 import type { FileSystemAdapter } from "obsidian";
@@ -24,11 +24,11 @@ export class ImgCacheImporter extends Service {
 
   private queue = new Map<string, () => Promise<boolean>>();
 
-  getCachePath(annot: Annotation) {
+  getCachePath(annot: AnnotationInfo) {
     return getCacheImagePath(annot, this.databaseSettings.zoteroDataDir);
   }
 
-  getInVaultPath(annot: Annotation): string | null {
+  getInVaultPath(annot: AnnotationInfo): string | null {
     if (!this.settings.imgExcerptDir || annot.type !== AnnotationType.image)
       return null;
     const cachePath = getCacheImagePath(
@@ -38,7 +38,7 @@ export class ImgCacheImporter extends Service {
     return getInVaultPath(annot, cachePath, this.settings.imgExcerptDir);
   }
 
-  import(annot: Annotation): string | null {
+  import(annot: AnnotationInfo): string | null {
     const cachePath = this.getCachePath(annot),
       inVaultPath = this.getInVaultPath(annot);
     if (!inVaultPath) return null;
@@ -124,7 +124,7 @@ const getInVaultName = (cachePath: string, groupID: number | null) =>
   (groupID ?? "") + basename(cachePath);
 
 const getInVaultPath = (
-  annot: Annotation,
+  annot: AnnotationInfo,
   cachePath: string,
   imgExcerptPath: string,
 ): string => {

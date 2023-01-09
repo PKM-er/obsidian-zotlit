@@ -1,6 +1,6 @@
 import workerpool from "@aidenlx/workerpool";
-import type { DbWorkerAPI } from "@obzt/database";
-import dbWorker from "@obzt/database";
+import type { DbWorkerAPI } from "@obzt/database/dist/api";
+import dbWorker from "@obzt/db-worker";
 import { Service } from "@ophidian/core";
 import logger, { LogSettings } from "@log";
 

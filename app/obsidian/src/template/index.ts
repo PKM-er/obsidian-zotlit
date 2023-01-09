@@ -1,12 +1,12 @@
 import { join } from "path/posix";
 import { getItemKeyGroupID } from "@obzt/common";
 import type {
-  Annotation,
+  AnnotationInfo,
   Creator,
-  GeneralItem,
-  GeneralItemBase,
-} from "@obzt/zotero-type";
-import { getCreatorName } from "@obzt/zotero-type";
+  RegularItemInfo,
+  RegularItemInfoBase,
+} from "@obzt/database";
+import { getCreatorName } from "@obzt/database";
 import * as Eta from "eta";
 import { stringify } from "gray-matter";
 import { Notice, TFile } from "obsidian";
@@ -82,7 +82,7 @@ export default class NoteTemplate {
     return str;
   }
   renderAnnots(
-    annots: [data: Annotation, extra: AnnotationExtra][],
+    annots: [data: AnnotationInfo, extra: AnnotationExtra][],
     ctx: Context,
   ) {
     const data = annots.map(([data, extra]) =>
@@ -92,17 +92,17 @@ export default class NoteTemplate {
     revokeHelper(data);
     return str;
   }
-  renderCitation(item: GeneralItem, alt = false) {
+  renderCitation(item: RegularItemInfo, alt = false) {
     return this.render(
       alt ? "altCitation" : "citation",
-      item as GeneralItemBase,
+      item as RegularItemInfoBase,
     );
   }
-  renderFilename(item: GeneralItem) {
-    return this.render("filename", item as GeneralItemBase);
+  renderFilename(item: RegularItemInfo) {
+    return this.render("filename", item as RegularItemInfoBase);
   }
 
-  private toFrontmatterData<T extends GeneralItemBase>(target: T) {
+  private toFrontmatterData<T extends RegularItemInfoBase>(target: T) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {};
     let notEmpty = false;
@@ -166,7 +166,7 @@ export default class NoteTemplate {
           break;
       }
       Eta.templates.define(name, full);
-      log.debug(`Template "${name}" complie success`, converted);
+      log.trace(`Template "${name}" complie success`, converted);
     } catch (error) {
       log.error("Error compling template", name, converted, error);
       new Notice(`Error compling template "${name}", error: ${error}`);

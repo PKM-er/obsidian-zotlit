@@ -13,6 +13,10 @@
       "path": "lib/database"
     },
     {
+      "name": "db-worker",
+      "path": "lib/db-worker"
+    },
+    {
       "name": "note-parser",
       "path": "lib/note-parser"
     },

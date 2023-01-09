@@ -1,5 +1,5 @@
-import type { ItemCreator } from "@obzt/zotero-type";
-import { getCreatorName } from "@obzt/zotero-type";
+import type { ItemCreator } from "@obzt/database";
+import { getCreatorName } from "@obzt/database";
 import { withHelper } from "./base";
 
 export type CreatorHelper = ReturnType<typeof withCreatorHelper>;

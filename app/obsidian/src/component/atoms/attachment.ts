@@ -1,14 +1,14 @@
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { RegularItemInfo } from "@obzt/database";
 import type { Getter } from "jotai";
 import { atom } from "jotai";
 import { atomFamily, atomWithDefault, atomWithStorage } from "jotai/utils";
 import log from "@log";
 import { activeDocItemAtom, pluginAtom } from "./obsidian";
 
-const toLocalStorageKey = (docItem: GeneralItem) =>
+const toLocalStorageKey = (docItem: RegularItemInfo) =>
   `obzt-active-atch-${docItem.itemID}-${docItem.libraryID}`;
 export const activeAtchIdAtomFamily = atomFamily(
-  (item: GeneralItem) =>
+  (item: RegularItemInfo) =>
     atomWithStorage(toLocalStorageKey(item), null as number | null),
   (a, b) => a.itemID === b.itemID && a.libraryID === b.libraryID,
 );

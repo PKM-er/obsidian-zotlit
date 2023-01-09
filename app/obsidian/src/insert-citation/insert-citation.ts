@@ -1,6 +1,6 @@
 import "./style.less";
 
-import type { GeneralItem } from "@obzt/zotero-type";
+import type { RegularItemInfo } from "@obzt/database";
 import type {
   Editor,
   EditorPosition,
@@ -72,7 +72,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   }
 
   selectSuggestion(
-    suggestion: FuzzyMatch<GeneralItem>,
+    suggestion: FuzzyMatch<RegularItemInfo>,
     evt: MouseEvent | KeyboardEvent,
   ): void {
     if (!this.context) return;
@@ -87,7 +87,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
 }
 
 const insertCitationTo = (
-  { alt, item }: { item: GeneralItem; alt: boolean },
+  { alt, item }: { item: RegularItemInfo; alt: boolean },
   range: Record<"start" | "end", EditorPosition> | undefined,
   editor: Editor,
   template: NoteTemplate,

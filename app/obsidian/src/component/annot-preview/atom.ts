@@ -1,4 +1,4 @@
-import type { Annotation } from "@obzt/zotero-type";
+import type { AnnotationInfo } from "@obzt/database";
 import equal from "fast-deep-equal";
 import type { PrimitiveAtom } from "jotai";
 import { atom, useAtom, useAtomValue } from "jotai";
@@ -16,7 +16,7 @@ import { GLOBAL_SCOPE } from "../atoms/utils";
 
 // https://github.com/pmndrs/jotai/discussions/826
 export const ANNOT_PREVIEW_SCOPE = Symbol("jotai-scope-annot-preview");
-export const annotAtomAtom = atom<PrimitiveAtom<Annotation>>(null as never);
+export const annotAtomAtom = atom<PrimitiveAtom<AnnotationInfo>>(null as never);
 
 export const useAnnotValue = () => useSelector((v) => v, equal);
 
@@ -53,7 +53,7 @@ export const tagsAtom = atom(async (get) => {
 export const annotAtom = atom((get) => get(get(annotAtomAtom)));
 
 export const useAnnotHelperArgs = ():
-  | [Annotation, AnnotationExtra, Context]
+  | [AnnotationInfo, AnnotationExtra, Context]
   | null => {
   const annot = useAtomValue(annotAtom, ANNOT_PREVIEW_SCOPE),
     tags = useAtomValue(loadableTagsAtom, ANNOT_PREVIEW_SCOPE),

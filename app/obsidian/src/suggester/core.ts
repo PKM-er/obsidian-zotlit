@@ -1,9 +1,6 @@
-import type {
-  GeneralItem,
-  Creator,
-  JournalArticleItem,
-} from "@obzt/zotero-type";
-import { isCreatorNameOnly, isCreatorFullName } from "@obzt/zotero-type";
+import type { RegularItemInfo, Creator } from "@obzt/database";
+import { isCreatorFullName, isCreatorNameOnly } from "@obzt/database";
+import type { JournalArticleItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
 import type ZoteroPlugin from "../zt-main.js";
@@ -20,7 +17,7 @@ export interface SuggesterBase {
 export const getSuggestions = async (
   input: string,
   plugin: ZoteroPlugin,
-): Promise<FuzzyMatch<GeneralItem>[]> => {
+): Promise<FuzzyMatch<RegularItemInfo>[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
     return await plugin.database.search(
       input.replace(/^\+|\+$/g, "").split(/\+/),
@@ -34,7 +31,7 @@ export const getSuggestions = async (
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function renderSuggestion(
   this: SuggesterBase,
-  suggestion: FuzzyMatch<GeneralItem>,
+  suggestion: FuzzyMatch<RegularItemInfo>,
   el: HTMLElement,
 ): void {
   const item = suggestion.item;
@@ -67,10 +64,12 @@ export function renderSuggestion(
   }
 }
 
-const isJournalArticleItem = (item: GeneralItem): item is JournalArticleItem =>
+const isJournalArticleItem = (
+  item: RegularItemInfo,
+): item is JournalArticleItem<RegularItemInfo> =>
   item.itemType === "journalArticle";
 
-const getArticleMeta = (item: JournalArticleItem) => {
+const getArticleMeta = (item: JournalArticleItem<RegularItemInfo>) => {
   const { creators, date, publicationTitle, volume, issue, pages } = item;
   const meta = {
     creators: creatorToString(creators),
@@ -81,7 +80,8 @@ const getArticleMeta = (item: JournalArticleItem) => {
     pages,
   };
   const newSpan = (to: HTMLElement, key: keyof typeof meta, cls?: string) =>
-    meta[key] && to.createSpan({ cls: cls ?? key, text: meta[key] });
+    meta[key] &&
+    to.createSpan({ cls: cls ?? key, text: meta[key] ?? undefined });
   return createDiv({ cls: "meta" }, (main) => {
     if (meta.creators || meta.date)
       main.createSpan({ cls: "author-year" }, (ay) => {

@@ -3,20 +3,13 @@
   "compilerOptions": {
     "baseUrl": "src",
     "outDir": "dist",
-    "target": "ES2020",
-    "lib": ["WebWorker", "es2018"],
+    "target": "ESNext",
+    "lib": ["es2018"],
     "declaration": true,
-    "emitDeclarationOnly": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "module": "ESNext",
     "incremental": false,
     "noEmit": false,
-    "paths": {
-      "@log": ["./logger.ts"],
-      "@api": ["./api.ts"],
-      "@init": ["./init.ts"],
-      "@query/*": ["./query/*"]
-    }
   },
-  "include": ["src/**/*.ts", "scripts/sql-type.ts"]
+  "include": ["src/**/*.ts"]
 }

@@ -1,6 +1,10 @@
-import type { AttachmentInfo } from "@obzt/database";
-import type { Annotation, GeneralItem, ItemTag } from "@obzt/zotero-type";
-import { getBacklink } from "@obzt/zotero-type";
+import type {
+  AnnotationInfo,
+  AttachmentInfo,
+  RegularItemInfo,
+  TagInfo,
+} from "@obzt/database";
+import { getBacklink } from "@obzt/database";
 import type { AnnotationExtra } from "./annot";
 import { withAnnotHelper } from "./annot";
 import type { Context } from "./base";
@@ -8,16 +12,16 @@ import { bindRevoke, withHelper } from "./base";
 import { withCreatorHelper } from "./creator";
 import { fileLink } from "./utils";
 
-export type GeneralItemHelper = ReturnType<typeof withItemHelper>;
-export type GeneralItemExtra = {
+export type RegularItemInfoHelper = ReturnType<typeof withItemHelper>;
+export type RegularItemInfoExtra = {
   attachment: AttachmentInfo | null;
-  annotations?: [data: Annotation, extra: AnnotationExtra][];
+  annotations?: [data: AnnotationInfo, extra: AnnotationExtra][];
   allAttachments: AttachmentInfo[];
-  tags: ItemTag[];
+  tags: TagInfo[];
 };
 export const withItemHelper = (
-  { creators, ...data }: GeneralItem,
-  { annotations, ..._extra }: GeneralItemExtra,
+  { creators, ...data }: RegularItemInfo,
+  { annotations, ..._extra }: RegularItemInfoExtra,
   ctx: Context,
 ) => {
   const proxiedAnnots =

@@ -1,5 +1,4 @@
-import type { AttachmentInfo } from "@obzt/database";
-import type { Annotation } from "@obzt/zotero-type";
+import type { AttachmentInfo, AnnotationInfo } from "@obzt/database";
 import { ZoteroItemSuggestModal } from "../suggester/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { AttachmentSelectModal } from "./atch-select.js";
@@ -38,7 +37,7 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       attachment = allAttachments[0] ?? null;
     }
 
-    const annotations: Annotation[] = attachment
+    const annotations: AnnotationInfo[] = attachment
       ? await database.api.getAnnotations(attachment.itemID, defaultLibId)
       : [];
 

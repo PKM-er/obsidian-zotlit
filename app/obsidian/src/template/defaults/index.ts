@@ -1,14 +1,15 @@
-import type { GeneralItemBase, ItemFields } from "@obzt/zotero-type";
+import type { RegularItemInfoBase } from "@obzt/database";
+import type { ItemFields } from "@obzt/zotero-type";
 import type { AnnotationHelper } from "../helper/annot";
-import type { GeneralItemHelper } from "../helper/item";
+import type { RegularItemInfoHelper } from "../helper/item";
 
 export interface TemplateDataMap {
-  note: GeneralItemHelper;
-  filename: GeneralItemBase;
+  note: RegularItemInfoHelper;
+  filename: RegularItemInfoBase;
   annotation: AnnotationHelper;
   annots: AnnotationHelper[];
-  citation: GeneralItemBase;
-  altCitation: GeneralItemBase;
+  citation: RegularItemInfoBase;
+  altCitation: RegularItemInfoBase;
 }
 
 export type TemplateName = keyof TemplateDataMap;
@@ -55,7 +56,7 @@ export type NoteTemplateJSON = Record<TemplateName, string>;
  * true means accept; use string to map to a alias field name
  */
 export type FieldsInFrontmatter = {
-  [K in ItemFields | keyof GeneralItemBase]?: true | string;
+  [K in ItemFields | keyof RegularItemInfoBase]?: true | string;
 };
 
 export const ZOTERO_KEY_FIELDNAME = "zotero-key";

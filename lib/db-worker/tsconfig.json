@@ -1,0 +1,17 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "dist",
+    "target": "ES2020",
+    "lib": ["WebWorker", "es2018"],
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "incremental": false,
+    "paths": {
+      "@log": ["./logger.ts"],
+      "@init": ["./init.ts"],
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

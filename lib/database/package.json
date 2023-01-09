@@ -2,32 +2,30 @@
   "name": "@obzt/database",
   "version": "0.0.1",
   "scripts": {
-    "build": "cross-env BUILD=production node esbuild.config.mjs && tsc --project tsconfig.build.json",
-    "dev": "cross-env BUILD=development node esbuild.config.mjs && tsc --project tsconfig.build.json"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
+  "type": "module",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./api": "./dist/api.js"
+  },
   "devDependencies": {
     "@aidenlx/eslint-config": "2.0.5",
-    "@types/node": "^17.0.10",
     "typescript": "^4.9.4",
     "eslint": "~8.24.0",
-    "cross-env": "^7.0.3",
-    "@rmp135/sql-ts": "~1.15.0",
-    "endent": "~2.1.0",
-    "@obzt/esbuild-plugin-inline-worker": "workspace:*",
-    "@types/eslint": "~8.4.6",
-    "esbuild": "^0.14.21"
+    "@types/eslint": "~8.4.6"
   },
   "dependencies": {
-    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
-    "fuse.js": "^6.5.3",
     "@obzt/zotero-type": "workspace:*",
-    "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
     "@obzt/common": "workspace:*",
-    "log4js": "~6.6.1",
     "assert-never": "^1.2.1",
-    "@mobily/ts-belt": "~3.13.1",
-    "localforage": "~1.10.0"
+    "@mobily/ts-belt": "~3.13.1"
+  },
+  "peerDependencies": {
+    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
+    "fuse.js": "^6.5.3"
   }
 }

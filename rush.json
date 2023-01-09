@@ -375,6 +375,10 @@
       "projectFolder": "app/zotero"
     },
     {
+      "packageName": "@obzt/db-worker",
+      "projectFolder": "lib/db-worker"
+    },
+    {
       "packageName": "@obzt/database",
       "projectFolder": "lib/database"
     },

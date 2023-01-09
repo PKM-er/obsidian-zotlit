@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ItemTag } from "@obzt/zotero-type";
-import {
-  requiredKeys,
-  getCreatorName,
-  AnnotationType,
-  TagType,
-} from "@obzt/zotero-type";
+import type { TagInfo } from "@obzt/database";
+import { getCreatorName, requiredKeys } from "@obzt/database";
+import { AnnotationType, TagType } from "@obzt/zotero-type";
 import endent from "endent";
 import { Menu, Notice } from "obsidian";
 import React, { useEffect, useState } from "react";
@@ -197,7 +193,7 @@ const getItemString = (
     }
   }
   if (keyPath[1] === "tags" && keyPath.length === 3) {
-    const tag = data as ItemTag;
+    const tag = data as TagInfo;
     return (
       <span>
         "{tag.name}"" ({TagType[tag.type]})

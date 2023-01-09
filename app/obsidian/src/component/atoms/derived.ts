@@ -1,5 +1,5 @@
+import type { AnnotationInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
-import type { Annotation } from "@obzt/zotero-type";
 import { AnnotationType } from "@obzt/zotero-type";
 import assertNever from "assert-never";
 import { useAtomValue, atom } from "jotai";
@@ -9,7 +9,7 @@ import { annotAtomAtom, ANNOT_PREVIEW_SCOPE } from "../annot-preview/atom";
 import { pluginAtom } from "./obsidian";
 
 export const useSelector = <Slice>(
-  selector: (v: Awaited<Annotation>) => Slice,
+  selector: (v: Awaited<AnnotationInfo>) => Slice,
   equalityFn?: (a: Slice, b: Slice) => boolean,
 ) => {
   const atom = useAtomValue(annotAtomAtom, ANNOT_PREVIEW_SCOPE);
@@ -20,7 +20,7 @@ export const useSelector = <Slice>(
   return useAtomValue(derivedAtom);
 };
 
-export const getColor = ({ color }: Annotation) => color ?? undefined;
+export const getColor = ({ color }: AnnotationInfo) => color ?? undefined;
 
 export const imgSrcAtom = atom(
   (get) =>
@@ -30,7 +30,7 @@ export const imgSrcAtom = atom(
     )}`,
 );
 
-export const getIcon = ({ type }: Annotation) => {
+export const getIcon = ({ type }: AnnotationInfo) => {
   switch (type) {
     case AnnotationType.highlight:
       return "align-left";

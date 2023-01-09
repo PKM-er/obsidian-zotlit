@@ -1,4 +1,4 @@
-import type { Annotation } from "@obzt/zotero-type";
+import type { AnnotationInfo } from "@obzt/database";
 import clsx from "clsx";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { Suspense, useEffect, useMemo, useRef } from "react";
@@ -41,7 +41,7 @@ export const AnnotListItem = ({
   data,
   selectable,
 }: {
-  data: Annotation;
+  data: AnnotationInfo;
   selectable: boolean;
 }) => {
   // create local atom that will update when props.data changes
