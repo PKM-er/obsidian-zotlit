@@ -90,6 +90,9 @@ export type ItemFields =
   | "legalStatus"
   | "episodeNumber"
   | "audioFileType"
+  | "repository"
+  | "archiveID"
+  | "citationKey"
   | "presentationType"
   | "meetingName"
   | "programTitle"
@@ -104,11 +107,9 @@ export type ItemFields =
   | "thesisType"
   | "university"
   | "studio"
-  | "websiteTitle"
-  | "repository"
-  | "archiveID"
-  | "citationKey";
+  | "websiteTitle";
 export type ItemTypes =
+  | "annotation"
   | "artwork"
   | "attachment"
   | "audioRecording"
@@ -137,6 +138,7 @@ export type ItemTypes =
   | "note"
   | "patent"
   | "podcast"
+  | "preprint"
   | "presentation"
   | "radioBroadcast"
   | "report"
@@ -144,6 +146,4 @@ export type ItemTypes =
   | "thesis"
   | "tvBroadcast"
   | "videoRecording"
-  | "webpage"
-  | "annotation"
-  | "preprint";
+  | "webpage";
