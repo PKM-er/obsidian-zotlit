@@ -3,16 +3,23 @@ import type Fuse from "fuse.js";
 import type { AnnotationInfo, RegularItemInfo } from "./item.js";
 import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 
+export interface DbConnParams {
+  nativeBinding: string;
+  mainDbPath: string;
+  bbtDbPath: string;
+}
+
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
-  /* open new database, return true if successful */
+  /**
+   * open new database connection or refresh existing if no param passed in
+   * @returns return true if successful
+   */
   openDb(
-    nativeBinding: string,
-    mainDbPath: string,
-    bbtDbPath: string,
+    params?: Partial<DbConnParams>,
   ): [mainDbResult: boolean, bbtDbResult: boolean];
+
   isUpToDate(): boolean | null;
-  refreshDb(): [mainDbResult: boolean, bbtDbResult: boolean];
   checkDbStatus(name: "main" | "bbt"): boolean;
 
   /* start index for library, need to be called before query and after openDb */

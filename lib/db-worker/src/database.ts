@@ -52,8 +52,23 @@ export default class Database {
    * @param nativeBinding path to better-sqlite3.node
    * @returns false if no file found on given path
    */
-  public open(dbPath: string, nativeBinding: string): boolean {
-    this.nativeBinding = nativeBinding;
+  public open(params: { file?: string; nativeBinding?: string }): boolean {
+    const nativeBinding = params.nativeBinding
+      ? (this.nativeBinding = params.nativeBinding)
+      : this.nativeBinding;
+    if (!nativeBinding) {
+      throw new Error(
+        "Failed to open database conn: no native binding provided",
+      );
+    }
+    let dbPath;
+    if (!params.file) {
+      // refresh
+      if (!this.database?.file) throw new DatabaseNotSetError();
+      dbPath = this.database.file;
+    } else {
+      dbPath = params.file;
+    }
     try {
       if (this.database?.instance) {
         log.debug(
@@ -79,15 +94,6 @@ export default class Database {
       this.opened = false;
       return false;
     }
-  }
-  public refresh() {
-    if (!this.database?.file) throw new DatabaseNotSetError();
-    if (!this.nativeBinding) {
-      throw new Error(
-        "Failed to refresh database: no native binding path set before",
-      );
-    }
-    return this.open(this.database.file, this.nativeBinding);
   }
 
   public close() {

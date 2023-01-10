@@ -6,7 +6,7 @@ import localforage from "localforage";
 import { databases, getGroupID, getLibInfo } from "./init.js";
 import logger, { storageKey } from "./logger.js";
 import getItem from "./modules/get-item.js";
-import { openDb, refreshDb } from "./modules/init-conn.js";
+import { openDb } from "./modules/init-conn.js";
 import initIndex from "./modules/init-index.js";
 import query from "./modules/search.js";
 import { attachLogger } from "./utils.js";
@@ -49,7 +49,6 @@ const methods: DbWorkerAPI = {
       (annots ? `, count: ${annots.length}` : ""),
   ),
   getItem,
-  refreshDb,
   isUpToDate: () => databases.main.isUpToDate(),
   checkDbStatus: (name) => databases[name].opened,
   /**
