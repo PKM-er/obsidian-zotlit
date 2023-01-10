@@ -1,10 +1,11 @@
-import { createInitialValues } from "@utils/create-initial";
 import { atom, Provider } from "jotai";
 import { createNanoEvents } from "nanoevents";
 import type { TFile, WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
 import { pluginAtom } from "@component/atoms/obsidian";
 import { GLOBAL_SCOPE } from "@component/atoms/utils";
+import { createInitialValues } from "@utils/create-initial";
+import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
 import { AnnotView } from "./annot-view";
 import { DerivedFileView } from "./derived-file-view";
@@ -60,6 +61,18 @@ export class AnnotationView extends DerivedFileView {
     const initVals = createInitialValues();
     initVals.set(pluginAtom, this.plugin);
     initVals.set(annotViewAtom, this);
+    await new Promise<void>((resolve) => {
+      if (this.plugin.dbWorker.status !== DatabaseStatus.Ready) {
+        const ref = app.vault.on("zotero:db-ready", () => {
+          app.vault.offref(ref);
+          resolve();
+        });
+        this.registerEvent(ref);
+      } else {
+        resolve();
+      }
+    });
+
     ReactDOM.render(
       <Provider initialValues={initVals.get()} scope={GLOBAL_SCOPE}>
         <AnnotView />

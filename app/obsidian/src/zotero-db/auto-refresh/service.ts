@@ -60,9 +60,6 @@ export default class DatabaseWatcher extends Service {
 
 declare module "obsidian" {
   interface Vault {
-    /**
-     * @public
-     */
     on(
       name: "zotero:db-updated",
       callback: (target: "main" | "bbt") => any,

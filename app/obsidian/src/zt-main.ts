@@ -44,7 +44,10 @@ export default class ZoteroPlugin extends Plugin {
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
 
-  databaseAPI = this.use(DatabaseWorker).api;
+  get databaseAPI() {
+    return this.dbWorker.api;
+  }
+  dbWorker = this.use(DatabaseWorker);
   imgCacheImporter = this.use(ImgCacheImporter);
   dbWatcher = this.use(DatabaseWatcher);
   database = this.use(ZoteroDatabase);
@@ -71,8 +74,7 @@ export default class ZoteroPlugin extends Plugin {
       id: "refresh-zotero-data",
       name: "Refresh Zotero Data",
       callback: async () => {
-        await this.database.fullRefresh();
-        new Notice("Zotero data is now up-to-date");
+        await this.dbWorker.refresh({ task: "full" });
       },
     });
     this.addCommand({

@@ -186,8 +186,11 @@ export class ZoteroSettingTab extends PluginSettingTab {
           async (val) => {
             const level = +val;
             settings.citationLibrary = level;
-            await this.plugin.database.initIndex();
-            new Notice("Zotero database updated.");
+            await this.plugin.dbWorker.refresh({
+              task: "searchIndex",
+              force: true,
+            });
+            new Notice("Zotero search index updated.");
             await this.plugin.saveSettings();
           },
         );
@@ -200,7 +203,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setIcon("switch")
           .setTooltip("Refresh")
           .onClick(async () => {
-            await this.plugin.database.fullRefresh();
+            await this.plugin.dbWorker.refresh({ task: "full" });
             renderDropdown(setting);
           }),
       )

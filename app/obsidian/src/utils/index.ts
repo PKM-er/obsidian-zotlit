@@ -1,4 +1,5 @@
 import endent from "endent";
+import type { EventRef, Events, Workspace } from "obsidian";
 import { Platform, setIcon } from "obsidian";
 
 export const promptOpenLog = () => endent`

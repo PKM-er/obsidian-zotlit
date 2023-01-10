@@ -38,10 +38,10 @@ export class DatabaseSettings extends Settings<SettingOptions> {
   }
 
   get dbConnParams() {
-    return [
-      this.nativeBinding,
-      this.zoteroDbPath,
-      this.betterBibTexDbPath,
-    ] as const;
+    return {
+      nativeBinding: this.nativeBinding,
+      mainDbPath: this.zoteroDbPath,
+      bbtDbPath: this.betterBibTexDbPath,
+    };
   }
 }

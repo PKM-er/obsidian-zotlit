@@ -4,7 +4,6 @@ import clsx from "clsx";
 import type { Atom, Getter } from "jotai";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
-import { Notice } from "obsidian";
 import { createInitialValues } from "@utils/create-initial";
 import { pluginAtom } from "../component/atoms/obsidian";
 import type ZoteroPlugin from "../zt-main";
@@ -44,13 +43,12 @@ const SetDataDirButton = () => {
       if (newFolder && plugin.settings.database.zoteroDataDir !== newFolder) {
         plugin.settings.database.zoteroDataDir = newFolder;
         await plugin.saveSettings();
-        await plugin.database.init();
+        await plugin.dbWorker.refresh({ task: "full" });
         refresh();
-        new Notice("Zotero database path updated.");
         setSuccess(true);
       } else setSuccess(null);
     } catch (error) {
-      console.log("some, error", error);
+      console.log("some error", error);
       setSuccess(false);
     }
   });

@@ -6,8 +6,8 @@ import { attachmentsAtom, getAttachments } from "./attachment";
 import { pluginAtom } from "./obsidian";
 
 export const manualRefreshAtom = atom(null, async (get, set) => {
-  const { database } = get(pluginAtom);
-  await database.openDbConn(true);
+  const { dbWorker } = get(pluginAtom);
+  await dbWorker.refresh({ task: "dbConn" });
   await refresh(get, set);
   new Notice("Annotations refreshed", 500);
   // don't trigger index refresh
