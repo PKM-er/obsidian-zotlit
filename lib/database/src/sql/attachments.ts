@@ -7,7 +7,7 @@ SELECT
   atchs.itemID,
   atchs.path,
   items.key,
-  COUNT(annots.itemID) as annotCount
+  COUNT(atchs.itemID) as annotCount
 FROM
   itemAttachments atchs
   JOIN items USING (itemID)
@@ -16,7 +16,7 @@ WHERE
   atchs.parentItemID = $itemId
   AND libraryID = $libId
   AND ${checkItemID("atchs.itemID")}
-GROUP BY annots.itemID
+GROUP BY atchs.itemID
 `;
 
 interface Input {

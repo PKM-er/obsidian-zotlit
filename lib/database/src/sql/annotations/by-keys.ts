@@ -14,7 +14,7 @@ FROM
 WHERE
   items.key = $annotKey
   AND items.libraryID = $libId
-  AND ${checkItemID()}
+  AND ${checkItemID("items.itemID")}
 `;
 
 type OutputSql = WithParentItem<OutputBase>;
