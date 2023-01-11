@@ -14,12 +14,12 @@ export class ImgImporterSettings extends Settings<SettingOptions> {
       imgExcerptPath: new InVaultPath("ZtImgExcerpt"),
     };
   }
-  fromJSON(json: SettingOptions): void {
-    super.fromJSON(json);
+  async fromJSON(json: SettingOptions) {
     // convert string to InVaultPath in case of overwriting
-    if (typeof this.imgExcerptPath === "string") {
-      this.imgExcerptPath = new InVaultPath(this.imgExcerptPath);
+    if (typeof json.imgExcerptPath === "string") {
+      json.imgExcerptPath = new InVaultPath(json.imgExcerptPath);
     }
+    await super.fromJSON(json);
   }
   get imgExcerptDir(): string | null {
     return this.symlinkImgExcerpt ? this.imgExcerptPath.path : null;

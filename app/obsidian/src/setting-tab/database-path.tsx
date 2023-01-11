@@ -41,9 +41,8 @@ const SetDataDirButton = () => {
         properties: ["openDirectory"],
       });
       if (newFolder && plugin.settings.database.zoteroDataDir !== newFolder) {
-        plugin.settings.database.zoteroDataDir = newFolder;
+        await plugin.settings.database.setOption("zoteroDataDir", newFolder);
         await plugin.saveSettings();
-        await plugin.dbWorker.refresh({ task: "full" });
         refresh();
         setSuccess(true);
       } else setSuccess(null);

@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { enumerate } from "@obzt/common";
+import { Service } from "@ophidian/core";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
-import { LogSettings, applyLoglevel } from "@log";
+import log, { LogSettings } from "@log";
 
 import NoteTemplate from "./template/index.js";
 import { WatcherSettings } from "./zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "./zotero-db/connector/settings.js";
 import { ImgImporterSettings } from "./zotero-db/img-import/settings.js";
-import type ZoteroPlugin from "./zt-main.js";
+import ZoteroPlugin from "./zt-main.js";
 
 export interface ZoteroSettings {
   database: DatabaseSettings;
@@ -50,23 +51,28 @@ const requireConvert = new Set(
 
 const isRequireConvert = (key: string): key is RequireConvert =>
   requireConvert.has(key as RequireConvert);
-export async function loadSettings(this: ZoteroPlugin) {
-  const json = (await this.loadData()) ?? {};
-  this.settings.database.fromJSON(json);
-  this.settings.watcher.fromJSON(json);
-  this.settings.imgImporter.fromJSON(json);
-  this.settings.log.fromJSON(json);
-  await Promise.all(
-    Object.keys(this.settings).map(async (k) => {
-      const key = k as keyof ZoteroSettings;
-      if (isRequireConvert(key)) {
-        await this.settings[key].fromJSON(json[key]);
-      } else if (json[key] !== undefined) {
-        this.settings[key] = json[key] as never;
-      }
-    }),
-  );
-  applyLoglevel(this.databaseAPI, this.settings.log.level);
+
+export class SettingLoader extends Service {
+  plugin = this.use(ZoteroPlugin);
+  async onload(): Promise<void> {
+    log.debug("Loading Settings...");
+    const json = (await this.plugin.loadData()) ?? {};
+    const settings = this.plugin.settings;
+    await settings.database.fromJSON(json);
+    await settings.watcher.fromJSON(json);
+    await settings.imgImporter.fromJSON(json);
+    await settings.log.fromJSON(json);
+    await Promise.all(
+      Object.keys(settings).map(async (k) => {
+        const key = k as keyof ZoteroSettings;
+        if (isRequireConvert(key)) {
+          await settings[key].fromJSON(json[key]);
+        } else if (json[key] !== undefined) {
+          settings[key] = json[key] as never;
+        }
+      }),
+    );
+  }
 }
 
 export async function saveSettings(this: ZoteroPlugin) {

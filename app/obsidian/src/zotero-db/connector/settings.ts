@@ -1,8 +1,10 @@
 import { homedir } from "os";
 import { join } from "path";
+import assertNever from "assert-never";
 import { getBinaryFullPath } from "../../install-guide/version";
 
 import Settings from "../settings-base";
+import DatabaseWorker from "./service";
 
 interface SettingOptions {
   zoteroDataDir: string;
@@ -15,6 +17,27 @@ export class DatabaseSettings extends Settings<SettingOptions> {
       zoteroDataDir: join(homedir(), "Zotero"),
       citationLibrary: 1,
     };
+  }
+
+  async setOption<K extends keyof SettingOptions>(
+    key: K,
+    value: SettingOptions[K],
+  ): Promise<void> {
+    await super.setOption(key, value);
+    const worker = this.use(DatabaseWorker);
+    switch (key) {
+      case "zoteroDataDir":
+        await worker.refresh({ task: "full" });
+        break;
+      case "citationLibrary":
+        await worker.refresh({
+          task: "searchIndex",
+          force: true,
+        });
+        break;
+      default:
+        assertNever(key);
+    }
   }
 
   /** cache result */

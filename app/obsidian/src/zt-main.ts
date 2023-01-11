@@ -19,7 +19,7 @@ import NoteIndex from "./note-index/index.js";
 // import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
-import { getDefaultSettings, loadSettings, saveSettings } from "./settings.js";
+import { getDefaultSettings, SettingLoader, saveSettings } from "./settings.js";
 import registerEtaEditorHelper from "./template/editor";
 import DatabaseWatcher from "./zotero-db/auto-refresh/service";
 import DatabaseWorker from "./zotero-db/connector/service";
@@ -41,7 +41,6 @@ export default class ZoteroPlugin extends Plugin {
   }
 
   settings: ZoteroSettings = getDefaultSettings(this);
-  loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
 
   get databaseAPI() {
@@ -52,6 +51,8 @@ export default class ZoteroPlugin extends Plugin {
   dbWatcher = this.use(DatabaseWatcher);
   database = this.use(ZoteroDatabase);
 
+  settingLoader = this.use(SettingLoader);
+
   // noteParser: NoteParser;
   // pdfCache: PDFCache;
   annotBlockWorker: AnnotBlockWorker;
@@ -60,8 +61,6 @@ export default class ZoteroPlugin extends Plugin {
   editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
-    await this.loadSettings();
-
     registerCodeBlock(this);
     registerEtaEditorHelper(this);
     this.addCommand({

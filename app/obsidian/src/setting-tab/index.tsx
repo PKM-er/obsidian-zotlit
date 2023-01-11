@@ -13,7 +13,7 @@ import type {
 } from "obsidian";
 import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
-import log, { applyLoglevel } from "@log";
+import log from "@log";
 
 import type { SettingKeyWithType } from "../settings.js";
 import { TEMPLATE_NAMES } from "../template";
@@ -56,8 +56,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .addToggle((toggle) => {
         const settings = this.plugin.settings.watcher;
         toggle.setValue(settings.autoRefresh).onChange(async (value) => {
-          settings.autoRefresh = value;
-          await this.plugin.dbWatcher.setAutoRefresh(value);
+          settings.setOption("autoRefresh", value);
           await this.plugin.saveSettings();
         });
       })
@@ -134,7 +133,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .addToggle((toggle) => {
         const settings = this.plugin.settings.imgImporter;
         toggle.setValue(settings.symlinkImgExcerpt).onChange(async (value) => {
-          settings.symlinkImgExcerpt = value;
+          settings.setOption("symlinkImgExcerpt", value);
           setVisible(value);
           await this.plugin.saveSettings();
         });
@@ -184,12 +183,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const settings = this.plugin.settings.database;
         dd.setValue(settings.citationLibrary.toString()).onChange(
           async (val) => {
-            const level = +val;
-            settings.citationLibrary = level;
-            await this.plugin.dbWorker.refresh({
-              task: "searchIndex",
-              force: true,
-            });
+            await settings.setOption("citationLibrary", +val);
             new Notice("Zotero search index updated.");
             await this.plugin.saveSettings();
           },
@@ -386,8 +380,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setValue(log.level.toString())
           .onChange(async (val) => {
             const level = val as LogLevel;
-            this.plugin.settings.log.level = level;
-            await applyLoglevel(this.plugin.databaseAPI, level);
+            await this.plugin.settings.log.setOption("level", level);
             await this.plugin.saveSettings();
           }),
       );
