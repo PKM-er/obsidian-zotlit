@@ -62,11 +62,8 @@ const useDragStart = (containerRef: RefObject<HTMLDivElement>) => {
   const onDragStart: React.DragEventHandler<HTMLDivElement> = useMemoizedFn(
     (evt) => {
       if (helperArgs) {
-        const {
-          settings: { template },
-          imgCacheImporter,
-        } = plugin;
-        const str = template.renderAnnot(...helperArgs);
+        const { templateRenderer, imgCacheImporter } = plugin;
+        const str = templateRenderer.renderAnnot(...helperArgs);
         evt.dataTransfer.setData("text/plain", str);
         const evtRef = app.workspace.on("editor-drop", (evt) => {
           if (evt.dataTransfer?.getData("text/plain") === str) {

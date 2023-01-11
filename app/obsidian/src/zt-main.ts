@@ -20,6 +20,7 @@ import NoteIndex from "./note-index/index.js";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import type { ZoteroSettings } from "./settings.js";
 import { getDefaultSettings, SettingLoader, saveSettings } from "./settings.js";
+import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
 import registerEtaEditorHelper from "./template/editor";
 import DatabaseWatcher from "./zotero-db/auto-refresh/service";
 import DatabaseWorker from "./zotero-db/connector/service";
@@ -50,6 +51,10 @@ export default class ZoteroPlugin extends Plugin {
   imgCacheImporter = this.use(ImgCacheImporter);
   dbWatcher = this.use(DatabaseWatcher);
   database = this.use(ZoteroDatabase);
+
+  templateLoader = this.use(TemplateLoader);
+  templateComplier = this.use(TemplateComplier);
+  templateRenderer = this.use(TemplateRenderer);
 
   settingLoader = this.use(SettingLoader);
 

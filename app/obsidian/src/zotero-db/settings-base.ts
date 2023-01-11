@@ -8,25 +8,25 @@ abstract class Settings<Options extends Record<string, any>> {
     return this.use(ZoteroPlugin).manifest;
   }
   abstract getDefaults(): Options;
-  #value: Options;
+  protected value: Options;
 
   constructor() {
     const defaults = this.getDefaults();
-    this.#value = defaults;
+    this.value = defaults;
     Object.defineProperties(
       this,
       D.mapWithKey(defaults, (key) => ({
-        get: () => this.#value[key],
+        get: () => this.value[key],
       })),
     );
   }
 
   async setOption<K extends keyof Options>(key: K, value: Options[K]) {
-    this.#value[key] = value;
+    this.value[key] = value;
   }
 
   toJSON(): Options {
-    return this.#value;
+    return this.value;
   }
 
   /**
@@ -36,15 +36,13 @@ abstract class Settings<Options extends Record<string, any>> {
   async fromJSON(json: Options, apply = true): Promise<void> {
     const optKeys = D.keys(this.getDefaults());
     if (!apply) {
-      this.#value = {
-        ...this.#value,
+      this.value = {
+        ...this.value,
         ...D.selectKeys(json, optKeys),
       };
     } else {
       await Promise.all(
-        optKeys.map((key) =>
-          this.setOption(key, json[key] ?? this.#value[key]),
-        ),
+        optKeys.map((key) => this.setOption(key, json[key] ?? this.value[key])),
       );
     }
   }

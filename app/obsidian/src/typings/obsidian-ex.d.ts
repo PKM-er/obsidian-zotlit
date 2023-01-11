@@ -30,6 +30,11 @@ declare module "obsidian" {
       linktext: string,
       sourcePath: string,
     ): Promise<TFile>;
+    createNewMarkdownFile(
+      parent: TFolder,
+      path?: string,
+      content?: string,
+    ): Promise<TFile>;
   }
   interface MetadataCache {
     on(name: "finished", callback: () => any, ctx?: any): EventRef;

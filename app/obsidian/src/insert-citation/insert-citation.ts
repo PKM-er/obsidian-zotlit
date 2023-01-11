@@ -13,7 +13,7 @@ import {
   ZoteroItemEditorSuggest,
   ZoteroItemSuggestModal,
 } from "../suggester/index.js";
-import type NoteTemplate from "../template/index.js";
+import type { TemplateRenderer } from "../template";
 import type ZoteroPlugin from "../zt-main.js";
 
 const instructions = [
@@ -38,7 +38,7 @@ class CitationSuggestModal extends ZoteroItemSuggestModal {
       { item: result.value.item, alt: isAlternative(result.evt) },
       undefined,
       editor,
-      this.plugin.settings.template,
+      this.plugin.templateRenderer,
     );
     return true;
   }
@@ -81,7 +81,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
       { item, alt: isAlternative(evt) },
       this.context,
       this.context.editor,
-      this.plugin.settings.template,
+      this.plugin.templateRenderer,
     );
   }
 }
@@ -90,7 +90,7 @@ const insertCitationTo = (
   { alt, item }: { item: RegularItemInfo; alt: boolean },
   range: Record<"start" | "end", EditorPosition> | undefined,
   editor: Editor,
-  template: NoteTemplate,
+  template: TemplateRenderer,
 ) => {
   const cursor = editor.getCursor();
   range = range ?? { start: cursor, end: cursor };

@@ -6,7 +6,7 @@ import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/index.js";
-import { ZOTERO_KEY_FIELDNAME } from "../template/defaults/index.js";
+import { ZOTERO_KEY_FIELDNAME } from "../template";
 import type { RegularItemInfoExtra } from "../template/helper/item.js";
 import type ZoteroPlugin from "../zt-main.js";
 
@@ -29,7 +29,8 @@ export const createNote = async (
   }
 
   const { vault, fileManager, metadataCache: meta } = plugin.app,
-    { literatureNoteFolder: folder, template } = plugin.settings;
+    { literatureNoteFolder: folder } = plugin.settings,
+    template = plugin.templateRenderer;
   const filepath = join(folder.path, template.renderFilename(item));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {

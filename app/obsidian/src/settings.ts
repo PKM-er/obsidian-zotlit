@@ -5,7 +5,7 @@ import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
 import log, { LogSettings } from "@log";
 
-import NoteTemplate from "./template/index.js";
+import { TemplateSettings } from "./template/settings.js";
 import { WatcherSettings } from "./zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "./zotero-db/connector/settings.js";
 import { ImgImporterSettings } from "./zotero-db/img-import/settings.js";
@@ -17,7 +17,7 @@ export interface ZoteroSettings {
   imgImporter: ImgImporterSettings;
   log: LogSettings;
   literatureNoteFolder: InVaultPath;
-  template: NoteTemplate;
+  template: TemplateSettings;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
   // autoPairEta: boolean;
@@ -32,8 +32,8 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     watcher: plugin.use(WatcherSettings),
     imgImporter: plugin.use(ImgImporterSettings),
     log: plugin.use(LogSettings),
+    template: plugin.use(TemplateSettings),
     literatureNoteFolder: new InVaultPath("LiteratureNotes"),
-    template: new NoteTemplate(plugin),
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
     // autoPairEta: true,
@@ -46,7 +46,7 @@ export type SettingKeyWithType<T> = {
 type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
 
 const requireConvert = new Set(
-  enumerate<RequireConvert>()("literatureNoteFolder", "template"),
+  enumerate<RequireConvert>()("literatureNoteFolder"),
 );
 
 const isRequireConvert = (key: string): key is RequireConvert =>
@@ -58,10 +58,11 @@ export class SettingLoader extends Service {
     log.debug("Loading Settings...");
     const json = (await this.plugin.loadData()) ?? {};
     const settings = this.plugin.settings;
-    await settings.database.fromJSON(json);
-    await settings.watcher.fromJSON(json);
+    await settings.database.fromJSON(json, false);
+    await settings.watcher.fromJSON(json, false);
     await settings.imgImporter.fromJSON(json);
     await settings.log.fromJSON(json);
+    await settings.template.fromJSON(json, false);
     await Promise.all(
       Object.keys(settings).map(async (k) => {
         const key = k as keyof ZoteroSettings;
@@ -76,12 +77,14 @@ export class SettingLoader extends Service {
 }
 
 export async function saveSettings(this: ZoteroPlugin) {
-  const { database, watcher, imgImporter, log, ...regular } = this.settings;
+  const { database, watcher, imgImporter, log, template, ...regular } =
+    this.settings;
   await this.saveData({
     ...database.toJSON(),
     ...watcher.toJSON(),
     ...imgImporter.toJSON(),
     ...log.toJSON(),
+    ...template.toJSON(),
     ...regular,
   });
 }

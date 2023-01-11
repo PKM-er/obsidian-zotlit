@@ -16,8 +16,8 @@ import ReactDOM from "react-dom";
 import log from "@log";
 
 import type { SettingKeyWithType } from "../settings.js";
-import { TEMPLATE_NAMES } from "../template";
-import { EJECTABLE_TEMPLATE_NAMES } from "../template/defaults";
+import { InVaultPath } from "../settings.js";
+import { templateTypes, ejectableTemplateTypes } from "../template";
 // import { enableBracketExtension } from "../template/editor";
 import { promptOpenLog } from "../utils/index.js";
 import type ZoteroPlugin from "../zt-main.js";
@@ -141,15 +141,17 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .setName("Symlink Image Excerpt");
     const settings = this.plugin.settings.imgImporter;
     const setter = async (value: string, text: TextAreaComponent) => {
-      const { imgExcerptPath } = settings;
-      imgExcerptPath.path = value;
       // correct with normalized path
-      if (imgExcerptPath.path !== value) text.setValue(imgExcerptPath.path);
-      await this.plugin.saveSettings();
+      const newPath = new InVaultPath(value).path;
+      if (newPath !== value) {
+        text.setValue(newPath);
+        await settings.setOption("imgExcerptPath", newPath);
+        await this.plugin.saveSettings();
+      }
     };
     const text = this.addTextComfirm(
       this.containerEl,
-      () => settings.imgExcerptPath.path,
+      () => settings.imgExcerptPath,
       setter,
       { rows: 1 },
     ).setName("Image Excerpts Folder");
@@ -210,12 +212,15 @@ export class ZoteroSettingTab extends PluginSettingTab {
     // template folder
     this.addTextComfirm(
       this.containerEl,
-      () => template.folder.path,
+      () => template.folder,
       async (value: string, text: TextAreaComponent) => {
-        template.folder.path = value;
         // correct with normalized path
-        if (template.folder.path !== value) text.setValue(template.folder.path);
-        await this.plugin.saveSettings();
+        const newPath = new InVaultPath(value).path;
+        if (newPath !== value) {
+          text.setValue(newPath);
+          await template.setOption("folder", newPath);
+          await this.plugin.saveSettings();
+        }
       },
       { rows: 1 },
     )
@@ -240,7 +245,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     //     }),
     //   );
     new Setting(this.containerEl).setHeading().setName("Simple");
-    for (const key of TEMPLATE_NAMES) {
+    for (const key of templateTypes) {
       let title: string;
       const desc: string | DocumentFragment = "";
       switch (key) {
@@ -258,8 +263,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
       }
       const setting = this.addTextField(
         this.containerEl,
-        () => template.getTemplate(key),
-        (value) => template.complie(key, value),
+        () => template.templates[key],
+        (value) => template.setTemplate(key, value),
         { rows: 2 },
       ).setName(title);
       if (desc) setting.setDesc(desc);
@@ -291,9 +296,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
     };
     setEjectButton();
     ejectButton.onClick(async () => {
-      template.ejected = !template.ejected;
+      await template.setOption("ejected", !template.ejected);
       await this.plugin.saveSettings();
-      await template.loadAll();
       setEjectButton();
       this.setEjectableTemplates(ejectableContainer);
     });
@@ -304,7 +308,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
   setEjectableTemplates(container: HTMLElement) {
     container.empty();
     const { template } = this.plugin.settings;
-    for (const name of EJECTABLE_TEMPLATE_NAMES) {
+    for (const name of ejectableTemplateTypes) {
       let title,
         desc: string | DocumentFragment = "";
       switch (name) {
@@ -323,13 +327,14 @@ export class ZoteroSettingTab extends PluginSettingTab {
         default:
           assertNever(name);
       }
+      const loader = this.plugin.templateLoader;
       if (template.ejected) {
         new Setting(container)
           .setName(name)
           .setDesc(desc)
           .then((setting) =>
             setting.controlEl.createDiv("", (el) => {
-              el.createEl("code", { text: template.getTemplateFile(name) });
+              el.createEl("code", { text: loader.getTemplateFile(name) });
             }),
           )
           .addButton((btn) =>
@@ -342,7 +347,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
                   return;
                 }
                 await app.workspace.openLinkText(
-                  template.getTemplateFile(name),
+                  loader.getTemplateFile(name),
                   "",
                 );
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -352,8 +357,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
       } else {
         this.addTextField(
           container,
-          () => template.getTemplate(name),
-          (value) => template.complie(name, value),
+          () => loader.getTemplate(name),
+          () => void 0,
         )
           .setName(title)
           .setDesc(desc)
