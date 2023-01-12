@@ -80,8 +80,8 @@
     "clsx": "^1.2.1",
     "jotai": "~1.8.4",
     "immer": "~9.0.15",
-    "react": "~17.0.2",
-    "react-dom": "~17.0.2",
+    "react": "npm:@preact/compat@~17.1.2",
+    "react-dom": "npm:@preact/compat@~17.1.2",
     "lodash-es": "~4.17.21",
     "@obzt/note-parser": "workspace:*",
     "react-json-tree": "~0.17.0",
@@ -96,6 +96,8 @@
     "react-error-boundary": "~3.1.4",
     "@ophidian/core": "workspace:*",
     "@mobily/ts-belt": "~3.13.1",
-    "zustand": "~4.3.1"
+    "zustand": "~4.3.1",
+    "preact": "~10.11.3",
+    "@preact/compat": "~17.1.2"
   }
 }

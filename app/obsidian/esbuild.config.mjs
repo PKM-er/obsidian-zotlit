@@ -2,6 +2,7 @@ import obPlugin from "@aidenlx/esbuild-plugin-obsidian";
 import { build } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { readFile } from "fs/promises";
+import { join } from "path";
 // import myPackage from "./package.json" assert { type: "json" };
 import semverPrerelease from "semver/functions/prerelease.js";
 
@@ -15,6 +16,22 @@ if you want to view the source visit the plugins github repository
 `;
 
 const isProd = process.env.BUILD === "production";
+
+const preactCompatPlugin = {
+  name: "preact-compat",
+  setup(build) {
+    const preact = join(
+      process.cwd(),
+      "node_modules",
+      "@preact",
+      "compat",
+      "index.mjs",
+    );
+    build.onResolve({ filter: /^(react-dom|react)$/ }, (args) => {
+      return { path: preact };
+    });
+  },
+};
 
 /** @type import("esbuild").BuildOptions */
 const opts = {
@@ -47,7 +64,12 @@ try {
     entryPoints: ["src/zt-main.ts"],
     banner: { js: banner },
     outfile: "build/main.js",
-    plugins: [lessLoader(), obPlugin({ beta: isPreRelease })],
+    tsconfig: "tsconfig.build.json",
+    plugins: [
+      lessLoader(),
+      obPlugin({ beta: isPreRelease }),
+      preactCompatPlugin,
+    ],
   });
 } catch (err) {
   console.error(err);

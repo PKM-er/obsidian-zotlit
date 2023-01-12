@@ -21,6 +21,7 @@ importers:
       '@obzt/note-parser': workspace:*
       '@obzt/zotero-type': workspace:*
       '@ophidian/core': workspace:*
+      '@preact/compat': ~17.1.2
       '@release-it/bumper': ^4.0.0
       '@release-it/conventional-changelog': ^5.1.0
       '@types/dompurify': ~2.3.4
@@ -62,10 +63,11 @@ importers:
       monkey-around: ^2.3.0
       nanoevents: ~7.0.1
       obsidian: github:obsidianmd/obsidian-api
+      preact: ~10.11.3
       pretty-hrtime: ^1.0.3
       query-string: ~7.1.1
-      react: ~17.0.2
-      react-dom: ~17.0.2
+      react: npm:@preact/compat@~17.1.2
+      react-dom: npm:@preact/compat@~17.1.2
       react-error-boundary: ~3.1.4
       react-json-tree: ~0.17.0
       redom: ^3.27.1
@@ -84,7 +86,8 @@ importers:
       '@obzt/note-parser': link:../../lib/note-parser
       '@obzt/zotero-type': link:../../lib/zotero-type
       '@ophidian/core': link:../../lib/ophidian-lib-core
-      ahooks: 3.7.2_react@17.0.2
+      '@preact/compat': 17.1.2_preact@10.11.3
+      ahooks: 3.7.2_@preact+compat@17.1.2
       assert-never: 1.2.1
       clsx: 1.2.1
       endent: 2.1.0
@@ -97,7 +100,7 @@ importers:
       handlebars: 4.7.7
       idb: 7.1.0
       immer: 9.0.15
-      jotai: 1.8.6_immer@9.0.15+react@17.0.2
+      jotai: 1.8.6_2u4ewjqn3calj4tmi7uv32tmgy
       js-base64: 3.7.2
       lodash-es: 4.17.21
       log4js: 6.6.1
@@ -105,14 +108,15 @@ importers:
       monkey-around: 2.3.0
       nanoevents: 7.0.1
       obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_ebfztrivxsawr3nzgdquexqq6q
+      preact: 10.11.3
       pretty-hrtime: 1.0.3
       query-string: 7.1.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-error-boundary: 3.1.4_react@17.0.2
-      react-json-tree: 0.17.0_pxzommwrsowkd4kgag6q3sluym
+      react: /@preact/compat/17.1.2_preact@10.11.3
+      react-dom: /@preact/compat/17.1.2_preact@10.11.3
+      react-error-boundary: 3.1.4_@preact+compat@17.1.2
+      react-json-tree: 0.17.0_qh5swwke3x2p6qbb5ri566rvsm
       redom: 3.29.1
-      zustand: 4.3.1_immer@9.0.15+react@17.0.2
+      zustand: 4.3.1_2u4ewjqn3calj4tmi7uv32tmgy
     devDependencies:
       '@aidenlx/better-sqlite3': 8.0.1-mod.1
       '@aidenlx/esbuild-plugin-obsidian': 0.1.8_esbuild@0.14.54
@@ -3847,6 +3851,14 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: false
 
+  /@preact/compat/17.1.2_preact@10.11.3:
+    resolution: {integrity: sha512-7pOZN9lMDDRQ+6aWvjwTp483KR8/zOpfS83wmOo3zfuLKdngS8/5RLbsFWzFZMGdYlotAhX980hJ75bjOHTwWg==}
+    peerDependencies:
+      preact: '*'
+    dependencies:
+      preact: 10.11.3
+    dev: false
+
   /@release-it/bumper/4.0.0_release-it@15.5.0:
     resolution: {integrity: sha512-DswMVRuWNeeuDPd8DNpMhuHjqxnwOi5A+v9CTrbAQ7/1K+VOGUGItS4ekjWfb1qBvJw/ouiAinBo9ckjtnhktA==}
     engines: {node: '>=14'}
@@ -4913,7 +4925,7 @@ packages:
     resolution: {integrity: sha512-V7uUvAwnimu6eh/PED4mCDjE7tokeZQLKlxg9lCTMPhN+NjsSbtdacByVlR1oluXQzD3MOw55wylDmQo4+S9ZQ==}
     dev: false
 
-  /ahooks/3.7.2_react@17.0.2:
+  /ahooks/3.7.2_@preact+compat@17.1.2:
     resolution: {integrity: sha512-nJPsQJcmJnGaNXiqgZdfO7UMs+o926LQg6VyDYt2vzKhXU8Ze/U87NsA/FeIvlIZB0rQr/j7uotFb1bGPp627A==}
     engines: {node: '>=8.0.0'}
     peerDependencies:
@@ -4925,7 +4937,7 @@ packages:
       intersection-observer: 0.12.2
       js-cookie: 2.2.1
       lodash: 4.17.21
-      react: 17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
       resize-observer-polyfill: 1.5.1
       screenfull: 5.2.0
     dev: false
@@ -10033,7 +10045,7 @@ packages:
       '@sideway/formula': 3.0.0
       '@sideway/pinpoint': 2.0.0
 
-  /jotai/1.8.6_immer@9.0.15+react@17.0.2:
+  /jotai/1.8.6_2u4ewjqn3calj4tmi7uv32tmgy:
     resolution: {integrity: sha512-6JXNd2ewR6Ur0hGY0kRJebQ++p7lN/8kNdGNXv7XT11FDPxAtPN2XLM+m0w4bV22f1knQlG8ZpVLfY6BEGF+UQ==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -10068,7 +10080,7 @@ packages:
         optional: true
     dependencies:
       immer: 9.0.15
-      react: 17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
   /js-base64/3.7.2:
@@ -12494,6 +12506,10 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
+  /preact/10.11.3:
+    resolution: {integrity: sha512-eY93IVpod/zG3uMF22Unl8h9KkrcKIRs2EGar8hwLZZDU1lkjph303V9HZBwufh2s736U6VXuhD109LYqPoffg==}
+    dev: false
+
   /prebuild-install/7.1.1:
     resolution: {integrity: sha512-jAXscXWMcCK8GgCoHOfIr0ODh5ai8mj63L2nWrjuAgXE6tDyYGnx4/8o/rCgU+B4JSyZBKbeZqzhtwtC3ovxjw==}
     engines: {node: '>=10'}
@@ -12932,14 +12948,14 @@ packages:
       react: 17.0.2
       scheduler: 0.20.2
 
-  /react-error-boundary/3.1.4_react@17.0.2:
+  /react-error-boundary/3.1.4_@preact+compat@17.1.2:
     resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
     engines: {node: '>=10', npm: '>=6'}
     peerDependencies:
       react: '>=16.13.1'
     dependencies:
       '@babel/runtime': 7.19.4
-      react: 17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
   /react-error-overlay/6.0.11:
@@ -12970,7 +12986,7 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: false
 
-  /react-json-tree/0.17.0_pxzommwrsowkd4kgag6q3sluym:
+  /react-json-tree/0.17.0_qh5swwke3x2p6qbb5ri566rvsm:
     resolution: {integrity: sha512-hcWjibI/fAvsKnfYk+lka5OrE1Lvb1jH5pSnFhIU5T8cCCxB85r6h/NOzDPggSSgErjmx4rl3+2EkeclIKBOhg==}
     peerDependencies:
       '@types/react': ^16.3.0 || ^17.0.0 || ^18.0.0
@@ -12981,7 +12997,7 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/react': 17.0.50
       prop-types: 15.8.1
-      react: 17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
       react-base16-styling: 0.9.1
     dev: false
 
@@ -15136,12 +15152,12 @@ packages:
       use-isomorphic-layout-effect: 1.1.2_pxzommwrsowkd4kgag6q3sluym
     dev: false
 
-  /use-sync-external-store/1.2.0_react@17.0.2:
+  /use-sync-external-store/1.2.0_@preact+compat@17.1.2:
     resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      react: 17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
   /util-deprecate/1.0.2:
@@ -15757,7 +15773,7 @@ packages:
       - supports-color
     dev: true
 
-  /zustand/4.3.1_immer@9.0.15+react@17.0.2:
+  /zustand/4.3.1_2u4ewjqn3calj4tmi7uv32tmgy:
     resolution: {integrity: sha512-EVyo/eLlOTcJm/X5M00rwtbYFXwRVTaRteSvhtbTZUCQFJkNfIyHPiJ6Ke68MSWzcKHpPzvqNH4gC2ZS/sbNqw==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -15770,8 +15786,8 @@ packages:
         optional: true
     dependencies:
       immer: 9.0.15
-      react: 17.0.2
-      use-sync-external-store: 1.2.0_react@17.0.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
+      use-sync-external-store: 1.2.0_@preact+compat@17.1.2
     dev: false
 
   /zwitch/1.0.5:
