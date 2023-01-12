@@ -21,36 +21,36 @@ abstract class Settings<Options extends Record<string, any>> {
     );
   }
 
-  async setOption<K extends keyof Options>(key: K, value: Options[K]) {
+  setOption<K extends keyof Options>(
+    key: K,
+    value: Options[K],
+  ): { apply: () => Promise<void> } {
     this.value[key] = value;
+    return { apply: () => this.apply(key) };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async apply(key: keyof Options) {
+    return;
+  }
+  async applyAll() {
+    await Promise.all(D.keys(this.value).map((k) => this.apply(k)));
   }
 
   toJSON(): Options {
     return this.value;
   }
 
-  /**
-   * init method, will call methods that apply these settings for the first time
-   * @param apply whether to apply the settings using method defined in `setOption`
-   */
-  async fromJSON(json: Options, apply = true): Promise<void> {
+  fromJSON(json: Options): void {
     const optKeys = D.keys(this.getDefaults());
-    if (!apply) {
-      this.value = {
-        ...this.value,
-        ...D.selectKeys(json, optKeys),
-      };
-    } else {
-      await Promise.all(
-        optKeys.map((key) => this.setOption(key, json[key] ?? this.value[key])),
-      );
-    }
+    this.value = {
+      ...this.value,
+      ...D.selectKeys(json, optKeys),
+    };
   }
 }
 
 export default Settings as {
   // extends to expose values inside this.settings
-  new <Options extends Record<string, any>>(): Settings<Options> & {
-    readonly [K in keyof Options]: Options[K];
-  };
+  new <Options extends Record<string, any>>(): Settings<Options> &
+    Readonly<Options>;
 };

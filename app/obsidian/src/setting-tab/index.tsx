@@ -56,7 +56,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .addToggle((toggle) => {
         const settings = this.plugin.settings.watcher;
         toggle.setValue(settings.autoRefresh).onChange(async (value) => {
-          settings.setOption("autoRefresh", value);
+          await settings.setOption("autoRefresh", value).apply();
           await this.plugin.saveSettings();
         });
       })
@@ -133,7 +133,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       .addToggle((toggle) => {
         const settings = this.plugin.settings.imgImporter;
         toggle.setValue(settings.symlinkImgExcerpt).onChange(async (value) => {
-          settings.setOption("symlinkImgExcerpt", value);
+          await settings.setOption("symlinkImgExcerpt", value).apply();
           setVisible(value);
           await this.plugin.saveSettings();
         });
@@ -145,7 +145,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       const newPath = new InVaultPath(value).path;
       if (newPath !== value) {
         text.setValue(newPath);
-        await settings.setOption("imgExcerptPath", newPath);
+        await settings.setOption("imgExcerptPath", newPath).apply();
         await this.plugin.saveSettings();
       }
     };
@@ -185,7 +185,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const settings = this.plugin.settings.database;
         dd.setValue(settings.citationLibrary.toString()).onChange(
           async (val) => {
-            await settings.setOption("citationLibrary", +val);
+            await settings.setOption("citationLibrary", +val).apply();
             new Notice("Zotero search index updated.");
             await this.plugin.saveSettings();
           },
@@ -218,7 +218,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const newPath = new InVaultPath(value).path;
         if (newPath !== value) {
           text.setValue(newPath);
-          await template.setOption("folder", newPath);
+          await template.setOption("folder", newPath).apply();
           await this.plugin.saveSettings();
         }
       },
@@ -296,7 +296,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     };
     setEjectButton();
     ejectButton.onClick(async () => {
-      await template.setOption("ejected", !template.ejected);
+      await template.setOption("ejected", !template.ejected).apply();
       await this.plugin.saveSettings();
       setEjectButton();
       this.setEjectableTemplates(ejectableContainer);
@@ -385,7 +385,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .setValue(log.level.toString())
           .onChange(async (val) => {
             const level = val as LogLevel;
-            await this.plugin.settings.log.setOption("level", level);
+            await this.plugin.settings.log.setOption("level", level).apply();
             await this.plugin.saveSettings();
           }),
       );

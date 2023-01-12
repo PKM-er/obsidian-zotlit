@@ -19,22 +19,16 @@ export class DatabaseSettings extends Settings<SettingOptions> {
     };
   }
 
-  async setOption<K extends keyof SettingOptions>(
-    key: K,
-    value: SettingOptions[K],
-  ): Promise<void> {
-    await super.setOption(key, value);
+  async apply(key: keyof SettingOptions): Promise<void> {
     const worker = this.use(DatabaseWorker);
     switch (key) {
       case "zoteroDataDir":
-        await worker.refresh({ task: "full" });
-        break;
+        return await worker.refresh({ task: "full" });
       case "citationLibrary":
-        await worker.refresh({
+        return await worker.refresh({
           task: "searchIndex",
           force: true,
         });
-        break;
       default:
         assertNever(key);
     }

@@ -42,6 +42,7 @@ export default class ZoteroPlugin extends Plugin {
   }
 
   settings: ZoteroSettings = getDefaultSettings(this);
+  settingLoader = this.use(SettingLoader);
   saveSettings = saveSettings.bind(this);
 
   get databaseAPI() {
@@ -52,11 +53,9 @@ export default class ZoteroPlugin extends Plugin {
   dbWatcher = this.use(DatabaseWatcher);
   database = this.use(ZoteroDatabase);
 
-  templateLoader = this.use(TemplateLoader);
-  templateComplier = this.use(TemplateComplier);
   templateRenderer = this.use(TemplateRenderer);
-
-  settingLoader = this.use(SettingLoader);
+  templateComplier = this.use(TemplateComplier);
+  templateLoader = this.use(TemplateLoader);
 
   // noteParser: NoteParser;
   // pdfCache: PDFCache;

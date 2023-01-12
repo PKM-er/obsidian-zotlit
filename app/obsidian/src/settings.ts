@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
@@ -43,14 +42,6 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
 export type SettingKeyWithType<T> = {
   [K in keyof ZoteroSettings]: ZoteroSettings[K] extends T ? K : never;
 }[keyof ZoteroSettings];
-type RequireConvert = SettingKeyWithType<ClassInSettings<any>>;
-
-const requireConvert = new Set(
-  enumerate<RequireConvert>()("literatureNoteFolder"),
-);
-
-const isRequireConvert = (key: string): key is RequireConvert =>
-  requireConvert.has(key as RequireConvert);
 
 export class SettingLoader extends Service {
   plugin = this.use(ZoteroPlugin);
@@ -58,21 +49,33 @@ export class SettingLoader extends Service {
     log.debug("Loading Settings...");
     const json = (await this.plugin.loadData()) ?? {};
     const settings = this.plugin.settings;
-    await settings.database.fromJSON(json, false);
-    await settings.watcher.fromJSON(json, false);
-    await settings.imgImporter.fromJSON(json);
-    await settings.log.fromJSON(json);
-    await settings.template.fromJSON(json, false);
-    await Promise.all(
-      Object.keys(settings).map(async (k) => {
-        const key = k as keyof ZoteroSettings;
-        if (isRequireConvert(key)) {
-          await settings[key].fromJSON(json[key]);
-        } else if (json[key] !== undefined) {
-          settings[key] = json[key] as never;
-        }
-      }),
-    );
+    settings.database.fromJSON(json);
+    settings.watcher.fromJSON(json);
+    settings.imgImporter.fromJSON(json);
+    settings.log.fromJSON(json);
+    settings.template.fromJSON(json);
+    // call this manually since no Sevice is used to apply settings on load
+    await settings.log.applyAll();
+
+    const {
+      literatureNoteFolder,
+      citationEditorSuggester,
+      showCitekeyInSuggester,
+      mutoolPath,
+    } = json;
+    if (typeof literatureNoteFolder === "string" && literatureNoteFolder) {
+      settings.literatureNoteFolder.path = literatureNoteFolder;
+    }
+    if (typeof citationEditorSuggester === "boolean") {
+      settings.citationEditorSuggester = citationEditorSuggester;
+    }
+    if (typeof showCitekeyInSuggester === "boolean") {
+      settings.showCitekeyInSuggester = showCitekeyInSuggester;
+    }
+    if (typeof mutoolPath === "string" && mutoolPath) {
+      settings.mutoolPath = mutoolPath;
+    }
+    log.debug("Settings loaded");
   }
 }
 

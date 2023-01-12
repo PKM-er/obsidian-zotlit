@@ -24,9 +24,6 @@ export default logger;
 
 interface SettingOptions {
   level: LogLevel;
-  /** used to make assert never work (not working with one field...) */
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _p?: never;
 }
 
 export class LogSettings extends Settings<SettingOptions> {
@@ -34,23 +31,17 @@ export class LogSettings extends Settings<SettingOptions> {
     return { level: DEFAULT_LOGLEVEL };
   }
 
-  async applyLevel(level: LogLevel) {
-    logger.level = level;
-    localStorage.setItem(storageKey, level);
-    await this.use(DatabaseWorker).api.setLoglevel(level);
+  async applyLevel() {
+    logger.level = this.level;
+    localStorage.setItem(storageKey, this.level);
+    await this.use(DatabaseWorker).api.setLoglevel(this.level);
   }
 
-  async setOption<K extends keyof SettingOptions>(
-    key: K,
-    value: SettingOptions[K],
-  ): Promise<void> {
-    await super.setOption(key, value);
+  async apply(key: keyof SettingOptions): Promise<void> {
     switch (key) {
       case "level":
-        await this.applyLevel(value as SettingOptions["level"]);
-        break;
-      case "_p":
-        break;
+        await this.applyLevel();
+        return;
       default:
         assertNever(key);
     }

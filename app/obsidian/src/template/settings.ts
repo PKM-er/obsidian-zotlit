@@ -62,25 +62,22 @@ export class TemplateSettings extends Settings<SettingOptions> {
     app.vault.trigger("zotero:template-updated", key);
   }
 
-  async setOption<K extends keyof SettingOptions>(
-    key: K,
-    value: SettingOptions[K],
-  ): Promise<void> {
-    if (key === "templates") {
-      throw new Error(`Cannot set templates directly. Use setTemplate`);
-    }
-    await super.setOption(key, value);
+  async apply(key: keyof SettingOptions): Promise<void> {
     const loader = this.use(TemplateLoader);
     switch (key) {
       case "ejected":
-        await loader.loadTemplates("eject");
-        break;
+        return await loader.loadTemplates("eject");
       case "folder":
         // fully reload
-        await loader.loadTemplates("full");
-        break;
+        return await loader.loadTemplates("full");
+      case "templates":
+        return await loader.loadTemplates("noneject");
       default:
         assertNever(key);
     }
+  }
+  async applyAll() {
+    const loader = this.use(TemplateLoader);
+    return await loader.loadTemplates("full");
   }
 }

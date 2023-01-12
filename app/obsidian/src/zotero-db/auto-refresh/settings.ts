@@ -4,9 +4,6 @@ import DatabaseWatcher from "./service";
 
 interface SettingOptions {
   autoRefresh: boolean;
-  /** used to make assert never work (not working with one field...) */
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  _p?: never;
 }
 
 export class WatcherSettings extends Settings<SettingOptions> {
@@ -15,19 +12,10 @@ export class WatcherSettings extends Settings<SettingOptions> {
       autoRefresh: true,
     };
   }
-  async setOption<K extends keyof SettingOptions>(
-    key: K,
-    value: SettingOptions[K],
-  ): Promise<void> {
-    await super.setOption(key, value);
+  async apply(key: keyof SettingOptions): Promise<void> {
     switch (key) {
       case "autoRefresh":
-        await this.use(DatabaseWatcher).setAutoRefresh(
-          value as SettingOptions["autoRefresh"],
-        );
-        break;
-      case "_p":
-        break;
+        return await this.use(DatabaseWatcher).setAutoRefresh(this.autoRefresh);
       default:
         assertNever(key);
     }

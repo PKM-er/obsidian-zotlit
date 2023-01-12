@@ -33,15 +33,16 @@ const SetDataDirButton = () => {
   const setSuccess = useSetAtom(successAtom);
   const setDataDir = useMemoizedFn(async () => {
     setSuccess(null);
+    const { database } = plugin.settings;
     try {
       const {
         filePaths: [newFolder],
       } = await dialog.showOpenDialog({
-        defaultPath: plugin.settings.database.zoteroDataDir,
+        defaultPath: database.zoteroDataDir,
         properties: ["openDirectory"],
       });
-      if (newFolder && plugin.settings.database.zoteroDataDir !== newFolder) {
-        await plugin.settings.database.setOption("zoteroDataDir", newFolder);
+      if (newFolder && database.zoteroDataDir !== newFolder) {
+        await database.setOption("zoteroDataDir", newFolder).apply();
         await plugin.saveSettings();
         refresh();
         setSuccess(true);

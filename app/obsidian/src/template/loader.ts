@@ -34,7 +34,7 @@ export class TemplateLoader extends Service {
   }
 
   async onload() {
-    await this.loadTemplates("eject");
+    await this.loadTemplates("full");
   }
 
   async onModifyFile(file: TAbstractFile) {
