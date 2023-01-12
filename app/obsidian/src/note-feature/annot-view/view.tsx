@@ -1,22 +1,28 @@
-import { atom, Provider } from "jotai";
+import type {
+  AnnotationInfo,
+  AttachmentInfo,
+  RegularItemInfo,
+} from "@obzt/database";
 import { createNanoEvents } from "nanoevents";
-import type { TFile, WorkspaceLeaf } from "obsidian";
+import type { WorkspaceLeaf } from "obsidian";
+import { useContext, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { pluginAtom } from "@component/atoms/obsidian";
-import { GLOBAL_SCOPE } from "@component/atoms/utils";
-import { createInitialValues } from "@utils/create-initial";
+import { useStore } from "zustand";
+import { AnnotsView, Obsidian, createStore } from "../../component";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
-import { AnnotView } from "./annot-view";
 import { DerivedFileView } from "./derived-file-view";
 
 export const annotViewType = "zotero-annotation-view";
 
 interface Events {
-  "load-file": (file: TFile) => void;
+  "load-file": (file: string | null) => void;
+  "load-doc-item": (item: RegularItemInfo, sourcePath: string) => void;
+  "load-doc-tags": (tags: number[]) => void;
+  "load-attachments": (attachments: AttachmentInfo[]) => void;
+  "load-annotations": (annotations: AnnotationInfo[]) => void;
+  "load-annot-tags": (tags: Map<number, number[]>) => void;
 }
-
-export const annotViewAtom = atom<AnnotationView>(null as never);
 
 export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
@@ -46,7 +52,9 @@ export class AnnotationView extends DerivedFileView {
   }
 
   update() {
-    this.emitter.emit("load-file", this.file);
+    const file = this.getFile();
+    this.store.getState().loadDocItem(file, this.lib);
+    this.emitter.emit("load-file", file);
   }
   canAcceptExtension(_extension: string): boolean {
     // accept all extensions
@@ -56,12 +64,8 @@ export class AnnotationView extends DerivedFileView {
     return true;
   }
 
-  protected async onOpen() {
-    await super.onOpen();
-    const initVals = createInitialValues();
-    initVals.set(pluginAtom, this.plugin);
-    initVals.set(annotViewAtom, this);
-    await new Promise<void>((resolve) => {
+  untilZoteroReady() {
+    return new Promise<void>((resolve) => {
       if (this.plugin.dbWorker.status !== DatabaseStatus.Ready) {
         const ref = app.vault.on("zotero:db-ready", () => {
           app.vault.offref(ref);
@@ -72,11 +76,31 @@ export class AnnotationView extends DerivedFileView {
         resolve();
       }
     });
+  }
 
+  get lib() {
+    return this.plugin.settings.database.citationLibrary;
+  }
+  /** @returns null if current file not literature note */
+  getFile() {
+    if (
+      this.file?.extension === "md" &&
+      this.plugin.noteIndex.isLiteratureNote(this.file)
+    ) {
+      return this.file.path;
+    }
+    return null;
+  }
+
+  store = createStore(this.plugin.databaseAPI);
+
+  protected async onOpen() {
+    await super.onOpen();
+    await this.untilZoteroReady();
     ReactDOM.render(
-      <Provider initialValues={initVals.get()} scope={GLOBAL_SCOPE}>
-        <AnnotView />
-      </Provider>,
+      <Obsidian.Provider value={{ plugin: this.plugin, view: this }}>
+        <Component />
+      </Obsidian.Provider>,
       this.contentEl,
     );
   }
@@ -84,4 +108,31 @@ export class AnnotationView extends DerivedFileView {
     ReactDOM.unmountComponentAtNode(this.contentEl);
     await super.onClose();
   }
+}
+
+const useRefresh = () => {
+  const { view } = useContext(Obsidian);
+  const refresh = useStore(view.store, (s) => s.refresh);
+  useEffect(() => {
+    const ref = app.vault.on("zotero:db-refresh", refresh);
+    return () => app.vault.offref(ref);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+};
+
+function Component() {
+  const { view } = useContext(Obsidian);
+
+  useRefresh();
+  const empty = useStore(view.store, (s) => !s.doc);
+
+  if (empty) {
+    return (
+      <div className="annot-view">
+        <div className="pane-empty">Active file not literature note</div>
+      </div>
+    );
+  }
+
+  return <AnnotsView />;
 }

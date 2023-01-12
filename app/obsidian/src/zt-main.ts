@@ -7,7 +7,6 @@ import { Notice, Plugin, TFolder } from "obsidian";
 import log from "@log";
 
 import { AnnotBlockWorker, registerCodeBlock } from "./annot-block";
-import { activeAtchIdAtomFamily } from "./component/atoms/attachment";
 import {
   CitationEditorSuggest,
   insertCitation,
@@ -98,9 +97,6 @@ export default class ZoteroPlugin extends Plugin {
 
   onunload() {
     log.info("unloading Obsidian Zotero Plugin");
-    // clean up atom family
-    activeAtchIdAtomFamily.setShouldRemove(() => true);
-    activeAtchIdAtomFamily.setShouldRemove(null);
   }
 
   async getLiteratureNoteFolder(): Promise<TFolder> {

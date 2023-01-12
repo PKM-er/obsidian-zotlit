@@ -5,8 +5,9 @@ import type { Atom, Getter } from "jotai";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
 import { createInitialValues } from "@utils/create-initial";
-import { pluginAtom } from "../component/atoms/obsidian";
 import type ZoteroPlugin from "../zt-main";
+
+const pluginAtom = atom({} as ZoteroPlugin);
 
 export function atomWithRefresh<T>(fn: (get: Getter) => T) {
   const refreshCounter = atom(0);

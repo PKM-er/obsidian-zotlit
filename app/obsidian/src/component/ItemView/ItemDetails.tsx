@@ -55,7 +55,7 @@ const themeDark = {
 // matches #RGB, #RGBA, #RRGGBB, #RRGGBBAA
 const hex = /^#(?:[\dA-F]{3}){1,2}$|^#(?:[\dA-F]{4}){1,2}$/i;
 
-export const ItemDetails = ({ item }: { item: any }) => {
+export default function ItemDetails({ item }: { item: any }) {
   const [isDarkMode, setDarkMode] = useState(false);
   useEffect(() => {
     const listener = () => setDarkMode(queryDarkMode());
@@ -75,7 +75,7 @@ export const ItemDetails = ({ item }: { item: any }) => {
       valueRenderer={valueRenderer}
     />
   );
-};
+}
 
 /** @see https://stackoverflow.com/a/41491220 */
 const shouldBlack = (bgHex: string) => {
