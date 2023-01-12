@@ -14,6 +14,20 @@ declare module "obsidian" {
   }
   interface Workspace {
     getActiveFileView(): FileView | null;
+    ensureSideLeaf(
+      viewType: string,
+      side: "right" | "left",
+      viewState: {
+        /** @public */
+        state?: any;
+        /** @public */
+        split?: boolean;
+        /** @public */
+        reveal?: boolean;
+        /** @public */
+        active?: boolean;
+      },
+    ): any;
   }
 
   interface PluginManifest {

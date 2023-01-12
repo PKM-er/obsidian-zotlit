@@ -17,18 +17,15 @@ const registerNoteFeature = (plugin: ZoteroPlugin) => {
   plugin.addCommand({
     id: "zotero-annot-view",
     name: "Open Zotero Annotation Side Panel",
-    callback: async () => {
-      const existing = app.workspace.getLeavesOfType(annotViewType);
-      if (existing.length) {
-        app.workspace.revealLeaf(existing[0]);
-        return;
-      }
-      const leaf = app.workspace.getRightLeaf(false);
-      await leaf.setViewState({
-        type: annotViewType,
+    callback: () => {
+      app.workspace.ensureSideLeaf(annotViewType, "right", {
         active: true,
+        /**
+         * Workaroud to make sure view shows active file when first open
+         * TODO: bug report? replicate in Backlink, Outline etc...
+         */
+        state: { file: app.workspace.getActiveFile()?.path },
       });
-      app.workspace.revealLeaf(leaf);
     },
   });
 };
