@@ -1,8 +1,11 @@
 import { join, relative } from "path";
-import type { AttachmentInfo } from "@obzt/database";
+import type { AnnotationInfo, AttachmentInfo } from "@obzt/database";
+import { isAnnotationItem } from "@obzt/database";
+import { AnnotationType } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { FileSystemAdapter, TFile } from "obsidian";
 import log from "../../logger";
+import type ZoteroPlugin from "../../zt-main";
 
 export const toFileUrl = (path: string) => `file://${path}`;
 export const toMdLinkComponent = (path: string): string => {
@@ -46,3 +49,30 @@ export const fileLink = (
 };
 export const renderFilename = (name: string): string =>
   filenamify(name, { replacement: "_" });
+
+export const isImageAnnot = (item: unknown): item is AnnotationInfo =>
+  isAnnotationItem(item) && item.type === AnnotationType.image;
+
+export const linktextToLink = (
+  linktext: string,
+  useMd: boolean,
+  alt?: string,
+) => {
+  if (useMd) {
+    return `[${alt ?? ""}](${toMdLinkComponent(linktext)})`;
+  } else {
+    return `[[${linktext}${alt ? "|" + alt : ""}]]`;
+  }
+};
+
+export const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
+  if (isImageAnnot(item)) {
+    const linktext = plugin.imgCacheImporter.import(item);
+    if (!linktext) {
+      const path = plugin.imgCacheImporter.getCachePath(item);
+      return `[Annotation ${item.key}](${toMdLinkComponent(path)})`;
+    } else {
+      return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
+    }
+  } else return "";
+};

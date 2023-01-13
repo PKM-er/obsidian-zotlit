@@ -53,7 +53,7 @@ export default function AnnotsView() {
       >
         <AttachmentSelector />
       </Header>
-      <DocDetailsView showDetails={showDetails} renderArgs={renderArgs} />
+      <DocDetailsView showDetails={showDetails} renderArgs={renderArgs.args} />
       {annotListProps ? <AnnotList {...annotListProps} /> : <>Loading</>}
     </div>
   );

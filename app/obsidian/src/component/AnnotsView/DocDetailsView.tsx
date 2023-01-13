@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { ItemDetails } from "../ItemView";
-import type { DocHelperArgs } from "./hooks/useDocHelperArgs";
+import type { DocHelperArgsPartial } from "./hooks/useDocHelperArgs";
 import { useItemDetails } from "./hooks/useDocHelperArgs";
 
 interface DocDetailsViewProps {
   showDetails: boolean;
-  renderArgs: DocHelperArgs | null;
+  renderArgs: DocHelperArgsPartial | null;
 }
 
 export default function DocDetailsView({

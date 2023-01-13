@@ -46,14 +46,12 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       defaultLibId,
     );
 
-    const note = await createNote(this.plugin, item, {
+    const note = await createNote(this.plugin, {
+      docItem: item,
       attachment,
-      tags: tagsRecord[item.itemID],
+      tags: tagsRecord,
       allAttachments,
-      annotations: annotations.map((a) => [
-        a,
-        { attachment, tags: tagsRecord[a.itemID] },
-      ]),
+      annotations,
     });
     await app.workspace.openLinkText(note.path, "", false);
     return true;

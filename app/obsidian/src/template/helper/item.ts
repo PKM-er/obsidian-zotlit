@@ -1,47 +1,86 @@
+import { enumerate } from "@obzt/common";
 import type {
-  AnnotationInfo,
   AttachmentInfo,
-  RegularItemInfo,
+  RegularItemInfoBase,
   TagInfo,
 } from "@obzt/database";
 import { getBacklink } from "@obzt/database";
-import type { AnnotationExtra } from "./annot";
-import { withAnnotHelper } from "./annot";
+import type { AnnotHelper } from "./annot";
 import type { Context } from "./base";
-import { bindRevoke, withHelper } from "./base";
+import { zoteroDataDir } from "./base";
+import type { CreatorHelper } from "./creator";
 import { withCreatorHelper } from "./creator";
 import { fileLink } from "./utils";
 
-export type RegularItemInfoHelper = ReturnType<typeof withItemHelper>;
 export type RegularItemInfoExtra = {
   attachment: AttachmentInfo | null;
-  annotations?: [data: AnnotationInfo, extra: AnnotationExtra][];
+  // annotations: AnnotationInfo[];
   allAttachments: AttachmentInfo[];
-  tags: TagInfo[];
+  tags: Record<number, TagInfo[]>;
 };
-export const withItemHelper = (
-  { creators, ...data }: RegularItemInfo,
-  { annotations, ..._extra }: RegularItemInfoExtra,
+
+const extraKeys = new Set(
+  enumerate<keyof RegularItemInfoExtra>()(
+    "attachment",
+    "allAttachments",
+    "tags",
+  ),
+);
+
+export type DocItemHelper = Readonly<
+  Omit<RegularItemInfoBase, "creators"> &
+    Omit<RegularItemInfoExtra, "tags"> & {
+      creators: CreatorHelper[];
+      tags: TagInfo[];
+    } & {
+      backlink: string;
+      fileLink: string;
+    }
+> & { annotations: AnnotHelper[] };
+
+export const withDocItemHelper = (
+  { creators, ...data }: RegularItemInfoBase,
+  extra: RegularItemInfoExtra,
   ctx: Context,
-) => {
-  const proxiedAnnots =
-    annotations?.map(([a, e]) => withAnnotHelper(a, e, ctx)) ?? null;
-  const extra = proxiedAnnots
-    ? { ..._extra, annotations: proxiedAnnots }
-    : _extra;
-  const proxiedCreators = creators.map((c) => withCreatorHelper(c));
-  const proxy = withHelper({ ...data, creators: proxiedCreators }, extra, {
-    backlink(): string {
-      return getBacklink(this);
+) =>
+  new Proxy(
+    {
+      get backlink(): string {
+        return getBacklink(data);
+      },
+      get fileLink(): string {
+        return fileLink(zoteroDataDir(ctx), ctx.sourcePath, extra.attachment);
+      },
+      annotations: "not-loaded",
+      creators: creators.map((c) => withCreatorHelper(c)),
     },
-    fileLink(): string {
-      return fileLink(
-        ctx.plugin.settings.database.zoteroDataDir,
-        ctx.sourcePath,
-        _extra.attachment,
-      );
+    {
+      get(target, p, receiver) {
+        if (p === "tags") {
+          if (!extra.tags[data.itemID]) {
+            throw new Error("No tags loaded for item " + data.itemID);
+          }
+          return extra.tags[data.itemID];
+        }
+        if (extraKeys.has(p as keyof RegularItemInfoExtra)) {
+          return extra[p as keyof RegularItemInfoExtra];
+        }
+        if (p === "annotations") {
+          // if (target.annotations === "not-loaded") {
+          //   throw new Error("Annotations not loaded for item " + data.itemID);
+          // }
+          return target.annotations;
+        }
+        return (
+          Reflect.get(data, p, receiver) ?? Reflect.get(target, p, receiver)
+        );
+      },
+      ownKeys(target) {
+        return [
+          ...Reflect.ownKeys(data),
+          ...extraKeys,
+          ...Reflect.ownKeys(target),
+        ];
+      },
     },
-  });
-  bindRevoke(proxy, ...proxiedCreators, ...(proxiedAnnots ?? []));
-  return proxy;
-};
+  ) as unknown as DocItemHelper;

@@ -1,131 +1,154 @@
-import { getItemKeyGroupID, toPage } from "@obzt/common";
+import { enumerate, getItemKeyGroupID, toPage } from "@obzt/common";
 import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
-import {
-  isAnnotationItem,
-  getBacklink,
-  getCacheImagePath,
-} from "@obzt/database";
-import { AnnotationType } from "@obzt/zotero-type";
+import { getBacklink, getCacheImagePath } from "@obzt/database";
 import endent from "endent";
 import { htmlToMarkdown } from "obsidian";
 
-import type ZoteroPlugin from "../../zt-main.js";
 import type { Context } from "./base";
-import { withHelper } from "./base";
-import { fileLink, toFileUrl, toMdLinkComponent } from "./utils.js";
+import { zoteroDataDir } from "./base";
+import type { DocItemHelper } from "./item.js";
+import { fileLink, imgLink, isImageAnnot, toFileUrl } from "./utils.js";
 
-export type AnnotationHelper = ReturnType<typeof withAnnotHelper>;
-export type AnnotationExtra = {
-  attachment: AttachmentInfo | null;
-  tags: TagInfo[];
+export type AnnotHelper = Readonly<
+  AnnotationInfo &
+    Omit<AnnotationExtra, "tags"> & {
+      tags: TagInfo[];
+      docItem: DocItemHelper;
+    } & Record<
+      | "backlink"
+      | "blockID"
+      | "commentMd"
+      | "imgPath"
+      | "imgUrl"
+      | "imgLink"
+      | "imgEmbed"
+      | "fileLink"
+      | "textBlock"
+      | "colorName",
+      string
+    >
+> & {
+  docItem: DocItemHelper;
 };
+
+const extraKeys = new Set(
+  enumerate<keyof AnnotationExtra>()("attachment", "tags"),
+);
+
 export const withAnnotHelper = (
   data: AnnotationInfo,
   extra: AnnotationExtra,
-  { plugin, sourcePath }: Context,
+  ctx: Context,
 ) =>
-  withHelper(data, extra, {
-    backlink(): string {
-      return getBacklink(this);
-    },
-    blockID(): string {
-      let id = getItemKeyGroupID(this);
-      const page = toPage(this.position.pageIndex, true);
-      if (typeof page === "number") id += `p${page}`;
-      return id;
-    },
-    commentMd(): string {
-      if (this.comment) {
-        return htmlToMarkdown(this.comment);
-      } else return "";
-    },
-    imgPath(): string {
-      if (isImageAnnot(this)) {
-        return getCacheImagePath(this, plugin.settings.database.zoteroDataDir);
-      } else return "";
-    },
-    imgUrl(): string {
-      if (isImageAnnot(this)) {
-        const path = getCacheImagePath(
-          this,
-          plugin.settings.database.zoteroDataDir,
+  new Proxy(
+    {
+      get backlink(): string {
+        return getBacklink(data);
+      },
+      get blockID(): string {
+        let id = getItemKeyGroupID(data);
+        const page = toPage(data.position.pageIndex, true);
+        if (typeof page === "number") id += `p${page}`;
+        return id;
+      },
+      get commentMd(): string {
+        if (data.comment) {
+          return htmlToMarkdown(data.comment);
+        } else return "";
+      },
+      get imgPath(): string {
+        if (isImageAnnot(this)) {
+          return getCacheImagePath(this, zoteroDataDir(ctx));
+        } else return "";
+      },
+      get imgUrl(): string {
+        if (isImageAnnot(this)) {
+          const path = getCacheImagePath(this, zoteroDataDir(ctx));
+          return toFileUrl(path);
+        } else return "";
+      },
+      get imgLink(): string {
+        const link = imgLink(this, ctx.plugin);
+        return link;
+      },
+      get imgEmbed(): string {
+        const link = imgLink(this, ctx.plugin);
+        return link ? `!${link}` : "";
+      },
+      get fileLink(): string {
+        return fileLink(
+          zoteroDataDir(ctx),
+          ctx.sourcePath,
+          extra.attachment,
+          toPage(data.position.pageIndex, true),
         );
-        return toFileUrl(path);
-      } else return "";
+      },
+      get textBlock(): string {
+        if (!data.text) return "";
+        return endent`
+        \`\`\`zotero-annot
+        > ${data.text} [zotero](${getBacklink(data)})
+        \`\`\``;
+      },
+      get colorName() {
+        switch (data.color?.toUpperCase()) {
+          // from zotero.tagColorChooser
+          case "#FF6666":
+            return "red";
+          case "#FF8C19":
+            return "orange";
+          case "#999999":
+            return "gray";
+          case "#5FB236":
+            return "green";
+          case "#009980":
+            return "cyan";
+          case "#2EA8E5":
+            return "blue";
+          case "#576DD9":
+            return "navy";
+          case "#A28AE5":
+            return "purple";
+          case "#A6507B":
+            return "brown";
+          default:
+            return this.color;
+        }
+      },
+      docItem: "not-loaded",
     },
-    imgLink(): string {
-      const link = imgLink(this, plugin);
-      return link;
+    {
+      get(target, p, receiver) {
+        if (p === "tags") {
+          if (!extra.tags[data.itemID]) {
+            throw new Error("No tags loaded for item " + data.itemID);
+          }
+          return extra.tags[data.itemID];
+        }
+        if (p === "annotations") {
+          if (target.docItem === "not-loaded") {
+            throw new Error("Doc Item not loaded for item " + data.itemID);
+          }
+          return target.docItem;
+        }
+        if (extraKeys.has(p as keyof AnnotationExtra)) {
+          return Reflect.get(extra, p, receiver);
+        }
+        return (
+          Reflect.get(data, p, receiver) ?? Reflect.get(target, p, receiver)
+        );
+      },
+      ownKeys(target) {
+        return [
+          ...Reflect.ownKeys(data),
+          ...extraKeys,
+          ...Reflect.ownKeys(target),
+        ];
+      },
     },
-    imgEmbed(): string {
-      const link = imgLink(this, plugin);
-      return link ? `!${link}` : "";
-    },
-    fileLink(): string {
-      return fileLink(
-        plugin.settings.database.zoteroDataDir,
-        sourcePath,
-        extra.attachment,
-        toPage(this.position.pageIndex, true),
-      );
-    },
-    textBlock(): string {
-      if (!this.text) return "";
-      return endent`
-      \`\`\`zotero-annot
-      > ${this.text} [zotero](${getBacklink(this)})
-      \`\`\``;
-    },
-    colorName() {
-      switch (this.color?.toUpperCase()) {
-        // from zotero.tagColorChooser
-        case "#FF6666":
-          return "red";
-        case "#FF8C19":
-          return "orange";
-        case "#999999":
-          return "gray";
-        case "#5FB236":
-          return "green";
-        case "#009980":
-          return "cyan";
-        case "#2EA8E5":
-          return "blue";
-        case "#576DD9":
-          return "navy";
-        case "#A28AE5":
-          return "purple";
-        case "#A6507B":
-          return "brown";
-        default:
-          return this.color;
-      }
-    },
-  });
+  ) as unknown as AnnotHelper;
 
-const isImageAnnot = (item: unknown): item is AnnotationInfo =>
-  isAnnotationItem(item) && item.type === AnnotationType.image;
-
-export const linktextToLink = (
-  linktext: string,
-  useMd: boolean,
-  alt?: string,
-) => {
-  if (useMd) {
-    return `[${alt ?? ""}](${toMdLinkComponent(linktext)})`;
-  } else {
-    return `[[${linktext}${alt ? "|" + alt : ""}]]`;
-  }
-};
-
-const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
-  if (isImageAnnot(item)) {
-    const linktext = plugin.imgCacheImporter.import(item);
-    if (!linktext) {
-      const path = plugin.imgCacheImporter.getCachePath(item);
-      return `[Annotation ${item.key}](${toMdLinkComponent(path)})`;
-    } else {
-      return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
-    }
-  } else return "";
+export type AnnotationExtra = {
+  attachment: AttachmentInfo | null;
+  tags: Record<number, TagInfo[]>;
 };

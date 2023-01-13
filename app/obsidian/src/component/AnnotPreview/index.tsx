@@ -40,7 +40,10 @@ export default function AnnotPreview(props: AnnotPreviewProps) {
         color={annotation.color}
         icon={useAnnotIcon(annotation.type)}
         onMoreOptions={useMoreOptionMenu(annotation)}
-        {...useDragToInsert(containerRef, renderArgs)}
+        {...useDragToInsert(
+          containerRef,
+          renderArgs.status === 2 ? renderArgs.args : null,
+        )}
         showDetails={showDetails}
         onDetailsToggled={toggleDetails}
       >
@@ -58,7 +61,9 @@ export default function AnnotPreview(props: AnnotPreviewProps) {
       </Content>
       {annotation.comment && <Comment content={annotation.comment} />}
       {tags && <Tags tags={tags} />}
-      {renderArgs && <AnnotDetailsView {...{ showDetails, renderArgs }} />}
+      {renderArgs.status && (
+        <AnnotDetailsView {...{ showDetails, renderArgs: renderArgs.args }} />
+      )}
     </div>
   );
 }

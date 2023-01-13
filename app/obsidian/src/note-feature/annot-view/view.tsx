@@ -9,6 +9,7 @@ import { useContext, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { useStore } from "zustand";
 import { AnnotsView, Obsidian, createStore } from "../../component";
+import type { StoreAPI } from "../../component/store";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
 import { DerivedFileView } from "./derived-file-view";
@@ -27,6 +28,7 @@ interface Events {
 export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
+    this.store = createStore(plugin);
   }
   // root = createRoot(this.contentEl);
 
@@ -53,7 +55,9 @@ export class AnnotationView extends DerivedFileView {
 
   update() {
     const file = this.getFile();
-    this.store.getState().loadDocItem(file, this.lib);
+    this.untilZoteroReady().then(() =>
+      this.store.getState().loadDocItem(file, this.lib),
+    );
     this.emitter.emit("load-file", file);
   }
   canAcceptExtension(_extension: string): boolean {
@@ -66,14 +70,21 @@ export class AnnotationView extends DerivedFileView {
 
   untilZoteroReady() {
     return new Promise<void>((resolve) => {
-      if (this.plugin.dbWorker.status !== DatabaseStatus.Ready) {
+      const status = this.plugin.dbWorker.status;
+      if (status === DatabaseStatus.Ready) {
+        resolve();
+      } else if (status === DatabaseStatus.NotInitialized) {
         const ref = app.vault.on("zotero:db-ready", () => {
           app.vault.offref(ref);
           resolve();
         });
         this.registerEvent(ref);
-      } else {
-        resolve();
+      } else if (status === DatabaseStatus.Pending) {
+        const ref = app.vault.on("zotero:db-refresh", () => {
+          app.vault.offref(ref);
+          resolve();
+        });
+        this.registerEvent(ref);
       }
     });
   }
@@ -92,7 +103,7 @@ export class AnnotationView extends DerivedFileView {
     return null;
   }
 
-  store = createStore(this.plugin.databaseAPI);
+  store: StoreAPI;
 
   protected async onOpen() {
     await super.onOpen();

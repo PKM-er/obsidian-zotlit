@@ -1,13 +1,12 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
-import type { RegularItemInfo } from "@obzt/database";
 import { BaseError } from "make-error";
 import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/index.js";
 import { ZOTERO_KEY_FIELDNAME } from "../template";
-import type { RegularItemInfoExtra } from "../template/helper/item.js";
+import type { HelperExtra } from "../template/helper/to-helper.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 export class NoteExistsError extends BaseError {
@@ -19,32 +18,32 @@ export class NoteExistsError extends BaseError {
 
 export const createNote = async (
   plugin: ZoteroPlugin,
-  item: RegularItemInfo,
-  extra: RegularItemInfoExtra,
+  extra: HelperExtra,
 ): Promise<TFile> => {
-  const info = plugin.noteIndex.getNoteFromItem(item);
+  const { docItem } = extra;
+  const info = plugin.noteIndex.getNoteFromItem(docItem);
   if (info) {
     // only throw error if the note is linked to the same zotero item
-    throw new NoteExistsError(info.file, item.key);
+    throw new NoteExistsError(info.file, docItem.key);
   }
 
   const { vault, fileManager, metadataCache: meta } = plugin.app,
     { literatureNoteFolder: folder } = plugin.settings,
     template = plugin.templateRenderer;
-  const filepath = join(folder.path, template.renderFilename(item));
+  const filepath = join(folder.path, template.renderFilename(docItem));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {
     const metadata = meta.getCache(existingFile.path);
     if (
       metadata?.frontmatter &&
       metadata.frontmatter[ZOTERO_KEY_FIELDNAME] ===
-        getItemKeyGroupID(item, true)
+        getItemKeyGroupID(docItem, true)
     ) {
       // only throw error if the note is linked to the same zotero item
-      throw new NoteExistsError(filepath, item.key);
+      throw new NoteExistsError(filepath, docItem.key);
     }
   }
-  const content = template.renderNote(item, extra, {
+  const content = template.renderNote(extra, {
     plugin,
     sourcePath: filepath,
   });

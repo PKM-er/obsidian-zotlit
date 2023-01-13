@@ -6,7 +6,7 @@ import type {
 } from "@obzt/database";
 import { createStore as create } from "zustand";
 import { getItemKeyFromFrontmatter } from "../note-index/ztkey-file-map";
-import type { DbWorkerAPI } from "../zotero-db/api";
+import type ZoteroPlugin from "../zt-main";
 
 interface DataModel {
   doc: { sourcePath: string; docItem: RegularItemInfo; lib: number } | null;
@@ -64,13 +64,17 @@ const getInit = (): Pick<
   tags: {},
 });
 
-export const createStore = (api: DbWorkerAPI) =>
+const api = (p: ZoteroPlugin) => p.databaseAPI;
+
+export type StoreAPI = ReturnType<typeof createStore>;
+
+export const createStore = (p: ZoteroPlugin) =>
   create<DataModel>((set, get) => {
     /**
      * @param docItem if provided, load active attachment from localStorage
      */
     const loadAtchs = async (itemID: number, lib: number) => {
-        const attachments = await api.getAttachments(itemID, lib);
+        const attachments = await api(p).getAttachments(itemID, lib);
         set((state) => ({
           ...state,
           allAttachments: attachments,
@@ -78,16 +82,16 @@ export const createStore = (api: DbWorkerAPI) =>
         }));
       },
       loadDocTags = async (itemID: number, lib: number) => {
-        const docTags = await api.getTags([itemID], lib);
+        const docTags = await api(p).getTags([itemID], lib);
         set((state) => ({ ...state, tags: docTags }));
         return docTags;
       },
       loadAnnots = async (lib: number) => {
         const { attachment } = get();
         if (!attachment) return;
-        const annotations = await api.getAnnotations(attachment.itemID, lib);
+        const annotations = await api(p).getAnnotations(attachment.itemID, lib);
         set((state) => ({ ...state, annotations, attachment }));
-        const annotTags = await api.getTags(
+        const annotTags = await api(p).getTags(
           annotations.map((a) => a.itemID),
           lib,
         );
@@ -101,7 +105,7 @@ export const createStore = (api: DbWorkerAPI) =>
         if (!file) return set(getInit());
         const key = getItemKeyFromFrontmatter(app.metadataCache.getCache(file));
         if (!key) return set(getInit());
-        const item = await api.getItem(key, lib);
+        const item = await api(p).getItem(key, lib);
         if (!item) return set(getInit());
         const doc = { sourcePath: file, docItem: item, lib };
         const attachmentID = getCachedActiveAtch(item);

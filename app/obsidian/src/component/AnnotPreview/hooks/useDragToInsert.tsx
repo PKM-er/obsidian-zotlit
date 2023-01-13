@@ -2,11 +2,11 @@ import { useMemoizedFn } from "ahooks";
 import type { RefObject } from "react";
 import { useContext } from "react";
 import { Obsidian } from "../../context";
-import type { AnnotHelperArgs } from "./useAnnotHelperArgs";
+import type { AnnotHelperArgsFull } from "./useAnnotHelperArgs";
 
 export const useDragToInsert = (
   containerRef: RefObject<HTMLDivElement>,
-  renderArgs: AnnotHelperArgs | null,
+  renderArgs: AnnotHelperArgsFull | null,
 ) => {
   const { plugin } = useContext(Obsidian);
 
