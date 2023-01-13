@@ -407,6 +407,10 @@
       "projectFolder": "lib/ophidian-lib-core"
     },
     {
+      "packageName": "@aidenlx/eslint-config",
+      "projectFolder": "common/config/eslint"
+    },
+    {
       "packageName": "@obzt/docs",
       "projectFolder": "docs"
     }

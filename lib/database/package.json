@@ -13,9 +13,9 @@
     "./api": "./dist/api.js"
   },
   "devDependencies": {
-    "@aidenlx/eslint-config": "2.0.5",
+    "@aidenlx/eslint-config": "workspace:*",
     "typescript": "^4.9.4",
-    "eslint": "~8.24.0",
+    "eslint": "~8.31.0",
     "@types/eslint": "~8.4.6"
   },
   "dependencies": {

@@ -8,13 +8,13 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "@aidenlx/eslint-config": "2.0.5",
+    "@aidenlx/eslint-config": "workspace:*",
     "@types/node": "^17.0.10",
     "typescript": "^4.9.4",
-    "eslint": "~8.24.0",
+    "eslint": "~8.31.0",
     "cross-env": "^7.0.3",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
-    "esbuild": "^0.14.21",
+    "esbuild": "^0.16.17",
     "@types/eslint": "~8.4.6",
     "@types/mdast": "~3.0.10"
   },

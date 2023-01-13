@@ -34,15 +34,15 @@
     "releaseURL": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/"
   },
   "devDependencies": {
-    "@aidenlx/eslint-config": "2.0.5",
+    "@aidenlx/eslint-config": "workspace:*",
     "@types/lodash-es": "~4.17.6",
     "assert-never": "^1.2.1",
     "cz-conventional-changelog": "^3.3.0",
     "@types/mocha": "^9.0.0",
-    "esbuild": "^0.14.21",
+    "esbuild": "^0.16.17",
     "zotero-plugin": "1.4.8",
     "@types/eslint": "~8.4.6",
-    "eslint": "~8.24.0",
+    "eslint": "~8.31.0",
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",
