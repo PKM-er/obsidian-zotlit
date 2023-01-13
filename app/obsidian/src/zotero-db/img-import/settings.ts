@@ -1,5 +1,3 @@
-import { InVaultPath } from "../../settings";
-
 import Settings from "../settings-base";
 
 interface SettingOptions {

@@ -104,17 +104,18 @@ export class ZoteroSettingTab extends PluginSettingTab {
   }
   setLiteratureNoteFolder() {
     const setter = async (value: string, text: TextAreaComponent) => {
-      const { literatureNoteFolder: noteFolder } = this.plugin.settings;
-      noteFolder.path = value;
+      const { noteIndex } = this.plugin.settings;
+      const newPath = new InVaultPath(value).path;
       // correct with normalized path
-      if (noteFolder.path !== value) text.setValue(noteFolder.path);
-      // update note index
-      this.plugin.noteIndex.noteFolder = noteFolder.path;
-      await this.plugin.saveSettings();
+      if (newPath !== value) {
+        text.setValue(newPath);
+      }
+      if (await noteIndex.setOption("literatureNoteFolder", newPath).apply())
+        await this.plugin.saveSettings();
     };
     this.addTextComfirm(
       this.containerEl,
-      () => this.plugin.settings.literatureNoteFolder.path,
+      () => this.plugin.settings.noteIndex.literatureNoteFolder,
       setter,
       { rows: 1 },
     ).setName("Literature Note Folder");
@@ -145,9 +146,9 @@ export class ZoteroSettingTab extends PluginSettingTab {
       const newPath = new InVaultPath(value).path;
       if (newPath !== value) {
         text.setValue(newPath);
-        await settings.setOption("imgExcerptPath", newPath).apply();
-        await this.plugin.saveSettings();
       }
+      if (await settings.setOption("imgExcerptPath", newPath).apply())
+        await this.plugin.saveSettings();
     };
     const text = this.addTextComfirm(
       this.containerEl,
@@ -185,9 +186,10 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const settings = this.plugin.settings.database;
         dd.setValue(settings.citationLibrary.toString()).onChange(
           async (val) => {
-            await settings.setOption("citationLibrary", +val).apply();
-            new Notice("Zotero search index updated.");
-            await this.plugin.saveSettings();
+            if (await settings.setOption("citationLibrary", +val).apply()) {
+              new Notice("Zotero search index updated.");
+              await this.plugin.saveSettings();
+            }
           },
         );
       });
@@ -218,7 +220,8 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const newPath = new InVaultPath(value).path;
         if (newPath !== value) {
           text.setValue(newPath);
-          await template.setOption("folder", newPath).apply();
+        }
+        if (await template.setOption("folder", newPath).apply()) {
           await this.plugin.saveSettings();
         }
       },
@@ -384,9 +387,13 @@ export class ZoteroSettingTab extends PluginSettingTab {
           .addOptions(logLevels)
           .setValue(log.level.toString())
           .onChange(async (val) => {
-            const level = val as LogLevel;
-            await this.plugin.settings.log.setOption("level", level).apply();
-            await this.plugin.saveSettings();
+            if (
+              await this.plugin.settings.log
+                .setOption("level", val as LogLevel)
+                .apply()
+            ) {
+              await this.plugin.saveSettings();
+            }
           }),
       );
   };

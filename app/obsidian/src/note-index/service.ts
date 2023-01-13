@@ -1,5 +1,6 @@
 import type { ItemKeyGroup, KeyFileInfo } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
+import { Service } from "@ophidian/core";
 import assertNever from "assert-never";
 import type {
   BlockCache,
@@ -8,16 +9,17 @@ import type {
   TAbstractFile,
   Vault,
 } from "obsidian";
-import { Events, TFile, TFolder } from "obsidian";
+import { TFile, TFolder } from "obsidian";
 import log from "@log";
 
-import type ZoteroPlugin from "../zt-main.js";
+import ZoteroPlugin from "../zt-main.js";
+import { NoteIndexSettings } from "./settings.js";
 import getZoteroKeyFileMap, {
   getItemKeyFromFrontmatter,
 } from "./ztkey-file-map.js";
 
 export { getItemKeyGroupID };
-export default class NoteIndex extends Events {
+export default class NoteIndex extends Service {
   get meta(): MetadataCache {
     return this.plugin.app.metadataCache;
   }
@@ -27,6 +29,7 @@ export default class NoteIndex extends Events {
   get template() {
     return this.plugin.settings.template;
   }
+  settings = this.use(NoteIndexSettings);
 
   keyFileMap: Map<string, KeyFileInfo> = new Map();
 
@@ -67,11 +70,8 @@ export default class NoteIndex extends Events {
 
   // buildFilemapWorker: PromiseWorker<Input, Output>;
 
-  constructor(public plugin: ZoteroPlugin) {
-    super();
-    // this.buildFilemapWorker = new PromiseWorker<Input, Output>(buildFilemap);
-    const folder = plugin.settings.literatureNoteFolder.path;
-    this._folder = { folder, joinPath: getFolderJoinPath(folder) };
+  plugin = this.use(ZoteroPlugin);
+  onload(): void {
     // plugin.register(() => this.buildFilemapWorker.terminate());
     [
       this.meta.on("changed", this.onMetaChanged.bind(this)),
@@ -79,21 +79,8 @@ export default class NoteIndex extends Events {
       // this.vault.on("create") // also fired on meta.changed
       this.vault.on("rename", this.onFileMoved.bind(this)),
       this.vault.on("delete", this.onFileMoved.bind(this)),
-    ].forEach(plugin.registerEvent.bind(plugin));
+    ].forEach(this.registerEvent.bind(this));
     if (this.meta.initialized) this.onMetaBuilt();
-  }
-
-  private _folder: {
-    folder: string;
-    joinPath: string;
-  };
-  public set noteFolder(folder: string) {
-    if (this._folder.folder === folder) return;
-    this._folder = { folder, joinPath: getFolderJoinPath(folder) };
-    this.reload();
-  }
-  public get noteFolder(): string {
-    return this._folder.folder;
   }
 
   isLiteratureNote(file: string): boolean;
@@ -110,17 +97,19 @@ export default class NoteIndex extends Events {
   #isLiteratureNote(file: TAbstractFile): file is TFile;
   #isLiteratureNote(file: TAbstractFile | string): boolean {
     if (typeof file === "string") {
-      return file.endsWith(".md") && file.startsWith(this._folder.joinPath);
+      return file.endsWith(".md") && file.startsWith(this.settings.joinPath);
     } else
       return (
         file instanceof TFile &&
         file.extension === "md" &&
-        file.path.startsWith(this._folder.joinPath)
+        file.path.startsWith(this.settings.joinPath)
       );
   }
 
   onMetaBuilt() {
-    const folder = this.vault.getAbstractFileByPath(this._folder.folder);
+    const folder = this.vault.getAbstractFileByPath(
+      this.settings.literatureNoteFolder,
+    );
     if (folder && folder instanceof TFolder)
       for (const file of getAllMarkdownIn(folder)) {
         this.addFileRecord(file);
@@ -197,5 +186,3 @@ function* getAllMarkdownIn(folder: TFolder): IterableIterator<TFile> {
 
 const getFilePath = (file: TAbstractFile | string): string =>
   typeof file === "string" ? file : file.path;
-const getFolderJoinPath = (folder: string): string =>
-  folder === "/" ? "" : folder + "/";

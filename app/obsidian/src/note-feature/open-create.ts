@@ -4,7 +4,7 @@ import { BaseError } from "make-error";
 import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
-import { getItemKeyGroupID } from "../note-index/index.js";
+import { getItemKeyGroupID } from "../note-index/service.js";
 import { ZOTERO_KEY_FIELDNAME } from "../template";
 import type { HelperExtra } from "../template/helper/to-helper.js";
 import type ZoteroPlugin from "../zt-main.js";
@@ -28,9 +28,9 @@ export const createNote = async (
   }
 
   const { vault, fileManager, metadataCache: meta } = plugin.app,
-    { literatureNoteFolder: folder } = plugin.settings,
+    { literatureNoteFolder: folder } = plugin.settings.noteIndex,
     template = plugin.templateRenderer;
-  const filepath = join(folder.path, template.renderFilename(docItem));
+  const filepath = join(folder, template.renderFilename(docItem));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {
     const metadata = meta.getCache(existingFile.path);

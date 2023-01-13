@@ -24,9 +24,13 @@ abstract class Settings<Options extends Record<string, any>> {
   setOption<K extends keyof Options>(
     key: K,
     value: Options[K],
-  ): { apply: () => Promise<void> } {
-    this.value[key] = value;
-    return { apply: () => this.apply(key) };
+  ): { apply: () => Promise<boolean>; changed: boolean } {
+    if (this.value[key] === value)
+      return { apply: () => Promise.resolve(false), changed: false };
+    else {
+      this.value[key] = value;
+      return { apply: () => this.apply(key).then(() => true), changed: true };
+    }
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async apply(key: keyof Options) {

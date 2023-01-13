@@ -3,7 +3,7 @@
 import type { Extension } from "@codemirror/state";
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
-import { Notice, Plugin, TFolder } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import log from "@log";
 
 import { AnnotBlockWorker, registerCodeBlock } from "./annot-block";
@@ -13,7 +13,7 @@ import {
 } from "./insert-citation/index.js";
 import checkLib from "./install-guide/index.jsx";
 import registerNoteFeature from "./note-feature";
-import NoteIndex from "./note-index/index.js";
+import NoteIndex from "./note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
@@ -35,7 +35,6 @@ export default class ZoteroPlugin extends Plugin {
       throw new Error("Library check failed");
     }
     this.annotBlockWorker = new AnnotBlockWorker(this);
-    this.noteIndex = new NoteIndex(this);
     // this.noteParser = new NoteParser(this);
     // this.pdfCache = new PDFCache(this);
   }
@@ -44,6 +43,7 @@ export default class ZoteroPlugin extends Plugin {
   settingLoader = this.use(SettingLoader);
   saveSettings = saveSettings.bind(this);
 
+  noteIndex = this.use(NoteIndex);
   get databaseAPI() {
     return this.dbWorker.api;
   }
@@ -59,7 +59,6 @@ export default class ZoteroPlugin extends Plugin {
   // noteParser: NoteParser;
   // pdfCache: PDFCache;
   annotBlockWorker: AnnotBlockWorker;
-  noteIndex: NoteIndex;
 
   editorExtensions: Extension[] = [];
   async onload() {
@@ -97,32 +96,5 @@ export default class ZoteroPlugin extends Plugin {
 
   onunload() {
     log.info("unloading Obsidian Zotero Plugin");
-  }
-
-  async getLiteratureNoteFolder(): Promise<TFolder> {
-    const { literatureNoteFolder: folder } = this.settings;
-    let af = folder.getFile(this.app.vault),
-      noteFolder: TFolder;
-    if (af instanceof TFolder) {
-      noteFolder = af;
-    } else if (!af) {
-      await this.app.vault.createFolder(folder.path);
-      af = folder.getFile(this.app.vault);
-      if (!(af instanceof TFolder)) {
-        throw new Error("Failed to create note folder: " + folder.path);
-      }
-      noteFolder = af;
-    } else {
-      new Notice(
-        `Invalid note folder: ${folder.path}, revert to default folder`,
-      );
-      folder.path = "";
-      af = folder.getFile(this.app.vault);
-      if (!(af instanceof TFolder)) {
-        throw new Error("Failed to get default note folder: " + folder.path);
-      }
-      noteFolder = af;
-    }
-    return noteFolder;
   }
 }

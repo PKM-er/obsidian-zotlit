@@ -4,6 +4,7 @@ import type { TAbstractFile, Vault } from "obsidian";
 import { normalizePath } from "obsidian";
 import log, { LogSettings } from "@log";
 
+import { NoteIndexSettings } from "./note-index/settings.js";
 import { TemplateSettings } from "./template/settings.js";
 import { WatcherSettings } from "./zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "./zotero-db/connector/settings.js";
@@ -15,7 +16,7 @@ export interface ZoteroSettings {
   watcher: WatcherSettings;
   imgImporter: ImgImporterSettings;
   log: LogSettings;
-  literatureNoteFolder: InVaultPath;
+  noteIndex: NoteIndexSettings;
   template: TemplateSettings;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
@@ -27,12 +28,12 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
   // set inside logger.ts
   // log.setDefaultLevel(DEFAULT_LOG_LEVEL);
   return {
+    noteIndex: plugin.use(NoteIndexSettings),
     database: plugin.use(DatabaseSettings),
     watcher: plugin.use(WatcherSettings),
     imgImporter: plugin.use(ImgImporterSettings),
     log: plugin.use(LogSettings),
     template: plugin.use(TemplateSettings),
-    literatureNoteFolder: new InVaultPath("LiteratureNotes"),
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
     // autoPairEta: true,
@@ -54,18 +55,12 @@ export class SettingLoader extends Service {
     settings.imgImporter.fromJSON(json);
     settings.log.fromJSON(json);
     settings.template.fromJSON(json);
+    settings.noteIndex.fromJSON(json);
     // call this manually since no Sevice is used to apply settings on load
     await settings.log.applyAll();
 
-    const {
-      literatureNoteFolder,
-      citationEditorSuggester,
-      showCitekeyInSuggester,
-      mutoolPath,
-    } = json;
-    if (typeof literatureNoteFolder === "string" && literatureNoteFolder) {
-      settings.literatureNoteFolder.path = literatureNoteFolder;
-    }
+    const { citationEditorSuggester, showCitekeyInSuggester, mutoolPath } =
+      json;
     if (typeof citationEditorSuggester === "boolean") {
       settings.citationEditorSuggester = citationEditorSuggester;
     }
