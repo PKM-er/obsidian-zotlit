@@ -145,6 +145,15 @@ export const withAnnotHelper = (
           ...Reflect.ownKeys(target),
         ];
       },
+      getOwnPropertyDescriptor(target, prop) {
+        if (Object.prototype.hasOwnProperty.call(data, prop)) {
+          return Reflect.getOwnPropertyDescriptor(data, prop);
+        }
+        if (extraKeys.has(prop as keyof AnnotationExtra)) {
+          return Reflect.getOwnPropertyDescriptor(extra, prop);
+        }
+        return Reflect.getOwnPropertyDescriptor(target, prop);
+      },
     },
   ) as unknown as AnnotHelper;
 

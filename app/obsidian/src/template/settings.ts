@@ -5,6 +5,8 @@ import Settings from "../zotero-db/settings-base";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
+import type { FmBlackList, FmWhiteList } from "./frontmatter";
+import { FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
 
 export type EjectableTemplate = "note" | "annotation" | "annots";
@@ -15,6 +17,7 @@ interface SettingOptions {
   ejected: boolean;
   folder: string;
   templates: Record<NonEjectableTemplate, string>;
+  fields: FmWhiteList | FmBlackList;
 }
 
 export const DEFAULT_TEMPLATE: Record<TemplateType, string> = {
@@ -50,6 +53,12 @@ export class TemplateSettings extends Settings<SettingOptions> {
       ejected: false,
       folder: "ZtTemplates",
       templates: D.deleteKeys(DEFAULT_TEMPLATE, ejectableTemplateTypes),
+      fields: {
+        mode: "whitelist",
+        mapping: {
+          ...FMFIELD_MAPPING,
+        },
+      } satisfies FmWhiteList,
     };
   }
 
@@ -72,6 +81,8 @@ export class TemplateSettings extends Settings<SettingOptions> {
         return await loader.loadTemplates("full");
       case "templates":
         return await loader.loadTemplates("noneject");
+      case "fields":
+        return;
       default:
         assertNever(key);
     }

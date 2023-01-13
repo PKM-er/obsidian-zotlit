@@ -43,17 +43,16 @@ export const createNote = async (
       throw new NoteExistsError(filepath, docItem.key);
     }
   }
-  const content = template.renderNote(extra, {
-    plugin,
-    sourcePath: filepath,
-  });
 
   // filepath with suffix if file already exists
-  const note = await fileManager.createNewMarkdownFileFromLinktext(
+  const note = await fileManager.createNewMarkdownFile(
+    app.vault.getRoot(),
     filepath,
-    "",
+    template.renderNote(extra, {
+      plugin,
+      sourcePath: filepath,
+    }),
   );
-  await vault.modify(note, content);
   return note;
 };
 

@@ -25,5 +25,11 @@ export const withCreatorHelper = (data: Creator) =>
       ownKeys(target) {
         return [...Reflect.ownKeys(data), ...Reflect.ownKeys(target)];
       },
+      getOwnPropertyDescriptor(target, prop) {
+        if (Object.prototype.hasOwnProperty.call(data, prop)) {
+          return Reflect.getOwnPropertyDescriptor(data, prop);
+        }
+        return Reflect.getOwnPropertyDescriptor(target, prop);
+      },
     },
   ) as unknown as CreatorHelper;
