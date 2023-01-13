@@ -1,9 +1,3 @@
-import type {
-  AnnotationInfo,
-  AttachmentInfo,
-  RegularItemInfo,
-} from "@obzt/database";
-import { createNanoEvents } from "nanoevents";
 import type { WorkspaceLeaf } from "obsidian";
 import { useContext, useEffect } from "react";
 import ReactDOM from "react-dom";
@@ -16,14 +10,14 @@ import { DerivedFileView } from "./derived-file-view";
 
 export const annotViewType = "zotero-annotation-view";
 
-interface Events {
-  "load-file": (file: string | null) => void;
-  "load-doc-item": (item: RegularItemInfo, sourcePath: string) => void;
-  "load-doc-tags": (tags: number[]) => void;
-  "load-attachments": (attachments: AttachmentInfo[]) => void;
-  "load-annotations": (annotations: AnnotationInfo[]) => void;
-  "load-annot-tags": (tags: Map<number, number[]>) => void;
-}
+// interface Events {
+//   "load-file": (file: string | null) => void;
+//   "load-doc-item": (item: RegularItemInfo, sourcePath: string) => void;
+//   "load-doc-tags": (tags: number[]) => void;
+//   "load-attachments": (attachments: AttachmentInfo[]) => void;
+//   "load-annotations": (annotations: AnnotationInfo[]) => void;
+//   "load-annot-tags": (tags: Map<number, number[]>) => void;
+// }
 
 export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
@@ -34,6 +28,16 @@ export class AnnotationView extends DerivedFileView {
 
   public getViewType(): string {
     return annotViewType;
+  }
+
+  onload(): void {
+    super.onload();
+    this.registerEvent(
+      app.metadataCache.on("zotero:index-update", this.loadDocItem),
+    );
+    this.registerEvent(
+      app.metadataCache.on("zotero:index-clear", this.loadDocItem),
+    );
   }
 
   public getDisplayText(): string {
@@ -47,18 +51,20 @@ export class AnnotationView extends DerivedFileView {
     return "highlighter";
   }
 
-  emitter = createNanoEvents<Events>();
+  loadDocItem = () => {
+    this.store.getState().loadDocItem(this.getFile(), this.lib);
+  };
 
-  on<E extends keyof Events>(event: E, callback: Events[E]) {
-    return this.emitter.on(event, callback);
-  }
+  // emitter = createNanoEvents<Events>();
+
+  // on<E extends keyof Events>(event: E, callback: Events[E]) {
+  //   return this.emitter.on(event, callback);
+  // }
 
   update() {
-    const file = this.getFile();
-    this.untilZoteroReady().then(() =>
-      this.store.getState().loadDocItem(file, this.lib),
-    );
-    this.emitter.emit("load-file", file);
+    // const file = this.getFile();
+    this.untilZoteroReady().then(this.loadDocItem);
+    // this.emitter.emit("load-file", file?.path);
   }
   canAcceptExtension(_extension: string): boolean {
     // accept all extensions
@@ -94,11 +100,12 @@ export class AnnotationView extends DerivedFileView {
   }
   /** @returns null if current file not literature note */
   getFile() {
+    let itemKey;
     if (
       this.file?.extension === "md" &&
-      this.plugin.noteIndex.isLiteratureNote(this.file)
+      (itemKey = this.plugin.noteIndex.getItemKeyOf(this.file))
     ) {
-      return this.file.path;
+      return { path: this.file.path, itemKey };
     }
     return null;
   }
@@ -121,7 +128,7 @@ export class AnnotationView extends DerivedFileView {
   }
 }
 
-const useRefresh = () => {
+const useOnDbRefresh = () => {
   const { view } = useContext(Obsidian);
   const refresh = useStore(view.store, (s) => s.refresh);
   useEffect(() => {
@@ -134,7 +141,7 @@ const useRefresh = () => {
 function Component() {
   const { view } = useContext(Obsidian);
 
-  useRefresh();
+  useOnDbRefresh();
   const empty = useStore(view.store, (s) => !s.doc);
 
   if (empty) {

@@ -5,17 +5,20 @@ import type {
   TagInfo,
 } from "@obzt/database";
 import { createStore as create } from "zustand";
-import { getItemKeyFromFrontmatter } from "../note-index/ztkey-file-map";
 import type ZoteroPlugin from "../zt-main";
 
-interface DataModel {
+export interface DataModel {
   doc: { sourcePath: string; docItem: RegularItemInfo; lib: number } | null;
   attachment: AttachmentInfo | null;
   attachmentID: number | null;
   allAttachments: AttachmentInfo[] | null;
   annotations: AnnotationInfo[] | null;
   tags: Record<number, TagInfo[]>;
-  loadDocItem: (file: string | null, lib: number) => Promise<void>;
+  loadDocItem(
+    file: { path: string; itemKey: string } | null,
+    lib: number,
+    force?: boolean,
+  ): Promise<void>;
   refresh: () => Promise<void>;
   setActiveAtch: (id: number) => void;
 }
@@ -101,13 +104,18 @@ export const createStore = (p: ZoteroPlugin) =>
     return {
       ...getInit(),
       // setFile: (sourcePath: string) => set((state) => ({ ...state, sourcePath })),
-      loadDocItem: async (file, lib) => {
+      loadDocItem: async (file, lib, force = false) => {
         if (!file) return set(getInit());
-        const key = getItemKeyFromFrontmatter(app.metadataCache.getCache(file));
-        if (!key) return set(getInit());
-        const item = await api(p).getItem(key, lib);
+        const curr = get();
+        if (
+          (curr.doc?.docItem.key === file.itemKey ||
+            (curr.doc?.sourcePath === file.path && !force)) &&
+          !force
+        )
+          return;
+        const item = await api(p).getItem(file.itemKey, lib);
         if (!item) return set(getInit());
-        const doc = { sourcePath: file, docItem: item, lib };
+        const doc = { sourcePath: file.path, docItem: item, lib };
         const attachmentID = getCachedActiveAtch(item);
         set({ ...getInit(), doc, attachmentID });
         await loadAtchs(item.itemID, lib);

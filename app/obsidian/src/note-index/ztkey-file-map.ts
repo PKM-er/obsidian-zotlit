@@ -9,7 +9,7 @@ import type { CachedMetadata } from "obsidian";
 
 import { ZOTERO_KEY_FIELDNAME } from "../template";
 
-export const getItemKeyFromFrontmatter = (
+const getItemKeyFromFrontmatter = (
   cache: CachedMetadata | null,
 ): string | null => {
   const field = cache?.frontmatter?.[ZOTERO_KEY_FIELDNAME];
@@ -17,6 +17,9 @@ export const getItemKeyFromFrontmatter = (
     return field;
   } else return null;
 };
+
+export const getItemKeyOf = (file: string) =>
+  getItemKeyFromFrontmatter(app.metadataCache.getCache(file));
 
 export default function* getZoteroKeyFileMap(
   file: string,
