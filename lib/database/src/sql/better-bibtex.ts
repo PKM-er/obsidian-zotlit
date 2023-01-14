@@ -32,7 +32,7 @@ export class BetterBibtex extends PreparedBase<InputSql, OutputSql, Output> {
     return query;
   }
 
-  get(input: InputSql): OutputSql {
+  get(input: InputSql): OutputSql | undefined {
     return this.statement.get(input);
   }
 
@@ -41,8 +41,9 @@ export class BetterBibtex extends PreparedBase<InputSql, OutputSql, Output> {
     const query = (this.trxCache[libId] ??= this.database.transaction(
       (itemIDs: number[]) =>
         itemIDs.reduce((rec, itemID) => {
-          const { citekey } = this.get({ itemID, libId });
-          rec[itemID] = citekey;
+          const result = this.get({ itemID, libId });
+          if (!result) return rec;
+          rec[itemID] = result.citekey;
           return rec;
         }, {} as Output),
     ));
