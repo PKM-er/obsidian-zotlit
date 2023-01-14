@@ -1,6 +1,7 @@
 import { D } from "@mobily/ts-belt";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
+import type { EtaConfig } from "eta/dist/types/config";
 import Settings from "../zotero-db/settings-base";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
@@ -12,6 +13,27 @@ import { TemplateLoader } from "./loader";
 export type EjectableTemplate = "note" | "annotation" | "annots";
 export type NonEjectableTemplate = "filename" | "citation" | "altCitation";
 export type TemplateType = EjectableTemplate | NonEjectableTemplate;
+
+/**
+ * render undefined/null in interpolate tag as empty string
+ */
+const nullishAsEmptyString = {
+  processAST: (buffer: (string | { t: "i" | "e" | "r"; val: string })[]) => {
+    for (const b of buffer) {
+      if (typeof b === "string") continue;
+      if (b.t === "i" && b.val.startsWith("it.")) {
+        // undefined/null is rendered as empty string in favor of 'undefined'
+        b.val += '??""';
+      }
+    }
+    return buffer;
+  },
+};
+
+export const defaultEtaConfig = {
+  autoEscape: false,
+  plugins: [nullishAsEmptyString],
+} satisfies Partial<EtaConfig>;
 
 interface SettingOptions {
   ejected: boolean;

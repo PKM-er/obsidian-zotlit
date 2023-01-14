@@ -4,6 +4,7 @@ import { Notice } from "obsidian";
 import log from "@log";
 import { TemplateLoader } from "./loader";
 import type { TemplateType } from "./settings";
+import { defaultEtaConfig } from "./settings";
 import { acceptLineBreak, renderFilename } from "./utils";
 
 export class TemplateComplier extends Service {
@@ -13,6 +14,7 @@ export class TemplateComplier extends Service {
     this.registerEvent(
       app.vault.on("zotero:template-updated", this.onTemplateUpdated, this),
     );
+    Eta.configure(defaultEtaConfig);
   }
 
   onTemplateUpdated(template: TemplateType) {
