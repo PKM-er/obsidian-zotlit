@@ -34,6 +34,7 @@ export class TemplateLoader extends Service {
   }
 
   async onload() {
+    this.registerEvent(app.vault.on("modify", this.onModifyFile, this));
     await this.loadTemplates("full");
   }
 
