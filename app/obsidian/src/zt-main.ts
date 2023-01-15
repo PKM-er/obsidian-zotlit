@@ -79,6 +79,13 @@ export default class ZoteroPlugin extends Plugin {
       },
     });
     this.addCommand({
+      id: "refresh-zotero-search-index",
+      name: "Refresh Zotero Search Index",
+      callback: async () => {
+        await this.dbWorker.refresh({ task: "searchIndex" });
+      },
+    });
+    this.addCommand({
       id: "refresh-note-index",
       name: "Refresh Literature Notes Index",
       callback: () => {
