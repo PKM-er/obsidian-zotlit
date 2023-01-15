@@ -4,10 +4,10 @@ import { getBacklink, getCacheImagePath } from "@obzt/database";
 import endent from "endent";
 import { htmlToMarkdown } from "obsidian";
 
+import { fileLink, imgLink, isImageAnnot, toFileUrl } from "../utils.js";
 import type { Context } from "./base";
 import { zoteroDataDir } from "./base";
 import type { DocItemHelper } from "./item.js";
-import { fileLink, imgLink, isImageAnnot, toFileUrl } from "./utils.js";
 
 export type AnnotHelper = Readonly<
   AnnotationInfo &

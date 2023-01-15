@@ -1,4 +1,5 @@
 import { join } from "path";
+import type { AttachmentInfo } from "../index.js";
 
 /**
  * @see https://github.com/zotero/zotero/blob/c13d17b5e6ca496491e926211c0e1ea7aef072ae/chrome/content/zotero/xpcom/annotations.js#L42-L45
@@ -29,3 +30,5 @@ export const sortBySortIndex = (aIdx: number[], bIdx: number[]) => {
   }
   return 0;
 };
+
+export const isFileAttachment = (i: AttachmentInfo): boolean => Boolean(i.path);

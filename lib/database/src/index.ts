@@ -12,7 +12,11 @@ export type { Output as AttachmentInfo } from "./sql/attachments.js";
 export type { OutputSql as TagInfo } from "./sql/tags.js";
 export type { Output as LibraryInfo } from "./sql/all-libraries.js";
 
-export { getCacheImagePath, sortBySortIndex } from "./utils/misc.js";
+export {
+  getCacheImagePath,
+  sortBySortIndex,
+  isFileAttachment,
+} from "./utils/misc.js";
 export * from "./utils/prepared.js";
 
 export { getBacklink } from "./utils/zotero-backlink.js";

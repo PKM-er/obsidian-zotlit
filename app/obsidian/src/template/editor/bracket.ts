@@ -1,7 +1,7 @@
 import type { CloseBracketConfig } from "@codemirror/autocomplete";
 import { EditorState, Prec } from "@codemirror/state";
 import { editorInfoField } from "obsidian";
-import { isEtaFile } from "../helper/utils";
+import { isEtaFile } from "../utils";
 
 export const bracketExtension = Prec.highest(
   EditorState.languageData.of((state) => {

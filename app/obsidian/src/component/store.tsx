@@ -4,6 +4,7 @@ import type {
   RegularItemInfo,
   TagInfo,
 } from "@obzt/database";
+import { isFileAttachment } from "@obzt/database";
 import { createStore as create } from "zustand";
 import type ZoteroPlugin from "../zt-main";
 
@@ -77,7 +78,9 @@ export const createStore = (p: ZoteroPlugin) =>
      * @param docItem if provided, load active attachment from localStorage
      */
     const loadAtchs = async (itemID: number, lib: number) => {
-        const attachments = await api(p).getAttachments(itemID, lib);
+        const attachments = (await api(p).getAttachments(itemID, lib)).filter(
+          isFileAttachment,
+        );
         set((state) => ({
           ...state,
           allAttachments: attachments,

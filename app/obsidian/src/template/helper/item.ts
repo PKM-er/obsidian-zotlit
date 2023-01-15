@@ -5,12 +5,12 @@ import type {
   TagInfo,
 } from "@obzt/database";
 import { getBacklink } from "@obzt/database";
+import { fileLink } from "../utils";
 import type { AnnotHelper } from "./annot";
 import type { Context } from "./base";
 import { zoteroDataDir } from "./base";
 import type { CreatorHelper } from "./creator";
 import { withCreatorHelper } from "./creator";
-import { fileLink } from "./utils";
 
 export type RegularItemInfoExtra = {
   attachment: AttachmentInfo | null;

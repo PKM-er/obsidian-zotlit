@@ -1,4 +1,5 @@
 import type { AttachmentInfo, AnnotationInfo } from "@obzt/database";
+import { isFileAttachment } from "@obzt/database";
 import { ZoteroItemSuggestModal } from "../suggester/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { AttachmentSelectModal } from "./atch-select.js";
@@ -28,13 +29,14 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       defaultLibId,
     );
     let attachment: AttachmentInfo | null = null;
-    if (allAttachments.length > 1) {
+    const fileAttachments = allAttachments.filter(isFileAttachment);
+    if (fileAttachments.length > 1) {
       // prompt for attachment selection
       attachment =
-        (await new AttachmentSelectModal(allAttachments).open())?.value.item ??
+        (await new AttachmentSelectModal(fileAttachments).open())?.value.item ??
         null;
     } else {
-      attachment = allAttachments[0] ?? null;
+      attachment = fileAttachments[0] ?? null;
     }
 
     const annotations: AnnotationInfo[] = attachment

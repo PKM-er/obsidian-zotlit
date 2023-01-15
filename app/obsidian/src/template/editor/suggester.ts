@@ -6,7 +6,7 @@ import type {
   TFile,
 } from "obsidian";
 import { EditorSuggest } from "obsidian";
-import { isEtaFile } from "../helper/utils";
+import { isEtaFile } from "../utils";
 
 interface EtaHint {
   prefix: "~" | "=" | " " | "_";
