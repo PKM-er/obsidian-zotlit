@@ -18,7 +18,7 @@ import log from "@log";
 import type { SettingKeyWithType } from "../settings.js";
 import { InVaultPath } from "../settings.js";
 import { templateTypes, ejectableTemplateTypes } from "../template";
-// import { enableBracketExtension } from "../template/editor";
+import { setBracketExtension } from "../template/editor";
 import { promptOpenLog } from "../utils/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { DatabaseSetting } from "./database-path.js";
@@ -229,24 +229,21 @@ export class ZoteroSettingTab extends PluginSettingTab {
     )
       .setName("Template Folder")
       .setDesc("The folder which templates are ejected into and stored");
-    // this.addToggle(this.containerEl, "autoPairEta", (val) => {
-    //   this.plugin.editorExtensions.length = 0;
-    //   if (val) {
-    //     enableBracketExtension(this.plugin);
-    //   }
-    //   app.workspace.updateOptions();
-    // })
-    //   .setName("Auto Pair For Eta")
-    //   .setDesc(
-    //     createFragment((c) => {
-    //       c.createDiv({
-    //         text: "Pair `<` and `%` automatically in eta templates.",
-    //       });
-    //       c.createDiv({
-    //         text: "If you have issue with native auto pair features, you can disable this option and report the bug in GitHub",
-    //       });
-    //     }),
-    //   );
+    this.addToggle(this.containerEl, "autoPairEta", (val) => {
+      setBracketExtension(this.plugin, val);
+      app.workspace.updateOptions();
+    })
+      .setName("Auto Pair For Eta")
+      .setDesc(
+        createFragment((c) => {
+          c.createDiv({
+            text: "Pair `<` and `%` automatically in eta templates.",
+          });
+          c.createDiv({
+            text: "If you have issue with native auto pair features, you can disable this option and report the bug in GitHub",
+          });
+        }),
+      );
     new Setting(this.containerEl).setHeading().setName("Simple");
     for (const key of templateTypes) {
       let title: string;

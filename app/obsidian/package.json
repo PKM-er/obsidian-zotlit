@@ -48,8 +48,9 @@
     "@types/react": "~17.0.8",
     "@types/lodash-es": "~4.17.6",
     "@types/eslint": "~8.4.6",
-    "@codemirror/autocomplete": "~6.3.0",
-    "@codemirror/state": "~6.1.2",
+    "@codemirror/autocomplete": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
     "jszip": "~3.10.1",
     "semver": "~7.3.8"
   },

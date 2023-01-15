@@ -12,8 +12,8 @@ export const bracketExtension = Prec.highest(
     pb && brackets.push("(", "[", "{", "'", '"');
     pm && brackets.push("*", "_", "`", "```");
     // custom match '<' & '%' on eta files
-    const { file } = state.field(editorInfoField);
-    if (file && isEtaFile(file)) {
+    const fileinfo = state.field(editorInfoField);
+    if (fileinfo?.file && isEtaFile(fileinfo?.file)) {
       brackets.push("<", "%");
     }
     const closeBrackets: CloseBracketConfig = {

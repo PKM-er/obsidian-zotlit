@@ -20,7 +20,7 @@ export interface ZoteroSettings {
   template: TemplateSettings;
   citationEditorSuggester: boolean;
   showCitekeyInSuggester: boolean;
-  // autoPairEta: boolean;
+  autoPairEta: boolean;
   mutoolPath: string | null;
 }
 
@@ -36,7 +36,7 @@ export const getDefaultSettings = (plugin: ZoteroPlugin): ZoteroSettings => {
     template: plugin.use(TemplateSettings),
     citationEditorSuggester: true,
     showCitekeyInSuggester: false,
-    // autoPairEta: true,
+    autoPairEta: false,
     mutoolPath: null,
   };
 };
@@ -59,13 +59,20 @@ export class SettingLoader extends Service {
     // call this manually since no Sevice is used to apply settings on load
     await settings.log.applyAll();
 
-    const { citationEditorSuggester, showCitekeyInSuggester, mutoolPath } =
-      json;
+    const {
+      citationEditorSuggester,
+      showCitekeyInSuggester,
+      mutoolPath,
+      autoPairEta,
+    } = json;
     if (typeof citationEditorSuggester === "boolean") {
       settings.citationEditorSuggester = citationEditorSuggester;
     }
     if (typeof showCitekeyInSuggester === "boolean") {
       settings.showCitekeyInSuggester = showCitekeyInSuggester;
+    }
+    if (typeof autoPairEta === "boolean") {
+      settings.autoPairEta = autoPairEta;
     }
     if (typeof mutoolPath === "string" && mutoolPath) {
       settings.mutoolPath = mutoolPath;

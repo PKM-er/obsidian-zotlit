@@ -11,8 +11,9 @@ importers:
       '@aidenlx/esbuild-plugin-obsidian': ^0.1.4
       '@aidenlx/eslint-config': workspace:*
       '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
-      '@codemirror/autocomplete': ~6.3.0
-      '@codemirror/state': ~6.1.2
+      '@codemirror/autocomplete': ^6.0.0
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
       '@mobily/ts-belt': ~3.13.1
       '@obzt/annot-block': workspace:*
       '@obzt/common': workspace:*
@@ -100,7 +101,7 @@ importers:
       make-error: 1.3.6
       monkey-around: 2.3.0
       nanoevents: 7.0.1
-      obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_yy5ed4w4vjqygr64zm3krpoliy
+      obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_a4vbhepr4qhxm5cldqd4jpyase
       preact: 10.11.3
       pretty-hrtime: 1.0.3
       query-string: 7.1.3
@@ -113,8 +114,9 @@ importers:
       '@aidenlx/better-sqlite3': 8.0.1-mod.1
       '@aidenlx/esbuild-plugin-obsidian': 0.1.8_esbuild@0.16.17
       '@aidenlx/eslint-config': link:../../common/config/eslint
-      '@codemirror/autocomplete': 6.3.4_hwwctg7fitzalytjo2jkxp5fzq
-      '@codemirror/state': 6.1.4
+      '@codemirror/autocomplete': 6.3.4_3jfk5zzaw77h3sqp5wt6b7asku
+      '@codemirror/state': 6.2.0
+      '@codemirror/view': 6.7.3
       '@release-it/bumper': 4.0.2_release-it@15.6.0
       '@release-it/conventional-changelog': 5.1.1_release-it@15.6.0
       '@types/dompurify': 2.3.4
@@ -2011,7 +2013,7 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 
-  /@codemirror/autocomplete/6.3.4_hwwctg7fitzalytjo2jkxp5fzq:
+  /@codemirror/autocomplete/6.3.4_3jfk5zzaw77h3sqp5wt6b7asku:
     resolution: {integrity: sha512-irxKsTSjS0OkfMWWt9YxtNK97++/E+XIHfKnRpSVfZyHzda/amYF0BR+T8mMkrGQWidx2zApxHx08GT13egyQA==}
     peerDependencies:
       '@codemirror/language': ^6.0.0
@@ -2020,7 +2022,7 @@ packages:
       '@lezer/common': ^1.0.0
     dependencies:
       '@codemirror/language': 6.4.0
-      '@codemirror/state': 6.1.4
+      '@codemirror/state': 6.2.0
       '@codemirror/view': 6.7.3
       '@lezer/common': 1.0.2
     dev: true
@@ -2028,16 +2030,13 @@ packages:
   /@codemirror/language/6.4.0:
     resolution: {integrity: sha512-Wzb7GnNj8vnEtbPWiOy9H0m1fBtE28kepQNGLXekU2EEZv43BF865VKITUn+NoV8OpW6gRtvm29YEhqm46927Q==}
     dependencies:
-      '@codemirror/state': 6.1.4
+      '@codemirror/state': 6.2.0
       '@codemirror/view': 6.7.3
       '@lezer/common': 1.0.2
       '@lezer/highlight': 1.1.3
       '@lezer/lr': 1.3.1
       style-mod: 4.0.0
     dev: true
-
-  /@codemirror/state/6.1.4:
-    resolution: {integrity: sha512-g+3OJuRylV5qsXuuhrc6Cvs1NQluNioepYMM2fhnpYkNk7NgX+j0AFuevKSVKzTDmDyt9+Puju+zPdHNECzCNQ==}
 
   /@codemirror/state/6.2.0:
     resolution: {integrity: sha512-69QXtcrsc3RYtOtd+GsvczJ319udtBf1PTrr2KbLWM/e2CXUPnh0Nz9AUo8WfhSQ7GeL8dPVNUmhQVgpmuaNGA==}
@@ -15499,21 +15498,6 @@ packages:
       '@codemirror/view': ^6.0.0
     dependencies:
       '@codemirror/state': 6.2.0
-      '@codemirror/view': 6.7.3
-      '@types/codemirror': 0.0.108
-      moment: 2.29.4
-    dev: false
-
-  github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_yy5ed4w4vjqygr64zm3krpoliy:
-    resolution: {tarball: https://codeload.github.com/obsidianmd/obsidian-api/tar.gz/38dd22168d2925086371bfc59e36fd9121527a39}
-    id: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39
-    name: obsidian
-    version: 1.1.7
-    peerDependencies:
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
-    dependencies:
-      '@codemirror/state': 6.1.4
       '@codemirror/view': 6.7.3
       '@types/codemirror': 0.0.108
       moment: 2.29.4
