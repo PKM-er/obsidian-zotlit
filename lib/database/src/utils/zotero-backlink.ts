@@ -1,5 +1,4 @@
 import { toPage } from "@obzt/common";
-import log from "@obzt/zotero-type/src/logger.js";
 import { isAnnotationItem, isRegularItemInfo } from "../item.js";
 
 const toLibraryID = (item: { groupID: number | null }) =>
@@ -17,7 +16,7 @@ export const getBacklink = (item: unknown) => {
     try {
       page = toPage(item.position.pageIndex, true);
     } catch (error) {
-      log.warn(error);
+      console.warn(error);
       page = null;
     }
     if (typeof page === "number")
