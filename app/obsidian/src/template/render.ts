@@ -4,7 +4,7 @@ import { use } from "@ophidian/core";
 import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
-import log from "@log";
+import { logError } from "@log";
 import type { FieldsInFrontmatter } from "./frontmatter";
 import { ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
@@ -91,7 +91,7 @@ export class TemplateRenderer {
       const str = stringifyYaml(record);
       return str;
     } catch (err) {
-      log.error(
+      logError(
         "Failed to renderYaml",
         err,
         data,
@@ -107,7 +107,7 @@ export class TemplateRenderer {
         Object.assign(fm, record),
       );
     } catch (err) {
-      log.error(
+      logError(
         "Failed to set frontmatter to file " + file.path,
         err,
         data,

@@ -6,7 +6,7 @@ import type { DBSchema } from "idb";
 import { openDB } from "idb";
 import { Events, Notice } from "obsidian";
 import queryString from "query-string";
-import log from "./logger";
+import log, { logError } from "@log";
 import type ZoteroPlugin from "./zt-main";
 const execFile = promisify(_execFile);
 
@@ -138,7 +138,7 @@ export default class PDFCache extends Events {
         return parseResult(stdout);
       }
     } catch (error) {
-      log.error(error);
+      logError("parse PDF Outline", error);
     }
     return null;
   }

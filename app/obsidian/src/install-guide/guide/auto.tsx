@@ -1,7 +1,7 @@
 import { useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import log from "../../logger";
+import { logError } from "@log";
 import { useIconRef } from "../../utils/icon";
 import { binaryFullPathAtom, binaryLinkAtom, modalAtom } from "./atom";
 import { ListItem } from "./list-item";
@@ -50,7 +50,7 @@ const setErrorAtom = atom(
   ) => {
     set(installStateAtom, InstallState.Failed);
     const message = "Failed to install module when " + InstallState[phrase];
-    log.error(message, error);
+    logError(message, error);
     set(
       errorMessageAtom,
       message + ": " + (error instanceof Error ? error.message : `${error}`),

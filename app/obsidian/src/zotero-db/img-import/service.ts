@@ -7,7 +7,7 @@ import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 import type { FileSystemAdapter } from "obsidian";
 import { Notice, TFile } from "obsidian";
-import log from "@log";
+import log, { logError } from "@log";
 import { DatabaseSettings } from "../connector/settings";
 import { ImgImporterSettings } from "./settings";
 
@@ -75,7 +75,7 @@ export class ImgCacheImporter extends Service {
     if (file) {
       if (file instanceof TFile) return true;
       else {
-        log.error(
+        logError(
           "failed to get in-vault image excerpt: given path not file",
           inVaultPath,
         );
@@ -90,14 +90,14 @@ export class ImgCacheImporter extends Service {
       if (!stats.isFile()) {
         const msg = `failed to link image excerpt cache to vault: given path not file ${cachePath}`;
         new Notice(msg);
-        log.error(msg);
+        logError(msg, null);
         return false;
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         const msg = `failed to link image excerpt cache to vault: file not found ${cachePath}`;
         new Notice(msg);
-        log.error(msg);
+        logError(msg, error);
         return false;
       } else throw error;
     }

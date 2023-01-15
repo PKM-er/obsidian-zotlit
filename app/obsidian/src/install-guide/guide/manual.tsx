@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { Notice } from "obsidian";
 import { useState } from "react";
-import log from "../../logger";
+import log, { logError } from "@log";
 import {
   binaryFullPathAtom,
   binaryLinkAtom,
@@ -22,8 +22,8 @@ const install = async (binaryPath: string): Promise<boolean> => {
     await importModule(binary.arrayBuffer, binaryPath, binary.decompressed);
     return true;
   } catch (error) {
-    new Notice(`Failed to import module: ${error}`);
-    log.error("Failed to import module", error);
+    new Notice(`Failed to import module from ${binaryPath}: ${error}`);
+    logError("import module " + binaryPath, error);
     return false;
   }
 };

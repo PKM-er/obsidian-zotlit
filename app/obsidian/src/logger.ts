@@ -22,6 +22,20 @@ const logger = initLogger("main", getDefaultLogLevel(), log4js);
 
 export default logger;
 
+export const logError = (message: string, error: unknown, ...args: any[]) => {
+  if (!error) {
+    logger.error(message, ...args);
+    return;
+  }
+  logger.error(
+    message,
+    error instanceof Error ? error.message : String(error),
+    ...args,
+  );
+  // show error in console with proper stack trace
+  console.error(error);
+};
+
 interface SettingOptions {
   level: LogLevel;
 }

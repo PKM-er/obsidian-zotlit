@@ -1,7 +1,7 @@
 import { statSync } from "fs";
 import type { PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
-import log from "../logger";
+import { logError } from "@log";
 import { InstallGuideModal } from "./guide";
 import type { GuideMode } from "./guide/atom";
 import {
@@ -67,10 +67,10 @@ const showInstallGuide = (
       } else {
         // unexpected error when checking path
         new Notice(
-          `Unexpected error while checking path, please check the location manually: ${libPath}, error: ${error}`,
+          `Unexpected error while checking path of better-sqlite3, please check the location manually: ${libPath}, error: ${error}`,
           2e3,
         );
-        log.error("Unexpected error while checking path", libPath, error);
+        logError("checking better-sqlite3 path:" + libPath, error);
       }
     }
   }
@@ -94,7 +94,7 @@ const checkLib = (manifest: PluginManifest): boolean => {
       showInstallGuide(binaryPath, manifest, "install");
     } else {
       new Notice(`Failed to load database library: ${err}`);
-      log.error("Failed to load database library", err);
+      logError("Failed to load database library", err);
       showInstallGuide(binaryPath, manifest, "reset");
     }
     return false;

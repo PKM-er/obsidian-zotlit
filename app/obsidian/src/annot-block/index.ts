@@ -4,7 +4,7 @@ import annotBlockWorker from "@obzt/annot-block";
 import type { AnnotDetails, AnnotInfo } from "@obzt/annot-block/dist/api";
 import { AnnotationType } from "@obzt/zotero-type";
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
-import log from "../logger";
+import log, { logError } from "@log";
 import type { ZoteroDatabase } from "../zotero-db/database";
 import type ZoteroPlugin from "../zt-main";
 
@@ -51,7 +51,7 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
         })),
       );
     } catch (error) {
-      log.error("Failed to stringify annots", error);
+      logError("stringify annots", error);
       markdown = source;
     }
     await MarkdownRenderer.renderMarkdown(

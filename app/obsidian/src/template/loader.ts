@@ -3,7 +3,7 @@ import { D } from "@mobily/ts-belt";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile } from "obsidian";
 import { Notice, TFile } from "obsidian";
-import log from "@log";
+import log, { logError } from "@log";
 import type {
   EjectableTemplate,
   NonEjectableTemplate,
@@ -117,7 +117,7 @@ export class TemplateLoader extends Service {
       // file instanceof TFolder
       const msg = `Template file location occupied by a folder: ${filePath}, skipping...`;
       new Notice(msg);
-      log.error(msg);
+      logError(msg, null);
     }
     return defaultTemplate;
   }

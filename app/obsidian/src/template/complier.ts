@@ -1,7 +1,7 @@
 import { Service } from "@ophidian/core";
 import * as Eta from "eta";
 import { Notice } from "obsidian";
-import log from "@log";
+import log, { logError } from "@log";
 import { TemplateLoader } from "./loader";
 import type { TemplateType } from "./settings";
 import { defaultEtaConfig } from "./settings";
@@ -38,8 +38,8 @@ export class TemplateComplier extends Service {
       Eta.templates.define(name, full);
       log.trace(`Template "${name}" complie success`, converted);
     } catch (error) {
-      log.error("Error compling template", name, converted, error);
-      new Notice(`Error compling template "${name}", error: ${error}`);
+      logError("compling template: " + name, error);
+      new Notice(`Error compling template "${name}", ${error}`);
     }
   }
 }
