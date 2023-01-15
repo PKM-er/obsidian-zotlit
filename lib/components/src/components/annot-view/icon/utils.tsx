@@ -1,6 +1,6 @@
-import { setIcon } from "obsidian";
 import type React from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useContext, useRef } from "react";
+import { Obsidian } from "../context";
 
 /**
  * @see https://github.com/gregberge/react-merge-refs/blob/main/src/index.tsx
@@ -21,12 +21,13 @@ export function mergeRefs<T = any>(
 export const useIconRef = <E extends HTMLElement = HTMLElement>(
   icon: string,
 ) => {
+  const { setIcon } = useContext(Obsidian);
   const ref = useRef<E | null>(null);
   const setRef = useCallback(
     (node: E) => {
       if (ref.current) {
         // Make sure to cleanup any events/references added to the last instance
-        ref.current.empty();
+        empty.call(ref.current);
       }
 
       if (node) {
@@ -38,8 +39,12 @@ export const useIconRef = <E extends HTMLElement = HTMLElement>(
       // Save a reference to the node
       ref.current = node;
     },
-    [icon],
+    [icon, setIcon],
   );
 
   return setRef;
 };
+
+function empty(this: Node) {
+  for (; this.lastChild; ) this.removeChild(this.lastChild);
+}

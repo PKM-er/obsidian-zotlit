@@ -1,19 +1,16 @@
 import clsx from "clsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { ItemDetails } from "../ItemView";
-import type { DocHelperArgsPartial } from "./hooks/useDocHelperArgs";
-import { useItemDetails } from "./hooks/useDocHelperArgs";
 
 interface DocDetailsViewProps {
   showDetails: boolean;
-  renderArgs: DocHelperArgsPartial | null;
+  helper: any;
 }
 
 export default function DocDetailsView({
   showDetails,
-  renderArgs,
+  helper,
 }: DocDetailsViewProps) {
-  const item = useItemDetails(renderArgs);
   return (
     <div
       className={clsx("doc-details", {
@@ -28,7 +25,7 @@ export default function DocDetailsView({
           </div>
         )}
       >
-        {item && <ItemDetails item={item} />}
+        {helper && <ItemDetails item={helper} />}
       </ErrorBoundary>
     </div>
   );

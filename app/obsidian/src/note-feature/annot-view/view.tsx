@@ -1,13 +1,19 @@
-import { Hello } from "@obzt/components";
+import "./style.less";
+
+import type { ObsidianContext } from "@obzt/components";
+import { ObsidianCtx, AnnotsView } from "@obzt/components";
 import type { WorkspaceLeaf } from "obsidian";
-import { useContext, useEffect } from "react";
+import { setIcon } from "obsidian";
 import ReactDOM from "react-dom";
-import { useStore } from "zustand";
-import { AnnotsView, Obsidian, createStore } from "../../component";
-import type { StoreAPI } from "../../component/store";
+import { withAnnotHelper, withDocItemHelper } from "../../template/helper";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
 import { DerivedFileView } from "./derived-file-view";
+import { getDragStartHandler } from "./drag-insert";
+import { itemDetailsProps } from "./item-details";
+import { getMoreOptionsHandler } from "./more-options";
+import type { StoreAPI } from "./store";
+import { createStore } from "./store";
 
 export const annotViewType = "zotero-annotation-view";
 
@@ -33,6 +39,7 @@ export class AnnotationView extends DerivedFileView {
 
   onload(): void {
     super.onload();
+    this.contentEl.addClass("obzt");
     this.registerEvent(
       app.metadataCache.on("zotero:index-update", this.loadDocItem),
     );
@@ -113,13 +120,60 @@ export class AnnotationView extends DerivedFileView {
 
   store: StoreAPI;
 
+  getContext(): ObsidianContext {
+    const plugin = this.plugin;
+    return {
+      sanitize: DOMPurify.sanitize.bind(DOMPurify),
+      setIcon,
+      store: this.store,
+      registerCssChange(callback) {
+        app.workspace.on("css-change", callback);
+        return () => app.workspace.off("css-change", callback);
+      },
+      registerDbUpdate(callback) {
+        app.vault.on("zotero:db-refresh", callback);
+        return () => app.vault.off("zotero:db-refresh", callback);
+      },
+      refreshConn: async () => {
+        await this.plugin.dbWorker.refresh({ task: "dbConn" });
+      },
+      getZoteroDataDir: () => this.plugin.settings.database.zoteroDataDir,
+      buildAnnotHelper: (annotation, tags, attachment, sourcePath) =>
+        withAnnotHelper(
+          annotation,
+          { tags, attachment },
+          { plugin, sourcePath },
+        ),
+      buildDocItemHelper: (
+        item,
+        tags,
+        attachment,
+        sourcePath,
+        allAttachments,
+      ) =>
+        withDocItemHelper(
+          item,
+          { tags, attachment, allAttachments },
+          { plugin, sourcePath },
+        ),
+      getAnnotTextRenderer: (annotation, extra, sourcePath) => () =>
+        this.plugin.templateRenderer.renderAnnot(annotation, extra, {
+          plugin,
+          sourcePath,
+        }),
+      itemDetailsProps,
+      onDragStart: getDragStartHandler(this.plugin),
+      onMoreOptions: getMoreOptionsHandler(this),
+    };
+  }
+
   protected async onOpen() {
     await super.onOpen();
     await this.untilZoteroReady();
     ReactDOM.render(
-      <Obsidian.Provider value={{ plugin: this.plugin, view: this }}>
-        <Hello />;
-      </Obsidian.Provider>,
+      <ObsidianCtx.Provider value={this.getContext()}>
+        <AnnotsView />
+      </ObsidianCtx.Provider>,
       this.contentEl,
     );
   }
@@ -127,31 +181,4 @@ export class AnnotationView extends DerivedFileView {
     ReactDOM.unmountComponentAtNode(this.contentEl);
     await super.onClose();
   }
-}
-
-const useOnDbRefresh = () => {
-  const { view } = useContext(Obsidian);
-  const refresh = useStore(view.store, (s) => s.refresh);
-  useEffect(() => {
-    const ref = app.vault.on("zotero:db-refresh", refresh);
-    return () => app.vault.offref(ref);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-};
-
-function Component() {
-  const { view } = useContext(Obsidian);
-
-  useOnDbRefresh();
-  const empty = useStore(view.store, (s) => !s.doc);
-
-  if (empty) {
-    return (
-      <div className="annot-view">
-        <div className="pane-empty">Active file not literature note</div>
-      </div>
-    );
-  }
-
-  return <AnnotsView />;
 }

@@ -121,6 +121,7 @@ export const withAnnotHelper = (
       get(target, p, receiver) {
         if (p === "tags") {
           if (!extra.tags[data.itemID]) {
+            console.error(extra, data.itemID);
             throw new Error("No tags loaded for item " + data.itemID);
           }
           return extra.tags[data.itemID];

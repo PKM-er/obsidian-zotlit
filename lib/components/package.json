@@ -16,7 +16,15 @@
   "dependencies": {
     "@obzt/common": "workspace:*",
     "@obzt/database": "workspace:*",
-    "zustand": "~4.3.1"
+    "zustand": "~4.3.1",
+    "ahooks": "~3.7.1",
+    "clsx": "^1.2.1",
+    "@obzt/zotero-type": "workspace:*",
+    "assert-never": "^1.2.1",
+    "@mobily/ts-belt": "~3.13.1",
+    "react-error-boundary": "~3.1.4",
+    "react-json-tree": "~0.18.0",
+    "lodash-es": "~4.17.21"
   },
   "devDependencies": {
     "@types/react": "~17.0.8",
@@ -31,7 +39,8 @@
     "@aidenlx/eslint-config": "workspace:*",
     "postcss-prefix-selector": "~1.16.0",
     "vite-plugin-dts": "~1.7.1",
-    "postcss-discard": "~2.0.0"
+    "postcss-discard": "~2.0.0",
+    "@types/lodash-es": "~4.17.6"
   },
   "peerDependencies": {
     "react": "~17.0.2",

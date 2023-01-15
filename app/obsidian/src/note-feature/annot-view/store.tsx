@@ -1,32 +1,12 @@
-import type {
-  AnnotationInfo,
-  AttachmentInfo,
-  RegularItemInfo,
-  TagInfo,
-} from "@obzt/database";
+import type { DataModel } from "@obzt/components";
+import type { AttachmentInfo } from "@obzt/database";
 import {
   cacheActiveAtch,
   getCachedActiveAtch,
   isFileAttachment,
 } from "@obzt/database";
 import { createStore as create } from "zustand";
-import type ZoteroPlugin from "../zt-main";
-
-export interface DataModel {
-  doc: { sourcePath: string; docItem: RegularItemInfo; lib: number } | null;
-  attachment: AttachmentInfo | null;
-  attachmentID: number | null;
-  allAttachments: AttachmentInfo[] | null;
-  annotations: AnnotationInfo[] | null;
-  tags: Record<number, TagInfo[]>;
-  loadDocItem(
-    file: { path: string; itemKey: string } | null,
-    lib: number,
-    force?: boolean,
-  ): Promise<void>;
-  refresh: () => Promise<void>;
-  setActiveAtch: (id: number) => void;
-}
+import type ZoteroPlugin from "../../zt-main";
 
 const getActiveAttachment = (
   cachedID: number | null,

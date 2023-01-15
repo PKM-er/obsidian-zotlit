@@ -14,7 +14,7 @@ export default defineConfig({
     },
     target: "esnext",
     rollupOptions: {
-      external: ["react", "react/jsx-runtime"],
+      external: ["react", "react/jsx-runtime", "path"],
       output: {
         assetFileNames: (assetInfo) =>
           assetInfo.name === "style.css" ? "styles.css" : assetInfo.name,

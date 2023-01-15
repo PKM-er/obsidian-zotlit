@@ -1,21 +1,17 @@
-import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
+import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { useSet } from "ahooks";
 import AnnotPreview from "./AnnotPreview";
 
 export interface AnnotListProps {
   annotations: AnnotationInfo[];
   getTags(itemId: number): TagInfo[];
-  attachment: AttachmentInfo;
-  sourcePath: string;
   selectable?: boolean;
 }
 
 export default function AnnotList({
   selectable = false,
   annotations,
-  attachment,
   getTags,
-  sourcePath,
 }: AnnotListProps) {
   const [selected, { add, remove }] = useSet<AnnotationInfo>();
   return (
@@ -33,12 +29,7 @@ export default function AnnotList({
               toggle={(v) => (v ? add : remove)(annot)}
             />
           )}
-          <AnnotPreview
-            annotation={annot}
-            tags={getTags(annot.itemID)}
-            attachment={attachment}
-            sourcePath={sourcePath}
-          />
+          <AnnotPreview annotation={annot} tags={getTags(annot.itemID)} />
         </div>
       ))}
     </div>

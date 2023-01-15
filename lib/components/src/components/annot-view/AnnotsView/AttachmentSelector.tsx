@@ -12,7 +12,7 @@ export interface AttachmentSelectorProps {
 
 const useAttachmentSelect = () =>
   useStore(
-    useContext(Obsidian).view.store,
+    useContext(Obsidian).store,
     (s): AttachmentSelectorProps => ({
       attachments: s.allAttachments,
       onChange: s.setActiveAtch,

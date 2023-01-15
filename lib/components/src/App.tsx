@@ -1,7 +1,5 @@
-import { Hello } from "./components";
-
 function App() {
-  return <Hello />;
+  return <div>hello</div>;
 }
 
 export default App;

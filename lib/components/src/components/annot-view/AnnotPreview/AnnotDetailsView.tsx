@@ -1,16 +1,14 @@
 import clsx from "clsx";
-import { withAnnotHelper } from "../../template/helper";
 import { ItemDetails } from "../ItemView";
-import type { AnnotHelperArgsPartial } from "./hooks/useAnnotHelperArgs";
 
 interface AnnotDetailsViewProps {
   showDetails: boolean;
-  renderArgs: AnnotHelperArgsPartial;
+  helper: any;
 }
 
 export default function AnnotDetailsView({
   showDetails,
-  renderArgs,
+  helper,
 }: AnnotDetailsViewProps) {
   return (
     <div
@@ -18,7 +16,7 @@ export default function AnnotDetailsView({
         showing: showDetails,
       })}
     >
-      <ItemDetails item={withAnnotHelper(...renderArgs)} />
+      <ItemDetails item={helper} />
     </div>
   );
 }

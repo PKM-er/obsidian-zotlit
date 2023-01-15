@@ -1,13 +1,11 @@
+import type { ObsidianContext } from "@obzt/components";
 import type { AnnotationInfo } from "@obzt/database";
-import { useMemoizedFn } from "ahooks";
 import { MarkdownView, Menu, Notice } from "obsidian";
-import { useContext } from "react";
-import type { AnnotationView } from "../../../note-feature/annot-view/view";
-import { Obsidian } from "../../context";
+import type { AnnotationView } from "../../note-feature/annot-view/view";
 
-export const useMoreOptionMenu = (annotation: AnnotationInfo) => {
-  const { view } = useContext(Obsidian);
-  return useMemoizedFn((evt: React.MouseEvent | React.KeyboardEvent) => {
+export const getMoreOptionsHandler =
+  (view: AnnotationView): ObsidianContext["onMoreOptions"] =>
+  (evt, annotation) => {
     const menu = new Menu();
     menu.addItem((i) =>
       i
@@ -25,8 +23,7 @@ export const useMoreOptionMenu = (annotation: AnnotationInfo) => {
         y: rect.bottom,
       });
     }
-  });
-};
+  };
 const jumpToAnnotNote =
   (annot: AnnotationInfo, view: AnnotationView) => async () => {
     const block = view.plugin.noteIndex.getBlockInfoFromItem(annot);

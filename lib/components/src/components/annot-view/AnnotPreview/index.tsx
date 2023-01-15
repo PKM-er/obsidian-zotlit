@@ -1,33 +1,33 @@
 import { D } from "@mobily/ts-belt";
-import type { AnnotationInfo, TagInfo, AttachmentInfo } from "@obzt/database";
+import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { getBacklink } from "@obzt/database";
-import { useBoolean } from "ahooks";
-import { useRef } from "react";
+import { useBoolean, useMemoizedFn } from "ahooks";
+import { useContext, useRef } from "react";
+import { Obsidian } from "../context";
 import AnnotDetailsView from "./AnnotDetailsView";
 import Comment from "./Comment";
 import Content from "./Content";
 import Excerpt from "./Excerpt";
 import Header from "./Header";
-import { useAnnotHelperArgs } from "./hooks/useAnnotHelperArgs";
+import { useAnnotHelper, useAnnotRenderer } from "./hooks/useAnnotHelper";
 import { useAnnotIcon } from "./hooks/useAnnotIcon";
-import { useDragToInsert } from "./hooks/useDragToInsert";
 import { useImgSrc } from "./hooks/useImgSrc";
-import { useMoreOptionMenu } from "./hooks/useMoreOptionMenu";
 import PageLabel from "./PageLabel";
 import Tags from "./Tags";
 
 export interface AnnotPreviewProps {
   annotation: AnnotationInfo;
   tags: TagInfo[] | undefined;
-  attachment: AttachmentInfo;
-  sourcePath: string;
 }
 
-export default function AnnotPreview(props: AnnotPreviewProps) {
-  const { annotation, tags } = props;
+export default function AnnotPreview({ annotation, tags }: AnnotPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const renderArgs = useAnnotHelperArgs(props);
+  const helper = useAnnotHelper(annotation);
+  const renderText = useAnnotRenderer(annotation);
+
+  const { onMoreOptions: handleMoreOptions, onDragStart: handleDragStart } =
+    useContext(Obsidian);
 
   const [showDetails, { toggle: toggleDetails }] = useBoolean(false);
 
@@ -39,10 +39,12 @@ export default function AnnotPreview(props: AnnotPreviewProps) {
         type={annotation.type}
         color={annotation.color}
         icon={useAnnotIcon(annotation.type)}
-        onMoreOptions={useMoreOptionMenu(annotation)}
-        {...useDragToInsert(
-          containerRef,
-          renderArgs.status === 2 ? renderArgs.args : null,
+        onMoreOptions={useMemoizedFn((evt) =>
+          handleMoreOptions(evt, annotation),
+        )}
+        draggable={Boolean(renderText)}
+        onDragStart={useMemoizedFn((evt) =>
+          handleDragStart(evt, renderText, containerRef.current),
         )}
         showDetails={showDetails}
         onDetailsToggled={toggleDetails}
@@ -61,9 +63,7 @@ export default function AnnotPreview(props: AnnotPreviewProps) {
       </Content>
       {annotation.comment && <Comment content={annotation.comment} />}
       {tags && <Tags tags={tags} />}
-      {renderArgs.status && (
-        <AnnotDetailsView {...{ showDetails, renderArgs: renderArgs.args }} />
-      )}
+      {helper && <AnnotDetailsView {...{ showDetails, helper }} />}
     </div>
   );
 }

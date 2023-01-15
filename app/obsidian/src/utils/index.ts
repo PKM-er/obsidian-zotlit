@@ -31,7 +31,3 @@ declare global {
   // eslint-disable-next-line no-var, @typescript-eslint/naming-convention, @typescript-eslint/consistent-type-imports
   var DOMPurify: typeof import("dompurify");
 }
-
-export const renderHTMLReact = (html: string) => ({
-  dangerouslySetInnerHTML: { __html: DOMPurify.sanitize(html) },
-});

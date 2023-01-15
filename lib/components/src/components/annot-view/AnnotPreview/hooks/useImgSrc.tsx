@@ -4,9 +4,6 @@ import { useContext } from "react";
 import { Obsidian } from "../../context";
 
 export const useImgSrc = (annot: AnnotationInfo): string | undefined => {
-  const { plugin } = useContext(Obsidian);
-  return `app://local${getCacheImagePath(
-    annot,
-    plugin.settings.database.zoteroDataDir,
-  )}`;
+  const { getZoteroDataDir } = useContext(Obsidian);
+  return `app://local${getCacheImagePath(annot, getZoteroDataDir())}`;
 };
