@@ -24,7 +24,7 @@
     "build": ""
   },
   "peerDependencies": {
-    "esbuild": "latest"
+    "esbuild": "^0.16.17"
   },
   "devDependencies": {
     "@types/eslint": "~8.4.6"
