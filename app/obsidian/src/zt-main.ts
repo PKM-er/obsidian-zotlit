@@ -1,4 +1,5 @@
-// import "./main.less";
+import "./main.less";
+import "@obzt/components/styles";
 
 import type { Extension } from "@codemirror/state";
 import { use } from "@ophidian/core";

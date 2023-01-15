@@ -20,15 +20,12 @@ const isProd = process.env.BUILD === "production";
 const preactCompatPlugin = {
   name: "preact-compat",
   setup(build) {
-    const preact = join(
-      process.cwd(),
-      "node_modules",
-      "@preact",
-      "compat",
-      "index.mjs",
-    );
+    const preact = join(process.cwd(), "node_modules", "@preact", "compat");
     build.onResolve({ filter: /^(react-dom|react)$/ }, (args) => {
-      return { path: preact };
+      return { path: join(preact, "index.mjs") };
+    });
+    build.onResolve({ filter: /^react\/jsx-runtime$/ }, (args) => {
+      return { path: join(preact, "jsx-runtime.mjs") };
     });
   },
 };

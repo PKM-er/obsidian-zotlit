@@ -9,6 +9,10 @@
       "path": "app/zotero"
     },
     {
+      "name": "components",
+      "path": "lib/components"
+    },
+    {
       "name": "database",
       "path": "lib/database"
     },
@@ -93,6 +97,7 @@
       "./lib/annot-block",
       "./utils/esbuild-inline-worker",
       "./lib/zotero-type",
+      "./lib/components",
       "./docs"
     ],
     "eslint.validate": [
@@ -133,6 +138,8 @@
       "getting-started",
       "zotero",
       "lib/database",
+      "lib/db-worker",
+      "lib/components",
       "lib/note-parser",
       "lib/annot-block",
       "utils/esbuild-inline-worker",

@@ -1,3 +1,4 @@
+import { Hello } from "@obzt/components";
 import type { WorkspaceLeaf } from "obsidian";
 import { useContext, useEffect } from "react";
 import ReactDOM from "react-dom";
@@ -117,7 +118,7 @@ export class AnnotationView extends DerivedFileView {
     await this.untilZoteroReady();
     ReactDOM.render(
       <Obsidian.Provider value={{ plugin: this.plugin, view: this }}>
-        <Component />
+        <Hello />;
       </Obsidian.Provider>,
       this.contentEl,
     );
