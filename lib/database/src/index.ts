@@ -16,6 +16,8 @@ export {
   getCacheImagePath,
   sortBySortIndex,
   isFileAttachment,
+  cacheActiveAtch,
+  getCachedActiveAtch,
 } from "./utils/misc.js";
 export * from "./utils/prepared.js";
 

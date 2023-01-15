@@ -1,5 +1,5 @@
 import { join } from "path";
-import type { AttachmentInfo } from "../index.js";
+import type { AttachmentInfo, RegularItemInfo } from "../index.js";
 
 /**
  * @see https://github.com/zotero/zotero/blob/c13d17b5e6ca496491e926211c0e1ea7aef072ae/chrome/content/zotero/xpcom/annotations.js#L42-L45
@@ -32,3 +32,28 @@ export const sortBySortIndex = (aIdx: number[], bIdx: number[]) => {
 };
 
 export const isFileAttachment = (i: AttachmentInfo): boolean => Boolean(i.path);
+
+interface Storage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+const toLocalStorageKey = (docItem: RegularItemInfo) =>
+  `obzt-active-atch-${docItem.itemID}-${docItem.libraryID}`;
+
+export const getCachedActiveAtch = (
+  storage: Storage,
+  docItem: RegularItemInfo,
+) => {
+  const raw = storage.getItem(toLocalStorageKey(docItem));
+  if (!raw) return null;
+  const val = parseInt(raw, 10);
+  if (val > 0) return val;
+  return null;
+};
+
+export const cacheActiveAtch = (
+  storage: Storage,
+  docItem: RegularItemInfo,
+  atchID: number,
+) => storage.setItem(toLocalStorageKey(docItem), atchID.toString());

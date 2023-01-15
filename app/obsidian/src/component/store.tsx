@@ -4,7 +4,11 @@ import type {
   RegularItemInfo,
   TagInfo,
 } from "@obzt/database";
-import { isFileAttachment } from "@obzt/database";
+import {
+  cacheActiveAtch,
+  getCachedActiveAtch,
+  isFileAttachment,
+} from "@obzt/database";
 import { createStore as create } from "zustand";
 import type ZoteroPlugin from "../zt-main";
 
@@ -24,17 +28,6 @@ export interface DataModel {
   setActiveAtch: (id: number) => void;
 }
 
-const toLocalStorageKey = (docItem: RegularItemInfo) =>
-  `obzt-active-atch-${docItem.itemID}-${docItem.libraryID}`;
-
-const getCachedActiveAtch = (docItem: RegularItemInfo) => {
-  const raw = window.localStorage.getItem(toLocalStorageKey(docItem));
-  if (!raw) return null;
-  const val = parseInt(raw, 10);
-  if (val > 0) return val;
-  return null;
-};
-
 const getActiveAttachment = (
   cachedID: number | null,
   attachments: AttachmentInfo[],
@@ -47,9 +40,6 @@ const getActiveAttachment = (
   }
   return attachments.find((a) => a.itemID === cachedID) ?? attachments[0];
 };
-
-const cacheActiveAtch = (docItem: RegularItemInfo, atchID: number) =>
-  window.localStorage.setItem(toLocalStorageKey(docItem), atchID.toString());
 
 const getInit = (): Pick<
   DataModel,
@@ -119,7 +109,7 @@ export const createStore = (p: ZoteroPlugin) =>
         const item = await api(p).getItem(file.itemKey, lib);
         if (!item) return set(getInit());
         const doc = { sourcePath: file.path, docItem: item, lib };
-        const attachmentID = getCachedActiveAtch(item);
+        const attachmentID = getCachedActiveAtch(window.localStorage, item);
         set({ ...getInit(), doc, attachmentID });
         await loadAtchs(item.itemID, lib);
         await loadDocTags(item.itemID, lib);
@@ -137,7 +127,7 @@ export const createStore = (p: ZoteroPlugin) =>
       setActiveAtch: (id) => {
         const { doc, allAttachments } = get();
         if (!doc) return;
-        cacheActiveAtch(doc.docItem, id);
+        cacheActiveAtch(window.localStorage, doc.docItem, id);
         if (!allAttachments) {
           set((state) => ({ ...state, attachment: null, attachmentID: id }));
         } else {

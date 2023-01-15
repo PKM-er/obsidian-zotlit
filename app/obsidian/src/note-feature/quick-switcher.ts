@@ -1,5 +1,5 @@
 import type { AttachmentInfo, AnnotationInfo } from "@obzt/database";
-import { isFileAttachment } from "@obzt/database";
+import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
 import { ZoteroItemSuggestModal } from "../suggester/index.js";
 import type ZoteroPlugin from "../zt-main.js";
 import { AttachmentSelectModal } from "./atch-select.js";
@@ -37,6 +37,10 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
         null;
     } else {
       attachment = fileAttachments[0] ?? null;
+    }
+
+    if (attachment) {
+      cacheActiveAtch(window.localStorage, item, attachment.itemID);
     }
 
     const annotations: AnnotationInfo[] = attachment
