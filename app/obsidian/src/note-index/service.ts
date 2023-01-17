@@ -41,10 +41,10 @@ declare module "obsidian" {
 }
 export default class NoteIndex extends Service {
   get meta(): MetadataCache {
-    return this.plugin.app.metadataCache;
+    return app.metadataCache;
   }
   get vault(): Vault {
-    return this.plugin.app.vault;
+    return app.vault;
   }
   get template() {
     return this.plugin.settings.template;
@@ -104,13 +104,26 @@ export default class NoteIndex extends Service {
   onload(): void {
     // plugin.register(() => this.buildFilemapWorker.terminate());
     [
-      this.meta.on("changed", this.onMetaChanged.bind(this)),
-      this.meta.on("finished", this.onMetaBuilt.bind(this)),
+      this.meta.on("changed", this.onMetaChanged, this),
       // this.vault.on("create") // also fired on meta.changed
-      this.vault.on("rename", this.onFileRenamed.bind(this)),
-      this.vault.on("delete", this.onFileRemoved.bind(this)),
+      this.vault.on("rename", this.onFileRenamed, this),
+      this.vault.on("delete", this.onFileRemoved, this),
     ].forEach(this.registerEvent.bind(this));
-    if (this.meta.initialized) this.onMetaBuilt();
+
+    this.untilMetaBuilt().then(this.onMetaBuilt.bind(this));
+  }
+
+  untilMetaBuilt(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.meta.initialized) {
+        resolve();
+      } else {
+        const ref = this.meta.on("initialized", () => {
+          resolve();
+          this.meta.offref(ref);
+        });
+      }
+    });
   }
 
   getItemKeyOf(file: TAbstractFile | string): string | null {

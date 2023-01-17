@@ -52,6 +52,7 @@ declare module "obsidian" {
   }
   interface MetadataCache {
     on(name: "finished", callback: () => any, ctx?: any): EventRef;
+    on(name: "initialized", callback: () => any, ctx?: any): EventRef;
     initialized: boolean;
   }
 
