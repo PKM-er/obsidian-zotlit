@@ -3,8 +3,13 @@
 import { join } from "path/posix";
 import { betterSqlite3 } from "@obzt/common";
 import type { PluginManifest } from "obsidian";
-import { FileSystemAdapter, Platform } from "obsidian";
+import { Platform } from "obsidian";
 import _PLATFORM_SUPPORT from "support-platform";
+
+const appDataDir: string | null = Platform.isDesktopApp
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("@electron/remote").app.getPath("userData")
+  : null;
 
 export const {
   arch,
@@ -69,21 +74,21 @@ export const getPlatformDetails = () => {
 export const getBinaryVersion = (manifest: PluginManifest) =>
   manifest.versions?.["better-sqlite3"];
 
-export const getBinaryPath = (manifest: PluginManifest) => {
+export const getBinaryFullPath = (manifest: PluginManifest) => {
+  if (!appDataDir) return null;
   const binaryVersion = getBinaryVersion(manifest);
-  if (!binaryVersion) {
-    return null;
-  }
-  return join(app.vault.configDir, betterSqlite3(binaryVersion));
+  if (!binaryVersion) return null;
+
+  return join(appDataDir, betterSqlite3(binaryVersion));
 };
 
-export const getBinaryFullPath = (manifest: PluginManifest): string | null => {
-  const binaryPath = getBinaryPath(manifest);
-  if (!binaryPath) {
-    return null;
-  }
-  if (!(app.vault.adapter instanceof FileSystemAdapter)) {
-    return null;
-  }
-  return app.vault.adapter.getFullPath(binaryPath);
-};
+// export const getBinaryFullPath = (manifest: PluginManifest): string | null => {
+//   const binaryPath = getBinaryPath(manifest);
+//   if (!binaryPath) {
+//     return null;
+//   }
+//   if (!(app.vault.adapter instanceof FileSystemAdapter)) {
+//     return null;
+//   }
+//   return app.vault.adapter.getFullPath(binaryPath);
+// };

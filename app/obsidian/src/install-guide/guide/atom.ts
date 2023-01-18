@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { getBinaryFullPath, getBinaryPath } from "../version";
+import { getBinaryFullPath } from "../version";
 import type { InstallGuideModal } from ".";
 
 export const modalAtom = atom<InstallGuideModal>(null as never);
@@ -18,10 +18,6 @@ export const binaryLinkAtom = atom(
 
 export const binaryLinkFastgitAtom = atom((get) =>
   get(binaryLinkAtom).replace("github.com", "download.fastgit.org"),
-);
-
-export const binaryPathAtom = atom((get) =>
-  getBinaryPath(get(modalAtom).manifest),
 );
 
 export const binaryFullPathAtom = atom((get) =>
