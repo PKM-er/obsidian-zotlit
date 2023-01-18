@@ -97,6 +97,8 @@ export const withAnnotHelper = (
             return "red";
           case "#FF8C19":
             return "orange";
+          case "#ffd400":
+            return "yellow";
           case "#999999":
             return "gray";
           case "#5FB236":
