@@ -1,4 +1,4 @@
 import "./index.css";
 
-export type { AnnotListProps, DataModel, ObsidianContext } from "./annot-view";
-export { AnnotList, AnnotsView, Obsidian as ObsidianCtx } from "./annot-view";
+export type { AnnotsViewContextType, AnnotsViewStore } from "./annot-view";
+export { AnnotsView, AnnotsViewContext } from "./annot-view";

@@ -1,9 +1,8 @@
 import type { AnnotationInfo } from "@obzt/database";
-import { getCacheImagePath } from "@obzt/database";
-import { useContext } from "react";
-import { Obsidian } from "../../context";
+import { useContext, useMemo } from "react";
+import { Context } from "../../context";
 
 export const useImgSrc = (annot: AnnotationInfo): string | undefined => {
-  const { getZoteroDataDir } = useContext(Obsidian);
-  return `app://local${getCacheImagePath(annot, getZoteroDataDir())}`;
+  const { getImgSrc } = useContext(Context);
+  return useMemo(() => getImgSrc(annot), [annot, getImgSrc]);
 };

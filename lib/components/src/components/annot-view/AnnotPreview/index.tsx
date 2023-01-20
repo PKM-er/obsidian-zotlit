@@ -1,16 +1,16 @@
 import { D } from "@mobily/ts-belt";
 import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { getBacklink } from "@obzt/database";
-import { useBoolean, useMemoizedFn } from "ahooks";
+import { useMemoizedFn } from "ahooks";
 import { useContext, useRef } from "react";
-import { Obsidian } from "../context";
-import AnnotDetailsView from "./AnnotDetailsView";
+import { Context } from "../context";
+
 import Comment from "./Comment";
 import Content from "./Content";
 import Excerpt from "./Excerpt";
 import Header from "./Header";
-import { useAnnotHelper, useAnnotRenderer } from "./hooks/useAnnotHelper";
 import { useAnnotIcon } from "./hooks/useAnnotIcon";
+import { useAnnotRenderer } from "./hooks/useAnnotRender";
 import { useImgSrc } from "./hooks/useImgSrc";
 import PageLabel from "./PageLabel";
 import Tags from "./Tags";
@@ -23,15 +23,14 @@ export interface AnnotPreviewProps {
 export default function AnnotPreview({ annotation, tags }: AnnotPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const helper = useAnnotHelper(annotation);
-  const renderText = useAnnotRenderer(annotation);
-
-  const { onMoreOptions: handleMoreOptions, onDragStart: handleDragStart } =
-    useContext(Obsidian);
-
-  const [showDetails, { toggle: toggleDetails }] = useBoolean(false);
+  const {
+    onMoreOptions: handleMoreOptions,
+    onDragStart: handleDragStart,
+    onShowDetails,
+  } = useContext(Context);
 
   const excerptProps = D.selectKeys(annotation, ["type", "text", "pageLabel"]);
+  const renderer = useAnnotRenderer(annotation);
 
   return (
     <div className="annot-preview">
@@ -42,12 +41,12 @@ export default function AnnotPreview({ annotation, tags }: AnnotPreviewProps) {
         onMoreOptions={useMemoizedFn((evt) =>
           handleMoreOptions(evt, annotation),
         )}
-        draggable={Boolean(renderText)}
-        onDragStart={useMemoizedFn((evt) =>
-          handleDragStart(evt, renderText, containerRef.current),
+        draggable={renderer !== null}
+        onDragStart={useMemoizedFn(
+          (evt) =>
+            renderer && handleDragStart(evt, renderer, containerRef.current),
         )}
-        showDetails={showDetails}
-        onDetailsToggled={toggleDetails}
+        onDetailsToggled={useMemoizedFn(() => onShowDetails(annotation.itemID))}
       >
         <PageLabel
           pageLabel={annotation.pageLabel}
@@ -63,7 +62,6 @@ export default function AnnotPreview({ annotation, tags }: AnnotPreviewProps) {
       </Content>
       {annotation.comment && <Comment content={annotation.comment} />}
       {tags && <Tags tags={tags} />}
-      {helper && <AnnotDetailsView {...{ showDetails, helper }} />}
     </div>
   );
 }

@@ -95,6 +95,7 @@
     "zustand": "~4.3.1",
     "preact": "~10.11.3",
     "@preact/compat": "~17.1.2",
-    "@obzt/components": "workspace:*"
+    "@obzt/components": "workspace:*",
+    "react-json-tree": "~0.18.0"
   }
 }

@@ -1,6 +1,4 @@
-export type { ObsidianContext } from "./context";
-export { Obsidian } from "./context";
-export type { AnnotListProps } from "./AnnotList";
-export { default as AnnotList } from "./AnnotList";
+export type { ContextType as AnnotsViewContextType } from "./context";
+export { Context as AnnotsViewContext } from "./context";
 export { default as AnnotsView } from "./AnnotsView";
-export type { DataModel } from "./store";
+export type { DataModel as AnnotsViewStore } from "./store";

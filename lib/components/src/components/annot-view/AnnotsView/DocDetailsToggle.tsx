@@ -1,5 +1,5 @@
-import type { DetailsToggleProps } from "../ItemView";
-import { DetailsToggle } from "../ItemView";
+import type { DetailsToggleProps } from "../DetailsToggle";
+import DetailsToggle from "../DetailsToggle";
 
 export type DocItemDetailsToggleProps = DetailsToggleProps;
 

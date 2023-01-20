@@ -2,7 +2,7 @@ import type { AttachmentInfo } from "@obzt/database";
 import { useContext } from "react";
 import { useStore } from "zustand";
 import { shallow } from "zustand/shallow";
-import { Obsidian } from "../context";
+import { Context } from "../context";
 
 export interface AttachmentSelectorProps {
   attachments: AttachmentInfo[] | null;
@@ -12,7 +12,7 @@ export interface AttachmentSelectorProps {
 
 const useAttachmentSelect = () =>
   useStore(
-    useContext(Obsidian).store,
+    useContext(Context).store,
     (s): AttachmentSelectorProps => ({
       attachments: s.allAttachments,
       onChange: s.setActiveAtch,

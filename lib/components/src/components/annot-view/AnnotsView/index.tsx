@@ -1,17 +1,16 @@
-import { useBoolean } from "ahooks";
+import type { RegularItemInfoBase } from "@obzt/database";
+import { useBoolean, useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import { useContext, useEffect } from "react";
 import { useStore } from "zustand";
 import { shallow } from "zustand/shallow";
 import type { AnnotListProps } from "../AnnotList";
 import AnnotList from "../AnnotList";
-import { Obsidian } from "../context";
+import { Context } from "../context";
 import AttachmentSelector from "./AttachmentSelector";
 import CollapseButton from "./CollapseButton";
 import DocItemDetailsToggle from "./DocDetailsToggle";
-import DocDetailsView from "./DocDetailsView";
 import Header from "./Header";
-import { useDocHelper } from "./hooks/useDocHelper";
 
 import RefreshButton from "./RefreshButton";
 
@@ -21,44 +20,41 @@ import RefreshButton from "./RefreshButton";
 // }
 
 const useOnDbRefresh = () => {
-  const { registerDbUpdate, store } = useContext(Obsidian);
+  const { registerDbUpdate, store } = useContext(Context);
   const refresh = useStore(store, (s) => s.refresh);
   useEffect(() => registerDbUpdate(refresh), [registerDbUpdate, refresh]);
 };
 
 export default function AnnotsView() {
-  const { store } = useContext(Obsidian);
+  const { store } = useContext(Context);
 
   useOnDbRefresh();
-  const empty = useStore(store, (s) => !s.doc);
+  const doc = useStore(store, (s) => s.doc);
 
-  if (empty) {
+  if (!doc) {
     return (
       <div className="annot-view">
         <div className="pane-empty">Active file not literature note</div>
       </div>
     );
   }
-  return <AnnotsViewMain />;
+  return <AnnotsViewMain docItem={doc.docItem} />;
 }
 
-function AnnotsViewMain() {
-  const { refreshConn } = useContext(Obsidian);
+function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
+  const { refreshConn, onShowDetails } = useContext(Context);
 
-  const [showDetails, { toggle: toggleDetails }] = useBoolean(false);
   const [isCollapsed, { toggle: toggleCollapsed }] = useBoolean(false);
 
   const annotListProps = useAnnotList();
 
-  const helper = useDocHelper();
   return (
     <div className={clsx("annot-view", { "is-collapsed": isCollapsed })}>
       <Header
         action={
           <>
             <DocItemDetailsToggle
-              onClick={toggleDetails}
-              active={showDetails}
+              onClick={useMemoizedFn(() => onShowDetails(docItem.itemID))}
             />
             <CollapseButton
               isCollapsed={isCollapsed}
@@ -70,7 +66,6 @@ function AnnotsViewMain() {
       >
         <AttachmentSelector />
       </Header>
-      {helper && <DocDetailsView {...{ showDetails, helper }} />}
       {annotListProps ? <AnnotList {...annotListProps} /> : <>Loading</>}
     </div>
   );
@@ -78,7 +73,7 @@ function AnnotsViewMain() {
 
 const useAnnotList = () =>
   useStore(
-    useContext(Obsidian).store,
+    useContext(Context).store,
     (s): Omit<AnnotListProps, "selectable"> | null => {
       if (!s.doc || !s.annotations || !s.attachment) return null;
       return {

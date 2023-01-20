@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import type { DetailsToggleProps } from "../ItemView";
-import { DetailsToggle } from "../ItemView";
+import type { DetailsToggleProps } from "../DetailsToggle";
+import DetailsToggle from "../DetailsToggle";
 
 type AnnotDetailsToggleProps = DetailsToggleProps;
 

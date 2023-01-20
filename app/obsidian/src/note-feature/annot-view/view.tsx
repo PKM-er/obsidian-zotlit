@@ -1,16 +1,15 @@
 import "./style.less";
 
-import type { ObsidianContext } from "@obzt/components";
-import { ObsidianCtx, AnnotsView } from "@obzt/components";
+import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
+import { AnnotsViewContext, AnnotsView } from "@obzt/components";
+import { getCacheImagePath } from "@obzt/database";
 import type { WorkspaceLeaf } from "obsidian";
 import { setIcon } from "obsidian";
 import ReactDOM from "react-dom";
-import { withAnnotHelper, withDocItemHelper } from "../../template/helper";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
 import { DerivedFileView } from "./derived-file-view";
-import { getDragStartHandler } from "./drag-insert";
-import { itemDetailsProps } from "./item-details";
+import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
@@ -120,16 +119,18 @@ export class AnnotationView extends DerivedFileView {
 
   store: StoreAPI;
 
-  getContext(): ObsidianContext {
+  getContext(): AnnotsViewContextType<
+    Pick<
+      AnnotsViewStore,
+      "doc" | "attachment" | "allAttachments" | "tags" | "annotations"
+    >
+  > {
     const plugin = this.plugin;
     return {
       sanitize: DOMPurify.sanitize.bind(DOMPurify),
       setIcon,
       store: this.store,
-      registerCssChange(callback) {
-        app.workspace.on("css-change", callback);
-        return () => app.workspace.off("css-change", callback);
-      },
+
       registerDbUpdate(callback) {
         app.vault.on("zotero:db-refresh", callback);
         return () => app.vault.off("zotero:db-refresh", callback);
@@ -137,33 +138,18 @@ export class AnnotationView extends DerivedFileView {
       refreshConn: async () => {
         await this.plugin.dbWorker.refresh({ task: "dbConn" });
       },
-      getZoteroDataDir: () => this.plugin.settings.database.zoteroDataDir,
-      buildAnnotHelper: (annotation, tags, attachment, sourcePath) =>
-        withAnnotHelper(
+      getImgSrc: (annotation) => {
+        return `app://local${getCacheImagePath(
           annotation,
-          { tags, attachment },
-          { plugin, sourcePath },
-        ),
-      buildDocItemHelper: (
-        item,
-        tags,
-        attachment,
-        sourcePath,
-        allAttachments,
-      ) =>
-        withDocItemHelper(
-          item,
-          { tags, attachment, allAttachments },
-          { plugin, sourcePath },
-        ),
-      getAnnotTextRenderer: (annotation, extra, sourcePath) => () =>
-        this.plugin.templateRenderer.renderAnnot(annotation, extra, {
-          plugin,
-          sourcePath,
-        }),
-      itemDetailsProps,
-      onDragStart: getDragStartHandler(this.plugin),
+          plugin.settings.database.zoteroDataDir,
+        )}`;
+      },
+      onShowDetails: (itemId) => {
+        console.log("show details", itemId);
+      },
+      onDragStart: getDragStartHandler(plugin),
       onMoreOptions: getMoreOptionsHandler(this),
+      annotRenderer: getAnnotRenderer(plugin),
     };
   }
 
@@ -171,9 +157,9 @@ export class AnnotationView extends DerivedFileView {
     await super.onOpen();
     await this.untilZoteroReady();
     ReactDOM.render(
-      <ObsidianCtx.Provider value={this.getContext()}>
+      <AnnotsViewContext.Provider value={this.getContext()}>
         <AnnotsView />
-      </ObsidianCtx.Provider>,
+      </AnnotsViewContext.Provider>,
       this.contentEl,
     );
   }

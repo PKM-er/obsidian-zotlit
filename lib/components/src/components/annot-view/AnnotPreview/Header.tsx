@@ -6,7 +6,6 @@ import MoreOptionsButton from "./MoreOptionsButton";
 
 type HeaderProps = {
   onMoreOptions(evt: React.MouseEvent | React.KeyboardEvent): any;
-  showDetails: boolean;
   onDetailsToggled(): any;
 } & DragProps &
   HeaderIconProps;
@@ -15,7 +14,6 @@ type DragProps = Pick<HTMLAttributes<HTMLElement>, "draggable" | "onDragStart">;
 
 export default function Header({
   onMoreOptions,
-  showDetails,
   onDetailsToggled,
   draggable,
   onDragStart,
@@ -34,7 +32,7 @@ export default function Header({
           color={color}
           type={type}
         />
-        <AnnotDetailsToggle active={showDetails} onClick={onDetailsToggled} />
+        <AnnotDetailsToggle onClick={onDetailsToggled} />
         <MoreOptionsButton onClick={onMoreOptions} onKeyDown={onMoreOptions} />
       </div>
       <div className="annot-header-space" />
