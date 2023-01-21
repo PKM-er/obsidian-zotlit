@@ -1,13 +1,1938 @@
-<!DOCTYPE html>
-<html lang="en" class="obzt">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <style>
+      .ͼ1.cm-editor.cm-focused {
+        outline: 1px dotted #212121;
+      }
+      .ͼ1.cm-editor {
+        position: relative !important;
+        box-sizing: border-box;
+        display: flex !important;
+        flex-direction: column;
+      }
+      .ͼ1 .cm-scroller {
+        display: flex !important;
+        align-items: flex-start !important;
+        font-family: monospace;
+        line-height: 1.4;
+        height: 100%;
+        overflow-x: auto;
+        position: relative;
+        z-index: 0;
+      }
+      .ͼ1 .cm-content[contenteditable="true"] {
+        -webkit-user-modify: read-write-plaintext-only;
+      }
+      .ͼ1 .cm-content {
+        margin: 0;
+        flex-grow: 2;
+        flex-shrink: 0;
+        display: block;
+        white-space: pre;
+        word-wrap: normal;
+        box-sizing: border-box;
+        padding: 4px 0;
+        outline: none;
+      }
+      .ͼ1 .cm-lineWrapping {
+        white-space: pre-wrap;
+        white-space: break-spaces;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        flex-shrink: 1;
+      }
+      .ͼ2 .cm-content {
+        caret-color: black;
+      }
+      .ͼ3 .cm-content {
+        caret-color: white;
+      }
+      .ͼ1 .cm-line {
+        display: block;
+        padding: 0 2px 0 6px;
+      }
+      .ͼ1 .cm-layer > * {
+        position: absolute;
+      }
+      .ͼ1 .cm-layer {
+        contain: size style;
+      }
+      .ͼ2 .cm-selectionBackground {
+        background: #d9d9d9;
+      }
+      .ͼ3 .cm-selectionBackground {
+        background: #222;
+      }
+      .ͼ2.cm-focused .cm-selectionBackground {
+        background: #d7d4f0;
+      }
+      .ͼ3.cm-focused .cm-selectionBackground {
+        background: #233;
+      }
+      .ͼ1 .cm-cursorLayer {
+        pointer-events: none;
+      }
+      .ͼ1.cm-focused .cm-cursorLayer {
+        animation: steps(1) cm-blink 1.2s infinite;
+      }
+      @keyframes cm-blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      @keyframes cm-blink2 {
+        50% {
+          opacity: 0;
+        }
+      }
+      .ͼ1 .cm-cursor,
+      .ͼ1 .cm-dropCursor {
+        border-left: 1.2px solid black;
+        margin-left: -0.6px;
+        pointer-events: none;
+      }
+      .ͼ1 .cm-cursor {
+        display: none;
+      }
+      .ͼ3 .cm-cursor {
+        border-left-color: #444;
+      }
+      .ͼ1.cm-focused .cm-cursor {
+        display: block;
+      }
+      .ͼ2 .cm-activeLine {
+        background-color: #cceeff44;
+      }
+      .ͼ3 .cm-activeLine {
+        background-color: #99eeff33;
+      }
+      .ͼ2 .cm-specialChar {
+        color: red;
+      }
+      .ͼ3 .cm-specialChar {
+        color: #f78;
+      }
+      .ͼ1 .cm-gutters {
+        flex-shrink: 0;
+        display: flex;
+        height: 100%;
+        box-sizing: border-box;
+        left: 0;
+        z-index: 200;
+      }
+      .ͼ2 .cm-gutters {
+        background-color: #f5f5f5;
+        color: #6c6c6c;
+        border-right: 1px solid #ddd;
+      }
+      .ͼ3 .cm-gutters {
+        background-color: #333338;
+        color: #ccc;
+      }
+      .ͼ1 .cm-gutter {
+        display: flex !important;
+        flex-direction: column;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        min-height: 100%;
+        overflow: hidden;
+      }
+      .ͼ1 .cm-gutterElement {
+        box-sizing: border-box;
+      }
+      .ͼ1 .cm-lineNumbers .cm-gutterElement {
+        padding: 0 3px 0 5px;
+        min-width: 20px;
+        text-align: right;
+        white-space: nowrap;
+      }
+      .ͼ2 .cm-activeLineGutter {
+        background-color: #e2f2ff;
+      }
+      .ͼ3 .cm-activeLineGutter {
+        background-color: #222227;
+      }
+      .ͼ1 .cm-panels {
+        box-sizing: border-box;
+        position: sticky;
+        left: 0;
+        right: 0;
+      }
+      .ͼ2 .cm-panels {
+        background-color: #f5f5f5;
+        color: black;
+      }
+      .ͼ2 .cm-panels-top {
+        border-bottom: 1px solid #ddd;
+      }
+      .ͼ2 .cm-panels-bottom {
+        border-top: 1px solid #ddd;
+      }
+      .ͼ3 .cm-panels {
+        background-color: #333338;
+        color: white;
+      }
+      .ͼ1 .cm-tab {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: bottom;
+      }
+      .ͼ1 .cm-widgetBuffer {
+        vertical-align: text-top;
+        height: 1em;
+        width: 0;
+        display: inline;
+      }
+      .ͼ1 .cm-placeholder {
+        color: #888;
+        display: inline-block;
+        vertical-align: top;
+      }
+      .ͼ1 .cm-highlightSpace:before {
+        content: attr(data-display);
+        position: absolute;
+        pointer-events: none;
+        color: #888;
+      }
+      .ͼ1 .cm-highlightTab {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20"><path stroke="%23888" stroke-width="1" fill="none" d="M1 10H196L190 5M190 15L196 10M197 4L197 16"/></svg>');
+        background-size: auto 100%;
+        background-position: right 90%;
+        background-repeat: no-repeat;
+      }
+      .ͼ1 .cm-trailingSpace {
+        background-color: #ff332255;
+      }
+      .ͼ1 .cm-button {
+        vertical-align: middle;
+        color: inherit;
+        font-size: 70%;
+        padding: 0.2em 1em;
+        border-radius: 1px;
+      }
+      .ͼ2 .cm-button:active {
+        background-image: linear-gradient(#b4b4b4, #d0d3d6);
+      }
+      .ͼ2 .cm-button {
+        background-image: linear-gradient(#eff1f5, #d9d9df);
+        border: 1px solid #888;
+      }
+      .ͼ3 .cm-button:active {
+        background-image: linear-gradient(#111, #333);
+      }
+      .ͼ3 .cm-button {
+        background-image: linear-gradient(#393939, #111);
+        border: 1px solid #888;
+      }
+      .ͼ1 .cm-textfield {
+        vertical-align: middle;
+        color: inherit;
+        font-size: 70%;
+        border: 1px solid silver;
+        padding: 0.2em 0.5em;
+      }
+      .ͼ2 .cm-textfield {
+        background-color: white;
+      }
+      .ͼ3 .cm-textfield {
+        border: 1px solid #555;
+        background-color: inherit;
+      }
+      .ͼ1 .cm-foldPlaceholder {
+        background-color: #eee;
+        border: 1px solid #ddd;
+        color: #888;
+        border-radius: 0.2em;
+        margin: 0 1px;
+        padding: 0 1px;
+        cursor: pointer;
+      }
+      .ͼ1 .cm-foldGutter span {
+        padding: 0 1px;
+        cursor: pointer;
+      }
+      .ͼq .cm-content {
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        padding: 0;
+      }
+    </style>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>New tab - Obsidian Sandbox - Obsidian v1.1.12</title>
+    <link href="app.css" type="text/css" rel="stylesheet" />
+    <style type="text/css"></style>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body
+    class="theme-light mod-macos is-frameless is-hidden-frameless obsidian-app native-scrollbars show-inline-title show-view-header is-fullscreen is-maximized"
+    style="--zoom-factor: 1; --font-text-size: 16px"
+  >
+    <div class="titlebar">
+      <div class="titlebar-inner">
+        <div class="titlebar-text">
+          New tab - Obsidian Sandbox - Obsidian v1.1.12
+        </div>
+        <div class="titlebar-button-container mod-left"></div>
+        <div class="titlebar-button-container mod-right"></div>
+      </div>
+    </div>
+    <div class="app-container">
+      <div class="horizontal-main-container">
+        <div class="workspace is-left-sidedock-open is-right-sidedock-open">
+          <div class="workspace-ribbon side-dock-ribbon mod-left">
+            <div
+              class="sidebar-toggle-button mod-left"
+              aria-label=""
+              aria-label-position="right"
+            >
+              <div class="clickable-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon sidebar-left"
+                >
+                  <path
+                    d="M21 3H3C1.89543 3 1 3.89543 1 5V19C1 20.1046 1.89543 21 3 21H21C22.1046 21 23 20.1046 23 19V5C23 3.89543 22.1046 3 21 3Z"
+                  ></path>
+                  <path d="M10 4V20"></path>
+                  <path d="M4 7H7"></path>
+                  <path d="M4 10H7"></path>
+                  <path d="M4 13H7"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="side-dock-actions">
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Open quick switcher"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-file-search"
+                >
+                  <path
+                    d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v3"
+                  ></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <path d="M5 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+                  <path d="m9 18-1.5-1.5"></path>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Open graph view"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-git-fork"
+                >
+                  <circle cx="12" cy="18" r="3"></circle>
+                  <circle cx="6" cy="6" r="3"></circle>
+                  <circle cx="18" cy="6" r="3"></circle>
+                  <path d="M18 9v1a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9"></path>
+                  <path d="M12 12v3"></path>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Create new canvas"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-layout-dashboard"
+                >
+                  <rect x="3" y="3" width="7" height="9"></rect>
+                  <rect x="14" y="3" width="7" height="5"></rect>
+                  <rect x="14" y="12" width="7" height="9"></rect>
+                  <rect x="3" y="16" width="7" height="5"></rect>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Open today's daily note"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-calendar"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Insert template"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-files"
+                >
+                  <path
+                    d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z"
+                  ></path>
+                  <path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8"></path>
+                  <path d="M15 2v5h5"></path>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Open command palette"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-terminal"
+                >
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="side-dock-settings">
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Open another vault"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon vault"
+                >
+                  <path
+                    d="M21 19.2L21 4.8C21 3.47452 20.6046 3 19.5 3L4.5 3C3.39543 3 3 3.47452 3 4.8L3 19.2C3 20.5255 3.39543 21 4.5 21L19.5 21C20.6046 21 21 20.5255 21 19.2Z"
+                  ></path>
+                  <path
+                    d="M14.9675 10.56C15.0601 11.1841 14.9535 11.8216 14.6629 12.3817C14.3722 12.9418 13.9124 13.396 13.3488 13.6797C12.7851 13.9634 12.1464 14.0621 11.5234 13.9619C10.9004 13.8616 10.3249 13.5675 9.87868 13.1213C9.43249 12.6751 9.13835 12.0996 9.0381 11.4766C8.93786 10.8536 9.0366 10.2149 9.3203 9.65123C9.60399 9.08759 10.0582 8.62776 10.6183 8.33713C11.1784 8.04651 11.8159 7.93989 12.4401 8.03245C13.0767 8.12687 13.6662 8.42355 14.1213 8.87868C14.5765 9.33381 14.8731 9.92326 14.9675 10.56Z"
+                  ></path>
+                  <path d="M12 14L12 17"></path>
+                  <path d="M21 7L22.5 7"></path>
+                  <path d="M21 16L22.5 16"></path>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Help"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon help"
+                >
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  ></path>
+                  <path
+                    d="M9.09009 9.00003C9.32519 8.33169 9.78924 7.76813 10.4 7.40916C11.0108 7.05019 12.079 6.94542 12.7773 7.06519C13.9093 7.25935 14.9767 8.25497 14.9748 9.49073C14.9748 11.9908 12 11.2974 12 14"
+                  ></path>
+                  <path d="M12 17H12.01"></path>
+                </svg>
+              </div>
+              <div
+                class="clickable-icon side-dock-ribbon-action"
+                aria-label="Settings"
+                aria-label-position="right"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="svg-icon lucide-settings"
+                >
+                  <path
+                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                  ></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div
+            class="workspace-split mod-horizontal mod-left-split"
+            style="width: 300px"
+          >
+            <hr class="workspace-leaf-resize-handle" />
+            <div class="workspace-sidedock-empty-state" style="display: none">
+              <p class="u-muted">
+                The sidebar is empty, try dragging a tab here.
+              </p>
+            </div>
+            <div class="workspace-tabs mod-top mod-top-left-space">
+              <hr class="workspace-leaf-resize-handle" />
+              <div class="workspace-tab-header-container">
+                <div
+                  class="workspace-tab-header-container-inner"
+                  style="--animation-dur: 250ms"
+                >
+                  <div
+                    class="workspace-tab-header is-active"
+                    draggable="true"
+                    aria-label="Files"
+                    aria-label-delay="50"
+                    data-type="file-explorer"
+                    style=""
+                  >
+                    <div class="workspace-tab-header-inner">
+                      <div class="workspace-tab-header-inner-icon">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-folder-closed"
+                        >
+                          <path
+                            d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+                          ></path>
+                          <path d="M2 10h20"></path>
+                        </svg>
+                      </div>
+                      <div class="workspace-tab-header-inner-title">Files</div>
+                      <div class="workspace-tab-header-status-container"></div>
+                      <div
+                        class="workspace-tab-header-inner-close-button"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-x"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="workspace-tab-header"
+                    draggable="true"
+                    aria-label="Search"
+                    aria-label-delay="50"
+                    data-type="search"
+                    style=""
+                  >
+                    <div class="workspace-tab-header-inner">
+                      <div class="workspace-tab-header-inner-icon">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-search"
+                        >
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                      </div>
+                      <div class="workspace-tab-header-inner-title">Search</div>
+                      <div class="workspace-tab-header-status-container"></div>
+                      <div
+                        class="workspace-tab-header-inner-close-button"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-x"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="workspace-tab-header"
+                    draggable="true"
+                    aria-label="Starred"
+                    aria-label-delay="50"
+                    data-type="starred"
+                    style=""
+                  >
+                    <div class="workspace-tab-header-inner">
+                      <div class="workspace-tab-header-inner-icon">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-star"
+                        >
+                          <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                          ></polygon>
+                        </svg>
+                      </div>
+                      <div class="workspace-tab-header-inner-title">
+                        Starred
+                      </div>
+                      <div class="workspace-tab-header-status-container"></div>
+                      <div
+                        class="workspace-tab-header-inner-close-button"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-x"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-tab-header-new-tab">
+                  <span class="clickable-icon" aria-label="New tab"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-plus"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line></svg
+                  ></span>
+                </div>
+                <div class="workspace-tab-header-spacer"></div>
+                <div class="workspace-tab-header-tab-list">
+                  <span class="clickable-icon"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-chevron-down"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline></svg
+                  ></span>
+                </div>
+              </div>
+              <div class="workspace-tab-container">
+                <div class="workspace-leaf">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="file-explorer">
+                    <div class="nav-header">
+                      <div class="nav-buttons-container">
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="New note"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-edit"
+                          >
+                            <path
+                              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                            ></path>
+                            <path
+                              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                            ></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="New folder"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-folder-plus"
+                          >
+                            <path
+                              d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+                            ></path>
+                            <line x1="12" y1="10" x2="12" y2="16"></line>
+                            <line x1="9" y1="13" x2="15" y2="13"></line>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Change sort order"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-sort-asc"
+                          >
+                            <path d="M11 5h4"></path>
+                            <path d="M11 9h7"></path>
+                            <path d="M11 13h10"></path>
+                            <path d="m3 17 3 3 3-3"></path>
+                            <path d="M6 18V4"></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Expand all"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-chevrons-up-down"
+                          >
+                            <path d="m7 15 5 5 5-5"></path>
+                            <path d="m7 9 5-5 5 5"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="nav-files-container node-insert-event"
+                      style="position: relative"
+                    >
+                      <div class="nav-folder mod-root">
+                        <div class="nav-folder-title" data-path="/">
+                          <div
+                            class="nav-folder-collapse-indicator collapse-icon"
+                          ></div>
+                          <div class="nav-folder-title-content">
+                            Obsidian Sandbox
+                          </div>
+                        </div>
+                        <div class="nav-folder-children" style="">
+                          <div
+                            style="
+                              width: 276px;
+                              height: 0.1px;
+                              margin-bottom: 0px;
+                            "
+                          ></div>
+                          <div class="nav-folder is-collapsed">
+                            <div
+                              class="nav-folder-title"
+                              data-path="Adventurer"
+                              draggable="true"
+                            >
+                              <div
+                                class="nav-folder-collapse-indicator collapse-icon"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="svg-icon right-triangle"
+                                >
+                                  <path d="M3 8L12 17L21 8"></path>
+                                </svg>
+                              </div>
+                              <div class="nav-folder-title-content">
+                                Adventurer
+                              </div>
+                            </div>
+                          </div>
+                          <div class="nav-folder is-collapsed">
+                            <div
+                              class="nav-folder-title"
+                              data-path="Formatting"
+                              draggable="true"
+                            >
+                              <div
+                                class="nav-folder-collapse-indicator collapse-icon"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="svg-icon right-triangle"
+                                >
+                                  <path d="M3 8L12 17L21 8"></path>
+                                </svg>
+                              </div>
+                              <div class="nav-folder-title-content">
+                                Formatting
+                              </div>
+                            </div>
+                          </div>
+                          <div class="nav-folder is-collapsed">
+                            <div
+                              class="nav-folder-title"
+                              data-path="Guides"
+                              draggable="true"
+                            >
+                              <div
+                                class="nav-folder-collapse-indicator collapse-icon"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="svg-icon right-triangle"
+                                >
+                                  <path d="M3 8L12 17L21 8"></path>
+                                </svg>
+                              </div>
+                              <div class="nav-folder-title-content">Guides</div>
+                            </div>
+                          </div>
+                          <div class="nav-file">
+                            <div
+                              class="nav-file-title"
+                              data-path="Plugins make Obsidian special for you.md"
+                              draggable="true"
+                            >
+                              <div class="nav-file-title-content">
+                                Plugins make Obsidian special for you
+                              </div>
+                            </div>
+                          </div>
+                          <div class="nav-file">
+                            <div
+                              class="nav-file-title"
+                              data-path="Start Here.md"
+                              draggable="true"
+                            >
+                              <div class="nav-file-title-content">
+                                Start Here
+                              </div>
+                            </div>
+                          </div>
+                          <div class="nav-file">
+                            <div
+                              class="nav-file-title"
+                              data-path="Vault is just a local folder.md"
+                              draggable="true"
+                            >
+                              <div class="nav-file-title-content">
+                                Vault is just a local folder
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-leaf" style="display: none">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="search">
+                    <div class="nav-header">
+                      <div class="nav-buttons-container">
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Match case"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon uppercase-lowercase-a"
+                          >
+                            <path d="M10.5 14L4.5 14"></path>
+                            <path d="M12.5 18L7.5 6"></path>
+                            <path d="M3 18L7.5 6"></path>
+                            <path
+                              d="M15.9526 10.8322C15.9526 10.8322 16.6259 10 18.3832 10C20.1406 9.99999 20.9986 11.0587 20.9986 11.9682V16.7018C20.9986 17.1624 21.2815 17.7461 21.7151 18"
+                            ></path>
+                            <path
+                              d="M20.7151 13.5C18.7151 13.5 15.7151 14.2837 15.7151 16C15.7151 17.7163 17.5908 18.2909 18.7151 18C19.5635 17.7804 20.5265 17.3116 20.889 16.6199"
+                            ></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Explain search term"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon help"
+                          >
+                            <path
+                              d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                            ></path>
+                            <path
+                              d="M9.09009 9.00003C9.32519 8.33169 9.78924 7.76813 10.4 7.40916C11.0108 7.05019 12.079 6.94542 12.7773 7.06519C13.9093 7.25935 14.9767 8.25497 14.9748 9.49073C14.9748 11.9908 12 11.2974 12 14"
+                            ></path>
+                            <path d="M12 17H12.01"></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Collapse results"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-list"
+                          >
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Show more context"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-move-vertical"
+                          >
+                            <polyline points="8 18 12 22 16 18"></polyline>
+                            <polyline points="8 6 12 2 16 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="22"></line>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Change sort order"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-sort-asc"
+                          >
+                            <path d="M11 5h4"></path>
+                            <path d="M11 9h7"></path>
+                            <path d="M11 13h10"></path>
+                            <path d="m3 17 3 3 3-3"></path>
+                            <path d="M6 18V4"></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Copy search results"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-copy"
+                          >
+                            <rect
+                              x="9"
+                              y="9"
+                              width="13"
+                              height="13"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <path
+                              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                            ></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="search-input-container">
+                      <input
+                        enterkeyhint="search"
+                        type="search"
+                        spellcheck="false"
+                        placeholder="Type to start search..."
+                      />
+                      <div
+                        class="search-input-clear-button"
+                        aria-label="Clear search"
+                        style="display: none"
+                      ></div>
+                    </div>
+                    <div
+                      class="search-info-container"
+                      style="display: none"
+                    ></div>
+                    <div
+                      class="search-result-container mod-global-search node-insert-event"
+                      style="position: relative"
+                    >
+                      <div class="search-results-children"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-leaf" style="display: none">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="starred">
+                    <div class="nav-header">
+                      <div class="nav-buttons-container">
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Star/unstar current file"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-star"
+                          >
+                            <polygon
+                              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                            ></polygon>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Star/unstar current search"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon star-list"
+                          >
+                            <path d="M10 12H3"></path>
+                            <path d="M16 6H3"></path>
+                            <path d="M10 18H3"></path>
+                            <path
+                              d="M17 11L18.236 13.3039L21 13.6756L19 15.4679L19.472 18L17 16.8039L14.528 18L15 15.4679L13 13.6756L15.764 13.3039L17 11Z"
+                            ></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="item-list" style="position: relative"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="workspace-split mod-vertical mod-root">
+            <hr class="workspace-leaf-resize-handle" />
+            <div class="workspace-tabs mod-top mod-active">
+              <hr class="workspace-leaf-resize-handle" />
+              <div class="workspace-tab-header-container">
+                <div
+                  class="workspace-tab-header-container-inner"
+                  style="--animation-dur: 250ms"
+                >
+                  <div
+                    class="workspace-tab-header is-active mod-active"
+                    draggable="true"
+                    aria-label="New tab"
+                    aria-label-delay="50"
+                    data-type="empty"
+                    style=""
+                  >
+                    <div class="workspace-tab-header-inner">
+                      <div class="workspace-tab-header-inner-icon">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-file"
+                        >
+                          <path
+                            d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                          ></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                      </div>
+                      <div class="workspace-tab-header-inner-title">
+                        New tab
+                      </div>
+                      <div class="workspace-tab-header-status-container"></div>
+                      <div
+                        class="workspace-tab-header-inner-close-button"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-x"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-tab-header-new-tab">
+                  <span class="clickable-icon" aria-label="New tab"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-plus"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line></svg
+                  ></span>
+                </div>
+                <div class="workspace-tab-header-spacer"></div>
+                <div class="workspace-tab-header-tab-list">
+                  <span class="clickable-icon"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-chevron-down"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline></svg
+                  ></span>
+                </div>
+              </div>
+              <div class="workspace-tab-container">
+                <div class="workspace-leaf mod-active">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="empty">
+                    <div class="view-header">
+                      <div
+                        class="clickable-icon view-header-icon"
+                        draggable="true"
+                        aria-label="Drag to rearrange"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-file"
+                        >
+                          <path
+                            d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                          ></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                      </div>
+                      <div class="view-header-nav-buttons">
+                        <button
+                          class="clickable-icon"
+                          aria-disabled="true"
+                          aria-label="Navigate back"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-arrow-left"
+                          >
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                          </svg></button
+                        ><button
+                          class="clickable-icon"
+                          aria-disabled="true"
+                          aria-label="Navigate forward"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-arrow-right"
+                          >
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                          </svg>
+                        </button>
+                      </div>
+                      <div class="view-header-title-container mod-at-start">
+                        <div class="view-header-title-parent"></div>
+                        <div class="view-header-title">New tab</div>
+                      </div>
+                      <div class="view-actions">
+                        <a
+                          class="clickable-icon view-action"
+                          aria-label="Unlink tab"
+                          style="display: none"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-link"
+                          >
+                            <path
+                              d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                            ></path>
+                            <path
+                              d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                            ></path></svg></a
+                        ><a
+                          class="clickable-icon view-action mod-pin-leaf"
+                          aria-label="Pin"
+                          style="display: none"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-pin"
+                          >
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path
+                              d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"
+                            ></path></svg></a
+                        ><a
+                          class="clickable-icon view-action"
+                          aria-label="More options"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-more-vertical"
+                          >
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle></svg
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="view-content">
+                      <div class="empty-state">
+                        <div class="empty-state-container">
+                          <div class="empty-state-title">
+                            No file is open<span
+                              class="empty-state-close-button"
+                              ><svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="svg-icon lucide-x"
+                              >
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line></svg
+                            ></span>
+                          </div>
+                          <div class="empty-state-action-list">
+                            <div class="empty-state-action">
+                              Create new file (⌘ N)
+                            </div>
+                            <div class="empty-state-action">
+                              Go to file (⌘ O)
+                            </div>
+                            <div class="empty-state-action">
+                              See recent files (⌘ O)
+                            </div>
+                            <div class="empty-state-action mod-close">
+                              Close
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="workspace-split mod-horizontal mod-right-split"
+            style="width: 300px"
+          >
+            <hr class="workspace-leaf-resize-handle" style="opacity: 1" />
+            <div class="workspace-sidedock-empty-state" style="display: none">
+              <p class="u-muted">
+                The sidebar is empty, try dragging a tab here.
+              </p>
+            </div>
+            <div class="workspace-tabs mod-top mod-top-right-space" style="">
+              <hr class="workspace-leaf-resize-handle" />
+              <div class="workspace-tab-header-container">
+                <div
+                  class="workspace-tab-header-container-inner"
+                  style="--animation-dur: 250ms"
+                >
+                  <div
+                    class="workspace-tab-header is-active"
+                    draggable="true"
+                    aria-label="Tags"
+                    aria-label-delay="50"
+                    data-type="tag"
+                  >
+                    <div class="workspace-tab-header-inner">
+                      <div class="workspace-tab-header-inner-icon">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-hash"
+                        >
+                          <line x1="4" y1="9" x2="20" y2="9"></line>
+                          <line x1="4" y1="15" x2="20" y2="15"></line>
+                          <line x1="10" y1="3" x2="8" y2="21"></line>
+                          <line x1="16" y1="3" x2="14" y2="21"></line>
+                        </svg>
+                      </div>
+                      <div class="workspace-tab-header-inner-title">Tags</div>
+                      <div class="workspace-tab-header-status-container"></div>
+                      <div
+                        class="workspace-tab-header-inner-close-button"
+                        aria-label="Close"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-x"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-tab-header-new-tab">
+                  <span class="clickable-icon" aria-label="New tab"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-plus"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line></svg
+                  ></span>
+                </div>
+                <div class="workspace-tab-header-spacer"></div>
+                <div class="workspace-tab-header-tab-list">
+                  <span class="clickable-icon"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon lucide-chevron-down"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline></svg
+                  ></span>
+                </div>
+                <div
+                  class="sidebar-toggle-button mod-right"
+                  aria-label=""
+                  aria-label-position="left"
+                  style=""
+                >
+                  <div class="clickable-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="svg-icon sidebar-right"
+                    >
+                      <path
+                        d="M3 3H21C22.1046 3 23 3.89543 23 5V19C23 20.1046 22.1046 21 21 21H3C1.89543 21 1 20.1046 1 19V5C1 3.89543 1.89543 3 3 3Z"
+                      ></path>
+                      <path d="M14 4V20"></path>
+                      <path d="M20 7H17"></path>
+                      <path d="M20 10H17"></path>
+                      <path d="M20 13H17"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="workspace-tab-container">
+                <div class="workspace-leaf" style="display: none">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="tag">
+                    <div class="nav-header">
+                      <div class="nav-buttons-container">
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Change sort order"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-sort-asc"
+                          >
+                            <path d="M11 5h4"></path>
+                            <path d="M11 9h7"></path>
+                            <path d="M11 13h10"></path>
+                            <path d="m3 17 3 3 3-3"></path>
+                            <path d="M6 18V4"></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button is-active"
+                          aria-label="Show nested tags"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-folder-tree"
+                          >
+                            <path
+                              d="M13 10h7a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"
+                            ></path>
+                            <path
+                              d="M13 21h7a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.88a1 1 0 0 1-.9-.55l-.44-.9a1 1 0 0 0-.9-.55H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"
+                            ></path>
+                            <path d="M3 3v2c0 1.1.9 2 2 2h3"></path>
+                            <path d="M3 3v13c0 1.1.9 2 2 2h3"></path>
+                          </svg>
+                        </div>
+                        <div
+                          class="clickable-icon nav-action-button"
+                          aria-label="Expand all"
+                          aria-disabled="false"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-chevrons-up-down"
+                          >
+                            <path d="m7 15 5 5 5-5"></path>
+                            <path d="m7 9 5-5 5 5"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="tag-container node-insert-event"
+                      style="position: relative"
+                    >
+                      <div style="">
+                        <div
+                          style="
+                            width: 276px;
+                            height: 0.1px;
+                            margin-bottom: 0px;
+                          "
+                        ></div>
+                        <div class="tree-item">
+                          <div class="tree-item-self tag-pane-tag is-clickable">
+                            <div class="tree-item-inner">
+                              <div class="tag-pane-tag-text">
+                                <span class="tag-pane-tag-parent"></span
+                                ><span class="tag-pane-tag-self">tags</span>
+                              </div>
+                            </div>
+                            <div class="tree-item-flair-outer">
+                              <span class="tag-pane-tag-count tree-item-flair"
+                                >1</span
+                              >
+                            </div>
+                          </div>
+                          <div
+                            class="tree-item-children"
+                            style="min-height: 0px"
+                          >
+                            <div
+                              style="
+                                width: 1px;
+                                height: 0.1px;
+                                margin-bottom: 0px;
+                              "
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="workspace-leaf mod-active">
+                  <hr class="workspace-leaf-resize-handle" />
+                  <div class="workspace-leaf-content" data-type="outline">
+                    <div class="view-header">
+                      <div
+                        class="clickable-icon view-header-icon"
+                        draggable="true"
+                        aria-label="Drag to rearrange"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="svg-icon lucide-list"
+                        >
+                          <line x1="8" y1="6" x2="21" y2="6"></line>
+                          <line x1="8" y1="12" x2="21" y2="12"></line>
+                          <line x1="8" y1="18" x2="21" y2="18"></line>
+                          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                      </div>
+                      <div class="view-header-nav-buttons">
+                        <button
+                          class="clickable-icon"
+                          aria-disabled="true"
+                          aria-label="Navigate back"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-arrow-left"
+                          >
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                          </svg></button
+                        ><button
+                          class="clickable-icon"
+                          aria-disabled="true"
+                          aria-label="Navigate forward"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-arrow-right"
+                          >
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                          </svg>
+                        </button>
+                      </div>
+                      <div class="view-header-title-container mod-at-start">
+                        <div class="view-header-title-parent"></div>
+                        <div class="view-header-title">Outline</div>
+                      </div>
+                      <div class="view-actions">
+                        <a
+                          class="clickable-icon view-action"
+                          aria-label="Unlink tab"
+                          style="display: none"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-link"
+                          >
+                            <path
+                              d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                            ></path>
+                            <path
+                              d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                            ></path></svg></a
+                        ><a
+                          class="clickable-icon view-action mod-pin-leaf"
+                          aria-label="Pin"
+                          style="display: none"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-pin"
+                          >
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path
+                              d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"
+                            ></path></svg></a
+                        ><a
+                          class="clickable-icon view-action"
+                          aria-label="More options"
+                          ><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="svg-icon lucide-more-vertical"
+                          >
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle></svg
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="view-content obzt" id="root">                  
+                    </div>
+                    <script type="module" src="/src/main.tsx"></script>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="workspace-ribbon side-dock-ribbon mod-right"></div>
+        </div>
+      </div>
+      <div class="status-bar">
+        <div class="status-bar-item plugin-backlink mod-clickable">
+          0 backlinks
+        </div>
+        <div
+          class="status-bar-item plugin-editor-status mod-clickable"
+          style="display: none"
+          aria-label="Live Preview"
+          aria-label-position="top"
+        >
+          <span class="status-bar-item-icon"></span>
+        </div>
+        <div class="status-bar-item plugin-word-count">
+          <span class="status-bar-item-segment">0 words</span
+          ><span class="status-bar-item-segment">0 characters</span>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

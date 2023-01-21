@@ -1,0 +1,484 @@
+{
+  "doc": {
+    "sourcePath": "LiteratureNotes/el-brolosyGeneticCompensationPhenomenon2017.md",
+    "docItem": {
+      "key": "V2AZXJF5",
+      "itemType": "journalArticle",
+      "libraryID": 1,
+      "groupID": null,
+      "itemID": 23218,
+      "creators": [
+        {
+          "firstName": "Mohamed A.",
+          "lastName": "El-Brolosy",
+          "fieldMode": 0,
+          "creatorType": "author",
+          "orderIndex": 0
+        },
+        {
+          "firstName": "Didier Y. R.",
+          "lastName": "Stainier",
+          "fieldMode": 0,
+          "creatorType": "author",
+          "orderIndex": 1
+        }
+      ],
+      "citekey": "el-brolosyGeneticCompensationPhenomenon2017",
+      "title": ["Genetic compensation: A phenomenon in search of mechanisms"],
+      "abstractNote": [
+        "Several recent studies in a number of model systems including zebrafish, Arabidopsis, and mouse have revealed phenotypic differences between knockouts (i.e., mutants) and knockdowns (e.g., antisense-treated animals). These differences have been attributed to a number of reasons including off-target effects of the antisense reagents. An alternative explanation was recently proposed based on a zebrafish study reporting that genetic compensation was observed in egfl7 mutant but not knockdown animals. Dosage compensation was first reported in Drosophila in 1932, and genetic compensation in response to a gene knockout was first reported in yeast in 1969. Since then, genetic compensation has been documented many times in a number of model organisms; however, our understanding of the underlying molecular mechanisms remains limited. In this review, we revisit studies reporting genetic compensation in higher eukaryotes and outline possible molecular mechanisms, which may include both transcriptional and posttranscriptional processes."
+      ],
+      "date": ["2017"],
+      "shortTitle": ["Genetic compensation"],
+      "libraryCatalog": ["PubMed Central"],
+      "url": ["https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5509088/"],
+      "accessDate": ["2023-01-14 08:13:57"],
+      "extra": ["PMID: 28704371\nPMCID: PMC5509088"],
+      "volume": ["13"],
+      "pages": ["e1006780"],
+      "publicationTitle": ["PLoS Genetics"],
+      "DOI": ["10.1371/journal.pgen.1006780"],
+      "issue": ["7"],
+      "journalAbbreviation": ["PLoS Genet"],
+      "ISSN": ["1553-7390"]
+    },
+    "lib": 1
+  },
+  "allAttachments": [
+    {
+      "itemID": 23220,
+      "path": "storage:El-Brolosy 和 Stainier - 2017 - Genetic compensation A phenomenon in search of me.pdf",
+      "key": "QSGICCGF",
+      "annotCount": 17
+    }
+  ],
+  "attachmentID": null,
+  "annotations": [
+    {
+      "itemID": 23228,
+      "key": "45T7RMUW",
+      "type": 1,
+      "authorName": null,
+      "text": "Genetic robustness isthe ability of aliving organism to maintain its viability and fitness despite genetic variations, including perturbations.",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "1",
+      "sortIndex": [0, 1139, 506],
+      "position": {
+        "pageIndex": 0,
+        "rects": [
+          [200.012, 276.222, 575.894, 285.222],
+          [200.012, 263.183, 371.464, 272.183]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23270,
+      "key": "4I9537UI",
+      "type": 1,
+      "authorName": null,
+      "text": "RNA-binding proteins (RBPs) can also regulate gene expression in anumber of ways (reviewed in [131]),",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "7",
+      "sortIndex": [6, 1998, 428],
+      "position": {
+        "pageIndex": 6,
+        "rects": [
+          [211.974, 354.631, 548.809, 363.631],
+          [200.012, 341.592, 278.385, 350.592]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23267,
+      "key": "EBZHAFV7",
+      "type": 1,
+      "authorName": null,
+      "text": "Following DNA damage, global chromatin reorganization and decondensation are detected [94, 95], actions mediated by several chromatin remodelers and histone-modifying enzymes (reviewed in [96])",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "5",
+      "sortIndex": [4, 623, 199],
+      "position": {
+        "pageIndex": 4,
+        "rects": [
+          [211.975, 583.272, 575.515, 592.272],
+          [200.013, 570.289, 565.194, 579.289],
+          [200.013, 557.306, 271.386, 566.306]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23271,
+      "key": "HELTDEPQ",
+      "type": 3,
+      "authorName": null,
+      "text": null,
+      "comment": null,
+      "color": "#ffd400",
+      "pageLabel": "3",
+      "sortIndex": [2, 1764, 85],
+      "position": {
+        "pageIndex": 2,
+        "rects": [[30.938, 406.687, 580.313, 706.688]]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23230,
+      "key": "HUK7CJGZ",
+      "type": 3,
+      "authorName": null,
+      "text": null,
+      "comment": null,
+      "color": "#ffd400",
+      "pageLabel": "2",
+      "sortIndex": [1, 2716, 590],
+      "position": {
+        "pageIndex": 1,
+        "rects": [[195.5, 89, 581.5, 201.5]]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23269,
+      "key": "JK2GZSW7",
+      "type": 1,
+      "authorName": null,
+      "text": "Mutations often lead to mRNAs with apremature termination codon (PTC), secondary structures that stall ribosomal translocation, or, less frequently, mRNAs that lack astop codon. The presence of such mRNAs triggers the nonsense-mediated decay (NMD), no-go decay, or no-stop decay pathways, respectively, which results in mRNA degradation (reviewed in [114116])",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "6",
+      "sortIndex": [5, 3237, 649],
+      "position": {
+        "pageIndex": 5,
+        "rects": [
+          [211.975, 133.587, 559.585, 142.587],
+          [200.013, 120.604, 575.001, 129.604],
+          [200.013, 107.621, 568.95, 116.621],
+          [200.013, 94.582, 571.132, 103.582],
+          [200.013, 81.6, 221.043, 90.6]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23264,
+      "key": "L4EMG97U",
+      "type": 3,
+      "authorName": null,
+      "text": null,
+      "comment": null,
+      "color": "#ffd400",
+      "pageLabel": "5",
+      "sortIndex": [4, 1130, 313],
+      "position": {
+        "pageIndex": 4,
+        "rects": [[308.077, 170.077, 575.192, 478.731]]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23261,
+      "key": "LBYMJAPX",
+      "type": 1,
+      "authorName": null,
+      "text": "Upregulation of related genes due to the loss of anegative feedback loop",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "2",
+      "sortIndex": [1, 2590, 557],
+      "position": {
+        "pageIndex": 1,
+        "rects": [
+          [338.511, 225.823, 564.604, 234.823],
+          [200.012, 212.84, 255.169, 221.84]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23244,
+      "key": "M6ZXKU8J",
+      "type": 1,
+      "authorName": null,
+      "text": "lack of acompensatory response in knockdown animals compared to their corresponding mutants indicates that atrigger upstream of protein function isat play, perhaps the genomic lesion itself or the mutant mRNA",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "3",
+      "sortIndex": [2, 400, 488],
+      "position": {
+        "pageIndex": 2,
+        "rects": [
+          [259.936, 294.761, 574.582, 303.761],
+          [200.012, 281.722, 561.649, 290.722],
+          [200.012, 268.739, 383.919, 277.739]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23233,
+      "key": "PRIGA3CK",
+      "type": 1,
+      "authorName": null,
+      "text": "riggered upstream of protein function (hereafter referred to as genetic compensation or transcriptional adaptation",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "2",
+      "sortIndex": [1, 604, 181],
+      "position": {
+        "pageIndex": 1,
+        "rects": [
+          [265.435, 601.584, 568.168, 610.584],
+          [200.013, 588.601, 355.978, 597.601]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23239,
+      "key": "QV5FDL2G",
+      "type": 1,
+      "authorName": null,
+      "text": "Upregulation of related genes following agene knockout may be adirect consequence of the loss of protein function",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "2",
+      "sortIndex": [1, 2327, 518],
+      "position": {
+        "pageIndex": 1,
+        "rects": [
+          [200.012, 264.827, 565.687, 273.827],
+          [200.012, 250.858, 292.663, 260.858]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23266,
+      "key": "RIHKCNUN",
+      "type": 1,
+      "authorName": null,
+      "text": "Chromatin reorganization may be accompanied by changes in DNA looping and nuclear organization [100], which may also affect gene expression. Interchromosomal interactions are well documented (reviewed in [101]),",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "6",
+      "sortIndex": [5, 626, 181],
+      "position": {
+        "pageIndex": 5,
+        "rects": [
+          [211.975, 601.584, 565.342, 610.584],
+          [200.013, 588.601, 572.45, 597.601],
+          [200.013, 575.618, 349.082, 584.618]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23262,
+      "key": "SGIZWADZ",
+      "type": 1,
+      "authorName": null,
+      "text": "Reduction or absence of aphenotype in several germline mutants compared to their conditional counterparts has been reported in anumber of studies in mouse",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "4",
+      "sortIndex": [3, 2141, 480],
+      "position": {
+        "pageIndex": 3,
+        "rects": [
+          [200.012, 302.187, 573.285, 311.187],
+          [200.012, 289.205, 448.88, 298.205]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23232,
+      "key": "UXKQFZMK",
+      "type": 1,
+      "authorName": null,
+      "text": "from tightly regulated cellular networks including metabolic, signaling, and transcriptional networks.",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "2",
+      "sortIndex": [1, 16, 77],
+      "position": {
+        "pageIndex": 1,
+        "rects": [
+          [269.233, 705.614, 568.627, 714.614],
+          [200.013, 692.575, 300.227, 701.575]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23263,
+      "key": "V2DCBL6U",
+      "type": 3,
+      "authorName": null,
+      "text": null,
+      "comment": null,
+      "color": "#ffd400",
+      "pageLabel": "5",
+      "sortIndex": [4, 1017, 312],
+      "position": {
+        "pageIndex": 4,
+        "rects": [[132.115, 239.885, 305.192, 479.885]]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23268,
+      "key": "VRAVZHGR",
+      "type": 1,
+      "authorName": null,
+      "text": "Leading to adifferent potential model, anumber of studies have reported the generation of small non-coding RNAs (ncRNAs) from regions spanning adouble-stranded break (DSB), termed DSB-induced RNAs (diRNAs) [103, 104] (reviewed in [105])",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "6",
+      "sortIndex": [5, 1220, 285],
+      "position": {
+        "pageIndex": 5,
+        "rects": [
+          [211.975, 497.61, 572.532, 506.61],
+          [200.013, 484.627, 560.171, 493.627],
+          [200.013, 471.588, 472.236, 480.588]
+        ]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    },
+    {
+      "itemID": 23229,
+      "key": "WW9NBMR9",
+      "type": 1,
+      "authorName": null,
+      "text": "Genetic robustness may arise from redundant genes,",
+      "comment": null,
+      "color": "#2ea8e5",
+      "pageLabel": "1",
+      "sortIndex": [0, 2168, 675],
+      "position": {
+        "pageIndex": 0,
+        "rects": [[211.974, 107.222, 420.881, 116.222]]
+      },
+      "isExternal": 0,
+      "libraryID": 1,
+      "groupID": null,
+      "itemType": "annotation",
+      "parentItem": "QSGICCGF",
+      "parentItemID": 23220
+    }
+  ],
+  "attachment": {
+    "itemID": 23220,
+    "path": "storage:El-Brolosy 和 Stainier - 2017 - Genetic compensation A phenomenon in search of me.pdf",
+    "key": "QSGICCGF",
+    "annotCount": 17
+  },
+  "tags": {
+    "23218": [],
+    "23228": [],
+    "23229": [],
+    "23230": [],
+    "23232": [],
+    "23233": [],
+    "23239": [],
+    "23244": [],
+    "23261": [],
+    "23262": [],
+    "23263": [],
+    "23264": [],
+    "23266": [],
+    "23267": [],
+    "23268": [],
+    "23269": [],
+    "23270": [],
+    "23271": []
+  }
+}

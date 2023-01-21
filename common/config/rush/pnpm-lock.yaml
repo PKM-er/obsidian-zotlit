@@ -305,6 +305,7 @@ importers:
       clsx: ^1.2.1
       eslint: ~8.31.0
       lodash-es: ~4.17.21
+      path-browserify: ~1.0.1
       postcss: ~8.4.21
       postcss-discard: ~2.0.0
       postcss-prefix-selector: ~1.16.0
@@ -325,6 +326,7 @@ importers:
       assert-never: 1.2.1
       clsx: 1.2.1
       lodash-es: 4.17.21
+      path-browserify: 1.0.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-error-boundary: 3.1.4_react@17.0.2
@@ -11936,7 +11938,6 @@ packages:
 
   /path-browserify/1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
-    dev: true
 
   /path-case/3.0.4:
     resolution: {integrity: sha512-qO4qCFjXqVTrcbPt/hQfhTQ+VhFsqNKOPtytgNKkKxSoEp3XPUQ8ObFuePylOIok5gjn69ry8XiULxCwot3Wfg==}

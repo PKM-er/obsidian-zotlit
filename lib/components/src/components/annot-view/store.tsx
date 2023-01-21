@@ -1,13 +1,13 @@
 import type {
   AnnotationInfo,
   AttachmentInfo,
-  RegularItemInfo,
+  RegularItemInfoBase,
   TagInfo,
 } from "@obzt/database";
 import type { StoreApi } from "zustand";
 
 export interface DataModel {
-  doc: { sourcePath: string; docItem: RegularItemInfo; lib: number } | null;
+  doc: { sourcePath: string; docItem: RegularItemInfoBase; lib: number } | null;
   attachment: AttachmentInfo | null;
   attachmentID: number | null;
   allAttachments: AttachmentInfo[] | null;

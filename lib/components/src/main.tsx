@@ -1,11 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import { AnnotsView, AnnotsViewContext } from "./components";
 import "./index.css";
+import { context } from "./mock";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AnnotsViewContext.Provider value={context}>
+      <AnnotsView />
+    </AnnotsViewContext.Provider>
   </React.StrictMode>,
   document.getElementById("root") as HTMLElement,
 );
