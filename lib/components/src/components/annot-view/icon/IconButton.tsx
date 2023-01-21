@@ -1,13 +1,25 @@
+import clsx from "clsx";
 import { forwardRef } from "react";
 import type { IconProps } from "./Icon";
 import Icon from "./Icon";
 
-export type IconButtonProps = IconProps &
-  Required<Pick<IconProps, "onClick" | "onKeyDown">>;
+export type IconButtonProps = Omit<IconProps, "onClick"> & {
+  onClick(evt: React.MouseEvent | React.KeyboardEvent): any;
+};
 
 export default forwardRef(function IconButton(
-  props: IconProps,
+  { onClick, onKeyDown, className, ...props }: IconButtonProps,
   ref: React.Ref<HTMLDivElement>,
 ) {
-  return <Icon {...props} ref={ref} role="button" tabIndex={0} />;
+  return (
+    <Icon
+      onClick={onClick}
+      onKeyDown={onKeyDown ?? onClick}
+      className={clsx("clickable-icon", className)}
+      {...props}
+      ref={ref}
+      role="button"
+      tabIndex={0}
+    />
+  );
 });

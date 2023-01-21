@@ -23,7 +23,11 @@ export default memo(function HeaderIcon({
     <Icon
       icon={icon}
       style={{ color: color ?? undefined }}
-      className={clsx(className, "annot-type-icon")}
+      className={clsx(
+        className,
+        "annot-type-icon",
+        "flex h-auto cursor-grab items-center justify-center opacity-[var(--icon-opacity)]",
+      )}
       aria-label={label}
       aria-label-delay="500"
       {...props}

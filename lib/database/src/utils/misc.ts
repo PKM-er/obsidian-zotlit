@@ -1,5 +1,5 @@
 import { join } from "path";
-import type { AttachmentInfo, RegularItemInfo } from "../index.js";
+import type { AttachmentInfo, RegularItemInfoBase } from "../index.js";
 
 /**
  * @see https://github.com/zotero/zotero/blob/c13d17b5e6ca496491e926211c0e1ea7aef072ae/chrome/content/zotero/xpcom/annotations.js#L42-L45
@@ -38,12 +38,12 @@ interface Storage {
   setItem(key: string, value: string): void;
 }
 
-const toLocalStorageKey = (docItem: RegularItemInfo) =>
+const toLocalStorageKey = (docItem: RegularItemInfoBase) =>
   `obzt-active-atch-${docItem.itemID}-${docItem.libraryID}`;
 
 export const getCachedActiveAtch = (
   storage: Storage,
-  docItem: RegularItemInfo,
+  docItem: RegularItemInfoBase,
 ) => {
   const raw = storage.getItem(toLocalStorageKey(docItem));
   if (!raw) return null;
@@ -54,6 +54,6 @@ export const getCachedActiveAtch = (
 
 export const cacheActiveAtch = (
   storage: Storage,
-  docItem: RegularItemInfo,
+  docItem: RegularItemInfoBase,
   atchID: number,
 ) => storage.setItem(toLocalStorageKey(docItem), atchID.toString());

@@ -1,11 +1,11 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
-type HeaderProps = PropsWithChildren<{ action: ReactNode }>;
+type HeaderProps = PropsWithChildren<{ buttons: ReactNode }>;
 
-export default function Header({ children, action }: HeaderProps) {
+export default function Header({ children, buttons }: HeaderProps) {
   return (
-    <div className="annot-view-header">
-      <div className="annot-view-button-container">{action}</div>
+    <div className="nav-header">
+      <div className="nav-buttons-container">{buttons}</div>
       {children}
     </div>
   );

@@ -1,41 +1,41 @@
-import type { HTMLAttributes, PropsWithChildren } from "react";
-import AnnotDetailsToggle from "./AnnotDetailsToggle";
-import type { HeaderIconProps } from "./HeaderIcon";
-import HeaderIcon from "./HeaderIcon";
-import MoreOptionsButton from "./MoreOptionsButton";
+import clsx from "clsx";
+import type { PropsWithChildren, ReactNode } from "react";
+import type { Attributes } from "../utils";
 
-type HeaderProps = {
+interface HeaderProps extends Attributes {
+  drag: ReactNode;
+  checkbox: ReactNode;
+  buttons: ReactNode;
   onMoreOptions(evt: React.MouseEvent | React.KeyboardEvent): any;
-  onDetailsToggled(): any;
-} & DragProps &
-  HeaderIconProps;
-
-type DragProps = Pick<HTMLAttributes<HTMLElement>, "draggable" | "onDragStart">;
+}
 
 export default function Header({
+  checkbox,
+  drag,
+  buttons,
   onMoreOptions,
-  onDetailsToggled,
-  draggable,
-  onDragStart,
-  icon,
-  color,
-  type,
+  className,
   children,
+  onContextMenu,
+  ...props
 }: PropsWithChildren<HeaderProps>) {
   return (
-    <div className="annot-header" onContextMenu={onMoreOptions}>
-      <div className="annot-action-container">
-        <HeaderIcon
-          draggable={draggable}
-          onDragStart={onDragStart}
-          icon={icon}
-          color={color}
-          type={type}
-        />
-        <AnnotDetailsToggle onClick={onDetailsToggled} />
-        <MoreOptionsButton onClick={onMoreOptions} onKeyDown={onMoreOptions} />
+    <div
+      className={clsx(
+        "annot-header flex cursor-context-menu items-center gap-1 px-3 py-1",
+        className,
+      )}
+      onContextMenu={onContextMenu ?? onMoreOptions}
+      {...props}
+    >
+      {checkbox}
+      <div className="annot-header-drag-container flex flex-row items-center gap-1">
+        {drag}
       </div>
-      <div className="annot-header-space" />
+      <div className="annot-header-buttons-container flex flex-row items-center gap-1 opacity-0 transition-opacity hover:opacity-100">
+        {buttons}
+      </div>
+      <div className="annot-header-space flex-1" />
       {children}
     </div>
   );

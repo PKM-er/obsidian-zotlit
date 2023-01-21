@@ -11,6 +11,7 @@ export default function MoreOptionsButton({
   return (
     <IconButton
       icon="more-vertical"
+      // icon size patched in index.css
       className={clsx("annot-header-more-options", className)}
       aria-label="More Options"
       aria-label-delay="50"

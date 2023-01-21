@@ -6,6 +6,7 @@ import ImgExcerpt from "./ImgExcerpt";
 
 type ExcerptProps = Pick<AnnotationInfo, "type" | "text" | "pageLabel"> & {
   imgSrc?: string;
+  collapsed: boolean;
 };
 
 export default memo(function Excerpt({
@@ -13,13 +14,21 @@ export default memo(function Excerpt({
   text,
   pageLabel,
   imgSrc,
+  collapsed,
 }: ExcerptProps) {
   switch (type) {
     case AnnotationType.highlight:
-      return <p>{text}</p>;
+      return <p className="select-text">{text}</p>;
     case AnnotationType.image:
       if (!imgSrc) throw new Error("imgSrc is required for image annotation");
-      return <ImgExcerpt src={imgSrc} pageLabel={pageLabel} text={text} />;
+      return (
+        <ImgExcerpt
+          collapsed={collapsed}
+          src={imgSrc}
+          pageLabel={pageLabel}
+          text={text}
+        />
+      );
     case AnnotationType.note:
     case AnnotationType.ink:
       return <>Unsupported Type: {AnnotationType[type]}</>;

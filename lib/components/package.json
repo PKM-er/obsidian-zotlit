@@ -24,7 +24,9 @@
     "@mobily/ts-belt": "~3.13.1",
     "react-error-boundary": "~3.1.4",
     "lodash-es": "~4.17.21",
-    "path-browserify": "~1.0.1"
+    "path-browserify": "~1.0.1",
+    "@tailwindcss/container-queries": "~0.1.0",
+    "@tailwindcss/line-clamp": "~0.4.2"
   },
   "devDependencies": {
     "@types/react": "~17.0.8",

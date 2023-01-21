@@ -4,12 +4,12 @@ import clsx from "clsx";
 import { useContext, useEffect } from "react";
 import { useStore } from "zustand";
 import { shallow } from "zustand/shallow";
-import type { AnnotListProps } from "../AnnotList";
-import AnnotList from "../AnnotList";
 import { Context } from "../context";
+import DetailsButton from "../DetailsButton";
+import type { AnnotListProps } from "./AnnotList";
+import AnnotList from "./AnnotList";
 import AttachmentSelector from "./AttachmentSelector";
 import CollapseButton from "./CollapseButton";
-import DocItemDetailsToggle from "./DocDetailsToggle";
 import Header from "./Header";
 
 import RefreshButton from "./RefreshButton";
@@ -33,9 +33,9 @@ export default function AnnotsView() {
 
   if (!doc) {
     return (
-      <div className="annot-view">
-        <div className="pane-empty">Active file not literature note</div>
-      </div>
+      <>
+        <div className="pane-empty p-2">Active file not literature note</div>
+      </>
     );
   }
   return <AnnotsViewMain docItem={doc.docItem} />;
@@ -49,32 +49,51 @@ function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
   const annotListProps = useAnnotList();
 
   return (
-    <div className={clsx("annot-view", { "is-collapsed": isCollapsed })}>
+    <>
       <Header
-        action={
+        buttons={
           <>
-            <DocItemDetailsToggle
+            <DetailsButton
+              className="nav-action-button"
               onClick={useMemoizedFn(() => onShowDetails(docItem.itemID))}
             />
             <CollapseButton
+              className="nav-action-button"
               isCollapsed={isCollapsed}
-              onCollapsedToggled={toggleCollapsed}
+              onClick={toggleCollapsed}
             />
-            <RefreshButton onRefresh={refreshConn} />
+            <RefreshButton
+              className="nav-action-button"
+              onClick={refreshConn}
+            />
           </>
         }
       >
         <AttachmentSelector />
       </Header>
-      {annotListProps ? <AnnotList {...annotListProps} /> : <>Loading</>}
-    </div>
+      <div
+        className={clsx(
+          "annots-container @container",
+          "overflow-auto px-3 pt-1 pb-8 text-sm",
+        )}
+      >
+        {annotListProps ? (
+          <AnnotList collapsed={isCollapsed} {...annotListProps} />
+        ) : (
+          <>Loading</>
+        )}
+      </div>
+    </>
   );
 }
 
-const useAnnotList = () =>
+const useAnnotList = (): Pick<
+  AnnotListProps,
+  "annotations" | "getTags"
+> | null =>
   useStore(
     useContext(Context).store,
-    (s): Omit<AnnotListProps, "selectable"> | null => {
+    (s) => {
       if (!s.doc || !s.annotations || !s.attachment) return null;
       return {
         annotations: s.annotations,

@@ -18,7 +18,12 @@ export default memo(function PageLabel({
   if (backlink)
     return (
       <a
-        className={clsx("annot-page", "external-link", className)}
+        className={clsx(
+          "annot-page",
+          "external-link",
+          "bg-[length:12px] bg-[center_right_3px] pr-[18px] text-sm",
+          className,
+        )}
         href={backlink}
         aria-label={`Open Annotation In Zotero at Page ${pageLabel}`}
         aria-label-delay="500"

@@ -1,5 +1,3 @@
-import "./style.less";
-
 import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
 import { AnnotsViewContext, AnnotsView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
@@ -29,6 +27,7 @@ export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
     this.store = createStore(plugin);
+    this.containerEl.empty();
   }
   // root = createRoot(this.contentEl);
 
@@ -38,7 +37,7 @@ export class AnnotationView extends DerivedFileView {
 
   onload(): void {
     super.onload();
-    this.contentEl.addClass("obzt");
+    this.containerEl.addClass("obzt");
     this.registerEvent(
       app.metadataCache.on("zotero:index-update", this.loadDocItem),
     );
@@ -160,7 +159,7 @@ export class AnnotationView extends DerivedFileView {
       <AnnotsViewContext.Provider value={this.getContext()}>
         <AnnotsView />
       </AnnotsViewContext.Provider>,
-      this.contentEl,
+      this.containerEl,
     );
   }
   protected async onClose() {
