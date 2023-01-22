@@ -64,7 +64,7 @@ export class TemplateRenderer {
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
-    const { mode, mapping } = this.use(TemplateSettings).fields;
+    const { mode, mapping } = this.use(TemplateSettings).fmFields;
     const record: Record<string, any> = {};
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
@@ -95,7 +95,7 @@ export class TemplateRenderer {
         "Failed to renderYaml",
         err,
         data,
-        this.use(TemplateSettings).fields,
+        this.use(TemplateSettings).fmFields,
       );
       new Notice("Failed to renderYaml");
     }
@@ -111,7 +111,7 @@ export class TemplateRenderer {
         "Failed to set frontmatter to file " + file.path,
         err,
         data,
-        this.use(TemplateSettings).fields,
+        this.use(TemplateSettings).fmFields,
       );
       new Notice("Failed to set frontmatter to file " + file.path);
     }

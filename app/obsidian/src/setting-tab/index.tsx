@@ -15,8 +15,8 @@ import { debounce, Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
 import log from "@log";
 
-import type { SettingKeyWithType } from "../settings.js";
-import { InVaultPath } from "../settings.js";
+import { InVaultPath } from "../settings/invault-path";
+import type { SettingKeyWithType } from "../settings/service.js";
 import { templateTypes, ejectableTemplateTypes } from "../template";
 import { setBracketExtension } from "../template/editor";
 import { promptOpenLog } from "../utils/index.js";
@@ -57,7 +57,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         const settings = this.plugin.settings.watcher;
         toggle.setValue(settings.autoRefresh).onChange(async (value) => {
           await settings.setOption("autoRefresh", value).apply();
-          await this.plugin.saveSettings();
+          await this.plugin.settings.save();
         });
       })
       .setName("Refresh automatically when Zotero updates database");
@@ -88,7 +88,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           await access(value, constants.X_OK);
           new Notice("mutool path is saved.");
           this.plugin.settings.mutoolPath = value;
-          await this.plugin.saveSettings();
+          await this.plugin.settings.save();
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code === "ENOENT") {
             new Notice("File not found");
@@ -111,7 +111,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         text.setValue(newPath);
       }
       if (await noteIndex.setOption("literatureNoteFolder", newPath).apply())
-        await this.plugin.saveSettings();
+        await this.plugin.settings.save();
     };
     this.addTextComfirm(
       this.containerEl,
@@ -136,7 +136,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         toggle.setValue(settings.symlinkImgExcerpt).onChange(async (value) => {
           await settings.setOption("symlinkImgExcerpt", value).apply();
           setVisible(value);
-          await this.plugin.saveSettings();
+          await this.plugin.settings.save();
         });
       })
       .setName("Symlink Image Excerpt");
@@ -148,7 +148,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         text.setValue(newPath);
       }
       if (await settings.setOption("imgExcerptPath", newPath).apply())
-        await this.plugin.saveSettings();
+        await this.plugin.settings.save();
     };
     const text = this.addTextComfirm(
       this.containerEl,
@@ -188,7 +188,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           async (val) => {
             if (await settings.setOption("citationLibrary", +val).apply()) {
               new Notice("Zotero search index updated.");
-              await this.plugin.saveSettings();
+              await this.plugin.settings.save();
             }
           },
         );
@@ -222,7 +222,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
           text.setValue(newPath);
         }
         if (await template.setOption("folder", newPath).apply()) {
-          await this.plugin.saveSettings();
+          await this.plugin.settings.save();
         }
       },
       { rows: 1 },
@@ -297,7 +297,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     setEjectButton();
     ejectButton.onClick(async () => {
       await template.setOption("ejected", !template.ejected).apply();
-      await this.plugin.saveSettings();
+      await this.plugin.settings.save();
       setEjectButton();
       this.setEjectableTemplates(ejectableContainer);
     });
@@ -389,7 +389,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
                 .setOption("level", val as LogLevel)
                 .apply()
             ) {
-              await this.plugin.saveSettings();
+              await this.plugin.settings.save();
             }
           }),
       );
@@ -404,7 +404,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       toggle.setValue(this.plugin.settings[key]).onChange(async (value) => {
         this.plugin.settings[key] = value;
         await set?.(value);
-        await this.plugin.saveSettings();
+        await this.plugin.settings.save();
       });
     });
   }
@@ -418,7 +418,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     return new Setting(addTo).addTextArea((text) => {
       const onChange = async (value: string) => {
         await set(value);
-        await this.plugin.saveSettings();
+        await this.plugin.settings.save();
       };
       text.setValue(get()).onChange(debounce(onChange, timeout, true));
       Object.assign(text.inputEl, { cols: 30, rows: 5, ...size });

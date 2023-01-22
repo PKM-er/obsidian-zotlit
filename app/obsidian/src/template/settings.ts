@@ -1,11 +1,14 @@
+import type { Extension } from "@codemirror/state";
 import { D } from "@mobily/ts-belt";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { EtaConfig } from "eta/dist/types/config";
-import Settings from "../zotero-db/settings-base";
+import Settings from "../settings/base";
+import ZoteroPlugin from "../zt-main";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
+import { bracketExtension } from "./editor/bracket";
 import type { FmBlackList, FmWhiteList } from "./frontmatter";
 import { FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
@@ -39,8 +42,15 @@ interface SettingOptions {
   ejected: boolean;
   folder: string;
   templates: Record<NonEjectableTemplate, string>;
-  fields: FmWhiteList | FmBlackList;
+  fmFields: FmWhiteList | FmBlackList;
+  autoPairEta: boolean;
 }
+
+type SettingOptionsJSON = Record<
+  "template",
+  Pick<SettingOptions, "ejected" | "folder" | "templates">
+> &
+  Omit<SettingOptions, "ejected" | "folder" | "templates">;
 
 export const DEFAULT_TEMPLATE: Record<TemplateType, string> = {
   note,
@@ -75,13 +85,14 @@ export class TemplateSettings extends Settings<SettingOptions> {
       ejected: false,
       folder: "ZtTemplates",
       templates: D.deleteKeys(DEFAULT_TEMPLATE, ejectableTemplateTypes),
-      fields: {
+      fmFields: {
         mode: "whitelist",
         mapping: {
           ...FMFIELD_MAPPING,
         },
       } satisfies FmWhiteList,
-    };
+      autoPairEta: false,
+    } satisfies SettingOptions;
   }
 
   async setTemplate<K extends NonEjectableTemplate>(
@@ -93,8 +104,12 @@ export class TemplateSettings extends Settings<SettingOptions> {
     app.vault.trigger("zotero:template-updated", key);
   }
 
+  /** null if not registered */
+  #editorExtensions: Extension[] | null = null;
+
   async apply(key: keyof SettingOptions): Promise<void> {
-    const loader = this.use(TemplateLoader);
+    const loader = this.use(TemplateLoader),
+      plugin = this.use(ZoteroPlugin);
     switch (key) {
       case "ejected":
         return await loader.loadTemplates("eject");
@@ -103,8 +118,24 @@ export class TemplateSettings extends Settings<SettingOptions> {
         return await loader.loadTemplates("full");
       case "templates":
         return await loader.loadTemplates("noneject");
-      case "fields":
+      case "fmFields":
         return;
+      case "autoPairEta": {
+        const loadedBefore = this.#editorExtensions !== null;
+        if (this.#editorExtensions === null) {
+          this.#editorExtensions = [];
+          plugin.registerEditorExtension(this.#editorExtensions);
+        } else {
+          this.#editorExtensions.length = 0;
+        }
+        if (this.autoPairEta) {
+          this.#editorExtensions.push(bracketExtension);
+        }
+        if (loadedBefore) {
+          app.workspace.updateOptions();
+        }
+        break;
+      }
       default:
         assertNever(key);
     }
@@ -112,5 +143,25 @@ export class TemplateSettings extends Settings<SettingOptions> {
   async applyAll() {
     const loader = this.use(TemplateLoader);
     return await loader.loadTemplates("full");
+  }
+
+  toJSON(): SettingOptionsJSON {
+    return {
+      template: {
+        ejected: this.ejected,
+        folder: this.folder,
+        templates: this.templates,
+      },
+      fmFields: this.fmFields,
+      autoPairEta: this.autoPairEta,
+    };
+  }
+  // fix compatibility with old settings format
+  fromJSON({ template, autoPairEta, fmFields }: SettingOptionsJSON): void {
+    super.fromJSON({
+      ...template,
+      autoPairEta,
+      fmFields,
+    });
   }
 }

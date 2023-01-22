@@ -75,8 +75,9 @@ export default class PDFCache extends Events {
   constructor(public plugin: ZoteroPlugin) {
     super();
   }
-  get mutool() {
-    return this.plugin.settings.mutoolPath;
+  get mutool(): string {
+    throw new Error("Not implemented");
+    // return this.plugin.settings.mutoolPath;
   }
 
   async getCachedOutlineKeys() {

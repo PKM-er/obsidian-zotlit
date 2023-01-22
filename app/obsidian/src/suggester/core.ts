@@ -56,7 +56,7 @@ export function renderSuggestion(
   } else {
     titleEl.setText(title);
   }
-  if (this.plugin.settings.showCitekeyInSuggester && item.citekey) {
+  if (this.plugin.settings.suggester.showCitekeyInSuggester && item.citekey) {
     el.createDiv({ cls: "citekey", text: item.citekey });
   }
   if (isJournalArticleItem(item)) {

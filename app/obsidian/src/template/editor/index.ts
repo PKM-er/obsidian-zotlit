@@ -4,8 +4,8 @@ import { EtaSuggest } from "./suggester";
 
 const registerEtaEditorHelper = (plugin: ZoteroPlugin) => {
   // cause issue with canvas, disable for now
-  setBracketExtension(plugin, plugin.settings.autoPairEta);
-  plugin.registerEditorExtension(plugin.editorExtensions);
+  // setBracketExtension(plugin, plugin.settings.autoPairEta);
+  // plugin.registerEditorExtension(plugin.editorExtensions);
   plugin.registerEditorSuggest(new EtaSuggest(plugin.app));
 };
 

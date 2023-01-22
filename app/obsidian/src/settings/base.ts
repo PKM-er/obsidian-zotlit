@@ -40,15 +40,19 @@ abstract class Settings<Options extends Record<string, any>> {
     await Promise.all(D.keys(this.value).map((k) => this.apply(k)));
   }
 
-  toJSON(): Options {
+  toJSON(): unknown {
     return this.value;
   }
 
-  fromJSON(json: Options): void {
+  /**
+   * consider json to be flatten by default
+   * override this method if you want to use nested json
+   */
+  fromJSON(json: unknown): void {
     const optKeys = D.keys(this.getDefaults());
     this.value = {
       ...this.value,
-      ...D.selectKeys(json, optKeys),
+      ...D.selectKeys(json as Options, optKeys),
     };
   }
 }

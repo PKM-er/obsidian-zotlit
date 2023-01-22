@@ -1,4 +1,4 @@
-import Settings from "../settings-base";
+import Settings from "../../settings/base";
 
 interface SettingOptions {
   symlinkImgExcerpt: boolean;

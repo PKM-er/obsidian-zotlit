@@ -18,8 +18,7 @@ import NoteIndex from "./note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
-import type { ZoteroSettings } from "./settings.js";
-import { getDefaultSettings, SettingLoader, saveSettings } from "./settings.js";
+import { SettingLoader } from "./settings/service.js";
 import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
 import registerEtaEditorHelper from "./template/editor";
 import DatabaseWatcher from "./zotero-db/auto-refresh/service";
@@ -40,9 +39,7 @@ export default class ZoteroPlugin extends Plugin {
     // this.pdfCache = new PDFCache(this);
   }
 
-  settings: ZoteroSettings = getDefaultSettings(this);
-  settingLoader = this.use(SettingLoader);
-  saveSettings = saveSettings.bind(this);
+  settings = this.use(SettingLoader);
 
   noteIndex = this.use(NoteIndex);
   get databaseAPI() {

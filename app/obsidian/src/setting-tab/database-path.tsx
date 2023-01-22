@@ -44,7 +44,7 @@ const SetDataDirButton = () => {
       });
       if (newFolder && database.zoteroDataDir !== newFolder) {
         await database.setOption("zoteroDataDir", newFolder).apply();
-        await plugin.saveSettings();
+        await plugin.settings.save();
         refresh();
         setSuccess(true);
       } else setSuccess(null);
