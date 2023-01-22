@@ -98,10 +98,11 @@ export class TemplateSettings extends Settings<SettingOptions> {
   async setTemplate<K extends NonEjectableTemplate>(
     key: K,
     value: string,
-  ): Promise<void> {
-    if (this.templates[key] === value) return;
+  ): Promise<boolean> {
+    if (this.templates[key] === value) return false;
     this.templates[key] = value;
     app.vault.trigger("zotero:template-updated", key);
+    return true;
   }
 
   /** null if not registered */
