@@ -15,6 +15,33 @@ if you want to view the source visit the plugins github repository
 */
 `;
 
+const cmExternals = [
+  "@codemirror/autocomplete",
+  "@codemirror/collab",
+  "@codemirror/commands",
+  "@codemirror/language",
+  "@codemirror/lint",
+  "@codemirror/search",
+  "@codemirror/state",
+  "@codemirror/text",
+  "@codemirror/view",
+  "@lezer/common",
+  "@lezer/lr",
+  "@lezer/highlight",
+  "@codemirror/closebrackets",
+  "@codemirror/comment",
+  "@codemirror/fold",
+  "@codemirror/gutter",
+  "@codemirror/highlight",
+  "@codemirror/history",
+  "@codemirror/matchbrackets",
+  "@codemirror/panel",
+  "@codemirror/rangeset",
+  "@codemirror/rectangular-selection",
+  "@codemirror/stream-parser",
+  "@codemirror/tooltip",
+];
+
 const isProd = process.env.BUILD === "production";
 
 const preactCompatPlugin = {
@@ -36,13 +63,7 @@ const opts = {
   watch: !isProd,
   platform: "node",
   logLevel: process.env.BUILD === "development" ? "info" : "silent",
-  external: [
-    "obsidian",
-    "electron",
-    "@electron/remote",
-    "@codemirror/autocomplete",
-    "@codemirror/state",
-  ],
+  external: ["obsidian", "electron", "@electron/remote", ...cmExternals],
   format: "cjs",
   mainFields: ["browser", "module", "main"],
   sourcemap: isProd ? false : "inline",
