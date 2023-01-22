@@ -42,9 +42,9 @@ export class EtaSuggest extends EditorSuggest<EtaHint> {
   onTrigger(
     cursor: EditorPosition,
     editor: Editor,
-    file: TFile,
+    file: TFile | null,
   ): EditorSuggestTriggerInfo | null {
-    if (!isEtaFile(file)) return null;
+    if (!file || !isEtaFile(file)) return null;
     const line = editor.getLine(cursor.line),
       sub = line.substring(0, cursor.ch);
     const match = sub.match(/<%([ =]?)$/);
