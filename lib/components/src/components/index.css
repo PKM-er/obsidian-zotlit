@@ -17,6 +17,26 @@
   }
 
   /*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 1 */
+    font-weight: inherit; /* 1 */
+    line-height: inherit; /* 1 */
+    color: inherit; /* 1 */
+    margin: 0; /* 2 */
+    padding: 0; /* 3 */
+  }
+
+  /*
 Removes the default spacing and border for appropriate elements.
 */
 
@@ -34,6 +54,39 @@ Removes the default spacing and border for appropriate elements.
   p,
   pre {
     margin: 0;
+  }
+
+  /*
+Prevent resizing textareas horizontally by default.
+*/
+
+  textarea {
+    resize: vertical;
+  }
+
+  /*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 1; /* 1 */
+    color: theme("colors.gray.400", #9ca3af); /* 2 */
+  }
+
+  /*
+Remove the default font size and weight for headings.
+*/
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
   }
 
   fieldset {

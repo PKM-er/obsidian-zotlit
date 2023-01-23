@@ -296,7 +296,9 @@ importers:
       '@obzt/database': workspace:*
       '@obzt/zotero-type': workspace:*
       '@tailwindcss/container-queries': ~0.1.0
+      '@tailwindcss/forms': ~0.5.3
       '@tailwindcss/line-clamp': ~0.4.2
+      '@tailwindcss/typography': ~0.5.9
       '@types/lodash-es': ~4.17.6
       '@types/react': ~17.0.8
       '@types/react-dom': ~17.0.11
@@ -314,8 +316,10 @@ importers:
       react: ~17.0.2
       react-dom: ~17.0.2
       react-error-boundary: ~3.1.4
+      react-textarea-autosize: ~8.4.0
       tailwindcss: ~3.2.4
       typescript: ^4.9.4
+      use-immer: ~0.8.1
       vite: ^4.0.0
       vite-plugin-dts: ~1.7.1
       zustand: ~4.3.1
@@ -325,7 +329,9 @@ importers:
       '@obzt/database': link:../database
       '@obzt/zotero-type': link:../zotero-type
       '@tailwindcss/container-queries': 0.1.0_tailwindcss@3.2.4
+      '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
       '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
+      '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
       ahooks: 3.7.4_react@17.0.2
       assert-never: 1.2.1
       clsx: 1.2.1
@@ -334,7 +340,9 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-error-boundary: 3.1.4_react@17.0.2
-      zustand: 4.3.1_react@17.0.2
+      react-textarea-autosize: 8.4.0_q5o373oqrklnndq2vhekyuzhxi
+      use-immer: 0.8.1_immer@9.0.17+react@17.0.2
+      zustand: 4.3.1_immer@9.0.17+react@17.0.2
     devDependencies:
       '@aidenlx/eslint-config': link:../../common/config/eslint
       '@types/lodash-es': 4.17.6
@@ -4373,11 +4381,32 @@ packages:
       tailwindcss: 3.2.4_postcss@8.4.21
     dev: false
 
+  /@tailwindcss/forms/0.5.3_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-y5mb86JUoiUgBjY/o6FJSFZSEttfb3Q5gllE4xoKjAAD+vBrnIhE4dViwUuow3va8mpH4s9jyUbUbrRGoRdc2Q==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.2.4_postcss@8.4.21
+    dev: false
+
   /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.2.4:
     resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
+      tailwindcss: 3.2.4_postcss@8.4.21
+    dev: false
+
+  /@tailwindcss/typography/0.5.9_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-t8Sg3DyynFysV9f4JDOVISGsjazNb48AeIYQwcL+Bsq5uf4RYL75C1giZ43KISjeDGBaTN3Kxh7Xj/vRSMJUUg==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
       tailwindcss: 3.2.4_postcss@8.4.21
     dev: false
 
@@ -10564,7 +10593,6 @@ packages:
 
   /lodash.isplainobject/4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
-    dev: true
 
   /lodash.isregexp/4.0.1:
     resolution: {integrity: sha512-rw9+95tYcUa9nQ1FgdtKvO+hReLGNqnNMHfLq8SwK5Mo6D0R0tIsnRHGHaTHSKeYBaLCJ1JvXWdz4UmpPZ2bag==}
@@ -11250,6 +11278,11 @@ packages:
     dependencies:
       schema-utils: 4.0.0
       webpack: 5.75.0
+    dev: false
+
+  /mini-svg-data-uri/1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: false
 
   /minimalistic-assert/1.0.1:
@@ -12502,6 +12535,14 @@ packages:
     dependencies:
       postcss: 8.4.21
       postcss-value-parser: 4.2.0
+    dev: false
+
+  /postcss-selector-parser/6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
     dev: false
 
   /postcss-selector-parser/6.0.11:
@@ -15241,6 +15282,16 @@ packages:
       react: 17.0.2
     dev: false
 
+  /use-immer/0.8.1_immer@9.0.17+react@17.0.2:
+    resolution: {integrity: sha512-OfTFf1pL+ICjjcLPn9+ZnaJO/Yg4MBzYZtACEe2mZ/W2A5col28PNUnwowOAaBuOogACOK/37TU17KgsIhUpOw==}
+    peerDependencies:
+      immer: '>=2.0.0'
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0
+    dependencies:
+      immer: 9.0.17
+      react: 17.0.2
+    dev: false
+
   /use-isomorphic-layout-effect/1.1.2_q5o373oqrklnndq2vhekyuzhxi:
     resolution: {integrity: sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==}
     peerDependencies:
@@ -15983,7 +16034,7 @@ packages:
       - supports-color
     dev: true
 
-  /zustand/4.3.1_react@17.0.2:
+  /zustand/4.3.1_immer@9.0.17+react@17.0.2:
     resolution: {integrity: sha512-EVyo/eLlOTcJm/X5M00rwtbYFXwRVTaRteSvhtbTZUCQFJkNfIyHPiJ6Ke68MSWzcKHpPzvqNH4gC2ZS/sbNqw==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
@@ -15995,6 +16046,7 @@ packages:
       react:
         optional: true
     dependencies:
+      immer: 9.0.17
       react: 17.0.2
       use-sync-external-store: 1.2.0_react@17.0.2
     dev: false

@@ -4,7 +4,7 @@ import type { IconProps } from "./Icon";
 import Icon from "./Icon";
 
 export type IconButtonProps = Omit<IconProps, "onClick"> & {
-  onClick(evt: React.MouseEvent | React.KeyboardEvent): any;
+  onClick?: (evt: React.MouseEvent | React.KeyboardEvent) => any;
 };
 
 export default forwardRef(function IconButton(
