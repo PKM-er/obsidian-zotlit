@@ -14,6 +14,7 @@ import {
 } from "./insert-citation/index.js";
 import checkLib from "./install-guide/index.jsx";
 import registerNoteFeature from "./note-feature";
+import { NoteFields } from "./note-feature/note-fields/service";
 import NoteIndex from "./note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
@@ -42,6 +43,8 @@ export default class ZoteroPlugin extends Plugin {
   settings = this.use(SettingLoader);
 
   noteIndex = this.use(NoteIndex);
+  noteFields = this.use(NoteFields);
+
   get databaseAPI() {
     return this.dbWorker.api;
   }
