@@ -1,5 +1,5 @@
-import type { IconButtonProps } from "./icon";
-import { IconButton } from "./icon";
+import type { IconButtonProps } from "../icon";
+import { IconButton } from "../icon";
 
 export type DetailsToggleProps = Omit<IconButtonProps, "icon">;
 

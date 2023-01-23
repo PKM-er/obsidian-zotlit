@@ -1,5 +1,5 @@
-import type { IconToggleProps } from "../icon";
-import { IconToggle } from "../icon";
+import type { IconToggleProps } from "../../icon";
+import { IconToggle } from "../../icon";
 
 export interface CollapseButtonProps extends Omit<IconToggleProps, "icon"> {
   isCollapsed: boolean;

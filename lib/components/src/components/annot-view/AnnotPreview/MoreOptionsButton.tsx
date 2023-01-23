@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { IconButton } from "../icon";
-import type { IconButtonProps } from "../icon";
+import { IconButton } from "../../icon";
+import type { IconButtonProps } from "../../icon";
 
 export type MoreOptionsButton = Omit<IconButtonProps, "icon">;
 

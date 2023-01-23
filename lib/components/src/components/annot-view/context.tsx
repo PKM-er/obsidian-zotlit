@@ -5,8 +5,6 @@ import type { DataModel, StoreAPI } from "./store";
 // eslint-disable-next-line @typescript-eslint/ban-types
 export interface ContextType<R = {}> {
   store: StoreAPI;
-  sanitize(html: string): string;
-  setIcon(parent: HTMLElement, iconId: string): void;
   getImgSrc(annotation: AnnotationInfo): string;
   annotRenderer: {
     storeSelector(store: DataModel): R;

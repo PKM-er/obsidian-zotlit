@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { memo } from "react";
-import type { Attributes } from "../utils";
+import type { Attributes } from "../../utils";
 
 export interface PageLabelProps {
   pageLabel: string | null;

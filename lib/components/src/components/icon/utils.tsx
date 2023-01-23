@@ -1,6 +1,6 @@
 import type React from "react";
 import { useCallback, useContext, useRef } from "react";
-import { Context } from "../context";
+import { ObsidianContext } from "../obsidian";
 
 /**
  * @see https://github.com/gregberge/react-merge-refs/blob/main/src/index.tsx
@@ -21,7 +21,7 @@ export function mergeRefs<T = any>(
 export const useIconRef = <E extends HTMLElement = HTMLElement>(
   icon: string,
 ) => {
-  const { setIcon } = useContext(Context);
+  const { setIcon } = useContext(ObsidianContext);
   const ref = useRef<E | null>(null);
   const setRef = useCallback(
     (node: E) => {

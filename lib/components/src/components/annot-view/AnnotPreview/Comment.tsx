@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { memo } from "react";
-import type { Attributes } from "../utils";
-import { useRawHtml } from "../utils";
+import type { Attributes } from "../../utils";
+import { useRawHtml } from "../../utils";
 
 interface CommentProp extends Attributes {
   content: string;

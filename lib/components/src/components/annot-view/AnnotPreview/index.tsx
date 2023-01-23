@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { useContext, useRef } from "react";
 import { Context } from "../context";
 import DetailsButton from "../DetailsButton";
-import type { Attributes } from "../utils";
+import type { Attributes } from "../../utils";
 
 import Comment from "./Comment";
 import Content from "./Content";

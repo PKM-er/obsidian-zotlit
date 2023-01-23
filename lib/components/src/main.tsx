@@ -1,15 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { AnnotsView, AnnotsViewContext } from "./components";
+import { AnnotsView, AnnotsViewContext, ObsidianContext } from "./components";
 import "./index.css";
-import { context } from "./mock";
+import { annotViewCtx, context } from "./mock";
 
 for (const id of ["right", "main"]) {
   ReactDOM.render(
     <React.StrictMode>
-      <AnnotsViewContext.Provider value={context}>
-        <AnnotsView />
-      </AnnotsViewContext.Provider>
+      <ObsidianContext.Provider value={context}>
+        <AnnotsViewContext.Provider value={annotViewCtx}>
+          <AnnotsView />
+        </AnnotsViewContext.Provider>
+      </ObsidianContext.Provider>
     </React.StrictMode>,
     document.getElementById(id) as HTMLElement,
   );

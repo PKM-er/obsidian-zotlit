@@ -2,7 +2,7 @@ import clsx from "clsx";
 import type { KeyboardEvent, MouseEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
-import { IconButton } from "../annot-view/icon";
+import { IconButton } from "../icon";
 
 export type NoteFieldsData = Record<string, WithID[]>;
 

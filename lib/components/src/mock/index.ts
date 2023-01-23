@@ -1,6 +1,7 @@
 /* eslint-disable no-var */
 import { createStore } from "zustand";
 import type { AnnotsViewContextType, AnnotsViewStore } from "../components";
+import type { ObsidianContextType } from "../components/obsidian";
 import data from "./data.json";
 export const store = createStore<AnnotsViewStore>((set) => ({
   ...(data as unknown as AnnotsViewStore),
@@ -32,9 +33,8 @@ const icon = (() => {
   return template.content.firstElementChild as SVGSVGElement;
 })();
 
-export const context: AnnotsViewContextType = {
+export const annotViewCtx: AnnotsViewContextType = {
   store,
-  sanitize: (html) => html,
   registerDbUpdate(callback) {
     window.triggerDbUpdate = callback;
     return () => {
@@ -43,16 +43,6 @@ export const context: AnnotsViewContextType = {
   },
   refreshConn: async () => {
     window.triggerDbUpdate?.();
-  },
-  setIcon(parent, _iconId) {
-    const n = parent.firstChild;
-    if (
-      !((n && n instanceof SVGSVGElement) /* && n.classList.contains(iconId) */)
-    ) {
-      n && parent.removeChild(n);
-      const i = icon.cloneNode(true);
-      i && parent.appendChild(i);
-    }
   },
   onMoreOptions: (annot) => {
     console.log("onMoreOptions", annot);
@@ -71,4 +61,19 @@ export const context: AnnotsViewContextType = {
   },
   getImgSrc: (src) =>
     "https://upload.wikimedia.org/wikipedia/commons/1/14/Demo.jpg",
+};
+
+export const context: ObsidianContextType = {
+  sanitize: (html) => html,
+
+  setIcon(parent, _iconId) {
+    const n = parent.firstChild;
+    if (
+      !((n && n instanceof SVGSVGElement) /* && n.classList.contains(iconId) */)
+    ) {
+      n && parent.removeChild(n);
+      const i = icon.cloneNode(true);
+      i && parent.appendChild(i);
+    }
+  },
 };
