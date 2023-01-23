@@ -11,6 +11,7 @@ import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
+import "./style.less";
 
 export const annotViewType = "zotero-annotation-view";
 
@@ -27,7 +28,6 @@ export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
     this.store = createStore(plugin);
-    this.containerEl.empty();
   }
   // root = createRoot(this.contentEl);
 
@@ -37,7 +37,7 @@ export class AnnotationView extends DerivedFileView {
 
   onload(): void {
     super.onload();
-    this.containerEl.addClass("obzt");
+    this.contentEl.addClass("obzt");
     this.registerEvent(
       app.metadataCache.on("zotero:index-update", this.loadDocItem),
     );
@@ -159,7 +159,7 @@ export class AnnotationView extends DerivedFileView {
       <AnnotsViewContext.Provider value={this.getContext()}>
         <AnnotsView />
       </AnnotsViewContext.Provider>,
-      this.containerEl,
+      this.contentEl,
     );
   }
   protected async onClose() {

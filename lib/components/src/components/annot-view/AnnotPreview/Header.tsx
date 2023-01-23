@@ -22,7 +22,7 @@ export default function Header({
   return (
     <div
       className={clsx(
-        "annot-header flex cursor-context-menu items-center gap-1 px-3 py-1",
+        "annot-header flex cursor-context-menu items-center gap-1 py-1 pl-3 pr-2",
         className,
       )}
       onContextMenu={onContextMenu ?? onMoreOptions}

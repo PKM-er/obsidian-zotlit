@@ -536,7 +536,7 @@
           </div>
           <div
             class="workspace-split mod-horizontal mod-left-split"
-            style="width: 300px"
+            style="width: 300px; display: none"
           >
             <hr class="workspace-leaf-resize-handle" />
             <div class="workspace-sidedock-empty-state" style="display: none">
@@ -1465,45 +1465,7 @@
                         ></a>
                       </div>
                     </div>
-                    <div class="view-content">
-                      <div class="empty-state">
-                        <div class="empty-state-container">
-                          <div class="empty-state-title">
-                            No file is open<span
-                              class="empty-state-close-button"
-                              ><svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="svg-icon lucide-x"
-                              >
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line></svg
-                            ></span>
-                          </div>
-                          <div class="empty-state-action-list">
-                            <div class="empty-state-action">
-                              Create new file (⌘ N)
-                            </div>
-                            <div class="empty-state-action">
-                              Go to file (⌘ O)
-                            </div>
-                            <div class="empty-state-action">
-                              See recent files (⌘ O)
-                            </div>
-                            <div class="empty-state-action mod-close">
-                              Close
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <div class="view-content obzt" id="main"></div>
                   </div>
                 </div>
               </div>
@@ -1767,9 +1729,9 @@
                 </div>
                 <div class="workspace-leaf mod-active">
                   <hr class="workspace-leaf-resize-handle" />
-                  <div class="workspace-leaf-content obzt" id="root" data-type="outline">
+                  <div class="workspace-leaf-content">
+                    <div class="view-content obzt" id="right"></div>
                   </div>
-                  <script type="module" src="/src/main.tsx"></script>
                 </div>
               </div>
             </div>
@@ -1795,5 +1757,6 @@
         </div>
       </div>
     </div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

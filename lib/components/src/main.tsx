@@ -4,11 +4,13 @@ import { AnnotsView, AnnotsViewContext } from "./components";
 import "./index.css";
 import { context } from "./mock";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <AnnotsViewContext.Provider value={context}>
-      <AnnotsView />
-    </AnnotsViewContext.Provider>
-  </React.StrictMode>,
-  document.getElementById("root") as HTMLElement,
-);
+for (const id of ["right", "main"]) {
+  ReactDOM.render(
+    <React.StrictMode>
+      <AnnotsViewContext.Provider value={context}>
+        <AnnotsView />
+      </AnnotsViewContext.Provider>
+    </React.StrictMode>,
+    document.getElementById(id) as HTMLElement,
+  );
+}
