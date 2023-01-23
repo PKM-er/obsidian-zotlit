@@ -9,7 +9,7 @@ export function NoteFieldsMock() {
       data={fields}
       onAdd={(field) =>
         setFields((draft) => {
-          draft[field].push({ value: "", id: draft[field].length });
+          draft[field].push({ content: "", id: `${draft[field].length}` });
         })
       }
       onDelete={(field, index) =>
@@ -19,7 +19,7 @@ export function NoteFieldsMock() {
       }
       onChange={(value, field, index) =>
         setFields((draft) => {
-          draft[field][index].value = value;
+          draft[field][index].content = value;
         })
       }
     />
@@ -73,6 +73,6 @@ const data = {
   ].map(toID),
 } satisfies NoteFieldsData;
 
-function toID(value: string, index: number) {
-  return { value, id: index };
+function toID(content: string, index: number) {
+  return { content, id: `${index}` };
 }

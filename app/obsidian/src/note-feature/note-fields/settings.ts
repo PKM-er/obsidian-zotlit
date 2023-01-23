@@ -21,7 +21,11 @@ export class NoteFieldsSettings extends Settings<SettingOptions> {
       noteFieldsSuggester: false,
       noteFields: new Map(
         Object.entries({
-          question: {
+          highlights: {
+            keyword: "",
+            template: `> <%= it.field %>::`,
+          },
+          questions: {
             keyword: "",
             template: `> <%= it.field %>::`,
           },

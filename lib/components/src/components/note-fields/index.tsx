@@ -1,17 +1,18 @@
-import clsx from "clsx";
-import type { KeyboardEvent, MouseEvent } from "react";
-import { useEffect, useRef, useState } from "react";
-import TextareaAutosize from "react-textarea-autosize";
-import { IconButton } from "../icon";
+import { useRef, useState } from "react";
+import { Icon } from "../icon";
+import { FieldName } from "./FieldName";
+import { FieldValue } from "./FieldValue";
 
 export type NoteFieldsData = Record<string, WithID[]>;
 
-type WithID = { id: number; value: string };
+type WithID = { id: string; content: string };
 
 export interface NoteFieldsProps {
+  // saving?: boolean;
   data: NoteFieldsData;
-  onChange: (value: string, field: string, index: number) => void;
-  onDelete: (field: string, index: number) => void;
+  onSave?: (field: string, index: number, id: string) => void;
+  onChange: (value: string, field: string, index: number, id: string) => void;
+  onDelete: (field: string, index: number, id: string) => void;
   onAdd: (field: string) => void;
 }
 
@@ -20,148 +21,96 @@ export function NoteFields({
   onAdd,
   onDelete,
   onChange,
-}: NoteFieldsProps) {
+  onSave,
+}: // saving,
+NoteFieldsProps) {
   const [editing, setEditing] = useState<{
     field: string;
     index: number;
   } | null>(null);
-  return (
-    <nav className="h-full overflow-y-auto">
-      {Object.entries(data).map(([field, values]) => (
-        <div key={field} className="relative">
-          <FieldName
-            name={field}
-            onAdd={() => {
-              onAdd(field);
-              setEditing({ field, index: values.length });
-            }}
-          />
-          <ul className="divide-bg-mod-border relative z-0 divide-y">
-            {values.map((content, index) => {
-              const isEditing =
-                !!editing && editing.field === field && editing.index === index;
-              return (
-                <FieldValue
-                  key={content.id}
-                  value={content.value}
-                  editing={isEditing}
-                  onFocus={() => !isEditing && setEditing({ field, index })}
-                  onBlur={() => isEditing && setEditing(null)}
-                  onChange={(value) => onChange(value, field, index)}
-                  onDelete={() => onDelete(field, index)}
-                />
-              );
-            })}
-          </ul>
-        </div>
-      ))}
-    </nav>
-  );
-}
 
-export interface FieldNameProps {
-  name: string;
-  onAdd: (evt: MouseEvent | KeyboardEvent) => void;
-}
-
-export function FieldName({ name, onAdd }: FieldNameProps) {
-  return (
-    <div className="bg-bg-secondary text-txt-muted border-bg-mod-border sticky top-0 z-10 flex flex-row items-center border-y py-1 pl-4 pr-2 text-base font-semibold">
-      <h3 className="flex-1">{name}</h3>
-      <IconButton icon="plus" onClick={onAdd} />
-    </div>
-  );
-}
-
-export interface FieldValueProps {
-  value: string;
-  onChange: (value: string) => void;
-  onDelete: () => void;
-  editing: boolean;
-  onFocus: () => void;
-  onBlur: () => void;
-}
-
-export function FieldValue({
-  value,
-  onChange,
-  onDelete,
-  editing,
-  onBlur,
-  onFocus,
-}: FieldValueProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (!(editing && textareaRef.current)) return;
-    const target = textareaRef.current as HTMLTextAreaElement & {
-      scrollIntoViewIfNeeded?: (center?: boolean) => void;
-    };
-
-    if (!target.scrollIntoViewIfNeeded) {
-      if (target.getBoundingClientRect().bottom > window.innerHeight) {
-        target.scrollIntoView(false);
-      }
-      if (target.getBoundingClientRect().top < 0) {
-        target.scrollIntoView();
-      }
-    } else {
-      // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
-      target.scrollIntoViewIfNeeded();
-    }
-
-    target.select();
-  }, [editing]);
+  // used to check if the data has changed since the last edit
+  const beforeEdit = useRef<NoteFieldsData | null>(null);
 
   return (
-    <li className="bg-bg-primary">
-      <div className="hover:bg-bg-mod-hover focus-within:ring-bg-mod-border-focus relative flex items-stretch space-x-1 py-3 pl-4 pr-2 focus-within:ring-2 focus-within:ring-inset">
-        {editing ? (
-          // why min-w-0? https://stackoverflow.com/a/66689926
-          <div className="flex min-w-0 flex-1 items-center">
-            <TextareaAutosize
-              ref={textareaRef}
-              className={clsx(
-                "text-txt-normal w-full bg-transparent text-sm font-medium",
-                "min-w-0 border-none p-0 ring-0 focus:border-none focus:ring-0 ",
-              )}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              onBlur={() => {
-                onBlur();
-                if (editing && !value) {
-                  onDelete();
-                }
+    <>
+      {/* <div className="nav-header">
+        <p
+          className={clsx(
+            "text-center align-middle transition-opacity",
+            !saving && "opacity-0",
+          )}
+        >
+          Saving...
+        </p>
+      </div> */}
+      <nav className="flex-1 overflow-y-auto">
+        {Object.entries(data).map(([field, values]) => (
+          <div key={field} className="relative">
+            <FieldName
+              name={field}
+              onAdd={() => {
+                onAdd(field);
+                beforeEdit.current = data;
+                setEditing({ field, index: values.length });
               }}
-              onKeyUp={(e) => {
-                if (editing && e.key === "Escape") {
-                  (e.target as HTMLTextAreaElement).blur();
-                  onBlur();
-                }
-              }}
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              // autoFocus
             />
+            <ul className="divide-bg-mod-border relative z-0 divide-y">
+              {values.map((content, index) => {
+                const isEditing =
+                  !!editing &&
+                  editing.field === field &&
+                  editing.index === index;
+                return (
+                  <FieldValue
+                    key={content.id}
+                    value={content.content}
+                    editing={isEditing}
+                    onFocus={() => {
+                      if (isEditing) return;
+                      beforeEdit.current = data;
+                      setEditing({ field, index });
+                    }}
+                    onBlur={() => {
+                      if (!isEditing) return;
+                      setEditing(null);
+                      if (onSave && beforeEdit.current !== data) {
+                        onSave(field, index, content.id);
+                      }
+                      beforeEdit.current = null;
+                    }}
+                    onChange={(value) => {
+                      onChange(value, field, index, content.id);
+                    }}
+                    onDelete={() => {
+                      onDelete(field, index, content.id);
+                    }}
+                  />
+                );
+              })}
+            </ul>
           </div>
-        ) : (
-          <div
-            role="textbox"
-            tabIndex={0}
-            onClick={onFocus}
-            onKeyUp={(e) => e.key === "Enter" && onFocus()}
-            className="flex min-w-0 flex-1 items-center"
-          >
-            {/* prefer span over textarea when display to avoid expensive calc
-              of height */}
-            <p className="text-txt-normal min-w-0 break-words bg-transparent text-sm font-medium">
-              {value}
-            </p>
-          </div>
-        )}
-        <div className="flex shrink-0 flex-col items-start opacity-0 transition-opacity hover:opacity-100">
-          <IconButton icon="trash" onClick={onDelete} />
-        </div>
+        ))}
+      </nav>
+    </>
+  );
+}
+
+export function PrepareNote({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="m-8 justify-self-center text-center">
+      <Icon icon="file-warning" size="3rem" />
+      <h3 className="text-txt-normal mt-2 text-base font-medium">
+        Convert Existing Fields
+      </h3>
+      <p className="text-txt-muted mt-1 text-sm">
+        Normalize your existing fields to work with note fields viewer.
+      </p>
+      <div className="mt-6">
+        <button className="mod-cta" onClick={onClick}>
+          Convert
+        </button>
       </div>
-    </li>
+    </div>
   );
 }

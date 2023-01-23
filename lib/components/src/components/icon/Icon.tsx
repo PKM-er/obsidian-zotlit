@@ -4,14 +4,26 @@ import { useIconRef, mergeRefs } from "./utils";
 
 export interface IconProps extends Attributes {
   icon: string;
+  size?: string | number;
 }
 
 export default memo(
   forwardRef(function Icon(
-    { icon, ...props }: IconProps,
+    { icon, size, ...props }: IconProps,
     ref: React.Ref<HTMLDivElement>,
   ) {
     const setIconRef = useIconRef(icon);
-    return <div ref={mergeRefs(setIconRef, ref)} {...props} />;
+    return (
+      <div
+        style={
+          size &&
+          ({
+            "--icon-size": typeof size === "number" ? `${size}px` : size,
+          } as any)
+        }
+        ref={mergeRefs(setIconRef, ref)}
+        {...props}
+      />
+    );
   }),
 );

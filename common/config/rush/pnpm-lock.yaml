@@ -61,6 +61,7 @@ importers:
       make-error: ^1.3.6
       monkey-around: ^2.3.0
       nanoevents: ~7.0.1
+      nanoid: ~4.0.0
       obsidian: github:obsidianmd/obsidian-api
       preact: ~10.11.3
       pretty-hrtime: ^1.0.3
@@ -103,6 +104,7 @@ importers:
       make-error: 1.3.6
       monkey-around: 2.3.0
       nanoevents: 7.0.1
+      nanoid: 4.0.0
       obsidian: github.com/obsidianmd/obsidian-api/38dd22168d2925086371bfc59e36fd9121527a39_a4vbhepr4qhxm5cldqd4jpyase
       preact: 10.11.3
       pretty-hrtime: 1.0.3
@@ -11390,6 +11392,12 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
