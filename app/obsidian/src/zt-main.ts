@@ -18,6 +18,7 @@ import { NoteFields } from "./note-feature/note-fields/service";
 import NoteIndex from "./note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
+import { Server } from "./server/service";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import { SettingLoader } from "./settings/service.js";
 import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
@@ -44,6 +45,7 @@ export default class ZoteroPlugin extends Plugin {
 
   noteIndex = this.use(NoteIndex);
   noteFields = this.use(NoteFields);
+  server = this.use(Server);
 
   get databaseAPI() {
     return this.dbWorker.api;

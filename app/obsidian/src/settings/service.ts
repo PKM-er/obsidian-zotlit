@@ -5,6 +5,7 @@ import log, { LogSettings } from "@log";
 
 import { NoteFieldsSettings } from "../note-feature/note-fields/settings.js";
 import { NoteIndexSettings } from "../note-index/settings.js";
+import { ServerSettings } from "../server/settings.js";
 import { SuggesterSettings } from "../suggester/settings.js";
 import { TemplateSettings } from "../template/settings.js";
 import { WatcherSettings } from "../zotero-db/auto-refresh/settings.js";
@@ -22,6 +23,7 @@ export interface ZoteroSettings {
   template: TemplateSettings;
   suggester: SuggesterSettings;
   noteFields: NoteFieldsSettings;
+  server: ServerSettings;
   // mutoolPath: string | null;
 }
 const settingNames = enumerate<keyof ZoteroSettings>()(
@@ -33,6 +35,7 @@ const settingNames = enumerate<keyof ZoteroSettings>()(
   "template",
   "suggester",
   "noteFields",
+  "server",
   // "mutoolPath",
 );
 
@@ -52,6 +55,7 @@ export class SettingLoader extends Service implements ZoteroSettings {
   template = this.use(TemplateSettings);
   suggester = this.use(SuggesterSettings);
   noteFields = this.use(NoteFieldsSettings);
+  server = this.use(ServerSettings);
   // mutoolPath: string | null = null;
   // #endregion
 

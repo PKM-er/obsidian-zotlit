@@ -97,6 +97,7 @@
     "@preact/compat": "~17.1.2",
     "@obzt/components": "workspace:*",
     "react-json-tree": "~0.18.0",
-    "nanoid": "~4.0.0"
+    "nanoid": "~4.0.0",
+    "get-port": "~6.1.2"
   }
 }

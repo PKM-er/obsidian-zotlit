@@ -3,6 +3,7 @@ import "./styles.less";
 import { A, D, pipe } from "@mobily/ts-belt";
 import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
+import getPort from "get-port";
 import { around } from "monkey-around";
 import type {
   DropdownComponent,
@@ -72,6 +73,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
     // this.annotView();
     this.suggester();
     this.templates();
+    this.server();
     this.logLevel();
   }
   general(): void {
@@ -157,6 +159,61 @@ export class ZoteroSettingTab extends PluginSettingTab {
         },
       ),
     ).setName("Show BibTex Citekey in Suggester");
+  }
+  server(): void {
+    new Setting(this.containerEl).setHeading().setName("Server");
+
+    const { server } = this.plugin.settings;
+    this.pipe(
+      addToggle(
+        () => server.enableServer,
+        async (value) => {
+          portSetting.settingEl.toggle(value);
+          return await server.setOption("enableServer", value).apply();
+        },
+      ),
+    ).setName("Background Action Server");
+
+    const portSetting = this.pipe(
+      addTextComfirm(
+        () => `${server.serverPort}`,
+        async (value, text) => {
+          let portVal = Number.parseInt(value, 10);
+          if (isNaN(portVal) || portVal < 0 || portVal > 65535) {
+            const defaultPort = server.getDefaults().serverPort;
+            new Notice(
+              "Invalid port number, revert to default value: " + defaultPort,
+            );
+            portVal = defaultPort;
+            text.setValue(`${defaultPort}`);
+          }
+          if (portVal === server.serverPort) {
+            // no need to save if port is not changed
+            return false;
+          }
+          const portReady = await getPort({
+            host: "127.0.0.1",
+            port: [portVal],
+          });
+          console.log(portReady, portVal);
+          if (portReady !== portVal) {
+            new Notice(
+              `Port is currently occupied, a different port is provided: ${portReady}, confirm again to apply the change.`,
+            );
+            text.setValue(`${portReady}`);
+            return false;
+          }
+          const result = server.setOption("serverPort", portReady);
+          await result.apply();
+          if (result.changed) {
+            new Notice("Server port is saved and applied.");
+          }
+          return result.changed;
+        },
+        { rows: 1, cols: 6 },
+      ),
+    ).setName("Server port");
+    portSetting.settingEl.toggle(server.enableServer);
   }
   annotView(): void {
     new Setting(this.containerEl).setHeading().setName("Annotaion View");
