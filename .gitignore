@@ -12,7 +12,7 @@ app/zotero/**/*.tmp
 app/zotero/**/*.xpi
 
 dist
-tsconfig.tsbuildinfo
+tsconfig*.tsbuildinfo
 
 # Logs
 *.log

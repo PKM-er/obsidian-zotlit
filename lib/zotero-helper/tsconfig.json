@@ -1,0 +1,18 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "target": "ES2022",
+    "lib": ["es2022"],
+    "declaration": true,
+    "moduleResolution": "Node16",
+    "module": "Node16",
+    "incremental": true,
+    "noEmit": false,
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.js"],
+  "exclude": ["src/zotero/**/*"],
+  "references": [{ "path": "./tsconfig.zotero.json" }]
+}

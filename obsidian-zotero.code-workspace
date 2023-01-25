@@ -21,6 +21,14 @@
       "path": "lib/db-worker"
     },
     {
+      "name": "zotero-helper",
+      "path": "lib/zotero-helper"
+    },
+    {
+      "name": "db-worker",
+      "path": "lib/db-worker"
+    },
+    {
       "name": "note-parser",
       "path": "lib/note-parser"
     },

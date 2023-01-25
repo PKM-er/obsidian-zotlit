@@ -1,0 +1,14 @@
+{
+  "extends": "@aidenlx/eslint-config",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "composite": true,
+    "noEmit": false,
+    "target": "ESNext",
+    "lib": ["esnext", "DOM"],
+    "module": "Node16",
+    "moduleResolution": "Node16"
+  },
+  "include": ["src/zotero/**/*.ts", "src/zotero/**/*.js", "src/const.js"],
+}

@@ -387,6 +387,10 @@
       "projectFolder": "lib/database"
     },
     {
+      "packageName": "@aidenlx/zotero-helper",
+      "projectFolder": "lib/zotero-helper"
+    },
+    {
       "packageName": "@obzt/note-parser",
       "projectFolder": "lib/note-parser"
     },

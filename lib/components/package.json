@@ -21,7 +21,7 @@
     "clsx": "^1.2.1",
     "@obzt/zotero-type": "workspace:*",
     "assert-never": "^1.2.1",
-    "@mobily/ts-belt": "~3.13.1",
+    "@mobily/ts-belt": "^4.0.0-rc.5",
     "react-error-boundary": "~3.1.4",
     "lodash-es": "~4.17.21",
     "path-browserify": "~1.0.1",

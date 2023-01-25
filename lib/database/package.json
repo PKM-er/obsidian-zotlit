@@ -22,7 +22,7 @@
     "@obzt/zotero-type": "workspace:*",
     "@obzt/common": "workspace:*",
     "assert-never": "^1.2.1",
-    "@mobily/ts-belt": "~3.13.1"
+    "@mobily/ts-belt": "^4.0.0-rc.5"
   },
   "peerDependencies": {
     "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
