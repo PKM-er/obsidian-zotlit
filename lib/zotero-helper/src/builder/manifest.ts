@@ -3,13 +3,8 @@ import { join } from "path/posix";
 import { fileURLToPath } from "url";
 import { D } from "@mobily/ts-belt";
 import { renderFile } from "eta";
+import { toIdShort } from "../utils.js";
 import { getInfoFromPackageJson } from "./parse.js";
-/**
- * @param pluginIdFull plugin id in format of "make-it-red@zotero.org"
- */
-function toIdShort(pluginIdFull: string) {
-  return pluginIdFull.split("@")[0];
-}
 
 const installRdfTemplate = resolve(
   fileURLToPath(import.meta.url),
@@ -20,18 +15,17 @@ const installRdfTemplate = resolve(
   "install.rdf.ejs",
 );
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json
+ */
 export function genManifestJson(packageJson: Record<string, unknown>) {
-  const {
-    name,
-    version,
-    description,
-    homepage,
-    zotero: { id, update_url, icons },
-  } = getInfoFromPackageJson(packageJson);
+  const { name, version, description, author, homepage, id, update, icons } =
+    getInfoFromPackageJson(packageJson);
 
   const output = {
     manifest_version: 2,
     name,
+    author,
     version,
     description,
     homepage_url: homepage,
@@ -40,7 +34,7 @@ export function genManifestJson(packageJson: Record<string, unknown>) {
     applications: {
       zotero: {
         id,
-        update_url,
+        update_url: update.versions,
         strict_min_version: "6.999",
         strict_max_version: "7.0.*",
       },
@@ -50,13 +44,18 @@ export function genManifestJson(packageJson: Record<string, unknown>) {
 }
 
 export async function genInstallRdf(packageJson: Record<string, unknown>) {
-  const info = getInfoFromPackageJson(packageJson);
+  let info = getInfoFromPackageJson(packageJson);
 
-  const { icons, id } = info.zotero;
-
-  // icon need to be loaded with `chrome://` content URLs
-  info.zotero.icons = D.map(icons, (path) =>
-    join(`chrome://${toIdShort(id)}`, path),
+  info = D.updateUnsafe(
+    info,
+    "icons",
+    // icon need to be loaded with `chrome://` content URLs
+    (icons) =>
+      D.map(
+        icons,
+        (path) => new URL(path, `chrome://${toIdShort(info.id)}`).href,
+      ),
   );
+
   return renderFile(installRdfTemplate, info, { varName: "pkg" });
 }

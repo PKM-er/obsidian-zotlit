@@ -1,4 +1,4 @@
-import { D } from "@mobily/ts-belt";
+import { D, G } from "@mobily/ts-belt";
 import e from "escape-string-regexp";
 
 export function addToPref(
@@ -38,18 +38,38 @@ export function isNonEmptyString(x: unknown): x is string {
   return typeof x === "string" && x !== "";
 }
 interface ZoteroField {
-  update_url: string;
   id: string;
+  name: string;
   icons: Record<string, string>;
+  update: {
+    /** update.json */
+    versions: string;
+    /** url to each update's release */
+    download: string;
+    /** url to each update's log */
+    info: string;
+  };
 }
 export function isZoterField(x: unknown): x is ZoteroField {
-  return (
-    typeof x === "object" &&
-    x !== null &&
-    typeof (x as ZoteroField).update_url === "string" &&
-    typeof (x as ZoteroField).id === "string" &&
-    typeof (x as ZoteroField).icons === "object" &&
-    (x as ZoteroField).icons !== null &&
-    D.isNotEmpty((x as ZoteroField).icons)
-  );
+  if (!G.isObject(x)) return false;
+  const { id, name, icons, update } = x as unknown as ZoteroField;
+  if (!isNonEmptyString(id) || !isNonEmptyString(name)) return false;
+  if (icons === null || !G.isObject(icons) || D.isEmpty(icons)) return false;
+  if (!G.isObject(update)) return false;
+  const { versions, download, info } = update;
+  if (
+    !isNonEmptyString(versions) ||
+    !isNonEmptyString(download) ||
+    !isNonEmptyString(info)
+  )
+    return false;
+
+  return true;
+}
+
+/**
+ * @param pluginIdFull plugin id in format of "make-it-red@zotero.org"
+ */
+export function toIdShort(pluginIdFull: string) {
+  return pluginIdFull.split("@")[0];
 }

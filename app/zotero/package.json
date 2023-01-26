@@ -4,48 +4,48 @@
   "description": "Zotero plugin to integrate with Obsidian.md",
   "scripts": {
     "lint": "eslint . --ext .ts --cache --cache-location .eslintcache/",
-    "build": "tsc --noEmit && node esbuild.js && zotero-plugin-zipup build zotero-obsidian-note",
-    "dev": "python3 start.py",
+    "build": "tsc --noEmit && zt-build",
+    "dev": "zt-dev",
     "release": "release-it"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/aidenlx/obsidian-zotero.git"
   },
-  "author": {
-    "name": "aidenlx",
-    "email": "aiden.lx@outlook.com"
-  },
+  "author": "aidenlx",
   "bugs": {
     "url": "https://github.com/aidenlx/obsidian-zotero/issues"
   },
   "homepage": "https://github.com/aidenlx/obsidian-zotero",
-  "dependencies": {
-    "lodash-es": "~4.17.21",
-    "monkey-around": "^2.3.0",
-    "@obzt/common": "workspace:*",
-    "@release-it/bumper": "^4.0.0"
-  },
-  "xpi": {
+  "zotero": {
     "name": "Obsidian Note for Zotero",
-    "updateLink": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
-    "updateInfoURL": "https://github.com/aidenlx/obsidian-zotero/releases/latest",
-    "iconURL": "chrome://zotero-obsidian-note/skin/logo.svg",
-    "releaseURL": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/"
+    "id": "zotero-obsidian-note@aidenlx.top",
+    "icons": {
+      "48": "skin/logo.svg",
+      "64": "skin/logo.svg",
+      "96": "skin/logo.svg"
+    },
+    "update": {
+      "versions": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.json",
+      "download": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
+      "info": "https://github.com/aidenlx/obsidian-zotero/releases/tag/zt{version}"
+    }
+  },
+  "dependencies": {
+    "monkey-around": "^2.3.0",
+    "assert-never": "^1.2.1",
+    "@obzt/common": "workspace:*",
+    "@aidenlx/zotero-helper": "workspace:*"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",
-    "@types/lodash-es": "~4.17.6",
-    "assert-never": "^1.2.1",
+    "@release-it/bumper": "^4.0.0",
     "cz-conventional-changelog": "^3.3.0",
-    "@types/mocha": "^9.0.0",
     "esbuild": "^0.17.4",
-    "zotero-plugin": "1.4.8",
     "@types/eslint": "~8.4.6",
+    "zotero-types": "~1.0.4",
     "eslint": "~8.31.0",
-    "mkdirp": "^1.0.4",
-    "rimraf": "^3.0.2",
-    "ts-node": "^10.4.0",
     "typescript": "^4.9.4"
   },
   "config": {

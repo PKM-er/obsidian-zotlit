@@ -1,0 +1,17 @@
+{
+  "addons": {
+    "zotero-obsidian-note@aidenlx.top": [
+      {
+        "version": "0.2.0",
+        "update_link": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt0.2.0/zotero-obsidian-note-0.2.0.xpi",
+        "update_info_url": "https://github.com/aidenlx/obsidian-zotero/releases/tag/zt0.2.0",
+        "applications": {
+          "gecko": {
+            "strict_min_version": "60.9",
+            "strict_max_version": "60.9"
+          }
+        }
+      }
+    ]
+  }
+}

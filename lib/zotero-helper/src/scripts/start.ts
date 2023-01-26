@@ -3,12 +3,20 @@ import "zx/globals";
 import { resolve } from "path";
 import { D } from "@mobily/ts-belt";
 import { parse } from "yaml";
-import { removeFromPref, addToPref, isZoterField } from "../utils.js";
+import { getInfoFromPackageJson } from "../builder/parse.js";
+import { removeFromPref, addToPref, toIdShort } from "../utils.js";
+
+export function start(config: Config) {
+  return {
+    prepare: () => prepare(config),
+    run: () => run(config),
+  };
+}
 
 /**
  * @see https://www.zotero.org/support/dev/client_coding/plugin_development#setting_up_a_plugin_development_environment
  */
-export async function start({ log, plugins, profile, program }: Config) {
+async function prepare({ plugins, profile }: Config) {
   const settings = {
     "extensions.autoDisableScopes": 0,
     "extensions.enableScopes": 15,
@@ -17,44 +25,41 @@ export async function start({ log, plugins, profile, program }: Config) {
     "extensions.lastAppVersion": null,
     "extensions.zotero.debug.log": true,
   };
-
   for (const pref of ["user.js", "prefs.js"].map((pref) =>
     path.join(profile.path, pref),
   )) {
-    const fileContent = await fs.readFile(pref, "utf-8");
+    if (!(await fs.pathExists(pref))) continue;
+    let fileContent = await fs.readFile(pref, "utf-8");
     for (const [key, val] of D.toPairs(settings)) {
-      val === null
-        ? removeFromPref(fileContent, key)
-        : addToPref(fileContent, key, val);
+      fileContent =
+        val === null
+          ? removeFromPref(fileContent, key)
+          : addToPref(fileContent, key, val);
     }
     await fs.writeFile(pref, fileContent);
   }
 
-  const packageJson = (await fs
-    .readFile("package.json", "utf-8")
-    .then(JSON.parse)) as Record<string, unknown>;
-
-  if (!isZoterField(packageJson.zotero)) {
-    throw new Error("Invalid zotero field in package.json");
-  }
-
-  const { id } = packageJson.zotero;
-
+  const { id } = getInfoFromPackageJson(
+    await fs.readFile("package.json", "utf-8").then(JSON.parse),
+  );
   const extensionsDir = path.join(profile.path, "extensions");
 
   // rm -rf ${extensionsDir}/${id}*
-  await glob(`${extensionsDir}/${id}*`).then((files) =>
+  await glob(`${extensionsDir}/${toIdShort(id)}*`).then((files) =>
     Promise.all(files.map((f) => fs.rm(f, { force: true, recursive: true }))),
   );
 
   // Create a text file in the 'extensions' directory of your Zotero profile directory
   // named after the extension id (e.g., myplugin@mydomain.org)
-  await fs.writeFile(path.join(extensionsDir, id), resolve(plugins.path));
+  const placeholder = path.join(extensionsDir, id);
+  await fs.ensureFile(placeholder);
+  await fs.writeFile(placeholder, resolve(plugins.path));
+}
 
-  const logFile = path.resolve(Date.now() + (log.path ?? "zotero.log"));
-
+function run({ log, profile, program }: Config) {
+  const logFile = path.resolve(log.path ?? "zotero.log");
   const zotero = $`${program.path} -purgecaches -P ${profile.name} -jsconsole -ZoteroDebugText -datadir profile >> ${logFile} 2>&1`;
-  return { kill: () => zotero.kill() };
+  return zotero;
 }
 
 export async function readStartConfig(file: string): Promise<Config> {

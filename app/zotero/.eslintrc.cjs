@@ -38,7 +38,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ["content/**/*"],
+      files: ["src/**/*"],
       env: {
         node: false,
       },

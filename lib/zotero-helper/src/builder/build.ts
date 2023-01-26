@@ -15,12 +15,19 @@ export async function build({
     throw new Error("only one entry point is supported");
   }
   const ctx = await context({
+    logLevel: "info",
     ...options,
     outfile: join(outdir ?? "dist", bootstrapJs),
     target: "firefox60",
+    format: "iife",
+    platform: "browser",
+    globalName: "Hooks",
     bundle: true,
-    format: "esm",
     entryPoints: [bootstrapFile],
+    footer: {
+      // expose bootstrap functions
+      js: `var{install,startup,shutdown,uninstall}=Hooks;`,
+    },
     plugins: [
       resolvePlugin(entryPoints[0]),
       renameStylesheet,

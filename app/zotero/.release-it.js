@@ -2,7 +2,6 @@ module.exports = {
   hooks: {
     "before:init": ["npm run lint"],
     "after:bump": [
-      "rm -rf xpi",
       "node ../../common/scripts/install-run-rush.js rebuild --verbose",
       "cp gen/update.rdf ."
     ],
@@ -19,12 +18,12 @@ module.exports = {
     //   preset: "angular",
     //   infile: "CHANGELOG.md",
     // },
-    "@release-it/bumper": {
-      "out": {
-        "file": "gen/version.js",
-        "type": "text/javascript",
-      }
-    },
+    // "@release-it/bumper": {
+    //   "out": {
+    //     "file": "gen/version.js",
+    //     "type": "text/javascript",
+    //   }
+    // },
   },
   npm: {
     publish: false,
@@ -32,7 +31,7 @@ module.exports = {
   github: {
     release: true,
     assets: [
-      "xpi/zotero-obsidian-note-*.xpi",
+      "dist/zotero-obsidian-note-*.xpi",
     ],
     proxy: process.env.HTTPS_PROXY,
     releaseName: "zt${version}",

@@ -3,16 +3,20 @@ import "zx/globals";
 import { join } from "path";
 import { zip } from "compressing";
 import { genInstallRdf, genManifestJson } from "../builder/manifest.js";
+import { getInfoFromPackageJson } from "../builder/parse.js";
+import { toIdShort } from "../utils.js";
 
 export async function readPackageJson() {
   return JSON.parse(await fs.readFile("package.json", "utf-8"));
 }
 
-export async function prepare(
+export async function preparePackage(
   outDir: string,
   packageJson: Record<string, unknown>,
 ) {
   await fs.emptyDir(outDir);
+
+  // copy assets to dist folder
   await fs.copy("public", outDir);
 
   await fs.writeFile(
@@ -25,6 +29,16 @@ export async function prepare(
   );
 }
 
-export async function bundle(outDir: string, pluginId: string) {
-  await zip.compressDir(outDir, join(outDir, `${pluginId}.xpi`));
+export async function bundle(
+  outDir: string,
+  packageJson: Record<string, unknown>,
+) {
+  const { version, id } = getInfoFromPackageJson(packageJson);
+
+  const tmpDir = await fs.mkdtemp("ztpkg-");
+  const xpi = `${toIdShort(id)}-${version}.xpi`;
+
+  await zip.compressDir(outDir, join(tmpDir, xpi));
+  await fs.move(join(tmpDir, xpi), join(outDir, xpi), { overwrite: true });
+  await fs.remove(tmpDir);
 }

@@ -37,7 +37,7 @@ abstract class Plugin_2 extends Component {
   abstract onUninstall(): Promise<void> | void;
 }
 
-interface Manifest {
+export interface Manifest {
   id: string;
   version: string;
   resourceURI: unknown;

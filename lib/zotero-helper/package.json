@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
+    "dev": "tsc --build --watch",
     "build": "tsc --build"
   },
   "exports": {
@@ -30,9 +31,10 @@
     "eta": "^1.14.2",
     "compressing": "~1.7.0",
     "yaml": "~2.2.1",
-    "escape-string-regexp": "^5.0.0"
+    "escape-string-regexp": "^5.0.0",
+    "core-js": "~3.27.2"
   },
   "peerDependencies": {
-    "esbuild": "^0.16.17"
+    "zotero-types": "~1.0.4"
   }
 }

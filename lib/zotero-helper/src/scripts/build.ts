@@ -1,18 +1,24 @@
 import { build } from "../builder/build.js";
-import { bundle, prepare, readPackageJson } from "./prepare.js";
+import { bundle, preparePackage, readPackageJson } from "./pack.js";
 
 const packageJson = await readPackageJson();
 
 const outDir = argv["outdir"] || "dist";
-const entryPoint = argv._[0] || "src/index.ts";
+const entryPoint = argv._[0] || "src/main.ts";
 
-await prepare(outDir, packageJson);
+await preparePackage(outDir, packageJson);
 
-await build({
+const ctx = await build({
   entryPoints: [entryPoint],
   outdir: outDir,
   minify: true,
   sourcemap: false,
 });
+await ctx.dispose();
 
-await bundle(outDir, packageJson.zotero.id);
+// remove .d.ts files
+await glob(`${outDir}/**/*.d.ts`).then((dts) =>
+  Promise.all(dts.map((f) => fs.rm(f))),
+);
+
+await bundle(outDir, packageJson);

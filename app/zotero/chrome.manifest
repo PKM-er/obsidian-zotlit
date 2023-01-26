@@ -1,5 +1,0 @@
-content	zotero-obsidian-note				content/
-locale	zotero-obsidian-note	en-US		locale/en-US/
-skin	zotero-obsidian-note	default		skin/
-
-overlay	chrome://zotero/content/zoteroPane.xul	chrome://zotero-obsidian-note/content/zotero-obsidian-note.xul

@@ -90,8 +90,9 @@ try {
   });
   if (!isProd) {
     await ctx.watch();
+  } else {
+    await ctx.dispose();
   }
-  ctx.dispose();
 } catch (err) {
   console.error(err);
   process.exit(1);

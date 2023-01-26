@@ -1,0 +1,1 @@
+declare function pref(name: string, value?: any): any;

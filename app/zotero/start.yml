@@ -1,6 +1,6 @@
 profile:
   name: debug
-  path: ~/Library/Application Support/Zotero/Profiles/olymwkj1.debug
+  path: /Users/aidenlx/Library/Application Support/Zotero/Profiles/olymwkj1.debug
 log:
   path: zt-debug.log
 plugins:
