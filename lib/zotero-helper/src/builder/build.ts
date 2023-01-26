@@ -2,7 +2,7 @@ import { rename } from "fs/promises";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import type { Plugin, BuildOptions } from "esbuild";
-import { build as _build } from "esbuild";
+import { context } from "esbuild";
 import { styleCss, bootstrapJs } from "../const.js";
 
 export async function build({
@@ -14,7 +14,7 @@ export async function build({
   if (!Array.isArray(entryPoints) || typeof entryPoints[0] !== "string") {
     throw new Error("only one entry point is supported");
   }
-  return await _build({
+  const ctx = await context({
     ...options,
     outfile: join(outdir ?? "dist", bootstrapJs),
     target: "firefox60",
@@ -27,6 +27,7 @@ export async function build({
       ...(options.plugins ?? []),
     ],
   });
+  return ctx;
 }
 
 const __dirname = resolve(fileURLToPath(import.meta.url), "..");

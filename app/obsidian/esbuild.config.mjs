@@ -1,5 +1,5 @@
 import obPlugin from "@aidenlx/esbuild-plugin-obsidian";
-import { build } from "esbuild";
+import { context } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -60,7 +60,6 @@ const preactCompatPlugin = {
 /** @type import("esbuild").BuildOptions */
 const opts = {
   bundle: true,
-  watch: !isProd,
   platform: "node",
   logLevel: process.env.BUILD === "development" ? "info" : "silent",
   external: ["obsidian", "electron", "@electron/remote", ...cmExternals],
@@ -77,7 +76,7 @@ const opts = {
   },
 };
 try {
-  await build({
+  const ctx = await context({
     ...opts,
     entryPoints: ["src/zt-main.ts"],
     banner: { js: banner },
@@ -89,6 +88,10 @@ try {
       preactCompatPlugin,
     ],
   });
+  if (!isProd) {
+    await ctx.watch();
+  }
+  ctx.dispose();
 } catch (err) {
   console.error(err);
   process.exit(1);

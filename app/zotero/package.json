@@ -39,7 +39,7 @@
     "assert-never": "^1.2.1",
     "cz-conventional-changelog": "^3.3.0",
     "@types/mocha": "^9.0.0",
-    "esbuild": "^0.16.17",
+    "esbuild": "^0.17.4",
     "zotero-plugin": "1.4.8",
     "@types/eslint": "~8.4.6",
     "eslint": "~8.31.0",
