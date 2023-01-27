@@ -36,7 +36,8 @@
     "monkey-around": "^2.3.0",
     "assert-never": "^1.2.1",
     "@obzt/common": "workspace:*",
-    "@aidenlx/zotero-helper": "workspace:*"
+    "@aidenlx/zotero-helper": "workspace:*",
+    "@mobily/ts-belt": "^4.0.0-rc.5"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",

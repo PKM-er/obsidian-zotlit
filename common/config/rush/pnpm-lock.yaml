@@ -152,6 +152,7 @@ importers:
     specifiers:
       '@aidenlx/eslint-config': workspace:*
       '@aidenlx/zotero-helper': workspace:*
+      '@mobily/ts-belt': ^4.0.0-rc.5
       '@obzt/common': workspace:*
       '@release-it/bumper': ^4.0.0
       '@types/eslint': ~8.4.6
@@ -164,6 +165,7 @@ importers:
       zotero-types: ~1.0.4
     dependencies:
       '@aidenlx/zotero-helper': link:../../lib/zotero-helper
+      '@mobily/ts-belt': 4.0.0-rc.5
       '@obzt/common': link:../../lib/common
       assert-never: 1.2.1
       monkey-around: 2.3.0
@@ -473,6 +475,7 @@ importers:
     specifiers:
       '@aidenlx/eslint-config': workspace:*
       '@mobily/ts-belt': ^4.0.0-rc.5
+      '@obzt/common': workspace:*
       '@types/eslint': ~8.4.6
       '@types/node': ^17.0.10
       compressing: ~1.7.0
@@ -481,16 +484,19 @@ importers:
       escape-string-regexp: ^5.0.0
       eslint: ~8.31.0
       eta: ^1.14.2
+      nanoevents: ~7.0.1
       typescript: ^4.9.4
       yaml: ~2.2.1
       zotero-types: ~1.0.4
       zx: ~7.1.1
     dependencies:
       '@mobily/ts-belt': 4.0.0-rc.5
+      '@obzt/common': link:../common
       compressing: 1.7.0
       core-js: 3.27.2
       escape-string-regexp: 5.0.0
       eta: 1.14.2
+      nanoevents: 7.0.1
       yaml: 2.2.1
       zx: 7.1.1
     devDependencies:

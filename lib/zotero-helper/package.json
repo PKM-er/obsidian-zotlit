@@ -32,7 +32,9 @@
     "compressing": "~1.7.0",
     "yaml": "~2.2.1",
     "escape-string-regexp": "^5.0.0",
-    "core-js": "~3.27.2"
+    "core-js": "~3.27.2",
+    "nanoevents": "~7.0.1",
+    "@obzt/common": "workspace:*"
   },
   "peerDependencies": {
     "zotero-types": "~1.0.4"

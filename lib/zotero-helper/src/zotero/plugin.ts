@@ -1,4 +1,45 @@
+/* eslint-disable no-var */
+import "core-js/actual/object/from-entries.js";
+
+import { enumerate } from "@obzt/common";
+import type { Emitter } from "nanoevents";
+import { createNanoEvents } from "nanoevents";
+import type { MenuSelector } from "./menu/menu.js";
+import { Menu } from "./menu/menu.js";
 import { Component } from "./misc.js";
+
+declare global {
+  var mainWindow: Window;
+  var mainDocument: Document;
+  var app: typeof Zotero;
+}
+
+type ZoteroEvent = Record<
+  _ZoteroTypes.Notifier.Event,
+  (ids: string[], extraData: _ZoteroTypes.anyObj) => any
+>;
+
+const eventSources = enumerate<_ZoteroTypes.Notifier.Type>()(
+  "collection",
+  "search",
+  "share",
+  "share-items",
+  "item",
+  "file",
+  "collection-item",
+  "item-tag",
+  "tag",
+  "setting",
+  "group",
+  "trash",
+  "bucket",
+  "relation",
+  "feed",
+  "feedItem",
+  "sync",
+  "api-key",
+  "tab",
+);
 
 abstract class Plugin_2 extends Component {
   public manifest?: Manifest;
@@ -7,14 +48,34 @@ abstract class Plugin_2 extends Component {
    * The Services.jsm JavaScript code module offers a wide assortment of lazy getters that simplify the process of obtaining references to commonly used services.
    */
   public service?: any;
-  private stringBundle?: {
-    GetStringFromName: (name: string) => string;
-  };
+  // private stringBundle?: {
+  //   GetStringFromName: (name: string) => string;
+  // };
   get loaded() {
     return this.manifest !== undefined;
   }
   constructor(public app: typeof Zotero) {
     super();
+    Object.defineProperties(globalThis, {
+      mainWindow: {
+        get() {
+          return app.getMainWindow();
+        },
+        configurable: true,
+      },
+      mainDocument: {
+        get() {
+          return app.getMainWindow().document;
+        },
+        configurable: true,
+      },
+    });
+    this.register(() => {
+      // @ts-ignore
+      delete globalThis.mainWindow;
+      // @ts-ignore
+      delete globalThis.mainDocument;
+    });
   }
 
   load(manifest: Manifest, services: any) {
@@ -35,6 +96,55 @@ abstract class Plugin_2 extends Component {
   }
   abstract onInstall(): Promise<void> | void;
   abstract onUninstall(): Promise<void> | void;
+
+  // #region events
+  #events = Object.fromEntries(
+    eventSources.map((e) => [e, null as Emitter | null] as const),
+  );
+  events = new Proxy(this.#events, {
+    get(target, p, receiver) {
+      if (typeof p === "string" && target[p] === null) {
+        throw new Error(`Notifier for event source ${p} is not registered`);
+      }
+      return Reflect.get(target, p, receiver);
+    },
+  }) as Record<_ZoteroTypes.Notifier.Type, Emitter<ZoteroEvent>>;
+
+  registerNotifier(types: _ZoteroTypes.Notifier.Type[]) {
+    types
+      .filter((type) => this.#events[type] === null)
+      .map((type) => {
+        const emitter = createNanoEvents<ZoteroEvent>();
+        this.#events[type] = emitter;
+        const notifierID = this.app.Notifier.registerObserver(
+          {
+            notify: (event, _type, ids, extraData) => {
+              emitter.emit(event, ids, extraData);
+            },
+          },
+          [type],
+        );
+        return [type, notifierID] as const;
+      })
+      .forEach(([type, notifierID]) =>
+        this.register(() => {
+          this.app.Notifier.unregisterObserver(notifierID);
+          this.#events[type] = null;
+        }),
+      );
+  }
+  // #endregion
+
+  registerMenu(
+    selector: keyof typeof MenuSelector,
+    cb: (menu: Menu) => any,
+  ): Menu;
+  registerMenu(selector: string, cb: (menu: Menu) => any): Menu;
+  registerMenu(selector: string, cb: (menu: Menu) => any): Menu {
+    const menu = this.addChild(new Menu(selector));
+    cb(menu);
+    return menu;
+  }
 }
 
 export interface Manifest {
