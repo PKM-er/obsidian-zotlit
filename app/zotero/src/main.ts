@@ -21,6 +21,13 @@ export default class ZoteroPlugin extends Plugin {
         );
       }),
     );
+    this.registerMenu("reader", (menu) =>
+      menu.addItem((item) =>
+        item
+          .setTitle("Hello, world!")
+          .onClick(() => this.app.log("Hello, world!")),
+      ),
+    );
     this.registerMenu("item", (menu) =>
       menu
         .addItem((item) =>

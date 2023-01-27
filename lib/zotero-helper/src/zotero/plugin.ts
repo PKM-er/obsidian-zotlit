@@ -6,12 +6,12 @@ import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
+import { ReaderMenuHelper } from "./menu/reader-menu.js";
 import { Component } from "./misc.js";
 
 declare global {
-  var mainWindow: Window;
-  var mainDocument: Document;
-  var app: typeof Zotero;
+  var mainWindow: typeof window;
+  var mainDocument: typeof window.document;
 }
 
 type ZoteroEvent = Record<
@@ -76,6 +76,7 @@ abstract class Plugin_2 extends Component {
       // @ts-ignore
       delete globalThis.mainDocument;
     });
+    this.#readerHelper = this.addChild(new ReaderMenuHelper(app));
   }
 
   load(manifest: Manifest, services: any) {
@@ -111,6 +112,10 @@ abstract class Plugin_2 extends Component {
   }) as Record<_ZoteroTypes.Notifier.Type, Emitter<ZoteroEvent>>;
 
   registerNotifier(types: _ZoteroTypes.Notifier.Type[]) {
+    if (!this.manifest) {
+      throw new Error("Plugin is not loaded");
+    }
+    const { id } = this.manifest;
     types
       .filter((type) => this.#events[type] === null)
       .map((type) => {
@@ -123,6 +128,7 @@ abstract class Plugin_2 extends Component {
             },
           },
           [type],
+          `${id}-${type}`,
         );
         return [type, notifierID] as const;
       })
@@ -135,15 +141,20 @@ abstract class Plugin_2 extends Component {
   }
   // #endregion
 
+  // # menu
+  #readerHelper: ReaderMenuHelper;
   registerMenu(
     selector: keyof typeof MenuSelector,
     cb: (menu: Menu) => any,
-  ): Menu;
-  registerMenu(selector: string, cb: (menu: Menu) => any): Menu;
-  registerMenu(selector: string, cb: (menu: Menu) => any): Menu {
-    const menu = this.addChild(new Menu(selector));
-    cb(menu);
-    return menu;
+  ): void;
+  registerMenu(selector: string, cb: (menu: Menu) => any): void;
+  registerMenu(selector: string, cb: (menu: Menu) => any): void {
+    if (selector === "reader") {
+      this.#readerHelper.registerMenu(cb);
+    } else {
+      const menu = this.addChild(new Menu(selector));
+      cb(menu);
+    }
   }
 }
 

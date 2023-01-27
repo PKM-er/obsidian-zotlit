@@ -34,7 +34,8 @@
     "escape-string-regexp": "^5.0.0",
     "core-js": "~3.27.2",
     "nanoevents": "~7.0.1",
-    "@obzt/common": "workspace:*"
+    "@obzt/common": "workspace:*",
+    "monkey-around": "^2.3.0"
   },
   "peerDependencies": {
     "zotero-types": "~1.0.4"

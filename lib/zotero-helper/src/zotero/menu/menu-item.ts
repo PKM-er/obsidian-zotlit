@@ -1,6 +1,6 @@
 import { createXULElement } from "../helper.js";
 import { Component } from "../misc.js";
-import { Menu } from "./menu.js";
+import type { Menu } from "./menu.js";
 
 declare global {
   interface HTMLElementEventMap {
@@ -54,11 +54,28 @@ export class MenuItem extends Component {
     return this;
   }
 
+  show(): this {
+    return this.toggle(true);
+  }
+  hide(): this {
+    return this.toggle(false);
+  }
+  toggle(show: boolean): this {
+    this.dom.setAttribute("hidden", show ? "false" : "true");
+    return this;
+  }
+
   /**
    * @public
    */
   onClick(callback: (evt: MouseEvent | KeyboardEvent) => any): this {
-    this.dom.addEventListener("command", callback);
+    this.registerDomEvent(this.dom, "command", callback);
+    return this;
+  }
+
+  onShowing(callback: (item: this) => any): this {
+    callback(this);
+    this.registerDomEvent(this.menu.dom, "popupshowing", () => callback(this));
     return this;
   }
 

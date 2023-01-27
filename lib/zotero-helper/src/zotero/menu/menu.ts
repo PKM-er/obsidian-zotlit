@@ -11,6 +11,7 @@ export enum MenuSelector {
   menuHelp = "#menu_HelpPopup",
   collection = "#zotero-collectionmenu",
   item = "#zotero-itemmenu",
+  reader = -1,
 }
 
 /**
@@ -29,9 +30,16 @@ export class Menu extends Component {
       this.dom = menuPopup;
       this.removeSelf = true;
     } else {
-      this.dom = mainDocument.querySelector(
-        MenuSelector[menuPopup as keyof typeof MenuSelector] ?? menuPopup,
-      ) as XUL.MenuPopup;
+      let selector: string | -1 | undefined =
+        MenuSelector[menuPopup as keyof typeof MenuSelector];
+      if (selector === -1) {
+        throw new Error(`Menu can't handle ${menuPopup} directly`);
+      }
+      if (!selector) {
+        // use custom selector passed in
+        selector = menuPopup;
+      }
+      this.dom = mainDocument.querySelector(selector) as XUL.MenuPopup;
     }
 
     if (!this.dom) {
@@ -96,7 +104,7 @@ export class Menu extends Component {
   }
 
   onShowing(callback: (evt: MouseEvent | KeyboardEvent) => any): this {
-    this.dom.addEventListener("popupshowing", callback);
+    this.registerDomEvent(this.dom, "popupshowing", callback);
     return this;
   }
 

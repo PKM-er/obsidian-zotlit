@@ -58,7 +58,7 @@ async function prepare({ plugins, profile }: Config) {
 
 function run({ log, profile, program }: Config) {
   const logFile = path.resolve(log.path ?? "zotero.log");
-  const zotero = $`${program.path} -purgecaches -P ${profile.name} -jsconsole -ZoteroDebugText -datadir profile >> ${logFile} 2>&1`;
+  const zotero = $`${program.path} -purgecaches -P ${profile.name} -jsconsole -debugger -ZoteroDebugText -datadir profile >> ${logFile} 2>&1`;
   return zotero;
 }
 
