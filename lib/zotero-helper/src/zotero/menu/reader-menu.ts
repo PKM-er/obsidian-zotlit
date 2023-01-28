@@ -1,61 +1,86 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { around } from "monkey-around";
 import { Component } from "../misc.js";
 import { Menu } from "./menu.js";
 
+export interface AnnotPopupData {
+  [key: string]: any;
+  enableEditHighlightedText:
+    | false
+    | {
+        [key: string]: any;
+        comment: string;
+        libraryID: number;
+        /** itemKEY not itemID */
+        id: string;
+        tags: { name: string; [key: string]: any }[];
+      };
+  /** itemKEY not itemID */
+  currentID: string;
+  /** itemKEY of all selected items */
+  ids: string[];
+}
+
 export class ReaderMenuHelper extends Component {
-  #menuCallbacks: ((menu: Menu) => any)[] = [];
-  #observedPopupsets = new WeakSet<Node>();
-  #menuObserver: MutationObserver;
+  private menuCallbacks: ((
+    menu: Menu,
+    data: AnnotPopupData,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) => any)[] = [];
 
   constructor(public app: typeof Zotero) {
     super();
-    this.#menuObserver = new mainWindow.MutationObserver((mutations) => {
-      for (const mu of mutations) {
-        for (let i = 0; i < mu.addedNodes.length; i++) {
-          const node = mu.addedNodes[i];
-          if (node.nodeName !== "menupopup") continue;
-          const menu = new Menu(node as XUL.MenuPopup);
-          this.#menuCallbacks.forEach((cb) => cb(menu));
-        }
-      }
-    });
   }
 
   registerMenu(cb: (menu: Menu) => any): void {
-    this.#menuCallbacks.push(cb);
+    this.menuCallbacks.push(cb);
   }
 
   public onload(): void {
-    const observe = this.#observe,
-      Zotero = this.app;
+    const self = this;
 
-    Zotero.log("registering existing reader's menu");
-    observe(Zotero.Reader._readers);
+    self.app.log("hooking into _openAnnotationPopup");
+    if (this.#hookOpenAnnotPopup()) return;
+    const unload = around(self.app.Reader, {
+      open: (next) =>
+        function (this: _ZoteroTypes.Reader, ...args) {
+          const result = next.apply(this, args);
+          self.app.log("Reader opened, hooking into _openAnnotationPopup");
+          if (self.#hookOpenAnnotPopup()) {
+            unload();
+          }
+          return result;
+        },
+    });
+    this.register(unload);
+  }
+
+  #hookOpenAnnotPopup(): boolean {
+    const readers = this.app.Reader._readers;
+    if (readers.length === 0) return false;
+    const reader = readers[0];
+    const self = this;
+    const Zotero = this.app;
     this.register(
-      around(Zotero.Reader, {
-        open: (next) =>
-          function (this: _ZoteroTypes.Reader, ...args) {
-            const result = next.apply(this, args);
-            Zotero.log("Reader opened, registering menu");
-            observe(this._readers);
+      around(reader.constructor.prototype as _ZoteroTypes.ReaderInstance, {
+        _openAnnotationPopup: (next) =>
+          function (this: _ZoteroTypes.ReaderInstance, data: AnnotPopupData) {
+            const result = next.call(this, data);
+            const popup = (this._popupset as Element).firstChild;
+            if (!popup || popup.nodeName !== "menupopup") {
+              Zotero.log("No popup found while trying to add annotation popup");
+              return;
+            }
+            const menu = new Menu(popup as XUL.MenuPopup);
+            self.menuCallbacks.forEach((cb) => cb(menu, data, this));
             return result;
           },
       }),
     );
+    return true;
   }
 
-  #observe = (readers: _ZoteroTypes.ReaderInstance[]) => {
-    readers.forEach((r) => {
-      if (this.#observedPopupsets.has(r._popupset)) return;
-      this.#menuObserver.observe(r._popupset, {
-        childList: true,
-      });
-      this.#observedPopupsets.add(r._popupset);
-    });
-  };
-
   public onunload(): void {
-    this.#menuObserver.disconnect();
-    this.#menuCallbacks.length = 0;
+    this.menuCallbacks.length = 0;
   }
 }

@@ -6,6 +6,7 @@ import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
+import type { AnnotPopupData } from "./menu/reader-menu.js";
 import { ReaderMenuHelper } from "./menu/reader-menu.js";
 import { Component } from "./misc.js";
 
@@ -144,11 +145,22 @@ abstract class Plugin_2 extends Component {
   // # menu
   #readerHelper: ReaderMenuHelper;
   registerMenu(
+    selector: "reader",
+    cb: (
+      menu: Menu,
+      data: AnnotPopupData,
+      reader: _ZoteroTypes.ReaderInstance,
+    ) => any,
+  ): void;
+  registerMenu(
     selector: keyof typeof MenuSelector,
     cb: (menu: Menu) => any,
   ): void;
   registerMenu(selector: string, cb: (menu: Menu) => any): void;
-  registerMenu(selector: string, cb: (menu: Menu) => any): void {
+  registerMenu(
+    selector: string,
+    cb: (menu: Menu, ...args: any[]) => any,
+  ): void {
     if (selector === "reader") {
       this.#readerHelper.registerMenu(cb);
     } else {

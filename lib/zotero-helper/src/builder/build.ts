@@ -22,6 +22,11 @@ export async function build({
     format: "iife",
     platform: "browser",
     globalName: "Hooks",
+    define: {
+      // zotero has no window.setTimeout in extension context...
+      setTimeout: "mainWindow.setTimeout",
+      fetch: "mainWindow.fetch",
+    },
     bundle: true,
     entryPoints: [bootstrapFile],
     footer: {
