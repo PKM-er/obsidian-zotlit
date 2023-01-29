@@ -55,24 +55,30 @@ export class ReaderMenuHelper extends Component {
     this.register(unload);
   }
 
+  patchedPopups = new WeakSet<Element>();
+
   #hookOpenAnnotPopup(): boolean {
     const readers = this.app.Reader._readers;
     if (readers.length === 0) return false;
     const reader = readers[0];
     const self = this;
-    const Zotero = this.app;
     this.register(
       around(reader.constructor.prototype as _ZoteroTypes.ReaderInstance, {
         _openAnnotationPopup: (next) =>
           function (this: _ZoteroTypes.ReaderInstance, data: AnnotPopupData) {
             const result = next.call(this, data);
-            const popup = (this._popupset as Element).firstChild;
-            if (!popup || popup.nodeName !== "menupopup") {
-              Zotero.log("No popup found while trying to add annotation popup");
-              return;
+            for (const popup of (this._popupset as Element).children) {
+              if (
+                !popup ||
+                self.patchedPopups.has(popup) ||
+                popup.nodeName !== "menupopup"
+              ) {
+                continue;
+              }
+              const menu = new Menu(popup as XUL.MenuPopup);
+              self.menuCallbacks.forEach((cb) => cb(menu, data, this));
+              self.patchedPopups.add(popup);
             }
-            const menu = new Menu(popup as XUL.MenuPopup);
-            self.menuCallbacks.forEach((cb) => cb(menu, data, this));
             return result;
           },
       }),
