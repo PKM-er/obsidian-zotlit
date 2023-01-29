@@ -1,9 +1,0 @@
-profile:
-  name: debug
-  path: /Users/aidenlx/Library/Application Support/Zotero/Profiles/olymwkj1.debug
-log:
-  path: zt-debug.log
-plugins:
-  path: dist
-program:
-  path: /Applications/Zotero.app/Contents/MacOS/zotero

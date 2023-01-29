@@ -1,15 +1,7 @@
 app/*/build
 
-app/zotero/wiki
-app/zotero/gen/*
-!app/zotero/gen/version.js
-app/zotero/build
-app/zotero/**/*.swp
-app/zotero/**/*.debug
-app/zotero/**/*.cache
-app/zotero/**/*.status
-app/zotero/**/*.tmp
-app/zotero/**/*.xpi
+app/zotero/dist
+app/zotero/start.yml
 
 dist
 tsconfig*.tsbuildinfo
