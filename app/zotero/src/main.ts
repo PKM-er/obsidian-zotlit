@@ -47,7 +47,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
           pluginID: id,
           src: rootURI + "prefs.xhtml",
           label: "Obsidian Note",
-          image: rootURI + "chrome/skin/logo.svg",
+          image: rootURI + this.icons[32],
         },
         {
           Service: this.service,

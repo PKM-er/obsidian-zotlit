@@ -5,7 +5,13 @@
 
 ---
 
-In package.json, icon paths should be relative to `chrome` folder (folder need to be registered in chrome.manifest first in Zotero 6)
+In package.json, icon paths should be relative to the content uri path set in chrome.manifest
+
+---
+
+chrome.manifest documentation: https://firefox-source-docs.mozilla.org/build/buildsystem/chrome-registration.html
+
+plugin name for skin, locale and content can use placeholder _ to generate from package.json
 
 ---
 

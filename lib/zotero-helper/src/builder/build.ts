@@ -1,10 +1,12 @@
 import { rename } from "fs/promises";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
+import { D } from "@mobily/ts-belt";
 import type { Plugin, BuildOptions, BuildContext } from "esbuild";
 import { context, build as _build } from "esbuild";
 import { styleCss, bootstrapJs } from "../const.js";
 import { toIdShort } from "../utils.js";
+import { getContentURIDef, parseChromeManifest } from "./chrome.js";
 import { getInfoFromPackageJson } from "./parse.js";
 
 export async function build(
@@ -63,7 +65,14 @@ const bootstrapFile = resolve(
 
 const resolvePlugin = (entryPoint: string): Plugin => ({
   name: "resolve-plugin",
-  setup(build) {
+  async setup(build) {
+    const info = getInfoFromPackageJson(await fs.readJSON("package.json")),
+      manifest = parseChromeManifest(
+        await fs.readFile("chrome.manifest", "utf-8"),
+        info,
+      ),
+      contentURI = getContentURIDef(manifest);
+
     build.onResolve({ filter: /^@plugin$/ }, () => {
       return { path: resolve(entryPoint), namespace: "file" };
     });
@@ -73,17 +82,33 @@ const resolvePlugin = (entryPoint: string): Plugin => ({
     build.onLoad(
       { filter: /package\.json$/, namespace: "pkg" },
       async ({ path }) => {
-        const { id, version } = await fs
-            .readJSON(path)
-            .then(getInfoFromPackageJson),
-          idShort = toIdShort(id);
+        const { id, version } = info,
+          idShort = toIdShort(id),
+          icons = JSON.stringify(
+            D.map(info.icons, (relative) => join(contentURI.root, relative)),
+          );
         return {
           loader: "js",
           contents: `
 export const id = "${id}";
 export const idShort = "${idShort}";
 export const version = "${version}";
+export const icons = ${icons}
 `,
+        };
+      },
+    );
+    build.onResolve({ filter: /^@chrome$/, namespace: "file" }, () => {
+      return { path: resolve("chrome.manifest"), namespace: "pkg" };
+    });
+    build.onLoad(
+      { filter: /chrome\.manifest$/, namespace: "pkg" },
+      async ({ path }) => {
+        return {
+          contents: `const manifest = ${JSON.stringify(
+            manifest,
+          )}; export default manifest;`,
+          loader: "js",
         };
       },
     );

@@ -1,3 +1,5 @@
+import chromeManifest from "@chrome";
+import { updateAt } from "@mobily/ts-belt/Array";
 import { NS } from "../const.js";
 
 declare global {
@@ -63,4 +65,17 @@ ${xhtml}
   const range = doc.createRange();
   range.selectNodeContents(doc.querySelector("div")!);
   return range.extractContents();
+}
+
+export function getChromeManifest(rootURI: string) {
+  return chromeManifest.map((cols) => {
+    const [type] = cols;
+    if (type === "locale" || type === "skin") {
+      return updateAt(cols, 2, (path) => rootURI + path);
+    } else if (type === "content") {
+      return updateAt(cols, 1, (path) => rootURI + path);
+    } else {
+      return cols;
+    }
+  });
 }

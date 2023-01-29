@@ -1,7 +1,7 @@
 /* eslint-disable no-var */
 import "core-js/actual/object/from-entries.js";
 
-import { id, idShort, version } from "@manifest";
+import { icons, id, idShort, version } from "@manifest";
 import { enumerate } from "@obzt/common";
 
 import type { Emitter } from "nanoevents";
@@ -55,6 +55,7 @@ abstract class Plugin_2<
     full: id,
     short: idShort,
   };
+  public icons = icons;
   /**
    * https://contest-server.cs.uchicago.edu/ref/JavaScript/developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.html
    * The Services.jsm JavaScript code module offers a wide assortment of lazy getters that simplify the process of obtaining references to commonly used services.

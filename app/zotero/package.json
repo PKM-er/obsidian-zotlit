@@ -22,9 +22,10 @@
     "name": "Obsidian Note for Zotero",
     "id": "zotero-obsidian-note@aidenlx.top",
     "icons": {
-      "48": "skin/logo.svg",
-      "64": "skin/logo.svg",
-      "96": "skin/logo.svg"
+      "32": "logo.svg",
+      "48": "logo.svg",
+      "64": "logo.svg",
+      "96": "logo.svg"
     },
     "update": {
       "versions": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.json",

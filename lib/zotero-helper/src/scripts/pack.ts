@@ -2,7 +2,16 @@ import "zx/globals";
 
 import { join } from "path";
 import { zip } from "compressing";
-import { genInstallRdf, genManifestJson } from "../builder/manifest.js";
+import {
+  genChromeManifest,
+  getContentURIDef,
+  parseChromeManifest,
+} from "../builder/chrome.js";
+import {
+  genInstallRdf,
+  genManifestJson,
+  vaildataIcons,
+} from "../builder/manifest.js";
 import { getInfoFromPackageJson } from "../builder/parse.js";
 import { genPrefsJs } from "../builder/prefs.js";
 import { toIdShort } from "../utils.js";
@@ -24,13 +33,27 @@ export async function preparePackage(
   // copy assets to dist folder
   await fs.copy("public", outDir);
 
+  const info = getInfoFromPackageJson(packageJson);
+
+  const chromeManifest = parseChromeManifest(
+    await fs.readFile("chrome.manifest", "utf-8"),
+    info,
+  );
+  const contentURI = getContentURIDef(chromeManifest);
+
+  await vaildataIcons(info, contentURI);
+
   await fs.writeFile(
     join(outDir, "manifest.json"),
-    genManifestJson(packageJson),
+    genManifestJson(info, contentURI),
   );
   await fs.writeFile(
     join(outDir, "install.rdf"),
-    await genInstallRdf(packageJson),
+    await genInstallRdf(info, contentURI),
+  );
+  await fs.writeFile(
+    join(outDir, "chrome.manifest"),
+    genChromeManifest(chromeManifest),
   );
 }
 

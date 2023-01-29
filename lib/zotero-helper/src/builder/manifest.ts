@@ -3,8 +3,8 @@ import { join } from "path/posix";
 import { fileURLToPath } from "url";
 import { D } from "@mobily/ts-belt";
 import { renderFile } from "eta";
-import { toIdShort } from "../utils.js";
-import { getInfoFromPackageJson } from "./parse.js";
+import type { ContentURIManifest } from "./chrome.js";
+import type { PackageInfo } from "./parse.js";
 
 const installRdfTemplate = resolve(
   fileURLToPath(import.meta.url),
@@ -18,9 +18,12 @@ const installRdfTemplate = resolve(
 /**
  * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json
  */
-export function genManifestJson(packageJson: Record<string, unknown>) {
+export function genManifestJson(
+  info: PackageInfo,
+  content: ContentURIManifest,
+) {
   const { name, version, description, author, homepage, id, update, icons } =
-    getInfoFromPackageJson(packageJson);
+    info;
 
   const output = {
     manifest_version: 2,
@@ -30,7 +33,7 @@ export function genManifestJson(packageJson: Record<string, unknown>) {
     description,
     homepage_url: homepage,
     // resources can be loaded by using a relative path directly
-    icons: D.map(icons, (path) => join("chrome", path)),
+    icons: D.map(icons, (relative) => join(content.root, relative)),
     applications: {
       zotero: {
         id,
@@ -43,18 +46,32 @@ export function genManifestJson(packageJson: Record<string, unknown>) {
   return JSON.stringify(output, null, 2);
 }
 
-export async function genInstallRdf(packageJson: Record<string, unknown>) {
-  let info = getInfoFromPackageJson(packageJson);
+export async function vaildataIcons(
+  info: PackageInfo,
+  content: ContentURIManifest,
+) {
+  // vaildate if icons exist
+  await Promise.all(
+    D.toPairs(info.icons).map(async ([id, relative]) => {
+      const path = resolve("public", content.root, relative);
+      if (await fs.pathExists(path)) return;
+      throw new Error(`Icon ${id} is not found in ${path}`);
+    }),
+  );
+}
 
+export async function genInstallRdf(
+  info: PackageInfo,
+  content: ContentURIManifest,
+) {
   info = D.updateUnsafe(
     info,
     "icons",
-    // icon need to be loaded with `chrome://` content URLs
-    // TODO: check chrome.manifest file
+    // icon is loaded with `chrome://content`
     (icons) =>
       D.map(
         icons,
-        (path) => new URL(path, `chrome://${toIdShort(info.id)}`).href,
+        (path) => new URL(path, `chrome://${content.id}/content/`).href,
       ),
   );
 
