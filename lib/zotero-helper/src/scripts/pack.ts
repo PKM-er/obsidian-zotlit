@@ -4,6 +4,7 @@ import { join } from "path";
 import { zip } from "compressing";
 import { genInstallRdf, genManifestJson } from "../builder/manifest.js";
 import { getInfoFromPackageJson } from "../builder/parse.js";
+import { genPrefsJs } from "../builder/prefs.js";
 import { toIdShort } from "../utils.js";
 
 export async function readPackageJson() {
@@ -16,6 +17,10 @@ export async function preparePackage(
 ) {
   await fs.emptyDir(outDir);
 
+  await fs.writeFile(
+    join(outDir, "prefs.js"),
+    await genPrefsJs(await fs.readJson("prefs.json"), packageJson),
+  );
   // copy assets to dist folder
   await fs.copy("public", outDir);
 

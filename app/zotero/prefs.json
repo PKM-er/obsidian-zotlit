@@ -1,0 +1,4 @@
+{
+  "notify": false,
+  "notify-url": "http://localhost:9091"
+}

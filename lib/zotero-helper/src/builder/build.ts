@@ -4,6 +4,8 @@ import { fileURLToPath } from "url";
 import type { Plugin, BuildOptions } from "esbuild";
 import { context } from "esbuild";
 import { styleCss, bootstrapJs } from "../const.js";
+import { toIdShort } from "../utils.js";
+import { getInfoFromPackageJson } from "./parse.js";
 
 export async function build({
   entryPoints,
@@ -57,6 +59,26 @@ const resolvePlugin = (entryPoint: string): Plugin => ({
     build.onResolve({ filter: /^@plugin$/ }, () => {
       return { path: resolve(entryPoint), namespace: "file" };
     });
+    build.onResolve({ filter: /^@manifest$/ }, () => {
+      return { path: resolve("package.json"), namespace: "pkg" };
+    });
+    build.onLoad(
+      { filter: /package\.json$/, namespace: "pkg" },
+      async ({ path }) => {
+        const { id, version } = await fs
+            .readJSON(path)
+            .then(getInfoFromPackageJson),
+          idShort = toIdShort(id);
+        return {
+          loader: "js",
+          contents: `
+export const id = "${id}";
+export const idShort = "${idShort}";
+export const version = "${version}";
+`,
+        };
+      },
+    );
   },
 });
 

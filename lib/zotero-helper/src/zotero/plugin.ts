@@ -1,7 +1,9 @@
 /* eslint-disable no-var */
 import "core-js/actual/object/from-entries.js";
 
+import { id, idShort, version } from "@manifest";
 import { enumerate } from "@obzt/common";
+
 import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
 import type { MenuSelector } from "./menu/menu.js";
@@ -42,8 +44,17 @@ const eventSources = enumerate<_ZoteroTypes.Notifier.Type>()(
   "tab",
 );
 
-abstract class Plugin_2 extends Component {
+const toPrefID = (name: string) => `extensions.${idShort}.${name}`;
+
+abstract class Plugin_2<
+  Settings extends Record<string, any>,
+> extends Component {
   public manifest?: Manifest;
+  public version = version;
+  public id = {
+    full: id,
+    short: idShort,
+  };
   /**
    * https://contest-server.cs.uchicago.edu/ref/JavaScript/developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.html
    * The Services.jsm JavaScript code module offers a wide assortment of lazy getters that simplify the process of obtaining references to commonly used services.
@@ -52,6 +63,9 @@ abstract class Plugin_2 extends Component {
   // private stringBundle?: {
   //   GetStringFromName: (name: string) => string;
   // };
+
+  public settings: Settings;
+
   get loaded() {
     return this.manifest !== undefined;
   }
@@ -78,6 +92,26 @@ abstract class Plugin_2 extends Component {
       delete globalThis.mainDocument;
     });
     this.#readerHelper = this.addChild(new ReaderMenuHelper(app));
+    this.settings = new Proxy({} as Settings, {
+      get(target, p, receiver) {
+        if (typeof p === "string") {
+          return app.Prefs.get(toPrefID(p), true);
+        }
+        return Reflect.get(target, p, receiver);
+      },
+      set(target, p, value, receiver) {
+        if (typeof p === "string") {
+          return app.Prefs.set(toPrefID(p), value, true);
+        }
+        return Reflect.set(target, p, value, receiver);
+      },
+      deleteProperty(target, p) {
+        if (typeof p === "string") {
+          return app.Prefs.clear(toPrefID(p), true), true;
+        }
+        return Reflect.deleteProperty(target, p);
+      },
+    });
   }
 
   load(manifest: Manifest, services: any) {
@@ -113,10 +147,6 @@ abstract class Plugin_2 extends Component {
   }) as Record<_ZoteroTypes.Notifier.Type, Emitter<ZoteroEvent>>;
 
   registerNotifier(types: _ZoteroTypes.Notifier.Type[]) {
-    if (!this.manifest) {
-      throw new Error("Plugin is not loaded");
-    }
-    const { id } = this.manifest;
     types
       .filter((type) => this.#events[type] === null)
       .map((type) => {
@@ -139,6 +169,24 @@ abstract class Plugin_2 extends Component {
           this.#events[type] = null;
         }),
       );
+  }
+
+  registerPref<K extends keyof Settings>(
+    name: K,
+    callback: (value: K) => void,
+    immediate = false,
+  ) {
+    const _callback = () => callback(this.settings[name]);
+    const id = this.app.Prefs.registerObserver(
+      toPrefID(name as string),
+      _callback,
+    );
+    if (immediate) {
+      _callback();
+    }
+    this.register(() => {
+      this.app.Prefs.unregisterObserver(id);
+    });
   }
   // #endregion
 

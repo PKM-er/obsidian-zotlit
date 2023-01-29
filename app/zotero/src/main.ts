@@ -11,8 +11,9 @@ import type {
 } from "@obzt/common";
 import { stringifyQuery } from "@obzt/common";
 import { assertNever } from "assert-never";
+import type settings from "../prefs.json";
 
-export default class ZoteroPlugin extends Plugin {
+export default class ZoteroPlugin extends Plugin<typeof settings> {
   onInstall(): void | Promise<void> {
     this.app.log("zotero-obsidian-note Installed");
   }
@@ -22,13 +23,20 @@ export default class ZoteroPlugin extends Plugin {
   onload(): void {
     this.app.log("zotero-obsidian-note Loaded");
 
-    this.registerNotifier(["item"]);
-    this.register(
-      this.events.item.on("add", (ids) => {
-        this.notifyItemAdded(
-          ids.filter((id) => this.app.Items.get(id).isRegularItem()),
+    this.registerPref(
+      "notify",
+      (value) => {
+        if (!value) return;
+        this.registerNotifier(["item"]);
+        this.register(
+          this.events.item.on("add", (ids) => {
+            this.notifyItemAdded(
+              ids.filter((id) => this.app.Items.get(id).isRegularItem()),
+            );
+          }),
         );
-      }),
+      },
+      true,
     );
 
     const { id, rootURI } = this.manifest!;
@@ -103,19 +111,16 @@ export default class ZoteroPlugin extends Plugin {
     this.app.log("zotero-obsidian-note unloaded");
   }
 
-  get version() {
-    if (!this.manifest) {
-      throw new Error("get version before load");
-    }
-    return this.manifest.version;
-  }
-
   #addedItemsNotifyQueue = new Set<string>();
   #notifyItemAdded = debounce(async () => {
     if (this.#addedItemsNotifyQueue.size === 0) return;
     const ids = Array.from(this.#addedItemsNotifyQueue);
     this.#addedItemsNotifyQueue.clear();
-    await fetch("http://localhost:9091/notify", {
+
+    const target = this.settings["notify-url"];
+    this.app.log(`send to: ${target}`);
+
+    await fetch(target, {
       method: "POST",
       body: JSON.stringify({ type: "item", event: "add", ids }),
       headers: {
@@ -125,6 +130,7 @@ export default class ZoteroPlugin extends Plugin {
     this.app.log(`notify item added: ${ids.join(", ")}`);
   }, 500);
   notifyItemAdded(ids: string[]) {
+    if (this.settings.notify === false) return;
     ids.forEach((id) => this.#addedItemsNotifyQueue.add(id));
     this.#notifyItemAdded();
   }
