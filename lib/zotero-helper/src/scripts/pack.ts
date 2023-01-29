@@ -43,7 +43,9 @@ export async function bundle(
   const tmpDir = await fs.mkdtemp("ztpkg-");
   const xpi = `${toIdShort(id)}-${version}.xpi`;
 
-  await zip.compressDir(outDir, join(tmpDir, xpi));
+  await zip.compressDir(outDir, join(tmpDir, xpi), {
+    ignoreBase: true,
+  });
   await fs.move(join(tmpDir, xpi), join(outDir, xpi), { overwrite: true });
   await fs.remove(tmpDir);
 }

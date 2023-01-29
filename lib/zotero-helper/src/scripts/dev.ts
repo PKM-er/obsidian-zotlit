@@ -33,12 +33,15 @@ const reloadZotero: Plugin = {
   },
 };
 
-const ctx = await build({
-  entryPoints: [entryPoint],
-  outdir: outDir,
-  minify: false,
-  sourcemap: "inline",
-  plugins: [reloadZotero],
-});
+const ctx = await build(
+  {
+    entryPoints: [entryPoint],
+    outdir: outDir,
+    minify: false,
+    sourcemap: "inline",
+    plugins: [reloadZotero],
+  },
+  true,
+);
 
 await ctx.watch();

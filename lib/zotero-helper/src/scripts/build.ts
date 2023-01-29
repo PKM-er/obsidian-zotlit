@@ -8,17 +8,11 @@ const entryPoint = argv._[0] || "src/main.ts";
 
 await preparePackage(outDir, packageJson);
 
-const ctx = await build({
+await build({
   entryPoints: [entryPoint],
   outdir: outDir,
   minify: true,
   sourcemap: false,
 });
-await ctx.dispose();
-
-// remove .d.ts files
-await glob(`${outDir}/**/*.d.ts`).then((dts) =>
-  Promise.all(dts.map((f) => fs.rm(f))),
-);
 
 await bundle(outDir, packageJson);

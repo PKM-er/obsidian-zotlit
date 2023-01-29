@@ -1,22 +1,25 @@
 import { rename } from "fs/promises";
 import { join, resolve } from "path";
 import { fileURLToPath } from "url";
-import type { Plugin, BuildOptions } from "esbuild";
-import { context } from "esbuild";
+import type { Plugin, BuildOptions, BuildContext } from "esbuild";
+import { context, build as _build } from "esbuild";
 import { styleCss, bootstrapJs } from "../const.js";
 import { toIdShort } from "../utils.js";
 import { getInfoFromPackageJson } from "./parse.js";
 
-export async function build({
-  entryPoints,
-  outdir,
-  outfile,
-  ...options
-}: BuildOptions) {
+export async function build(
+  options: BuildOptions,
+  watch: true,
+): Promise<BuildContext>;
+export async function build(options: BuildOptions): Promise<void>;
+export async function build(
+  { entryPoints, outdir, outfile, ...options }: BuildOptions,
+  watch = false,
+): Promise<BuildContext | void> {
   if (!Array.isArray(entryPoints) || typeof entryPoints[0] !== "string") {
     throw new Error("only one entry point is supported");
   }
-  const ctx = await context({
+  const buildOpts = {
     logLevel: "info",
     ...options,
     outfile: join(outdir ?? "dist", bootstrapJs),
@@ -40,8 +43,13 @@ export async function build({
       renameStylesheet,
       ...(options.plugins ?? []),
     ],
-  });
-  return ctx;
+  } satisfies BuildOptions;
+
+  if (watch) {
+    return await context(buildOpts);
+  } else {
+    await _build(buildOpts);
+  }
 }
 
 const __dirname = resolve(fileURLToPath(import.meta.url), "..");
