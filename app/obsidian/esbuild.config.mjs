@@ -1,5 +1,5 @@
 import obPlugin from "@aidenlx/esbuild-plugin-obsidian";
-import { context } from "esbuild";
+import { build, context } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -48,10 +48,10 @@ const preactCompatPlugin = {
   name: "preact-compat",
   setup(build) {
     const preact = join(process.cwd(), "node_modules", "@preact", "compat");
-    build.onResolve({ filter: /^(react-dom|react)$/ }, (args) => {
+    build.onResolve({ filter: /^(react-dom|react)$/ }, () => {
       return { path: join(preact, "index.mjs") };
     });
-    build.onResolve({ filter: /^react\/jsx-runtime$/ }, (args) => {
+    build.onResolve({ filter: /^react\/jsx-runtime$/ }, () => {
       return { path: join(preact, "jsx-runtime.mjs") };
     });
   },
@@ -74,24 +74,17 @@ const opts = {
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
   },
+  entryPoints: ["src/zt-main.ts"],
+  banner: { js: banner },
+  outfile: "build/main.js",
+  tsconfig: "tsconfig.build.json",
+  plugins: [lessLoader(), obPlugin({ beta: isPreRelease }), preactCompatPlugin],
 };
 try {
-  const ctx = await context({
-    ...opts,
-    entryPoints: ["src/zt-main.ts"],
-    banner: { js: banner },
-    outfile: "build/main.js",
-    tsconfig: "tsconfig.build.json",
-    plugins: [
-      lessLoader(),
-      obPlugin({ beta: isPreRelease }),
-      preactCompatPlugin,
-    ],
-  });
   if (!isProd) {
-    await ctx.watch();
+    await (await context(opts)).watch();
   } else {
-    await ctx.dispose();
+    await build(opts);
   }
 } catch (err) {
   console.error(err);
