@@ -5,7 +5,7 @@
 
 ---
 
-In package.json, icon paths should be relative to `chrome` folder
+In package.json, icon paths should be relative to `chrome` folder (folder need to be registered in chrome.manifest first in Zotero 6)
 
 ---
 

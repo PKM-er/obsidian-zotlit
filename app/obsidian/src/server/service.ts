@@ -12,9 +12,9 @@ import ZoteroPlugin from "../zt-main";
 import { ServerSettings } from "./settings";
 
 /** background actions */
-const bgActions = new Set<string>();
+const bgActions = new Set<string>(["notify"]);
 /** obsidian protocol actions */
-const obActions = new Set<string>();
+const obActions = new Set<string>(["zotero/open", "zotero/export"]);
 
 export class Server extends Service implements Events {
   #events = new Events();
@@ -85,12 +85,31 @@ export class Server extends Service implements Events {
     );
 
     // use pathname without leading slash as action name
-    const action = pathname.substring(1);
+    const action = pathname.substring(1),
+      // use bg: prefix to avoid conflict with obsidian protocol actions
+      event = `bg:${pathname.substring(1)}`;
     if (bgActions.has(action)) {
       const params = Object.fromEntries(searchParams.entries());
-      // use bg: prefix to avoid conflict with obsidian protocol actions
-      this.trigger(`bg:${pathname.substring(1)}`, params);
-      response.end();
+      if (request.headers["content-type"] === "application/json") {
+        new Promise<unknown>((resolve, reject) => {
+          let data = "";
+          request.on("data", (chunk) => (data += chunk));
+          request.on("error", (error) => reject(error));
+          request.on("end", () => {
+            try {
+              resolve(JSON.parse(data));
+            } catch (error) {
+              reject(error);
+            }
+          });
+        }).then((data) => {
+          this.trigger(event, params, data);
+          response.end();
+        });
+      } else {
+        this.trigger(event, params);
+        response.end();
+      }
     } else {
       response.statusCode = 404;
       response.end();
@@ -103,7 +122,22 @@ export class Server extends Service implements Events {
   // #endregion
 
   // #region expose Events
-  on(name: string, callback: (...data: any) => any, ctx?: any) {
+  on(
+    name: "bg:notify",
+    callback: (param: Record<string, string>, data: unknown) => any,
+    ctx?: any,
+  ): EventRef;
+  on(
+    name: "zotero/open",
+    callback: (param: Record<string, string>) => any,
+    ctx?: any,
+  ): EventRef;
+  on(
+    name: "zotero/export",
+    callback: (param: Record<string, string>) => any,
+    ctx?: any,
+  ): EventRef;
+  on(name: string, callback: (...data: any) => any, ctx?: any): EventRef {
     return this.#events.on(name, callback, ctx);
   }
   off(name: string, callback: (...data: any) => any) {

@@ -1,7 +1,7 @@
 import { D, G } from "@mobily/ts-belt";
 import e from "escape-string-regexp";
 
-export function addToPref(
+export function addToPrefJs(
   content: string,
   key: string,
   value: number | string | boolean,
@@ -25,7 +25,7 @@ export function addToPref(
     return content + "\n" + replaceWith;
   }
 }
-export function removeFromPref(content: string, key: string) {
+export function removeFromPrefJs(content: string, key: string) {
   // user_pref("...", ...);
   const pattern = new RegExp(
     `${e(`user_pref("${key}",`)}\\s+.+${e(");")}`,

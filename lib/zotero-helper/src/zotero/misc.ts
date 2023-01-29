@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export abstract class Component {
   private _loaded = false;
   private _events: (() => void)[] = [];

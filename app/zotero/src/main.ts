@@ -1,6 +1,6 @@
 import "./style.css";
 
-import { Plugin } from "@aidenlx/zotero-helper/zotero";
+import { Plugin, PreferencePane } from "@aidenlx/zotero-helper/zotero";
 import { uniqBy } from "@mobily/ts-belt/Array";
 import { debounce } from "@mobily/ts-belt/Function";
 import type {
@@ -31,6 +31,22 @@ export default class ZoteroPlugin extends Plugin {
       }),
     );
 
+    const { id, rootURI } = this.manifest!;
+
+    this.addChild(
+      new PreferencePane(
+        {
+          pluginID: id,
+          src: rootURI + "prefs.xhtml",
+          label: "Obsidian Note",
+          image: rootURI + "chrome/skin/logo.svg",
+        },
+        {
+          Service: this.service,
+          Zotero: this.app,
+        },
+      ),
+    );
     this.registerMenu("item", (menu) =>
       menu
         .addItem((item) =>

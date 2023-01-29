@@ -4,7 +4,7 @@ import { resolve } from "path";
 import { D } from "@mobily/ts-belt";
 import { parse } from "yaml";
 import { getInfoFromPackageJson } from "../builder/parse.js";
-import { removeFromPref, addToPref, toIdShort } from "../utils.js";
+import { removeFromPrefJs, addToPrefJs, toIdShort } from "../utils.js";
 
 export function start(config: Config) {
   return {
@@ -33,8 +33,8 @@ async function prepare({ plugins, profile }: Config) {
     for (const [key, val] of D.toPairs(settings)) {
       fileContent =
         val === null
-          ? removeFromPref(fileContent, key)
-          : addToPref(fileContent, key, val);
+          ? removeFromPrefJs(fileContent, key)
+          : addToPrefJs(fileContent, key, val);
     }
     await fs.writeFile(pref, fileContent);
   }

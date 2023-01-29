@@ -6,9 +6,9 @@
     "composite": true,
     "noEmit": false,
     "target": "ESNext",
-    "lib": ["esnext", "DOM"],
+    "lib": ["ES2017", "DOM", "DOM.Iterable"],
     "module": "Node16",
     "moduleResolution": "Node16"
   },
-  "include": ["src/zotero/**/*.ts", "src/zotero/**/*.js", "src/const.js"],
+  "include": ["src/zotero/**/*.ts", "src/zotero/**/*.js", "src/const.js"]
 }

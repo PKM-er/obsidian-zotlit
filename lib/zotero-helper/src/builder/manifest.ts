@@ -50,6 +50,7 @@ export async function genInstallRdf(packageJson: Record<string, unknown>) {
     info,
     "icons",
     // icon need to be loaded with `chrome://` content URLs
+    // TODO: check chrome.manifest file
     (icons) =>
       D.map(
         icons,
