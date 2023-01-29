@@ -41,7 +41,3 @@ export interface PreferencePanes {
    */
   unregister(id: string): void;
 }
-
-export interface Zotero7 extends _ZoteroTypes.Zotero {
-  PreferencePanes: PreferencePanes;
-}

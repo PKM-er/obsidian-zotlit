@@ -6,11 +6,15 @@ import { enumerate } from "@obzt/common";
 
 import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
+import type { IPaneDescriptor } from "./index.js";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
 import type { AnnotPopupData } from "./menu/reader-menu.js";
 import { ReaderMenuHelper } from "./menu/reader-menu.js";
 import { Component } from "./misc.js";
+import { polyfill } from "./polyfill/index.js";
+import type { Zotero7 } from "./polyfill/index.js";
+import { PreferencePane } from "./pref/index.js";
 
 declare global {
   var mainWindow: typeof window;
@@ -60,7 +64,9 @@ abstract class Plugin_2<
    * https://contest-server.cs.uchicago.edu/ref/JavaScript/developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.html
    * The Services.jsm JavaScript code module offers a wide assortment of lazy getters that simplify the process of obtaining references to commonly used services.
    */
-  public service?: any;
+  public Services?: any;
+
+  public app: Zotero7;
   // private stringBundle?: {
   //   GetStringFromName: (name: string) => string;
   // };
@@ -70,8 +76,9 @@ abstract class Plugin_2<
   get loaded() {
     return this.manifest !== undefined;
   }
-  constructor(public app: typeof Zotero) {
+  constructor(app: typeof Zotero) {
     super();
+    this.app = app as Zotero7;
     Object.defineProperties(globalThis, {
       mainWindow: {
         get() {
@@ -115,10 +122,17 @@ abstract class Plugin_2<
     });
   }
 
-  load(manifest: Manifest, services: any) {
+  load(manifest: Manifest, Services: any) {
     this.manifest = manifest;
-    this.service = services;
-    super.load(manifest, services);
+    this.Services = Services;
+    const { Zotero, unload } = polyfill({
+      Zotero: this.app,
+      Services,
+    });
+    this.register(unload);
+    this.app = Zotero;
+    this.app.log(Zotero.PreferencePanes);
+    super.load(manifest, Services);
   }
   abstract onload(manifest: Manifest, services: any): void;
   unload(): void {
@@ -216,6 +230,13 @@ abstract class Plugin_2<
       const menu = this.addChild(new Menu(selector));
       cb(menu);
     }
+  }
+
+  registerPrefPane(des: IPaneDescriptor) {
+    if (!this.loaded) {
+      throw new Error("Plugin is not loaded");
+    }
+    this.addChild(new PreferencePane(des, this.app));
   }
 }
 
