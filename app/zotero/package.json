@@ -38,6 +38,7 @@
     "assert-never": "^1.2.1",
     "@obzt/common": "workspace:*",
     "@aidenlx/zotero-helper": "workspace:*",
+    "@obzt/protocol": "workspace:*",
     "@mobily/ts-belt": "^4.0.0-rc.5"
   },
   "devDependencies": {

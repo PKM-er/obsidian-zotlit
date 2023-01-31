@@ -4,6 +4,7 @@ import type {
   ServerResponse,
 } from "http";
 import { createServer } from "http";
+import type { INotify } from "@obzt/protocol/dist/bg";
 import { Service } from "@ophidian/core";
 import type { EventRef, ObsidianProtocolData } from "obsidian";
 import { Events } from "obsidian";
@@ -124,7 +125,7 @@ export class Server extends Service implements Events {
   // #region expose Events
   on(
     name: "bg:notify",
-    callback: (param: Record<string, string>, data: unknown) => any,
+    callback: (param: Record<string, string>, data: INotify) => any,
     ctx?: any,
   ): EventRef;
   on(

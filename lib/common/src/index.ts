@@ -4,5 +4,4 @@ export * from "./zotero-date.js";
 export * from "./logger.js";
 export * from "./must-include.js";
 export * from "./worker.js";
-export * from "./qs.js";
 export * from "./binary.js";

@@ -1,21 +1,21 @@
 {
-  "name": "@obzt/common",
+  "name": "@obzt/protocol",
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w"
   },
   "devDependencies": {
-    "@aidenlx/eslint-config": "workspace:*",
-    "@types/node": "^17.0.10",
     "typescript": "^4.9.4",
     "eslint": "~8.31.0",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@aidenlx/eslint-config": "workspace:*"
   },
   "dependencies": {
-    "log4js": "~6.6.1",
-    "monkey-around": "^2.3.0"
+    "query-string": "~7.1.1",
+    "assert-never": "^1.2.1"
   }
 }

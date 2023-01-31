@@ -5,11 +5,12 @@ import { uniqBy } from "@mobily/ts-belt/Array";
 import { debounce } from "@mobily/ts-belt/Function";
 import type {
   AnnotationsQuery,
+  INotifyRegularItem,
   ItemQuery,
   ItemsQuery,
   QueryAction,
-} from "@obzt/common";
-import { stringifyQuery } from "@obzt/common";
+} from "@obzt/protocol";
+import { stringifyQuery } from "@obzt/protocol";
 import { assertNever } from "assert-never";
 import type settings from "../prefs.json";
 
@@ -112,7 +113,10 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
 
     await fetch(target, {
       method: "POST",
-      body: JSON.stringify({ type: "item", event: "add", ids }),
+      body: JSON.stringify({
+        event: "regular-item/add",
+        ids,
+      } satisfies INotifyRegularItem),
       headers: {
         "Content-Type": "application/json",
       },

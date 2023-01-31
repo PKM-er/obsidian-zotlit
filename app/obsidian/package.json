@@ -98,6 +98,7 @@
     "@obzt/components": "workspace:*",
     "react-json-tree": "~0.18.0",
     "nanoid": "~4.0.0",
-    "get-port": "~6.1.2"
+    "get-port": "~6.1.2",
+    "@obzt/protocol": "workspace:*"
   }
 }

@@ -17,6 +17,10 @@
       "path": "lib/database"
     },
     {
+      "name": "protocol",
+      "path": "lib/protocol"
+    },
+    {
       "name": "db-worker",
       "path": "lib/db-worker"
     },
