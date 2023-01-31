@@ -76,6 +76,12 @@ abstract class Plugin_2<
   get loaded() {
     return this.manifest !== undefined;
   }
+  getResourceURL(...paths: string[]) {
+    if (!this.manifest) {
+      throw new Error("Plugin is not loaded");
+    }
+    return this.manifest.rootURI + paths.join("/").replace(/^\/{2,}/g, "/");
+  }
   constructor(app: typeof Zotero) {
     super();
     this.app = app as Zotero7;
@@ -227,7 +233,7 @@ abstract class Plugin_2<
     if (selector === "reader") {
       this.#readerHelper.registerMenu(cb);
     } else {
-      const menu = this.addChild(new Menu(selector));
+      const menu = this.addChild(new Menu({ selector }));
       cb(menu);
     }
   }

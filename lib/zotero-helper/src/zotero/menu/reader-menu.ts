@@ -75,7 +75,10 @@ export class ReaderMenuHelper extends Component {
               ) {
                 continue;
               }
-              const menu = new Menu(popup as XUL.MenuPopup);
+              const menu = new Menu({
+                element: popup as XUL.MenuPopup,
+                removeSelf: false,
+              });
               self.menuCallbacks.forEach((cb) => cb(menu, data, this));
               self.patchedPopups.add(popup);
             }

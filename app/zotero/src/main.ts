@@ -39,13 +39,11 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       true,
     );
 
-    const { id, rootURI } = this.manifest!;
-
     this.registerPrefPane({
-      pluginID: id,
-      src: rootURI + "prefs.xhtml",
+      pluginID: this.id.full,
+      src: this.getResourceURL("prefs.xhtml"),
       label: "Obsidian Note",
-      image: rootURI + this.icons[32],
+      image: this.getResourceURL(this.icons[32]),
     });
     this.registerMenu("item", (menu) =>
       menu

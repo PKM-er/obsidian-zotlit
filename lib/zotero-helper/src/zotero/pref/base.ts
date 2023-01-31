@@ -20,7 +20,8 @@ export class PreferencePane extends Component {
   app: Zotero7;
 
   public onload(): void {
-    const paneId = this.app.PreferencePanes.register(this.descriptor);
+    const Zotero = this.app;
+    const paneId = Zotero.PreferencePanes.register(this.descriptor);
     paneId.then((paneId) => {
       this.register(() => Zotero.PreferencePanes.unregister(paneId));
     });

@@ -14,32 +14,41 @@ export enum MenuSelector {
   reader = -1,
 }
 
+interface PopupSelector {
+  selector: keyof typeof MenuSelector | string;
+}
+interface PopupEl {
+  element: XUL.MenuPopup;
+  /** whether remove given element when unload, default to true */
+  removeSelf?: boolean;
+}
+const isSelector = (popup: PopupSelector | PopupEl): popup is PopupSelector =>
+  (popup as PopupSelector).selector !== undefined;
+
 /**
  * @public
  */
 export class Menu extends Component {
   dom: XUL.MenuPopup;
-  removeSelf = false;
-  constructor(
-    menuPopup: XUL.MenuPopup | keyof typeof MenuSelector | string,
-    parent?: Menu,
-  ) {
+  readonly removeSelf: boolean;
+  constructor(menuPopup: PopupSelector | PopupEl, parent?: Menu) {
     super();
     this.parentMenu = parent;
-    if (typeof menuPopup !== "string") {
-      this.dom = menuPopup;
-      this.removeSelf = true;
+    if (!isSelector(menuPopup)) {
+      this.dom = menuPopup.element;
+      this.removeSelf = menuPopup.removeSelf ?? true;
     } else {
       let selector: string | -1 | undefined =
-        MenuSelector[menuPopup as keyof typeof MenuSelector];
+        MenuSelector[menuPopup.selector as keyof typeof MenuSelector];
       if (selector === -1) {
         throw new Error(`Menu can't handle ${menuPopup} directly`);
       }
       if (!selector) {
         // use custom selector passed in
-        selector = menuPopup;
+        selector = menuPopup.selector;
       }
       this.dom = mainDocument.querySelector(selector) as XUL.MenuPopup;
+      this.removeSelf = false;
     }
 
     if (!this.dom) {
@@ -47,10 +56,6 @@ export class Menu extends Component {
     }
   }
 
-  /**
-   * Adds a menu item. Only works when menu is not shown yet.
-   * @public
-   */
   addItem(
     cb: (item: MenuItem) => any,
     insertBefore = false,
@@ -64,17 +69,10 @@ export class Menu extends Component {
   }
 
   private insert(el: Element, insertBefore: boolean, anchor?: Element) {
-    if (anchor) {
-      anchor.insertAdjacentElement(
-        insertBefore ? "beforebegin" : "afterend",
-        el,
-      );
-    } else {
-      this.dom.insertAdjacentElement(
-        insertBefore ? "afterbegin" : "beforeend",
-        el,
-      );
-    }
+    (anchor || this.dom).insertAdjacentElement(
+      insertBefore ? "beforebegin" : "afterend",
+      el,
+    );
   }
 
   parentMenu?: Menu;
@@ -97,7 +95,7 @@ export class Menu extends Component {
     submenuEl.setAttribute("label", label);
 
     this.register(() => submenuEl.remove());
-    const submenu = this.addChild(new Menu(popupEl, this));
+    const submenu = this.addChild(new Menu({ element: popupEl }, this));
     cb(submenu);
     this.insert(submenuEl, insertBefore, anchor);
     return this;
