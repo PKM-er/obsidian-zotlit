@@ -14,6 +14,7 @@ export default function MoreOptionsButton({
       // icon size patched in index.css
       className={clsx("annot-header-more-options", className)}
       aria-label="More Options"
+      size="0.9rem"
       aria-label-delay="50"
       {...props}
     />

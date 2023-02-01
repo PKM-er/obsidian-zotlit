@@ -1,7 +1,5 @@
 import { resolve } from "path";
 import react from "@vitejs/plugin-react-swc";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import path from "path-browserify";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 

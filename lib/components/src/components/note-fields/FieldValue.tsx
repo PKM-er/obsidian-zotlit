@@ -44,8 +44,8 @@ export function FieldValue({
   }, [editing]);
 
   return (
-    <li className="bg-bg-primary">
-      <div className="hover:bg-bg-mod-hover focus-within:ring-bg-mod-border-focus relative flex items-stretch space-x-1 py-0.5 pl-4 pr-2 focus-within:ring-2 focus-within:ring-inset">
+    <li className="bg-primary">
+      <div className="hover:bg-mod-hover focus-within:ring-bg-mod-border-focus relative flex items-stretch space-x-1 py-0.5 pl-4 pr-2 focus-within:ring-2 focus-within:ring-inset">
         {editing ? (
           // why min-w-0? https://stackoverflow.com/a/66689926
           <div className="flex min-w-0 flex-1 items-center">

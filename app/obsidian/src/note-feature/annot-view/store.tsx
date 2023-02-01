@@ -1,11 +1,11 @@
 import type { AnnotsViewStore } from "@obzt/components";
+import { createStore as create } from "@obzt/components";
 import type { AttachmentInfo } from "@obzt/database";
 import {
   cacheActiveAtch,
   getCachedActiveAtch,
   isFileAttachment,
 } from "@obzt/database";
-import { createStore as create } from "zustand";
 import type ZoteroPlugin from "../../zt-main";
 
 const getActiveAttachment = (

@@ -7,9 +7,9 @@ import {
 import { getCacheImagePath } from "@obzt/database";
 import type { WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
+import { context } from "../../components/context";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
-import { context } from "../context";
 import { DerivedFileView } from "../derived-file-view";
 import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";

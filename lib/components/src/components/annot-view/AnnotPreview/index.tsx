@@ -5,9 +5,9 @@ import { useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import type { ReactNode } from "react";
 import { useContext, useRef } from "react";
+import type { Attributes } from "../../utils";
 import { Context } from "../context";
 import DetailsButton from "../DetailsButton";
-import type { Attributes } from "../../utils";
 
 import Comment from "./Comment";
 import Content from "./Content";
@@ -55,13 +55,13 @@ export default function AnnotPreview({
     <div
       className={clsx(
         "annot-preview",
-        "bg-bg-primary shadow-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm",
+        "bg-primary shadow-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm",
         className,
       )}
       {...props}
     >
       <Header
-        className="bg-bg-primary-alt"
+        className="bg-primary-alt"
         checkbox={checkbox}
         drag={
           <HeaderIcon

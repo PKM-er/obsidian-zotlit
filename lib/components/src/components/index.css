@@ -2,8 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-.annot-header-more-options {
-  --icon-size: 0.9rem;
+button.obzt-btn-reset {
+  box-shadow: none;
+  font-family: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  font-weight: inherit; /* 1 */
+  line-height: inherit; /* 1 */
+  color: inherit; /* 1 */
+  margin: 0; /* 2 */
+  padding: 0; /* 3 */
+  -webkit-appearance: button; /* 1 */
+  background-color: transparent; /* 2 */
+  background-image: none; /* 2 */
+}
+
+.zt-icon svg.svg-icon {
+  height: var(--icon-size);
+  width: var(--icon-size);
+  stroke-width: var(--icon-stroke);
 }
 
 @layer base {
@@ -33,6 +49,19 @@
     color: inherit; /* 1 */
     margin: 0; /* 2 */
     padding: 0; /* 3 */
+  }
+
+  /*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+  [type="button"],
+  [type="reset"],
+  [type="submit"] {
+    -webkit-appearance: button; /* 1 */
+    background-color: transparent; /* 2 */
+    background-image: none; /* 2 */
   }
 
   /*

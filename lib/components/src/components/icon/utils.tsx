@@ -20,6 +20,7 @@ export function mergeRefs<T = any>(
 }
 export const useIconRef = <E extends HTMLElement = HTMLElement>(
   icon: string,
+  size?: string | number,
 ) => {
   const { setIcon } = useContext(ObsidianContext);
   const ref = useRef<E | null>(null);
@@ -34,12 +35,20 @@ export const useIconRef = <E extends HTMLElement = HTMLElement>(
         // Check if a node is actually passed. Otherwise node would be null.
         // You can now do what you need to, addEventListeners, measure, etc.
         setIcon(node, icon);
+        size &&
+          node.firstElementChild instanceof SVGSVGElement &&
+          node.firstElementChild.style.setProperty(
+            "--icon-size",
+            typeof size === "number" || !Number.isNaN(Number(size))
+              ? `${size}px`
+              : size,
+          );
       }
 
       // Save a reference to the node
       ref.current = node;
     },
-    [icon, setIcon],
+    [icon, size, setIcon],
   );
 
   return setRef;

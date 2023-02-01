@@ -1,5 +1,8 @@
+import type { ClassValue } from "clsx";
+import { clsx } from "clsx";
 import type { HTMLAttributes, ImgHTMLAttributes } from "react";
 import { useMemo, useContext } from "react";
+import { twMerge } from "tailwind-merge";
 import { ObsidianContext } from "./obsidian";
 
 export type Attributes<T = HTMLDivElement> = T extends HTMLImageElement
@@ -15,3 +18,7 @@ export const useRawHtml = (html: string) => {
     [html, sanitize],
   );
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}

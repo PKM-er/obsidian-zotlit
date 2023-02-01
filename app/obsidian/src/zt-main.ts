@@ -2,6 +2,7 @@ import "./main.less";
 import "@obzt/components/styles";
 
 import type { Extension } from "@codemirror/state";
+import { parseQuery } from "@obzt/protocol";
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
@@ -23,10 +24,16 @@ import { ZoteroSettingTab } from "./setting-tab/index.js";
 import { SettingLoader } from "./settings/service.js";
 import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
 import registerEtaEditorHelper from "./template/editor";
+import { TopicImport } from "./topic";
 import DatabaseWatcher from "./zotero-db/auto-refresh/service";
 import DatabaseWorker from "./zotero-db/connector/service";
 import { ZoteroDatabase } from "./zotero-db/database";
 import { ImgCacheImporter } from "./zotero-db/img-import/service";
+
+declare global {
+  // eslint-disable-next-line no-var
+  var zt: ZoteroPlugin | undefined;
+}
 
 export default class ZoteroPlugin extends Plugin {
   use = use.plugin(this);
@@ -46,6 +53,7 @@ export default class ZoteroPlugin extends Plugin {
   noteIndex = this.use(NoteIndex);
   noteFields = this.use(NoteFields);
   server = this.use(Server);
+  topicImport = this.use(TopicImport);
 
   get databaseAPI() {
     return this.dbWorker.api;
@@ -97,8 +105,16 @@ export default class ZoteroPlugin extends Plugin {
       },
     });
     this.addSettingTab(new ZoteroSettingTab(this));
-    // getZoteroLinkHandlers(this).forEach((args) =>
-    //   this.registerObsidianProtocolHandler(...args),
+
+    // globalThis.zt = this;
+    // this.register(() => delete globalThis.zt);
+
+    // this.registerEvent(this.server.on("bg:notify", (data) => {}));
+    // this.registerEvent(
+    //   this.server.on("zotero/export", (p) => console.warn(parseQuery(p))),
+    // );
+    // this.registerEvent(
+    //   this.server.on("zotero/open", (p) => console.warn(parseQuery(p))),
     // );
 
     registerNoteFeature(this);

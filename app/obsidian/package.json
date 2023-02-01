@@ -92,7 +92,6 @@
     "react-error-boundary": "~3.1.4",
     "@ophidian/core": "workspace:*",
     "@mobily/ts-belt": "^4.0.0-rc.5",
-    "zustand": "~4.3.1",
     "preact": "~10.11.3",
     "@preact/compat": "~17.1.2",
     "@obzt/components": "workspace:*",

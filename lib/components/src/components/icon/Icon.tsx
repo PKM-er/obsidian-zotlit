@@ -1,5 +1,7 @@
+import type { CSSProperties } from "react";
 import { forwardRef, memo } from "react";
 import type { Attributes } from "../utils";
+import { cn } from "../utils";
 import { useIconRef, mergeRefs } from "./utils";
 
 export interface IconProps extends Attributes {
@@ -9,21 +11,12 @@ export interface IconProps extends Attributes {
 
 export default memo(
   forwardRef(function Icon(
-    { icon, size, ...props }: IconProps,
+    { icon, size, className, ...props }: IconProps,
     ref: React.Ref<HTMLDivElement>,
   ) {
-    const setIconRef = useIconRef(icon);
-    return (
-      <div
-        style={
-          size &&
-          ({
-            "--icon-size": typeof size === "number" ? `${size}px` : size,
-          } as any)
-        }
-        ref={mergeRefs(setIconRef, ref)}
-        {...props}
-      />
-    );
+    const setIconRef = useIconRef(icon, size);
+    const myRef = mergeRefs(setIconRef, ref);
+
+    return <div ref={myRef} className={cn("zt-icon", className)} {...props} />;
   }),
 );
