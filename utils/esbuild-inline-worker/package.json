@@ -8,19 +8,29 @@
   ],
   "license": "MIT",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./index.js"
+      "import": "./src/plugin.js",
+      "types": "./dist/plugin.d.ts"
+    },
+    "./utils": {
+      "import": "./src/utils.js",
+      "types": "./dist/utils.d.ts"
     }
   },
   "scripts": {
-    "build": ""
+    "build": "tsc"
   },
   "peerDependencies": {
     "esbuild": "^0.17.4"
   },
   "dependencies": {
     "nanoid": "~4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4",
+    "@types/node": "^17.0.10"
   }
 }

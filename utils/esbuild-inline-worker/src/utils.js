@@ -1,4 +1,16 @@
 // @ts-check
+
+/**
+ *
+ * @param {string} scriptText
+ * @returns {string}
+ */
+export const toObjectURL = (scriptText) => {
+  const blob = new Blob([scriptText], { type: "text/javascript" });
+  const url = URL.createObjectURL(blob);
+  return url;
+};
+
 /**
  *
  * @param {string} scriptText
@@ -6,8 +18,7 @@
  * @returns {Worker}
  */
 export const fromScriptText = (scriptText, options) => {
-  const blob = new Blob([scriptText], { type: "text/javascript" });
-  const url = URL.createObjectURL(blob);
+  const url = toObjectURL(scriptText);
   const worker = new Worker(url, options);
   URL.revokeObjectURL(url);
   return worker;

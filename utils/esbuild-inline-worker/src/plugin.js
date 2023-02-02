@@ -8,15 +8,16 @@ import { tmpdir } from "os";
 import { rmdirSync } from "fs";
 
 const namespace = "inline-worker";
-const toUniqueFilename = (/** @type {string} */ path) => {
+const toUniqueFilename = async (/** @type {string} */ path) => {
   const base = basename(path).split("."),
     ext = base.pop();
-  return `${base.join(".")}_${nanoid(5)}.${ext}`;
+  return `${base.join(".")}_${await nanoid(5)}.${ext}`;
 };
 
 import { createRequire } from "module";
+import { cwd } from "process";
 
-const require = createRequire(import.meta.url);
+const require = createRequire(cwd());
 
 /**
  *
@@ -40,7 +41,7 @@ export const inlineWorkerPlugin = ({
         if (filter.transform) {
           path = filter.transform(path, filter.pattern);
         }
-        const entryPoint = require.resolve(resolveDir, { paths: [path] });
+        const entryPoint = require.resolve(path, { paths: [resolveDir] });
         return { path: entryPoint, namespace };
       });
       build.onLoad(
@@ -69,10 +70,12 @@ export const inlineWorkerPlugin = ({
           if (filter.transform) {
             path = filter.transform(path, filter.pattern);
           }
-          const entryPoint = require.resolve(resolveDir, { paths: [path] });
-          const id = workerEntryPoints[entryPoint]
-            ? workerEntryPoints[entryPoint]
-            : toUniqueFilename(entryPoint);
+          const entryPoint = require.resolve(path, { paths: [resolveDir] });
+          const id =
+            workerEntryPoints[entryPoint] ??
+            (workerEntryPoints[entryPoint] = await toUniqueFilename(
+              entryPoint
+            ));
 
           const outfile = join(cacheDir, id);
 

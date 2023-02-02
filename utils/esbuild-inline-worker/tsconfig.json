@@ -1,0 +1,16 @@
+{
+  // Change this to match your project
+  "include": ["src/**/*.js"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["ES2018", "DOM"],
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "skipLibCheck": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declarationMap": true
+  }
+}
