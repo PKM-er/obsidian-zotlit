@@ -12,6 +12,7 @@ import type {
 import { TFile, TFolder } from "obsidian";
 import log from "@log";
 
+import { untilMetaReady } from "../utils/once.js";
 import ZoteroPlugin from "../zt-main.js";
 import { NoteIndexSettings } from "./settings.js";
 import getZoteroKeyFileMap, { getItemKeyOf } from "./ztkey-file-map.js";
@@ -110,20 +111,9 @@ export default class NoteIndex extends Service {
       this.vault.on("delete", this.onFileRemoved, this),
     ].forEach(this.registerEvent.bind(this));
 
-    this.untilMetaBuilt().then(this.onMetaBuilt.bind(this));
-  }
-
-  untilMetaBuilt(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.meta.initialized) {
-        resolve();
-      } else {
-        const ref = this.meta.on("initialized", () => {
-          resolve();
-          this.meta.offref(ref);
-        });
-      }
-    });
+    untilMetaReady(this.plugin.app, {
+      onRegister: (r) => this.registerEvent(r),
+    }).then(() => this.onMetaBuilt());
   }
 
   getItemKeyOf(file: TAbstractFile | string): string | null {

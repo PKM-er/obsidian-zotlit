@@ -1,8 +1,8 @@
 import type { DB } from "@obzt/zotero-type";
-import type { ItemIDChecked } from "../utils/index.js";
-import { Prepared, checkItemID } from "../utils/index.js";
+import type { ItemIDChecked } from "../../utils/index.js";
+import { whereItemID, checkItemID } from "../../utils/index.js";
 
-const query = `--sql
+export const sql = (full: boolean) => `--sql
 SELECT
   itemID,
   creators.firstName,
@@ -17,27 +17,18 @@ FROM
   JOIN creatorTypes USING (creatorTypeID)
 WHERE
   libraryID = $libId
+  ${whereItemID(full || "itemID")}
   AND ${checkItemID()}
 ORDER BY
   itemID,
   orderIndex
 `;
 
-interface Input {
-  libId: number;
-}
-
-interface Output {
+export interface Output {
   itemID: ItemIDChecked;
   firstName: DB.Creators["firstName"];
   lastName: DB.Creators["lastName"];
   fieldMode: DB.Creators["fieldMode"];
   creatorType: DB.CreatorTypes["creatorType"];
   orderIndex: DB.ItemCreators["orderIndex"];
-}
-
-export class Creators extends Prepared<Output, Input> {
-  sql(): string {
-    return query;
-  }
 }

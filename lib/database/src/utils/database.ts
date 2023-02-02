@@ -14,3 +14,9 @@ export const checkItemID = (col = "itemID") => `--sql
 
 /** not nullable Items.itemID */
 export type ItemIDChecked = Exclude<DB.Items["itemID"], null>;
+
+export const whereItemID = (col: string | boolean) =>
+  typeof col === "boolean" ? "" : `AND ${col} = $itemId`;
+
+export type ItemIDLibID = [id: number, libId: number];
+export type ItemKeyLibID = [key: string, libId: number];

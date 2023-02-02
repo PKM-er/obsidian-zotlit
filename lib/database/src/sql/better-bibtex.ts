@@ -1,4 +1,5 @@
 import type { Database, Statement, Transaction } from "@aidenlx/better-sqlite3";
+import type { ItemIDLibID } from "../utils/index.js";
 import { PreparedBase } from "../utils/index.js";
 
 const queryMainLib = `--sql
@@ -27,8 +28,7 @@ interface InputSql {
 }
 
 interface Input {
-  itemIDs: number[];
-  libId: number;
+  items: ItemIDLibID[];
 }
 
 interface OutputSql {
@@ -37,7 +37,17 @@ interface OutputSql {
 type Output = Record<number, string>;
 
 export class BetterBibtex extends PreparedBase<InputSql, OutputSql, Output> {
-  trxCache: Record<number, Transaction> = {};
+  trxFunc = (items: ItemIDLibID[]) =>
+    items.reduce((rec, [itemID, libId]) => {
+      const input = { itemID, libId };
+      const result =
+        libId === 1 ? this.getMainLib(input) : this.getAltLib(input);
+      if (result) {
+        rec[itemID] = result.citekey;
+      }
+      return rec;
+    }, {} as Output);
+  trx: Transaction = this.database.transaction(this.trxFunc);
 
   statementAltLib: Statement;
   constructor(database: Database) {
@@ -56,17 +66,6 @@ export class BetterBibtex extends PreparedBase<InputSql, OutputSql, Output> {
   }
 
   query(input: Input): Output {
-    const { itemIDs, libId } = input;
-    const get = libId === 1 ? this.getMainLib : this.getAltLib;
-    const query = (this.trxCache[libId] ??= this.database.transaction(
-      (itemIDs: number[]) =>
-        itemIDs.reduce((rec, itemID) => {
-          const result = get.call(this, { itemID, libId });
-          if (!result) return rec;
-          rec[itemID] = result.citekey;
-          return rec;
-        }, {} as Output),
-    ));
-    return query(itemIDs);
+    return (this.trx as BetterBibtex["trxFunc"])(input.items);
   }
 }

@@ -80,6 +80,8 @@ export class Server extends Service implements Events {
       return;
     }
 
+    log.trace(`server recieved req`, request.url, request.rawHeaders);
+
     const { pathname, searchParams } = new URL(
       request.url,
       `http://${request.headers.host}`,
@@ -148,6 +150,7 @@ export class Server extends Service implements Events {
     return this.#events.offref(ref);
   }
   trigger(name: string, ...data: any[]) {
+    log.trace(`server trigger ${name}`, ...data);
     return this.#events.trigger(name, ...data);
   }
   tryTrigger(evt: EventRef, args: any[]) {

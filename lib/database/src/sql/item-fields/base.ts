@@ -1,8 +1,12 @@
 import type { DB } from "@obzt/zotero-type";
-import type { ItemIDChecked } from "../utils/index.js";
-import { Prepared, checkItemID, nonRegularItemTypes } from "../utils/index.js";
+import type { ItemIDChecked } from "../../utils/index.js";
+import {
+  whereItemID,
+  checkItemID,
+  nonRegularItemTypes,
+} from "../../utils/index.js";
 
-const query = `--sql
+export const sql = (full: boolean) => `--sql
 SELECT
   items.itemID,
   fieldsCombined.fieldName,
@@ -15,23 +19,14 @@ FROM
   JOIN itemTypesCombined USING (itemTypeID)
 WHERE
   libraryID = $libId
+  ${whereItemID(full || "items.itemID")}
   AND itemTypesCombined.typeName NOT IN (${nonRegularItemTypes})
   AND ${checkItemID()}
 `;
 
-interface Input {
-  libId: number;
-}
-
-interface Output {
+export interface Output {
   itemID: ItemIDChecked;
   fieldName: DB.FieldsCombined["fieldName"];
   value: DB.ItemDataValues["value"];
   itemType: DB.ItemTypesCombined["typeName"];
-}
-
-export class ItemFields extends Prepared<Output, Input> {
-  sql(): string {
-    return query;
-  }
 }

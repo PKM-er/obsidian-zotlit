@@ -1,5 +1,5 @@
 import type { DB } from "@obzt/zotero-type";
-import { PreparedNoInput } from "../utils/index.js";
+import { PreparedNoInput } from "../../utils/index.js";
 
 const query = `--sql
 SELECT
@@ -26,7 +26,7 @@ export interface Output {
   name: string | null;
 }
 
-export class AllLibraries extends PreparedNoInput<Output> {
+export class LibrariesFull extends PreparedNoInput<Output> {
   sql(): string {
     return query;
   }

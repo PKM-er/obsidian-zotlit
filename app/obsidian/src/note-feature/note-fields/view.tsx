@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 import type { FallbackProps } from "react-error-boundary";
 import { ErrorBoundary } from "react-error-boundary";
 import { context } from "../../components/context";
+import { untilMetaReady } from "../../utils/once";
 import type ZoteroPlugin from "../../zt-main";
 import { DerivedFileView } from "../derived-file-view";
 import { NoteFieldsMain } from "./component";
@@ -67,24 +68,13 @@ export class NoteFieldsView extends DerivedFileView {
     return true;
   }
 
-  untilMetaReady() {
-    return new Promise<void>((resolve) => {
-      if (this.app.metadataCache.initialized) resolve();
-      else {
-        const ref = app.metadataCache.on("initialized", () => {
-          app.metadataCache.offref(ref);
-          resolve();
-        });
-        this.registerEvent(ref);
-      }
-    });
-  }
-
   ErrorFallback = ErrorFallback.bind(this);
 
   protected async onOpen() {
     await super.onOpen();
-    await this.untilMetaReady();
+    await untilMetaReady(this.app, {
+      onRegister: (r) => this.registerEvent(r),
+    });
     const ErrorFallback = this.ErrorFallback;
     ReactDOM.render(
       <ObsidianContext.Provider value={context}>

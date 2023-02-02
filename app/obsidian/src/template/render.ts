@@ -1,3 +1,5 @@
+// @ts-ignore
+import { merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
 import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
 import { use } from "@ophidian/core";
@@ -45,9 +47,9 @@ export class TemplateRenderer {
     const str = this.render("annotation", data.annotation);
     return str;
   }
-  renderNote(extra: HelperExtra, ctx: Context) {
+  renderNote(extra: HelperExtra, ctx: Context, fm?: Record<string, any>) {
     const data = toHelper(extra, ctx);
-    const frontmatter = this.renderFrontmatter(data.docItem);
+    const frontmatter = this.renderFrontmatter(data.docItem, fm);
     const content = this.render("note", data.docItem);
     return ["", frontmatter, content].join("---\n");
   }
@@ -85,16 +87,18 @@ export class TemplateRenderer {
     return record;
   }
 
-  renderFrontmatter(data: DocItemHelper) {
+  renderFrontmatter(item: DocItemHelper, extra?: Record<string, any>) {
     try {
-      const record = this.toFrontmatterRecord(data);
-      const str = stringifyYaml(record);
+      const record = this.toFrontmatterRecord(item);
+      const str = stringifyYaml(
+        extra !== undefined ? merge(record, extra) : record,
+      );
       return str;
     } catch (err) {
       logError(
         "Failed to renderYaml",
         err,
-        data,
+        item,
         this.use(TemplateSettings).fmFields,
       );
       new Notice("Failed to renderYaml");

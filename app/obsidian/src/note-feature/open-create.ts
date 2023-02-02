@@ -1,12 +1,13 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
+import type { RegularItemInfoBase } from "@obzt/database";
 import { BaseError } from "make-error";
-import type { TFile } from "obsidian";
 
 import { Notice } from "obsidian";
 import { getItemKeyGroupID } from "../note-index/service.js";
+import type { TemplateRenderer } from "../template";
 import { ZOTERO_KEY_FIELDNAME } from "../template";
-import type { HelperExtra } from "../template/helper/to-helper.js";
+import type { Context } from "../template/helper/base.js";
 import type ZoteroPlugin from "../zt-main.js";
 
 export class NoteExistsError extends BaseError {
@@ -16,20 +17,20 @@ export class NoteExistsError extends BaseError {
   }
 }
 
-export const createNote = async (
-  plugin: ZoteroPlugin,
-  extra: HelperExtra,
-): Promise<TFile> => {
-  const { docItem } = extra;
-  const info = plugin.noteIndex.getNoteFromItem(docItem);
+export async function createNoteForDocItem(
+  this: ZoteroPlugin,
+  docItem: RegularItemInfoBase,
+  render: (template: TemplateRenderer, ctx: Context) => string,
+) {
+  const info = this.noteIndex.getNoteFromItem(docItem);
   if (info) {
     // only throw error if the note is linked to the same zotero item
     throw new NoteExistsError(info.file, docItem.key);
   }
 
-  const { vault, fileManager, metadataCache: meta } = plugin.app,
-    { literatureNoteFolder: folder } = plugin.settings.noteIndex,
-    template = plugin.templateRenderer;
+  const { vault, fileManager, metadataCache: meta } = this.app,
+    { literatureNoteFolder: folder } = this.settings.noteIndex,
+    template = this.templateRenderer;
   const filepath = join(folder, template.renderFilename(docItem));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {
@@ -48,22 +49,22 @@ export const createNote = async (
   const note = await fileManager.createNewMarkdownFile(
     app.vault.getRoot(),
     filepath,
-    template.renderNote(extra, {
-      plugin,
+    render(template, {
+      plugin: this,
       sourcePath: filepath,
     }),
   );
   return note;
-};
+}
 
-export const openNote = async (
-  plugin: ZoteroPlugin,
+export async function openNote(
+  this: ZoteroPlugin,
   item: ItemKeyGroup,
   slience = false,
-): Promise<boolean> => {
-  const { workspace } = plugin.app;
+): Promise<boolean> {
+  const { workspace } = this.app;
 
-  const info = plugin.noteIndex.getNoteFromItem(item);
+  const info = this.noteIndex.getNoteFromItem(item);
   if (!info) {
     !slience &&
       new Notice(
@@ -79,4 +80,4 @@ export const openNote = async (
 
   await workspace.openLinkText(linktext, "", false);
   return true;
-};
+}

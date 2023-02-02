@@ -1,5 +1,6 @@
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
+import type { ItemIDLibID } from "@obzt/database";
 import { AnnotByKeys, AnnotByParent, Attachements, Tags } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import localforage from "localforage";
@@ -17,8 +18,7 @@ const methods: DbWorkerAPI = {
   openDb,
   query,
   getTags: attachLogger(
-    (items: [id: number, libId: number][]) =>
-      databases.main.prepare(Tags).query(items),
+    (items: ItemIDLibID[]) => databases.main.prepare(Tags).query(items),
     "tags",
   ),
   getAttachments: attachLogger(

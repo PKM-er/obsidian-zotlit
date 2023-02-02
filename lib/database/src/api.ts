@@ -1,6 +1,7 @@
 import type { LogLevel } from "@obzt/common";
 import type Fuse from "fuse.js";
 import type { AnnotationInfo, RegularItemInfo } from "./item.js";
+import type { ItemIDLibID, ItemKeyLibID } from "./utils/database.js";
 import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 
 export interface DbConnParams {
@@ -34,13 +35,14 @@ export interface DbWorkerAPI {
    * @param item item key or item id
    */
   getItems(
-    items: [keyOrID: string | number, libId: number][],
+    items: ItemIDLibID[] | ItemKeyLibID[],
+    forceUpdate?: boolean,
   ): (RegularItemInfo | null)[];
 
   getLibs(): LibraryInfo[];
   getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];
   getAttachments(docId: number, libraryID: number): AttachmentInfo[];
-  getTags(items: [id: number, libId: number][]): Record<number, TagInfo[]>;
+  getTags(items: ItemIDLibID[]): Record<number, TagInfo[]>;
 
   raw<R>(mode: "get", sql: string, args: any[]): R;
   raw<R>(mode: "all", sql: string, args: any[]): R[];

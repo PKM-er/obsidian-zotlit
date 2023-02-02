@@ -5,9 +5,11 @@ import {
   AnnotsView,
 } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
+import { assertNever } from "assert-never";
 import type { WorkspaceLeaf } from "obsidian";
 import ReactDOM from "react-dom";
 import { context } from "../../components/context";
+import { waitUntil } from "../../utils/once";
 import { DatabaseStatus } from "../../zotero-db/connector/service";
 import type ZoteroPlugin from "../../zt-main";
 import { DerivedFileView } from "../derived-file-view";
@@ -85,23 +87,21 @@ export class AnnotationView extends DerivedFileView {
   }
 
   untilZoteroReady() {
-    return new Promise<void>((resolve) => {
-      const status = this.plugin.dbWorker.status;
-      if (status === DatabaseStatus.Ready) {
-        resolve();
-      } else if (status === DatabaseStatus.NotInitialized) {
-        const ref = app.vault.on("zotero:db-ready", () => {
-          app.vault.offref(ref);
-          resolve();
-        });
-        this.registerEvent(ref);
-      } else if (status === DatabaseStatus.Pending) {
-        const ref = app.vault.on("zotero:db-refresh", () => {
-          app.vault.offref(ref);
-          resolve();
-        });
-        this.registerEvent(ref);
-      }
+    return waitUntil({
+      unregister: (ref) => app.vault.offref(ref),
+      escape: () => this.plugin.dbWorker.status === DatabaseStatus.Ready,
+      register: (cb) => {
+        const status = this.plugin.dbWorker.status;
+        if (status === DatabaseStatus.NotInitialized) {
+          return app.vault.on("zotero:db-ready", cb);
+        } else if (status === DatabaseStatus.Pending) {
+          return app.vault.on("zotero:db-refresh", cb);
+        } else if (status === DatabaseStatus.Ready) {
+          throw new Error("should not be called when db is ready");
+        }
+        assertNever(status);
+      },
+      onRegister: (ref) => this.registerEvent(ref),
     });
   }
 

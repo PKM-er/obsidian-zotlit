@@ -31,9 +31,17 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         this.registerNotifier(["item"]);
         this.register(
           this.events.item.on("add", (ids) => {
-            this.notifyItemAdded(
-              ids.filter((id) => this.app.Items.get(id).isRegularItem()),
-            );
+            if (this.settings.notify === false) return;
+            this.app.log(`try notify items added: ${ids.join(", ")}`);
+            ids.forEach((id) => {
+              const item = this.app.Items.get(id);
+              if (!item.isRegularItem()) return;
+              this.#addedItemsNotifyQueue.set(item.id, [
+                item.id,
+                item.libraryID,
+              ]);
+            });
+            this.requestNotifyItemAdded();
           }),
         );
       },
@@ -102,16 +110,16 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     this.app.log("zotero-obsidian-note unloaded");
   }
 
-  #addedItemsNotifyQueue = new Set<string>();
-  #notifyItemAdded = debounce(async () => {
+  #addedItemsNotifyQueue = new Map<number, [id: number, lib: number]>();
+  requestNotifyItemAdded = debounce(async () => {
     if (this.#addedItemsNotifyQueue.size === 0) return;
-    const ids = Array.from(this.#addedItemsNotifyQueue);
+    const ids = Array.from(this.#addedItemsNotifyQueue.values());
     this.#addedItemsNotifyQueue.clear();
 
     const target = this.settings["notify-url"];
     this.app.log(`send to: ${target}`);
 
-    await fetch(target, {
+    await fetch(new URL("/notify", target), {
       method: "POST",
       body: JSON.stringify({
         event: "regular-item/add",
@@ -123,11 +131,6 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     });
     this.app.log(`notify item added: ${ids.join(", ")}`);
   }, 500);
-  notifyItemAdded(ids: string[]) {
-    if (this.settings.notify === false) return;
-    ids.forEach((id) => this.#addedItemsNotifyQueue.add(id));
-    this.#notifyItemAdded();
-  }
 
   handleSelectedItems(action: QueryAction) {
     let items: readonly Zotero.Item[] = this.app

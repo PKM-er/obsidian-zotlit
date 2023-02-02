@@ -42,10 +42,12 @@ export class NoteFieldsSettings extends Settings<SettingOptions> {
     }
   }
 
-  fromJSON(json: unknown): void {
-    const { noteFields, ...rest } = json as SettingOptionsJSON;
-    if (!noteFields) return;
-    super.fromJSON({ noteFields: recordToMap(noteFields), ...rest });
+  fromJSON(json: SettingOptionsJSON): void {
+    const { noteFields, ...rest } = json;
+    super.fromJSON({
+      ...(noteFields ? { noteFields: recordToMap(noteFields) } : {}),
+      ...rest,
+    });
   }
   toJSON(): SettingOptionsJSON {
     return {

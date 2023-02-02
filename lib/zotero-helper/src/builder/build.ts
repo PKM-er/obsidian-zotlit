@@ -33,6 +33,7 @@ export async function build(
       // zotero has no window.setTimeout in extension context...
       setTimeout: "mainWindow.setTimeout",
       fetch: "mainWindow.fetch",
+      URL: "mainWindow.URL",
     },
     bundle: true,
     entryPoints: [bootstrapFile],

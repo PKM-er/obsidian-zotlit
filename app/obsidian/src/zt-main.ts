@@ -2,7 +2,6 @@ import "./main.less";
 import "@obzt/components/styles";
 
 import type { Extension } from "@codemirror/state";
-import { parseQuery } from "@obzt/protocol";
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
@@ -16,6 +15,7 @@ import {
 import checkLib from "./install-guide/index.jsx";
 import registerNoteFeature from "./note-feature";
 import { NoteFields } from "./note-feature/note-fields/service";
+import { createNoteForDocItem, openNote } from "./note-feature/open-create";
 import NoteIndex from "./note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
@@ -25,6 +25,7 @@ import { SettingLoader } from "./settings/service.js";
 import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
 import registerEtaEditorHelper from "./template/editor";
 import { TopicImport } from "./topic";
+import { untilDbRefreshed } from "./utils/once";
 import DatabaseWatcher from "./zotero-db/auto-refresh/service";
 import DatabaseWorker from "./zotero-db/connector/service";
 import { ZoteroDatabase } from "./zotero-db/database";
@@ -71,6 +72,9 @@ export default class ZoteroPlugin extends Plugin {
   // pdfCache: PDFCache;
   annotBlockWorker: AnnotBlockWorker;
 
+  createNoteForDocItem = createNoteForDocItem;
+  openNote = openNote;
+
   editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
@@ -109,7 +113,46 @@ export default class ZoteroPlugin extends Plugin {
     // globalThis.zt = this;
     // this.register(() => delete globalThis.zt);
 
-    // this.registerEvent(this.server.on("bg:notify", (data) => {}));
+    this.registerEvent(
+      this.server.on("bg:notify", async (_p, data) => {
+        const currTopic = this.topicImport.topic;
+        if (data.event !== "regular-item/add" || !currTopic) return;
+        await untilDbRefreshed(this.app, {
+          onRegister: (r) => this.registerEvent(r),
+          waitAfterEvent: 1e3,
+        });
+        const items = (await this.databaseAPI.getItems(data.ids, true)).flatMap(
+          (item, index) => {
+            if (item === null) {
+              log.warn("item not found", data.ids[index]);
+              return [];
+            }
+            return [[item, index] as const];
+          },
+        );
+        const tags = await this.databaseAPI.getTags(data.ids);
+
+        for (const [item, index] of items) {
+          const attachments = await this.databaseAPI.getAttachments(
+            ...data.ids[index],
+          );
+          await this.createNoteForDocItem(item, (template, ctx) =>
+            template.renderNote(
+              {
+                docItem: item,
+                tags,
+                attachment: null,
+                allAttachments: attachments,
+                annotations: [],
+              },
+              ctx,
+              { tags: [currTopic] },
+            ),
+          );
+          new Notice(`Created note for ${item.title}`, 1e3);
+        }
+      }),
+    );
     // this.registerEvent(
     //   this.server.on("zotero/export", (p) => console.warn(parseQuery(p))),
     // );
@@ -118,6 +161,7 @@ export default class ZoteroPlugin extends Plugin {
     // );
 
     registerNoteFeature(this);
+    console.log("loading done");
   }
 
   onunload() {

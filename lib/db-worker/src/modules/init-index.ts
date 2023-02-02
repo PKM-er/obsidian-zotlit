@@ -1,10 +1,11 @@
-import { getItemKeyGroupID, multipartToSQL } from "@obzt/common";
-import type { RegularItemInfo, RegularItemInfoBase } from "@obzt/database";
-import { Items, ItemFields, Creators, BetterBibtex } from "@obzt/database";
+import { getItemKeyGroupID } from "@obzt/common";
+import type { ItemIDLibID, ItemDetails, RegularItemInfo } from "@obzt/database";
+import { ItemsFull } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import Fuse from "fuse.js";
 import { databases, cache } from "@init";
 import log from "@log";
+import { getItemObjects } from "./get-item";
 
 const fuseOptions: Fuse.IFuseOptions<RegularItemInfo> = {
   keys: ["title"],
@@ -15,59 +16,24 @@ const fuseOptions: Fuse.IFuseOptions<RegularItemInfo> = {
 };
 
 const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
-  if (!cache.libraries) throw new Error("Library info not loaded");
-  const libInfo = cache.libraries;
+  log.debug("Reading main Zotero database for index");
 
-  const { items, itemFields, creators } = readMainDb(libraryID);
-  const citekeyMap = readCitekeys(
-    libraryID,
-    items.map((v) => v.itemID),
+  const itemsResult = databases.main
+    .prepare(ItemsFull)
+    .query({ libId: libraryID });
+  const itemIDMap = itemsResult.reduce(
+    (rec, item) => ((rec[item.itemID] = item), rec),
+    {} as Record<number, ItemDetails>,
+  );
+  const itemIDs = Object.keys(itemIDMap).map(
+    (itemID) => [Number(itemID), libraryID] as ItemIDLibID,
   );
 
-  // prepare for fuse index
-  const entries = items.reduce((rec, { itemID, ...props }) => {
-    if (itemID) {
-      const citekey = citekeyMap[itemID];
-      if (!citekey) {
-        log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
-      }
-      const item: RegularItemInfoBase = {
-        ...props,
-        libraryID,
-        groupID: libInfo[libraryID].groupID,
-        itemID,
-        creators: [],
-        citekey: citekeyMap[itemID],
-      };
-      rec[itemID] = item as RegularItemInfo;
-    }
-    return rec;
-  }, {} as Record<number, RegularItemInfo>);
-
-  // eslint-disable-next-line prefer-const
-  for (let { itemID, fieldName, value } of itemFields) {
-    if (!itemID || !fieldName) continue;
-    if (fieldName === "date")
-      value = multipartToSQL(value as string).split("-")[0];
-    if (itemID in entries) {
-      const values = (entries[itemID][fieldName] =
-        entries[itemID][fieldName] || []);
-      values.push(value);
-    } else {
-      log.error(`Field: No item found for itemID ${itemID}`, fieldName, value);
-    }
-  }
-  for (const { itemID, ...creator } of creators) {
-    if (itemID in entries) {
-      entries[itemID].creators.push(creator);
-    } else {
-      log.error(`Creator: No item found for itemID ${itemID}`, creator);
-    }
-  }
+  const items = getItemObjects(itemIDMap, itemIDs);
+  log.info("Finished reading main Zotero database for index");
 
   log.trace("Start fuse indexing");
-  const regularItems = Object.values(entries);
-
+  const regularItems = Object.values(items);
   cache.items.set(libraryID, {
     fuse: new Fuse(regularItems, fuseOptions),
     byKey: regularItems.reduce(
@@ -87,25 +53,3 @@ const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
 };
 
 export default initIndex;
-
-const readMainDb = (libId: number) => {
-  log.debug("Reading main Zotero database for index");
-  const db = databases.main;
-  const result = {
-    items: db.prepare(Items).query({ libId }),
-    itemFields: db.prepare(ItemFields).query({ libId }),
-    creators: db.prepare(Creators).query({ libId }),
-  };
-  log.info("Finished reading main Zotero database for index");
-  return result;
-};
-const readCitekeys = (libId: number, itemIDs: number[]) => {
-  log.debug("Reading Better BibTex database");
-  if (!databases.bbt.opened) {
-    log.info("Better BibTex database not enabled, skipping...");
-    return [];
-  }
-  const result = databases.bbt.prepare(BetterBibtex).query({ libId, itemIDs });
-  log.info("Finished reading Better BibTex");
-  return result;
-};

@@ -2,15 +2,19 @@ export { AnnotByKeys } from "./sql/annotations/by-keys.js";
 export { AnnotByParent } from "./sql/annotations/by-parent.js";
 export { Attachements } from "./sql/attachments.js";
 export { BetterBibtex } from "./sql/better-bibtex.js";
-export { Creators } from "./sql/creators.js";
-export { ItemFields } from "./sql/item-fields.js";
-export { Items } from "./sql/items.js";
-export { AllLibraries } from "./sql/all-libraries.js";
+export { CreatorsFull } from "./sql/creator/full.js";
+export { Creators } from "./sql/creator/part.js";
+export { ItemFieldsFull } from "./sql/item-fields/full.js";
+export { ItemFields } from "./sql/item-fields/part.js";
+export { ItemsFull } from "./sql/items/full.js";
+export { Items, ItemsByKey } from "./sql/items/part.js";
+export { LibrariesFull as AllLibraries } from "./sql/libraries/full.js";
 export { Tags } from "./sql/tags.js";
 
 export type { Output as AttachmentInfo } from "./sql/attachments.js";
 export type { OutputSql as TagInfo } from "./sql/tags.js";
-export type { Output as LibraryInfo } from "./sql/all-libraries.js";
+export type { Output as LibraryInfo } from "./sql/libraries/full.js";
+export type { Output as ItemDetails } from "./sql/items/base.js";
 
 export {
   getCacheImagePath,
@@ -20,6 +24,7 @@ export {
   getCachedActiveAtch,
 } from "./utils/misc.js";
 export * from "./utils/prepared.js";
+export type { ItemIDLibID } from "./utils/database.js";
 
 export { getBacklink } from "./utils/zotero-backlink.js";
 export type {

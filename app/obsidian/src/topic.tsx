@@ -23,6 +23,9 @@ interface IStore {
   setTopics(topics: string[]): void;
 }
 
+const topicPrefix = "#zt-topic/",
+  toDisplayName = (topic: string) => topic.substring(topicPrefix.length);
+
 export class TopicImport extends Service {
   plugin = this.use(ZoteroPlugin);
 
@@ -58,6 +61,11 @@ export class TopicImport extends Service {
   get watching() {
     return this.store.getState().watching;
   }
+  get topic(): string | undefined {
+    const state = this.store.getState();
+    if (!state.watching) return undefined;
+    return state.topics[state.activeTopic];
+  }
   onFileOpen(file: TAbstractFile | null, force = false) {
     if (this.watching) return;
     if (!(file instanceof TFile)) {
@@ -82,9 +90,7 @@ export class TopicImport extends Service {
       return;
     }
     const tags =
-      getAllTags(cache)
-        ?.filter((t) => t.startsWith("#zt-topic/"))
-        .map((t) => `#${t.substring(10)}`) ?? [];
+      getAllTags(cache)?.filter((t) => t.startsWith(topicPrefix)) ?? [];
     this.store.getState().setTopics(tags);
   }
 
@@ -148,7 +154,7 @@ function TopicImportStatus(props: { store: StoreApi<IStore> }) {
     const mainTopic = v.topics[v.activeTopic] ?? v.topics[0],
       suffix = v.topics.length > 1 && !v.watching ? "..." : "";
     if (mainTopic) {
-      return `${mainTopic}${suffix}`;
+      return `#${toDisplayName(mainTopic)}${suffix}`;
     } else {
       return "no topic";
     }
@@ -168,7 +174,7 @@ function TopicImportStatus(props: { store: StoreApi<IStore> }) {
           const menu = new Menu();
           allTopics.forEach((topic, i) =>
             menu.addItem((item) =>
-              item.setTitle(topic).onClick(() => {
+              item.setTitle(toDisplayName(topic)).onClick(() => {
                 setActiveTopic(i);
                 setWatching(true);
               }),
@@ -178,6 +184,7 @@ function TopicImportStatus(props: { store: StoreApi<IStore> }) {
           if (!bound) return;
           menu.showAtPosition({ x: bound.x, y: bound.y });
         } else {
+          setActiveTopic(val === true ? 0 : -1);
           setWatching(val);
         }
       }}

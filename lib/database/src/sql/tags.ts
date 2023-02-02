@@ -1,6 +1,7 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
 import { fromPairs } from "@mobily/ts-belt/Dict";
 import type { DB } from "@obzt/zotero-type";
+import type { ItemIDLibID } from "../utils/index.js";
 import { PreparedBase } from "../utils/index.js";
 
 const query = `--sql
@@ -32,7 +33,7 @@ export interface OutputSql {
 type Output = Record<number, OutputSql[]>;
 
 export class Tags extends PreparedBase<Input, OutputSql, Output> {
-  trxFunc = (itemIds: [id: number, libId: number][]) =>
+  trxFunc = (itemIds: ItemIDLibID[]) =>
     itemIds.map(
       ([itemId, libId]) => [itemId, this.runAll({ itemId, libId })] as const,
     );
@@ -42,7 +43,7 @@ export class Tags extends PreparedBase<Input, OutputSql, Output> {
     return query;
   }
 
-  query(items: [id: number, libId: number][]): Output {
+  query(items: ItemIDLibID[]): Output {
     return fromPairs((this.trx as Tags["trxFunc"])(items));
   }
 }

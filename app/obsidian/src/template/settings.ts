@@ -158,11 +158,10 @@ export class TemplateSettings extends Settings<SettingOptions> {
     };
   }
   // fix compatibility with old settings format
-  fromJSON({ template, autoPairEta, fmFields }: SettingOptionsJSON): void {
+  fromJSON(json: SettingOptionsJSON): void {
     super.fromJSON({
-      ...template,
-      autoPairEta,
-      fmFields,
+      ...(json.template ?? {}),
+      ...D.selectKeys(json, ["autoPairEta", "fmFields"]),
     });
   }
 }
