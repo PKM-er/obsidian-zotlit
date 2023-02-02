@@ -5,7 +5,7 @@ import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import localforage from "localforage";
 import { databases, getGroupID, getLibInfo } from "./init.js";
 import logger, { storageKey } from "./logger.js";
-import getItem from "./modules/get-item.js";
+import { getItems } from "./modules/get-item.js";
 import { openDb } from "./modules/init-conn.js";
 import initIndex from "./modules/init-index.js";
 import query from "./modules/search.js";
@@ -17,8 +17,8 @@ const methods: DbWorkerAPI = {
   openDb,
   query,
   getTags: attachLogger(
-    (itemIds: number[], libId: number) =>
-      databases.main.prepare(Tags).query({ itemIds, libId }),
+    (items: [id: number, libId: number][]) =>
+      databases.main.prepare(Tags).query(items),
     "tags",
   ),
   getAttachments: attachLogger(
@@ -48,7 +48,7 @@ const methods: DbWorkerAPI = {
       `annotations with keys: ${annotKeys.join(",")}` +
       (annots ? `, count: ${annots.length}` : ""),
   ),
-  getItem,
+  getItems,
   isUpToDate: () => databases.main.isUpToDate(),
   checkDbStatus: (name) => databases[name].opened,
   /**

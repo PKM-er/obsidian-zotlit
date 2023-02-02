@@ -33,12 +33,14 @@ export interface DbWorkerAPI {
   /**
    * @param item item key or item id
    */
-  getItem(item: string | number, libraryID: number): RegularItemInfo | null;
+  getItems(
+    items: [keyOrID: string | number, libId: number][],
+  ): (RegularItemInfo | null)[];
 
   getLibs(): LibraryInfo[];
   getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];
   getAttachments(docId: number, libraryID: number): AttachmentInfo[];
-  getTags(itemIds: number[], libraryID: number): Record<number, TagInfo[]>;
+  getTags(items: [id: number, libId: number][]): Record<number, TagInfo[]>;
 
   raw<R>(mode: "get", sql: string, args: any[]): R;
   raw<R>(mode: "all", sql: string, args: any[]): R[];

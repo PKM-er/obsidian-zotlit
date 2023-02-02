@@ -58,7 +58,7 @@ export const createStore = (p: ZoteroPlugin) =>
         }));
       },
       loadDocTags = async (itemID: number, lib: number) => {
-        const docTags = await api(p).getTags([itemID], lib);
+        const docTags = await api(p).getTags([[itemID, lib]]);
         set((state) => ({ ...state, tags: docTags }));
         return docTags;
       },
@@ -68,8 +68,7 @@ export const createStore = (p: ZoteroPlugin) =>
         const annotations = await api(p).getAnnotations(attachment.itemID, lib);
         set((state) => ({ ...state, annotations, attachment }));
         const annotTags = await api(p).getTags(
-          annotations.map((a) => a.itemID),
-          lib,
+          annotations.map((a) => [a.itemID, lib]),
         );
         set((state) => ({ ...state, tags: { ...state.tags, ...annotTags } }));
         return { annotations, annotTags };
@@ -86,7 +85,7 @@ export const createStore = (p: ZoteroPlugin) =>
           !force
         )
           return;
-        const item = await api(p).getItem(file.itemKey, lib);
+        const item = (await api(p).getItems([[file.itemKey, lib]]))[0];
         if (!item) return set(getInit());
         const doc = { sourcePath: file.path, docItem: item, lib };
         const attachmentID = getCachedActiveAtch(window.localStorage, item);

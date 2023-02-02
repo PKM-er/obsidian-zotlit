@@ -1,4 +1,5 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
+import { fromPairs } from "@mobily/ts-belt/Dict";
 import type { DB } from "@obzt/zotero-type";
 import { PreparedBase } from "../utils/index.js";
 
@@ -31,21 +32,17 @@ export interface OutputSql {
 type Output = Record<number, OutputSql[]>;
 
 export class Tags extends PreparedBase<Input, OutputSql, Output> {
-  trxCache: Record<number, Transaction> = {};
+  trxFunc = (itemIds: [id: number, libId: number][]) =>
+    itemIds.map(
+      ([itemId, libId]) => [itemId, this.runAll({ itemId, libId })] as const,
+    );
+  trx: Transaction = this.database.transaction(this.trxFunc);
+
   sql(): string {
     return query;
   }
 
-  query({ itemIds, libId }: { itemIds: number[]; libId: number }) {
-    const query = (this.trxCache[libId] ??= this.database.transaction(
-      (itemIds: number[]) =>
-        itemIds.reduce(
-          (tagsByItem, itemId) => (
-            (tagsByItem[itemId] = this.runAll({ itemId, libId })), tagsByItem
-          ),
-          {} as Output,
-        ),
-    ));
-    return query(itemIds);
+  query(items: [id: number, libId: number][]): Output {
+    return fromPairs((this.trx as Tags["trxFunc"])(items));
   }
 }

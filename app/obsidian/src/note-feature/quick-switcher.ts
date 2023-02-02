@@ -47,10 +47,10 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       ? await database.api.getAnnotations(attachment.itemID, defaultLibId)
       : [];
 
-    const tagsRecord = await database.api.getTags(
-      [item.itemID, ...annotations.map((i) => i.itemID)],
-      defaultLibId,
-    );
+    const tagsRecord = await database.api.getTags([
+      [item.itemID, defaultLibId],
+      ...annotations.map((i) => [i.itemID, defaultLibId] as [number, number]),
+    ]);
 
     const note = await createNote(this.plugin, {
       docItem: item,
