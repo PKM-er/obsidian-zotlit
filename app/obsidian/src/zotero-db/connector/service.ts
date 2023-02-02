@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import workerpool from "@aidenlx/workerpool";
-import type { DbConnParams } from "@obzt/database/dist/api";
+import type { DbConnParams } from "@obzt/database/api";
 import dbWorker from "@obzt/db-worker";
 import { Service } from "@ophidian/core";
 import { assertNever } from "assert-never";

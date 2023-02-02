@@ -1,1 +1,1 @@
-export type { DbWorkerAPIWorkpool as DbWorkerAPI } from "@obzt/database/dist/api";
+export type { DbWorkerAPIWorkpool as DbWorkerAPI } from "@obzt/database/api";

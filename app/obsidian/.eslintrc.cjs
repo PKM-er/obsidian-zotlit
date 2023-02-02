@@ -10,7 +10,7 @@ const { getDefaultIgnorePatterns } = require("@aidenlx/eslint-config/helpers");
 
 const typescriptOptions = {
   tsconfigRootDir: __dirname,
-  project: "tsconfig.json",
+  project: "tsconfig.eslint.json",
 };
 
 /**
