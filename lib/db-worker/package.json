@@ -2,12 +2,16 @@
   "name": "@obzt/db-worker",
   "version": "0.0.1",
   "scripts": {
-    "build": "tsc --noEmit && tsc --project tsconfig.build.json && cross-env BUILD=production node esbuild.config.mjs",
+    "build": "",
     "check": "tsc --noEmit",
     "dev": "tsc --project tsconfig.build.json && cross-env BUILD=development node esbuild.config.mjs"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "src/main.ts",
+  "exports": {
+    ".": "./src/main.ts",
+    "./tsconfig": "./tsconfig.build.json"
+  },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",
     "@types/node": "^17.0.10",
@@ -15,10 +19,7 @@
     "eslint": "~8.31.0",
     "cross-env": "^7.0.3",
     "endent": "~2.1.0",
-    "@obzt/esbuild-plugin-inline-worker": "workspace:*",
-    "@types/eslint": "~8.4.6",
-    "esbuild": "^0.17.4",
-    "fuse.js": "^6.5.3"
+    "@types/eslint": "~8.4.6"
   },
   "dependencies": {
     "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",

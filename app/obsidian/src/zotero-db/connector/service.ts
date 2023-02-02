@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import workerpool from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
-import dbWorker from "@obzt/db-worker";
+import { toObjectURL } from "@obzt/esbuild-plugin-inline-worker/utils";
 import { Service } from "@ophidian/core";
 import { assertNever } from "assert-never";
 import { debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
+import dbWorker from "worker:@obzt/db-worker";
 import log, { LogSettings } from "@log";
 import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
@@ -65,7 +66,7 @@ export default class DatabaseWorker extends Service {
     this.#nextRefresh = null;
   }
 
-  #url = dbWorker();
+  #url = toObjectURL(dbWorker);
   #instance = workerpool.pool(this.#url, {
     minWorkers: 1,
     maxWorkers: 1,

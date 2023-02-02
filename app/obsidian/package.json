@@ -52,7 +52,8 @@
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
     "jszip": "~3.10.1",
-    "semver": "~7.3.8"
+    "semver": "~7.3.8",
+    "@obzt/esbuild-plugin-inline-worker": "workspace:*"
   },
   "config": {
     "commitizen": {
