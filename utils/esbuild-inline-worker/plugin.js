@@ -10,12 +10,17 @@ import { rmdirSync } from "fs";
 const namespace = "inline-worker";
 const toUniqueFilename = (/** @type {string} */ path) => {
   const base = basename(path).split("."),
-  ext = base.pop();
+    ext = base.pop();
   return `${base.join(".")}_${nanoid(5)}.${ext}`;
-}
+};
+
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+
 /**
  *
- * @param {import("esbuild").BuildOptions & { watch: boolean; cachedir?: string; codeLoader?: "dataurl" | "text"; filter?: {pattern:RegExp; transform:(path:string, pattern:RegExp)=>string} }} param0
+ * @param {import("esbuild").BuildOptions & { watch: boolean; cachedir?: string; codeLoader?: "dataurl" | "text"; filter?: {pattern:RegExp; transform?:(path:string, pattern:RegExp)=>string} }} param0
  * @returns {import("esbuild").Plugin}
  */
 export const inlineWorkerPlugin = ({
@@ -32,11 +37,11 @@ export const inlineWorkerPlugin = ({
   setup: async (build) => {
     if (!watch) {
       build.onResolve({ filter: filter.pattern }, ({ path, resolveDir }) => {
-        path = filter.transform(path, filter.pattern);
-        if (!path.startsWith(".")) {
-          throw new Error("Workers in external modules is not supported.");
+        if (filter.transform) {
+          path = filter.transform(path, filter.pattern);
         }
-        return { path: join(resolveDir, path), namespace };
+        const entryPoint = require.resolve(resolveDir, { paths: [path] });
+        return { path: entryPoint, namespace };
       });
       build.onLoad(
         { filter: /.*/, namespace },
@@ -61,14 +66,13 @@ export const inlineWorkerPlugin = ({
       build.onResolve(
         { filter: filter.pattern },
         async ({ path, resolveDir }) => {
-          path = filter.transform(path, filter.pattern);
-          if (!path.startsWith(".")) {
-            throw new Error("Workers in external modules is not supported.");
+          if (filter.transform) {
+            path = filter.transform(path, filter.pattern);
           }
-          const entryPoint = join(resolveDir, path),
-            id = workerEntryPoints[entryPoint]
-              ? workerEntryPoints[entryPoint]
-              : toUniqueFilename(entryPoint);
+          const entryPoint = require.resolve(resolveDir, { paths: [path] });
+          const id = workerEntryPoints[entryPoint]
+            ? workerEntryPoints[entryPoint]
+            : toUniqueFilename(entryPoint);
 
           const outfile = join(cacheDir, id);
 
