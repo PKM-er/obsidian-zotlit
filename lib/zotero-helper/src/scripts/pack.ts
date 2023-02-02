@@ -1,5 +1,6 @@
 import "zx/globals";
 
+import { tmpdir } from "os";
 import { join } from "path";
 import { zip } from "compressing";
 import {
@@ -63,7 +64,7 @@ export async function bundle(
 ) {
   const { version, id } = getInfoFromPackageJson(packageJson);
 
-  const tmpDir = await fs.mkdtemp("ztpkg-");
+  const tmpDir = await fs.mkdtemp(join(tmpdir(), "ztpkg-"));
   const xpi = `${toIdShort(id)}-${version}.xpi`;
 
   await zip.compressDir(outDir, join(tmpDir, xpi), {
