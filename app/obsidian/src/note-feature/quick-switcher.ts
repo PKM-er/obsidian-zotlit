@@ -4,8 +4,8 @@ import type {
   ItemIDLibID,
 } from "@obzt/database";
 import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
-import { ZoteroItemSuggestModal } from "../suggester/index.js";
-import type ZoteroPlugin from "../zt-main.js";
+import { ZoteroItemSuggestModal } from "@/suggester/index.js";
+import type ZoteroPlugin from "@/zt-main.js";
 import { AttachmentSelectModal } from "./atch-select.js";
 
 const instructions = [

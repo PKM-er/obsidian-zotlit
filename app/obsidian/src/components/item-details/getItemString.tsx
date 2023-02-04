@@ -5,7 +5,7 @@ import { Notice } from "obsidian";
 import type { KeyboardEvent, MouseEvent } from "react";
 
 import type { GetItemString } from "react-json-tree";
-import { useIconRef } from "../../utils/icon";
+import { useIconRef } from "@/utils/icon";
 
 const CopyJSONIcon = () => {
   const [iconRef] = useIconRef<HTMLSpanElement>("clipboard-copy");

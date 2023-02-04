@@ -1,9 +1,9 @@
 import { Service } from "@ophidian/core";
 import type Fuse from "fuse.js";
-import log from "@log";
 import DatabaseWatcher from "./auto-refresh/service";
 import DatabaseWorker, { DatabaseStatus } from "./connector/service";
 import { DatabaseSettings } from "./connector/settings";
+import log from "@/log";
 
 export class ZoteroDatabase extends Service {
   // async onload() {}

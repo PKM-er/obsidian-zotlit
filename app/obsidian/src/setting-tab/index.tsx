@@ -12,20 +12,21 @@ import type {
 } from "obsidian";
 import { Notice, PluginSettingTab, Setting } from "obsidian";
 import ReactDOM from "react-dom";
-import log from "@log";
 
-import { InVaultPath } from "../settings/invault-path";
-import { ejectableTemplateTypes } from "../template";
-import type { TemplateType } from "../template/settings";
-import { nonEjectableTemplateTypes } from "../template/settings";
-import { promptOpenLog } from "../utils/index.js";
-import type ZoteroPlugin from "../zt-main.js";
 import { DatabaseSetting } from "./database-path.js";
 import { addTextComfirm, addTextField, addToggle, getPipeFunc } from "./utils";
+import log from "@/log";
+import { InVaultPath } from "@/settings/invault-path";
+import { ejectableTemplateTypes } from "@/template";
+import type { TemplateType } from "@/template/settings";
+import { nonEjectableTemplateTypes } from "@/template/settings";
+import { promptOpenLog } from "@/utils/index.js";
+import type ZoteroPlugin from "@/zt-main.js";
 
 export class ZoteroSettingTab extends PluginSettingTab {
   constructor(public plugin: ZoteroPlugin) {
     super(plugin.app, plugin);
+    this.pipe = getPipeFunc(this.plugin, this.containerEl);
   }
 
   // patches for life cycle
@@ -64,7 +65,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
       this.#events.pop()!();
     }
   }
-  pipe = getPipeFunc(this.plugin, this.containerEl);
+  pipe: ReturnType<typeof getPipeFunc>;
 
   display(): void {
     this.containerEl.empty();

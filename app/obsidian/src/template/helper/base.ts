@@ -1,4 +1,4 @@
-import type ZoteroPlugin from "../../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 
 export interface Context {
   sourcePath?: string | null;

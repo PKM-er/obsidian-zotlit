@@ -1,6 +1,6 @@
 import type { AttachmentInfo } from "@obzt/database";
 import type { FuzzyMatch } from "obsidian";
-import { FuzzySuggestModalWithPromise } from "../suggester/index.js";
+import { FuzzySuggestModalWithPromise } from "@/suggester/index.js";
 
 export class AttachmentSelectModal extends FuzzySuggestModalWithPromise<AttachmentInfo> {
   constructor(public attachments: AttachmentInfo[]) {

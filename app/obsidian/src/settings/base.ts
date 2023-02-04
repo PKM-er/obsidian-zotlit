@@ -1,6 +1,6 @@
 import { D } from "@mobily/ts-belt";
 import { use } from "@ophidian/core";
-import ZoteroPlugin from "../zt-main";
+import ZoteroPlugin from "@/zt-main";
 
 abstract class Settings<Options extends Record<string, any>> {
   protected use = use.this;

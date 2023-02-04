@@ -1,4 +1,4 @@
-import type ZoteroPlugin from "../../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 import { bracketExtension } from "./bracket";
 import { EtaSuggest } from "./suggester";
 

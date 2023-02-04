@@ -1,18 +1,18 @@
 import { D, pipe } from "@mobily/ts-belt";
 import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
-import log, { LogSettings } from "@log";
 
-import { NoteFieldsSettings } from "../note-feature/note-fields/settings.js";
-import { NoteIndexSettings } from "../note-index/settings.js";
-import { ServerSettings } from "../server/settings.js";
-import { SuggesterSettings } from "../suggester/settings.js";
-import { TemplateSettings } from "../template/settings.js";
-import { WatcherSettings } from "../zotero-db/auto-refresh/settings.js";
-import { DatabaseSettings } from "../zotero-db/connector/settings.js";
-import { ImgImporterSettings } from "../zotero-db/img-import/settings.js";
-import ZoteroPlugin from "../zt-main.js";
+import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
+import { NoteIndexSettings } from "@/note-index/settings.js";
+import { ServerSettings } from "@/server/settings.js";
+import { SuggesterSettings } from "@/suggester/settings.js";
+import { TemplateSettings } from "@/template/settings.js";
+import { WatcherSettings } from "@/zotero-db/auto-refresh/settings.js";
+import { DatabaseSettings } from "@/zotero-db/connector/settings.js";
+import { ImgImporterSettings } from "@/zotero-db/img-import/settings.js";
+import ZoteroPlugin from "@/zt-main.js";
 import Settings from "./base";
+import log, { LogSettings } from "@/log";
 
 export interface ZoteroSettings {
   database: DatabaseSettings;

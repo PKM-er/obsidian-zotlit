@@ -18,14 +18,7 @@
     "isolatedModules": true,
     "incremental": true,
     "newLine": "lf",
-    "paths": {
-      "@log": ["./logger.ts"],
-      "support-platform": ["./platform.json"],
-      "@component/*": ["./component/*"],
-      "@assets/*": ["../assets/*"],
-      "@utils/*": ["./utils/*"],
-      "@utils": ["./utils"]
-    }
+    "paths": {}
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

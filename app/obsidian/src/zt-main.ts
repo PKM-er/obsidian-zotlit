@@ -4,7 +4,6 @@ import type { Extension } from "@codemirror/state";
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
-import log from "@log";
 
 import { AnnotBlock } from "./annot-block/service";
 import {
@@ -29,6 +28,7 @@ import DatabaseWatcher from "./zotero-db/auto-refresh/service";
 import DatabaseWorker from "./zotero-db/connector/service";
 import { ZoteroDatabase } from "./zotero-db/database";
 import { ImgCacheImporter } from "./zotero-db/img-import/service";
+import log from "@/log";
 
 declare global {
   // eslint-disable-next-line no-var

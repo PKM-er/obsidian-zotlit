@@ -6,7 +6,7 @@ import {
   getCachedActiveAtch,
   isFileAttachment,
 } from "@obzt/database";
-import type ZoteroPlugin from "../../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 
 const getActiveAttachment = (
   cachedID: number | null,

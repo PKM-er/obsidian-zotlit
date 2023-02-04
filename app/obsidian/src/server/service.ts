@@ -8,9 +8,9 @@ import type { INotify } from "@obzt/protocol/dist/bg";
 import { Service } from "@ophidian/core";
 import type { EventRef, ObsidianProtocolData } from "obsidian";
 import { Events } from "obsidian";
-import log from "@log";
-import ZoteroPlugin from "../zt-main";
+import ZoteroPlugin from "@/zt-main";
 import { ServerSettings } from "./settings";
+import log from "@/log";
 
 /** background actions */
 const bgActions = new Set<string>(["notify"]);

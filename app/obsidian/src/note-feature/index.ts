@@ -1,4 +1,4 @@
-import type ZoteroPlugin from "../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
 import { CitationSuggestModal } from "./quick-switcher";

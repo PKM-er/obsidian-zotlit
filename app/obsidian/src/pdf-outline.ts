@@ -6,8 +6,8 @@ import type { DBSchema } from "idb";
 import { openDB } from "idb";
 import { Events, Notice } from "obsidian";
 import queryString from "query-string";
-import log, { logError } from "@log";
 import type ZoteroPlugin from "./zt-main";
+import log, { logError } from "@/log";
 const execFile = promisify(_execFile);
 
 export interface PDFOutline {

@@ -7,10 +7,10 @@ import { assertNever } from "assert-never";
 import { debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";
-import log, { LogSettings } from "@log";
-import { createWorkerProxy } from "../../utils/worker";
 import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
+import log, { LogSettings } from "@/log";
+import { createWorkerProxy } from "@/utils/worker";
 
 export const enum DatabaseStatus {
   NotInitialized,

@@ -7,7 +7,7 @@ import type {
 } from "obsidian";
 import { EditorSuggest } from "obsidian";
 
-import type ZoteroPlugin from "../zt-main.js";
+import type ZoteroPlugin from "@/zt-main.js";
 import type { FuzzyMatch, SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 

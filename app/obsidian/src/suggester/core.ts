@@ -3,7 +3,7 @@ import { isCreatorFullName, isCreatorNameOnly } from "@obzt/database";
 import type { JournalArticleItem } from "@obzt/zotero-type";
 import type Fuse from "fuse.js";
 
-import type ZoteroPlugin from "../zt-main.js";
+import type ZoteroPlugin from "@/zt-main.js";
 import unionRanges from "./union.js";
 
 export type FuzzyMatch<T> = Fuse.FuseResult<T>;

@@ -1,6 +1,6 @@
 import { D } from "@mobily/ts-belt";
 import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
-import type ZoteroPlugin from "../../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 
 export const getDragStartHandler =
   (plugin: ZoteroPlugin): AnnotsViewContextType["onDragStart"] =>

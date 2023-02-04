@@ -1,7 +1,7 @@
 import type { AnnotsViewContextType } from "@obzt/components";
 import type { AnnotationInfo } from "@obzt/database";
 import { MarkdownView, Menu, Notice } from "obsidian";
-import type { AnnotationView } from "../../note-feature/annot-view/view";
+import type { AnnotationView } from "@/note-feature/annot-view/view";
 
 export const getMoreOptionsHandler =
   (view: AnnotationView): AnnotsViewContextType["onMoreOptions"] =>

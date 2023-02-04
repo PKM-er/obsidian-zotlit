@@ -1,5 +1,5 @@
 import assertNever from "assert-never";
-import Settings from "../settings/base";
+import Settings from "@/settings/base";
 import NoteIndex from "./service";
 
 interface SettingOptions {

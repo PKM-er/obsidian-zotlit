@@ -1,9 +1,9 @@
 import { homedir } from "os";
 import { join } from "path";
 import assertNever from "assert-never";
-import { getBinaryFullPath } from "../../install-guide/version";
+import { getBinaryFullPath } from "@/install-guide/version";
 
-import Settings from "../../settings/base";
+import Settings from "@/settings/base";
 import DatabaseWorker from "./service";
 
 interface SettingOptions {

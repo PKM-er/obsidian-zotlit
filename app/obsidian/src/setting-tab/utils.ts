@@ -1,6 +1,6 @@
 import type { TextAreaComponent } from "obsidian";
 import { debounce, Setting } from "obsidian";
-import type ZoteroPlugin from "../zt-main";
+import type ZoteroPlugin from "@/zt-main";
 
 export function getPipeFunc(ctx: ZoteroPlugin, defaultContainer: HTMLElement) {
   return (s: Setting | HTMLElement | SettingMod, ...funcs: SettingMod[]) => {

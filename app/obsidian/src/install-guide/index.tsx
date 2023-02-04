@@ -1,7 +1,6 @@
 import { statSync } from "fs";
 import type { PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
-import { logError } from "@log";
 import { InstallGuideModal } from "./guide";
 import type { GuideMode } from "./guide/atom";
 import {
@@ -11,6 +10,7 @@ import {
   compareElectronVer,
   isPlatformSupported,
 } from "./version";
+import { logError } from "@/log";
 
 const showInstallGuide = (
   libPath: string,

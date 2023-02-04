@@ -2,9 +2,7 @@ import type { Extension } from "@codemirror/state";
 import { D } from "@mobily/ts-belt";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
-import type { EtaConfig } from "eta/dist/types/config";
-import Settings from "../settings/base";
-import ZoteroPlugin from "../zt-main";
+import type { getConfig } from "eta";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
@@ -12,6 +10,8 @@ import { bracketExtension } from "./editor/bracket";
 import type { FmBlackList, FmWhiteList } from "./frontmatter";
 import { FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
+import Settings from "@/settings/base";
+import ZoteroPlugin from "@/zt-main";
 
 export type EjectableTemplate = "note" | "annotation" | "annots";
 export type NonEjectableTemplate = "filename" | "citation" | "altCitation";
@@ -36,7 +36,7 @@ const nullishAsEmptyString = {
 export const defaultEtaConfig = {
   autoEscape: false,
   plugins: [nullishAsEmptyString],
-} satisfies Partial<EtaConfig>;
+} satisfies Partial<ReturnType<typeof getConfig>>;
 
 interface SettingOptions {
   ejected: boolean;

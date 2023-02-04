@@ -6,7 +6,7 @@ import { Service } from "@ophidian/core";
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 import workerCode from "worker:@/worker/annot-block/main";
 
-import log, { logError } from "@log";
+import log, { logError } from "@/log";
 import { createWorkerProxy } from "@/utils/worker";
 import type {
   AnnotBlockWorkerAPI,

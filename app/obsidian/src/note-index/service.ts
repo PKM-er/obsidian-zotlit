@@ -10,12 +10,12 @@ import type {
   Vault,
 } from "obsidian";
 import { TFile, TFolder } from "obsidian";
-import log from "@log";
 
-import { untilMetaReady } from "../utils/once.js";
-import ZoteroPlugin from "../zt-main.js";
+import { untilMetaReady } from "@/utils/once.js";
+import ZoteroPlugin from "@/zt-main.js";
 import { NoteIndexSettings } from "./settings.js";
 import getZoteroKeyFileMap, { getItemKeyOf } from "./ztkey-file-map.js";
+import log from "@/log";
 
 export { getItemKeyGroupID };
 

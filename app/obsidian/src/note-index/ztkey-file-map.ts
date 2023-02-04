@@ -7,7 +7,7 @@ import {
 } from "@obzt/common";
 import type { CachedMetadata } from "obsidian";
 
-import { ZOTERO_KEY_FIELDNAME } from "../template";
+import { ZOTERO_KEY_FIELDNAME } from "@/template";
 
 const getItemKeyFromFrontmatter = (
   cache: CachedMetadata | null,

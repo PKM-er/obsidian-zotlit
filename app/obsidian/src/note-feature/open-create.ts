@@ -4,11 +4,11 @@ import type { RegularItemInfoBase } from "@obzt/database";
 import { BaseError } from "make-error";
 
 import { Notice } from "obsidian";
-import { getItemKeyGroupID } from "../note-index/service.js";
-import type { TemplateRenderer } from "../template";
-import { ZOTERO_KEY_FIELDNAME } from "../template";
-import type { Context } from "../template/helper/base.js";
-import type ZoteroPlugin from "../zt-main.js";
+import { getItemKeyGroupID } from "@/note-index/service.js";
+import type { TemplateRenderer } from "@/template";
+import { ZOTERO_KEY_FIELDNAME } from "@/template";
+import type { Context } from "@/template/helper/base.js";
+import type ZoteroPlugin from "@/zt-main.js";
 
 export class NoteExistsError extends BaseError {
   constructor(public target: string, public key: string) {

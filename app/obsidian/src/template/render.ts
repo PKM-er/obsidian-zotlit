@@ -6,7 +6,6 @@ import { use } from "@ophidian/core";
 import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
-import { logError } from "@log";
 import type { FieldsInFrontmatter } from "./frontmatter";
 import { ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
@@ -15,6 +14,7 @@ import type { HelperExtra } from "./helper/to-helper";
 import { toHelper } from "./helper/to-helper";
 import type { TemplateType } from "./settings";
 import { TemplateSettings } from "./settings";
+import { logError } from "@/log";
 
 export interface TemplateDataMap {
   note: DocItemHelper;

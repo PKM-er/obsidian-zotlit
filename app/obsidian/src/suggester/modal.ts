@@ -1,7 +1,7 @@
 import type { RegularItemInfo } from "@obzt/database";
 import { debounce } from "obsidian";
 
-import type ZoteroPlugin from "../zt-main.js";
+import type ZoteroPlugin from "@/zt-main.js";
 import type { FuzzyMatch, SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 import { SuggestModalWithPromise } from "./modal-promise";

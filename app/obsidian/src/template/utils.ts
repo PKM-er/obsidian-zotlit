@@ -4,8 +4,8 @@ import { isAnnotationItem } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import filenamify from "filenamify";
 import type { FileSystemAdapter, TFile } from "obsidian";
-import log from "../logger";
-import type ZoteroPlugin from "../zt-main";
+import log from "@/log";
+import type ZoteroPlugin from "@/zt-main";
 
 export const toFileUrl = (path: string) => `file://${path}`;
 export const toMdLinkComponent = (path: string): string => {

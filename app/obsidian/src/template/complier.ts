@@ -1,11 +1,11 @@
 import { Service } from "@ophidian/core";
 import * as Eta from "eta";
 import { Notice } from "obsidian";
-import log, { logError } from "@log";
 import { TemplateLoader } from "./loader";
 import type { TemplateType } from "./settings";
 import { defaultEtaConfig } from "./settings";
 import { acceptLineBreak, renderFilename } from "./utils";
+import log, { logError } from "@/log";
 
 export class TemplateComplier extends Service {
   loader = this.use(TemplateLoader);
