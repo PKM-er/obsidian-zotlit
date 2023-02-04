@@ -306,8 +306,11 @@ importers:
       autoprefixer: ~10.4.13
       class-variance-authority: ~0.4.0
       clsx: ^1.2.1
+      esbuild: ^0.17.4
       eslint: ~8.31.0
+      fs-extra: ~11.1.0
       lodash-es: ~4.17.21
+      nanoid: ~4.0.0
       path-browserify: ~1.0.1
       postcss: ~8.4.21
       postcss-discard: ~2.0.0
@@ -339,6 +342,7 @@ importers:
       assert-never: 1.2.1
       class-variance-authority: 0.4.0_typescript@4.9.5
       clsx: 1.2.1
+      esbuild: 0.17.5
       lodash-es: 4.17.21
       path-browserify: 1.0.1
       react: 17.0.2
@@ -357,6 +361,8 @@ importers:
       '@vitejs/plugin-react-swc': 3.0.1_vite@4.0.4
       autoprefixer: 10.4.13_postcss@8.4.21
       eslint: 8.31.0
+      fs-extra: 11.1.0
+      nanoid: 4.0.0
       postcss: 8.4.21
       postcss-discard: 2.0.0
       postcss-prefix-selector: 1.16.0_postcss@8.4.21
@@ -8964,6 +8970,15 @@ packages:
       jsonfile: 6.1.0
       universalify: 2.0.0
 
+  /fs-extra/11.1.0:
+    resolution: {integrity: sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==}
+    engines: {node: '>=14.14'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -11754,7 +11769,6 @@ packages:
     resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
     engines: {node: ^14 || ^16 || >=18}
     hasBin: true
-    dev: false
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}

@@ -9,6 +9,7 @@
     "lint": "eslint src/ --ext .ts,.tsx --fix",
     "release": "release-it"
   },
+  "type": "module",
   "keywords": [],
   "author": {
     "name": "AidenLx",

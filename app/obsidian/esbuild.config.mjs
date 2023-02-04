@@ -7,6 +7,7 @@ import { createRequire } from "module";
 import { join } from "path";
 // import myPackage from "./package.json" assert { type: "json" };
 import semverPrerelease from "semver/functions/prerelease.js";
+import PostcssPlugin from "@obzt/components/esbuild-postcss";
 
 const myPackage = JSON.parse(await readFile("./package.json"));
 const isPreRelease = semverPrerelease(myPackage.version) !== null;
@@ -104,6 +105,7 @@ const opts = {
       sourcemap: !isProd ? "inline" : false,
       watch: !isProd,
     }),
+    PostcssPlugin({}),
   ],
 };
 try {

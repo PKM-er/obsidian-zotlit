@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "",
     "preview": "vite preview"
   },
-  "main": "dist/index.js",
+  "main": "./src/components/index.tsx",
   "exports": {
-    ".": "./dist/index.js",
-    "./styles": "./dist/styles.css"
+    ".": "./src/components/index.tsx",
+    "./esbuild-postcss": {
+      "import": "./src/postcss.js"
+    }
   },
   "dependencies": {
     "@obzt/common": "workspace:*",
@@ -51,11 +53,14 @@
     "postcss-prefix-selector": "~1.16.0",
     "vite-plugin-dts": "~1.7.1",
     "postcss-discard": "~2.0.0",
-    "@types/lodash-es": "~4.17.6"
+    "@types/lodash-es": "~4.17.6",
+    "fs-extra": "~11.1.0",
+    "nanoid": "~4.0.0"
   },
   "peerDependencies": {
     "react": "~17.0.2",
-    "react-dom": "~17.0.2"
+    "react-dom": "~17.0.2",
+    "esbuild": "^0.17.4"
   },
   "browserslist": [
     "chrome >= 106",
