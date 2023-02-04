@@ -6,7 +6,7 @@ import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
 import log from "@log";
 
-import { AnnotBlockWorker } from "./annot-block/service";
+import { AnnotBlock } from "./annot-block/service";
 import {
   CitationEditorSuggest,
   insertCitation,
@@ -69,7 +69,7 @@ export default class ZoteroPlugin extends Plugin {
 
   // noteParser: NoteParser;
   // pdfCache: PDFCache;
-  annotBlockWorker = this.use(AnnotBlockWorker);
+  annotBlockWorker = this.use(AnnotBlock);
 
   createNoteForDocItem = createNoteForDocItem;
   openNote = openNote;

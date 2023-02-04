@@ -391,10 +391,6 @@
       "projectFolder": "lib/zotero-helper"
     },
     {
-      "packageName": "@obzt/note-parser",
-      "projectFolder": "lib/note-parser"
-    },
-    {
       "packageName": "@obzt/esbuild-plugin-inline-worker",
       "projectFolder": "utils/esbuild-inline-worker"
     },

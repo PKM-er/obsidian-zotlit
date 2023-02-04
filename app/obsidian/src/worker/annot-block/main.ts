@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
 import type { AnnotBlockWorkerAPI } from "./api";

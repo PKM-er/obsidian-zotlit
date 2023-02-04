@@ -15,13 +15,11 @@ importers:
       '@codemirror/state': ^6.0.0
       '@codemirror/view': ^6.0.0
       '@mobily/ts-belt': ^4.0.0-rc.5
-      '@obzt/annot-block': workspace:*
       '@obzt/common': workspace:*
       '@obzt/components': workspace:*
       '@obzt/database': workspace:*
       '@obzt/db-worker': workspace:*
       '@obzt/esbuild-plugin-inline-worker': workspace:*
-      '@obzt/note-parser': workspace:*
       '@obzt/protocol': workspace:*
       '@obzt/zotero-type': workspace:*
       '@ophidian/core': workspace:*
@@ -37,6 +35,7 @@ importers:
       '@types/pretty-hrtime': ^1.0.1
       '@types/react': ~17.0.8
       '@types/react-dom': ~17.0.11
+      '@types/turndown': ~5.0.1
       ahooks: ~3.7.1
       assert-never: ^1.2.1
       builtin-modules: ^3.2.0
@@ -84,12 +83,10 @@ importers:
     dependencies:
       '@aidenlx/workerpool': 6.2.1-mod.13
       '@mobily/ts-belt': 4.0.0-rc.5
-      '@obzt/annot-block': link:../../lib/annot-block
       '@obzt/common': link:../../lib/common
       '@obzt/components': link:../../lib/components
       '@obzt/database': link:../../lib/database
       '@obzt/db-worker': link:../../lib/db-worker
-      '@obzt/note-parser': link:../../lib/note-parser
       '@obzt/protocol': link:../../lib/protocol
       '@obzt/zotero-type': link:../../lib/zotero-type
       '@ophidian/core': link:../../lib/ophidian-lib-core
@@ -143,6 +140,7 @@ importers:
       '@types/pretty-hrtime': 1.0.1
       '@types/react': 17.0.53
       '@types/react-dom': 17.0.18
+      '@types/turndown': 5.0.1
       builtin-modules: 3.3.0
       conventional-changelog-angular: 5.0.13
       cross-env: 7.0.3
@@ -234,43 +232,6 @@ importers:
       '@types/react': 17.0.53
       eslint: 8.31.0
       eslint-plugin-mdx: 2.0.5_eslint@8.31.0
-      typescript: 4.9.5
-
-  ../../lib/annot-block:
-    specifiers:
-      '@aidenlx/eslint-config': workspace:*
-      '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
-      '@obzt/common': workspace:*
-      '@obzt/esbuild-plugin-inline-worker': workspace:*
-      '@types/eslint': ~8.4.6
-      '@types/mdast': ~3.0.10
-      '@types/node': ^17.0.10
-      assert-never: ^1.2.1
-      cross-env: ^7.0.3
-      esbuild: ^0.17.4
-      eslint: ~8.31.0
-      mdast-builder: ~1.1.1
-      remark-parse: ~10.0.1
-      typescript: ^4.9.4
-      unified: ~10.1.2
-      unist-util-select: ~4.0.1
-    dependencies:
-      '@aidenlx/workerpool': 6.2.1-mod.13
-      '@obzt/common': link:../common
-      assert-never: 1.2.1
-      mdast-builder: 1.1.1
-      remark-parse: 10.0.1
-      unified: 10.1.2
-      unist-util-select: 4.0.3
-    devDependencies:
-      '@aidenlx/eslint-config': link:../../common/config/eslint
-      '@obzt/esbuild-plugin-inline-worker': link:../../utils/esbuild-inline-worker
-      '@types/eslint': 8.4.10
-      '@types/mdast': 3.0.10
-      '@types/node': 17.0.45
-      cross-env: 7.0.3
-      esbuild: 0.17.5
-      eslint: 8.31.0
       typescript: 4.9.5
 
   ../../lib/common:
@@ -438,39 +399,6 @@ importers:
       '@types/eslint': 8.4.10
       '@types/node': 17.0.45
       cross-env: 7.0.3
-      eslint: 8.31.0
-      typescript: 4.9.5
-
-  ../../lib/note-parser:
-    specifiers:
-      '@aidenlx/eslint-config': workspace:*
-      '@aidenlx/workerpool': '>=6.2.1-mod.13 <6.2.1-mod0'
-      '@obzt/common': workspace:*
-      '@obzt/esbuild-plugin-inline-worker': workspace:*
-      '@obzt/zotero-type': workspace:*
-      '@types/eslint': ~8.4.6
-      '@types/node': ^17.0.10
-      '@types/turndown': ~5.0.1
-      assert-never: ^1.2.1
-      cross-env: ^7.0.3
-      esbuild: ^0.17.4
-      eslint: ~8.31.0
-      turndown: ~7.1.1
-      typescript: ^4.9.4
-    dependencies:
-      '@aidenlx/workerpool': 6.2.1-mod.13
-      '@obzt/common': link:../common
-      '@obzt/zotero-type': link:../zotero-type
-      assert-never: 1.2.1
-      turndown: 7.1.1
-    devDependencies:
-      '@aidenlx/eslint-config': link:../../common/config/eslint
-      '@obzt/esbuild-plugin-inline-worker': link:../../utils/esbuild-inline-worker
-      '@types/eslint': 8.4.10
-      '@types/node': 17.0.45
-      '@types/turndown': 5.0.1
-      cross-env: 7.0.3
-      esbuild: 0.17.5
       eslint: 8.31.0
       typescript: 4.9.5
 
@@ -7689,10 +7617,6 @@ packages:
     engines: {node: '>= 4'}
     dependencies:
       domelementtype: 2.3.0
-    dev: false
-
-  /domino/2.1.6:
-    resolution: {integrity: sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==}
     dev: false
 
   /domutils/2.8.0:
@@ -15173,12 +15097,6 @@ packages:
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
     dev: true
     optional: true
-
-  /turndown/7.1.1:
-    resolution: {integrity: sha512-BEkXaWH7Wh7e9bd2QumhfAXk5g34+6QUmmWx+0q6ThaVOLuLUqsnkq35HQ5SBHSaxjSfSM7US5o4lhJNH7B9MA==}
-    dependencies:
-      domino: 2.1.6
-    dev: false
 
   /type-check/0.3.2:
     resolution: {integrity: sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==}

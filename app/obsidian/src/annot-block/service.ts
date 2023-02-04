@@ -16,7 +16,7 @@ import type {
 import type { ZoteroDatabase } from "@/zotero-db/database";
 import ZoteroPlugin from "@/zt-main";
 
-export class AnnotBlockWorker extends Service {
+export class AnnotBlock extends Service {
   plugin = this.use(ZoteroPlugin);
 
   #url = toObjectURL(workerCode);
@@ -37,6 +37,10 @@ export class AnnotBlockWorker extends Service {
         child.render([source, ctx.sourcePath]);
       },
     );
+  }
+  async onunload(): Promise<void> {
+    await this.#instance.terminate();
+    URL.revokeObjectURL(this.#url);
   }
 
   async parse(markdown: string) {

@@ -55,7 +55,8 @@
     "jszip": "~3.10.1",
     "semver": "~7.3.8",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
-    "@types/mdast": "~3.0.10"
+    "@types/mdast": "~3.0.10",
+    "@types/turndown": "~5.0.1"
   },
   "config": {
     "commitizen": {
@@ -82,7 +83,6 @@
     "react": "npm:@preact/compat@~17.1.2",
     "react-dom": "npm:@preact/compat@~17.1.2",
     "lodash-es": "~4.17.21",
-    "@obzt/note-parser": "workspace:*",
     "ahooks": "~3.7.1",
     "query-string": "~7.1.1",
     "idb": "~7.1.0",

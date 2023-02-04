@@ -33,10 +33,6 @@
       "path": "lib/db-worker"
     },
     {
-      "name": "note-parser",
-      "path": "lib/note-parser"
-    },
-    {
       "name": "common",
       "path": "lib/common"
     },
