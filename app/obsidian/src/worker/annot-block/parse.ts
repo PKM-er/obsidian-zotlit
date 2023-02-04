@@ -3,7 +3,7 @@ import type { Content, Link, Paragraph } from "mdast";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { selectAll } from "unist-util-select";
-import type { AnnotBlockWorkerAPI, AnnotInfo } from "../api";
+import type { AnnotBlockWorkerAPI, AnnotInfo } from "./api";
 
 const parser = unified().use(remarkParse).freeze();
 

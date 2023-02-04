@@ -18,16 +18,16 @@ const getDefaultLogLevel = () => {
   }
 };
 
-const logger = initLogger("main", getDefaultLogLevel(), log4js);
+const log = initLogger("main", getDefaultLogLevel(), log4js);
 
-export default logger;
+export default log;
 
 export const logError = (message: string, error: unknown, ...args: any[]) => {
   if (!error) {
-    logger.error(message, ...args);
+    log.error(message, ...args);
     return;
   }
-  logger.error(
+  log.error(
     message,
     error instanceof Error ? error.message : String(error),
     ...args,
@@ -46,7 +46,7 @@ export class LogSettings extends Settings<SettingOptions> {
   }
 
   async applyLevel() {
-    logger.level = this.level;
+    log.level = this.level;
     localStorage.setItem(storageKey, this.level);
     await this.use(DatabaseWorker).api.setLoglevel(this.level);
   }

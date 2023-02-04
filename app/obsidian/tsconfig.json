@@ -19,13 +19,12 @@
     "incremental": true,
     "newLine": "lf",
     "paths": {
+      "@/*": ["./*"],
       "@log": ["./logger.ts"],
       "support-platform": ["./platform.json"],
-      "@component/*": ["./component/*"],
-      "@assets/*": ["../assets/*"],
-      "@utils/*": ["./utils/*"],
-      "@utils": ["./utils"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/worker/*/api.ts"],
+  "exclude": ["src/worker"],
+  "references": [{ "path": "./src/worker/tsconfig.json" }]
 }

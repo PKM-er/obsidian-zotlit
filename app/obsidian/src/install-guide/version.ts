@@ -4,7 +4,7 @@ import { join } from "path/posix";
 import { betterSqlite3 } from "@obzt/common";
 import type { PluginManifest } from "obsidian";
 import { Platform } from "obsidian";
-import _PLATFORM_SUPPORT from "support-platform";
+import _PLATFORM_SUPPORT from "@/platform.json";
 
 const appDataDir: string | null = Platform.isDesktopApp
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires

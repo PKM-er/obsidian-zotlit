@@ -1,12 +1,52 @@
 import workerpool from "@aidenlx/workerpool";
-import type { AnnotBlockWorkerAPI } from "@obzt/annot-block";
-import annotBlockWorker from "@obzt/annot-block";
-import type { AnnotDetails, AnnotInfo } from "@obzt/annot-block/dist/api";
+import { toObjectURL } from "@obzt/esbuild-plugin-inline-worker/utils";
 import { AnnotationType } from "@obzt/zotero-type";
+import { Service } from "@ophidian/core";
+
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
+import workerCode from "worker:@/worker/annot-block/main";
+
 import log, { logError } from "@log";
-import type { ZoteroDatabase } from "../zotero-db/database";
-import type ZoteroPlugin from "../zt-main";
+import { createWorkerProxy } from "@/utils/worker";
+import type {
+  AnnotBlockWorkerAPI,
+  AnnotDetails,
+  AnnotInfo,
+} from "@/worker/annot-block";
+import type { ZoteroDatabase } from "@/zotero-db/database";
+import ZoteroPlugin from "@/zt-main";
+
+export class AnnotBlockWorker extends Service {
+  plugin = this.use(ZoteroPlugin);
+
+  #url = toObjectURL(workerCode);
+  #instance = workerpool.pool(this.#url, {
+    workerType: "web",
+    name: "Zotero Annot Block Worker",
+  });
+
+  api = createWorkerProxy<AnnotBlockWorkerAPI>(this.#instance);
+
+  onload(): void {
+    this.plugin.registerMarkdownCodeBlockProcessor(
+      "zotero-annot",
+      (source, el, ctx) => {
+        const child = new AnnotBlockRenderChild(el, this.plugin.database, this);
+        ctx.addChild(child);
+        child.load();
+        child.render([source, ctx.sourcePath]);
+      },
+    );
+  }
+
+  async parse(markdown: string) {
+    return await this.api.parse(markdown);
+  }
+
+  async stringify(spec: AnnotDetails[]) {
+    return await this.api.stringify(spec);
+  }
+}
 
 class AnnotBlockRenderChild extends MarkdownRenderChild {
   constructor(
@@ -40,16 +80,15 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
         info.map(({ annotKey }) => annotKey),
         this.db.settings.citationLibrary,
       );
-      markdown = await this.worker.stringify(
-        info.map(({ annotKey, ...props }) => ({
-          ...props,
-          annotKey,
-          text:
-            annotations[annotKey]?.type === AnnotationType.highlight
-              ? annotations[annotKey].text ?? ""
-              : "",
-        })),
-      );
+      const annotDetails = info.map(({ annotKey, ...props }) => ({
+        ...props,
+        annotKey,
+        text:
+          annotations[annotKey]?.type === AnnotationType.highlight
+            ? annotations[annotKey].text ?? ""
+            : "",
+      }));
+      markdown = await this.worker.stringify(annotDetails);
     } catch (error) {
       logError("stringify annots", error);
       markdown = source;
@@ -67,43 +106,5 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     this.registerEvent(
       app.vault.on("zotero:db-refresh", this.render.bind(this)),
     );
-  }
-}
-
-export const registerCodeBlock = (plugin: ZoteroPlugin) => {
-  plugin.registerMarkdownCodeBlockProcessor(
-    "zotero-annot",
-    (source, el, ctx) => {
-      const child = new AnnotBlockRenderChild(
-        el,
-        plugin.database,
-        plugin.annotBlockWorker,
-      );
-      ctx.addChild(child);
-      child.load();
-      child.render([source, ctx.sourcePath]);
-    },
-  );
-};
-
-export class AnnotBlockWorker {
-  pool: workerpool.WorkerPool;
-  proxy: workerpool.Promise<workerpool.Proxy<AnnotBlockWorkerAPI>, Error>;
-
-  constructor(public plugin: ZoteroPlugin) {
-    this.pool = workerpool.pool(annotBlockWorker(), {
-      workerType: "web",
-    });
-    this.proxy = this.pool.proxy();
-  }
-
-  async parse(markdown: string) {
-    const proxy = await this.proxy;
-    return proxy.parse(markdown);
-  }
-
-  async stringify(spec: AnnotDetails[]) {
-    const proxy = await this.proxy;
-    return proxy.stringify(spec);
   }
 }

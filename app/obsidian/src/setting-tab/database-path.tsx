@@ -4,8 +4,8 @@ import clsx from "clsx";
 import type { Atom, Getter } from "jotai";
 import { atom, Provider, useAtomValue, useSetAtom } from "jotai";
 import { loadable } from "jotai/utils";
-import { createInitialValues } from "@utils/create-initial";
 import type ZoteroPlugin from "../zt-main";
+import { createInitialValues } from "@/utils/create-initial";
 
 const pluginAtom = atom({} as ZoteroPlugin);
 

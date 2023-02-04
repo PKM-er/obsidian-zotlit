@@ -1,11 +1,9 @@
-import endent from "endent";
-import type { EventRef, Events, Workspace } from "obsidian";
-import { Platform, setIcon } from "obsidian";
+import { Platform } from "obsidian";
 
-export const promptOpenLog = () => endent`
-Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
-  Platform.isMacOS ? "⌥ Option" : "Shift"
-} + I, then go to the "Console" tab to see the log.`;
+export const promptOpenLog = () =>
+  `Press ${Platform.isMacOS ? "⌘ Cmd" : "Ctrl"} + ${
+    Platform.isMacOS ? "⌥ Option" : "Shift"
+  } + I, then go to the "Console" tab to see the log.`;
 // export const checkNodeInWorker = () => {
 //   const url = URL.createObjectURL(
 //     new Blob(['self.postMessage("require" in self); self.close()'], {

@@ -18,7 +18,7 @@ WHERE
 `;
 
 type OutputSql = WithParentItem<OutputBase>;
-type Output = Record<string, Parsed<OutputSql>[]>;
+type Output = Record<string, Parsed<OutputSql>>;
 
 interface InputSql {
   annotKey: string;
@@ -41,16 +41,16 @@ export class AnnotByKeys extends PreparedBase<InputSql, OutputSql, Output> {
     return toParsed(o, input.libId, input.groupID);
   }
 
-  query(input: Input) {
+  query(input: Input): Output {
     const { annotKeys, libId } = input;
-    const query = (this.trxCache[libId] ??= this.database.transaction(
-      (annotKeys: string[]) =>
-        annotKeys.reduce((annotByKey, key) => {
-          const result = this.runAll({ annotKey: key, libId });
-          annotByKey[key] = result.map((o) => this.parse(o, input));
-          return annotByKey;
-        }, {} as Output),
-    ));
+    const queryFunc = (annotKeys: string[]) =>
+      annotKeys.reduce((annotByKey, key) => {
+        const result = this.statement.get({ annotKey: key, libId });
+        if (result) annotByKey[key] = result;
+        return annotByKey;
+      }, {} as Output);
+    const query = (this.trxCache[libId] ??=
+      this.database.transaction(queryFunc)) as typeof queryFunc;
     return query(annotKeys);
   }
 }

@@ -37,10 +37,6 @@
       "path": "lib/note-parser"
     },
     {
-      "name": "annot-block",
-      "path": "lib/annot-block"
-    },
-    {
       "name": "common",
       "path": "lib/common"
     },

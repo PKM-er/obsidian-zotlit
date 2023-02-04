@@ -50,6 +50,7 @@ module.exports = {
     "no-empty-function": "off",
     "import/default": "off",
     "import/no-duplicates": ["error", { considerQueryString: true }],
+    "import/no-unresolved": "off",
     "import/no-named-as-default-member": "off",
     "import/no-named-as-default": "off",
     "import/order": [
@@ -78,7 +79,8 @@ module.exports = {
         "ts-check": false,
       },
     ],
-    "@typescript-eslint/no-explicit-any": ["error", { ignoreRestArgs: false }],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-empty-function": [
       "error",
       { allow: ["private-constructors"] },
@@ -158,7 +160,7 @@ module.exports = {
       {
         selector: ["enum"],
         format: ["PascalCase"],
-      }
+      },
     ],
   },
   overrides: [

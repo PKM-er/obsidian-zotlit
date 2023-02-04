@@ -1,5 +1,5 @@
 import { assertNever } from "assert-never";
-import type { AnnotBlockWorkerAPI } from "../api";
+import type { AnnotBlockWorkerAPI } from "./api";
 
 const stringify: AnnotBlockWorkerAPI["stringify"] = (details) => {
   const excerpts = details.map(({ text: raw, alt, altType }): string => {

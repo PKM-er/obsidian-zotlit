@@ -1,5 +1,4 @@
 import { requiredKeys } from "@obzt/database";
-import endent from "endent";
 import { Menu } from "obsidian";
 import type { MouseEvent } from "react";
 import type { LabelRenderer } from "react-json-tree";
@@ -28,10 +27,10 @@ export const labelRenderer: LabelRenderer = (
             typeof toPick === "string" && identifiers.test(toPick)
               ? toPick
               : `'${toPick}'`;
-          navigator.clipboard.writeText(endent`
-          <% { const { ${destruct}: $it } = ${getKeyName(rest)}; %>
-            <%= $it %>
-          <% } %>`);
+          const key = getKeyName(rest);
+          navigator.clipboard.writeText(
+            `<% { const { ${destruct}: $it } = ${key}; %>\n  <%= $it %>\n<% } %>`,
+          );
         }),
       );
     }
@@ -40,20 +39,14 @@ export const labelRenderer: LabelRenderer = (
         .addItem((i) =>
           i.setTitle("Copy Template (using for-of loop)").onClick(() => {
             navigator.clipboard.writeText(
-              endent`
-              <% for (const $it of ${path}) { %>
-                <%= $it %>
-              <% } %>`,
+              `<% for (const $it of ${path}) { %>\n  <%= $it %>\n<% } %>`,
             );
           }),
         )
         .addItem((i) =>
           i.setTitle("Copy Template (using forEach)").onClick(() => {
             navigator.clipboard.writeText(
-              endent`
-              <% ${path}.forEach(($it, i) => { %>
-                <%= $it %>
-              <% }) %>`,
+              `<% ${path}.forEach(($it, i) => { %>\n  <%= $it %>\n<% }) %>`,
             );
           }),
         )
@@ -72,10 +65,7 @@ export const labelRenderer: LabelRenderer = (
       menu.addItem((i) =>
         i.setTitle("Copy Template (render when present)").onClick(() => {
           navigator.clipboard.writeText(
-            endent`
-            <% if ${path} { %>
-              <%= ${path} %>
-            <% } %>`,
+            `<% if ${path} { %>\n  <%= ${path} %>\n<% } %>`,
           );
         }),
       );

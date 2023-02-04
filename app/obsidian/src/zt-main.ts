@@ -6,7 +6,7 @@ import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
 import log from "@log";
 
-import { AnnotBlockWorker, registerCodeBlock } from "./annot-block";
+import { AnnotBlockWorker } from "./annot-block/service";
 import {
   CitationEditorSuggest,
   insertCitation,
@@ -43,7 +43,7 @@ export default class ZoteroPlugin extends Plugin {
     if (!checkLib(manifest)) {
       throw new Error("Library check failed");
     }
-    this.annotBlockWorker = new AnnotBlockWorker(this);
+    // this.annotBlockWorker = new AnnotBlockWorker(this);
     // this.noteParser = new NoteParser(this);
     // this.pdfCache = new PDFCache(this);
   }
@@ -69,7 +69,7 @@ export default class ZoteroPlugin extends Plugin {
 
   // noteParser: NoteParser;
   // pdfCache: PDFCache;
-  annotBlockWorker: AnnotBlockWorker;
+  annotBlockWorker = this.use(AnnotBlockWorker);
 
   createNoteForDocItem = createNoteForDocItem;
   openNote = openNote;
@@ -77,7 +77,6 @@ export default class ZoteroPlugin extends Plugin {
   editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
-    registerCodeBlock(this);
     registerEtaEditorHelper(this);
     this.addCommand({
       id: "insert-markdown-citation",

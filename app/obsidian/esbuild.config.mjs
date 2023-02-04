@@ -4,7 +4,7 @@ import { build, context } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { readFile } from "fs/promises";
 import { createRequire } from "module";
-import { join } from "path";
+import { join, resolve } from "path";
 // import myPackage from "./package.json" assert { type: "json" };
 import semverPrerelease from "semver/functions/prerelease.js";
 import PostcssPlugin from "@obzt/components/esbuild-postcss";
@@ -94,16 +94,13 @@ const opts = {
     obPlugin({ beta: isPreRelease }),
     preactCompatPlugin,
     inlineWorkerPlugin({
-      buildOptions: () => ({
+      buildOptions: ({ path }) => ({
         ...baseOpts,
-        tsconfig: require.resolve("@obzt/db-worker/tsconfig"),
+        tsconfig: path.startsWith("@/worker")
+          ? resolve("src/worker/tsconfig.json")
+          : require.resolve(`${path}/tsconfig`),
         sourcemap: !isProd ? "inline" : false,
       }),
-      filter: {
-        pattern: /^worker:@obzt\/db-worker$/,
-        // remove `worker:` prefix
-        transform: (path) => path.substring(7),
-      },
       cachedir: "dist",
       watch: !isProd,
     }),

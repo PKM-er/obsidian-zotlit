@@ -1,7 +1,6 @@
 import { enumerate, getItemKeyGroupID, toPage } from "@obzt/common";
 import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
 import { getBacklink, getCacheImagePath } from "@obzt/database";
-import endent from "endent";
 import { htmlToMarkdown } from "obsidian";
 
 import { fileLink, imgLink, isImageAnnot, toFileUrl } from "../utils.js";
@@ -85,10 +84,11 @@ export const withAnnotHelper = (
       },
       get textBlock(): string {
         if (!data.text) return "";
-        return endent`
-        \`\`\`zotero-annot
-        > ${data.text} [zotero](${getBacklink(data)})
-        \`\`\``;
+        return (
+          "```zotero-annot\n" +
+          `> ${data.text} [zotero](${getBacklink(data)})\n` +
+          "```"
+        );
       },
       get colorName() {
         switch (data.color?.toUpperCase()) {

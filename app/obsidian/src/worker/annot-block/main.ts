@@ -2,8 +2,8 @@
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
 import type { AnnotBlockWorkerAPI } from "./api";
-import parse from "./modules/parse.js";
-import stringify from "./modules/stringify.js";
+import parse from "./parse.js";
+import stringify from "./stringify.js";
 
 const methods: AnnotBlockWorkerAPI = {
   parse,

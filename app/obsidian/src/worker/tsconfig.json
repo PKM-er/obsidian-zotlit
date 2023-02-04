@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "src",
+    "outDir": "dist",
+    "target": "ES2022",
+    "lib": ["ES2022", "WebWorker"],
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "noEmit": false,
+    "paths": {}
+  },
+  "include": ["**/*.ts"],
+  "exclude": []
+}
