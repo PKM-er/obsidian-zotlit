@@ -94,15 +94,17 @@ const opts = {
     obPlugin({ beta: isPreRelease }),
     preactCompatPlugin,
     inlineWorkerPlugin({
-      ...baseOpts,
+      buildOptions: () => ({
+        ...baseOpts,
+        tsconfig: require.resolve("@obzt/db-worker/tsconfig"),
+        sourcemap: !isProd ? "inline" : false,
+      }),
       filter: {
         pattern: /^worker:@obzt\/db-worker$/,
         // remove `worker:` prefix
         transform: (path) => path.substring(7),
       },
-      tsconfig: require.resolve("@obzt/db-worker/tsconfig"),
       cachedir: "dist",
-      sourcemap: !isProd ? "inline" : false,
       watch: !isProd,
     }),
     PostcssPlugin({}),

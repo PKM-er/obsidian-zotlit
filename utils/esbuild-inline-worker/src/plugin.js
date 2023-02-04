@@ -14,14 +14,9 @@ const toUniqueFilename = async (/** @type {string} */ path) => {
   return `${base.join(".")}_${await nanoid(5)}.${ext}`;
 };
 
-import { createRequire } from "module";
-import { cwd } from "process";
-
-const require = createRequire(cwd());
-
 /**
  *
- * @param {import("esbuild").BuildOptions & { watch: boolean; cachedir?: string; codeLoader?: "dataurl" | "text"; filter?: {pattern:RegExp; transform?:(path:string, pattern:RegExp)=>string} }} param0
+ * @param {{ watch: boolean; cachedir?: string; codeLoader?: "dataurl" | "text"; filter?: { pattern: RegExp; transform?: (path: string, pattern: RegExp) => string; }; buildOptions: (ctx: {path: string, resolveDir: string; entryPoint: string;}) => import("esbuild").BuildOptions; }} param0
  * @returns {import("esbuild").Plugin}
  */
 export const inlineWorkerPlugin = ({
@@ -32,22 +27,39 @@ export const inlineWorkerPlugin = ({
     pattern: /^worker:/,
     transform: (path, pattern) => path.replace(pattern, ""),
   },
-  ...extraConfig
+  buildOptions,
 }) => ({
   name: "esbuild-plugin-inline-worker",
   setup: async (build) => {
     if (!watch) {
-      build.onResolve({ filter: filter.pattern }, ({ path, resolveDir }) => {
-        if (filter.transform) {
-          path = filter.transform(path, filter.pattern);
+      build.onResolve(
+        { filter: filter.pattern },
+        async ({ path, resolveDir, ...rest }) => {
+          if (filter.transform) {
+            path = filter.transform(path, filter.pattern);
+          }
+          const { path: entryPoint } = await build.resolve(path, {
+            resolveDir,
+            ...rest,
+          });
+          return {
+            path: entryPoint,
+            namespace,
+            pluginData: { path, resolveDir },
+          };
         }
-        const entryPoint = require.resolve(path, { paths: [resolveDir] });
-        return { path: entryPoint, namespace };
-      });
+      );
       build.onLoad(
         { filter: /.*/, namespace },
-        async ({ path: workerPath }) => {
-          const code = await buildWorker(workerPath, extraConfig);
+        async ({ path: workerPath, pluginData }) => {
+          const code = await buildWorker(
+            workerPath,
+            buildOptions({
+              path: pluginData.path,
+              entryPoint: workerPath,
+              resolveDir: pluginData.resolveDir,
+            })
+          );
           return { contents: code, loader: codeLoader };
         }
       );
@@ -66,11 +78,14 @@ export const inlineWorkerPlugin = ({
       const cacheDir = await mkdtemp(join(cacheDirRoot, "epiw-"));
       build.onResolve(
         { filter: filter.pattern },
-        async ({ path, resolveDir }) => {
+        async ({ path, resolveDir, ...rest }) => {
           if (filter.transform) {
             path = filter.transform(path, filter.pattern);
           }
-          const entryPoint = require.resolve(path, { paths: [resolveDir] });
+          const { path: entryPoint } = await build.resolve(path, {
+            resolveDir,
+            ...rest,
+          });
           const id =
             workerEntryPoints[entryPoint] ??
             (workerEntryPoints[entryPoint] = await toUniqueFilename(
@@ -85,8 +100,8 @@ export const inlineWorkerPlugin = ({
             return output;
           }
           const builder = await prepareWorkerBuilder(entryPoint, {
+            ...buildOptions({ path, resolveDir, entryPoint }),
             outfile,
-            ...extraConfig,
           });
           workerBuilders[id] = builder;
           await builder.rebuild();
