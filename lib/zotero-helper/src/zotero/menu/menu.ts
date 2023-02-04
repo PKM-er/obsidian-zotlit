@@ -23,7 +23,7 @@ interface PopupEl {
   removeSelf?: boolean;
 }
 const isSelector = (popup: PopupSelector | PopupEl): popup is PopupSelector =>
-  (popup as PopupSelector).selector !== undefined;
+  typeof (popup as PopupSelector).selector === "string";
 
 /**
  * @public
@@ -69,10 +69,17 @@ export class Menu extends Component {
   }
 
   private insert(el: Element, insertBefore: boolean, anchor?: Element) {
-    (anchor || this.dom).insertAdjacentElement(
-      insertBefore ? "beforebegin" : "afterend",
-      el,
-    );
+    if (anchor) {
+      anchor.insertAdjacentElement(
+        insertBefore ? "beforebegin" : "afterend",
+        el,
+      );
+    } else {
+      this.dom.insertAdjacentElement(
+        insertBefore ? "afterbegin" : "beforeend",
+        el,
+      );
+    }
   }
 
   parentMenu?: Menu;
