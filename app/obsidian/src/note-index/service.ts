@@ -57,11 +57,12 @@ export default class NoteIndex extends Service {
     byFile: new Map<string, readonly BlockInfo[]>(),
     byKey: new Map<string, Set<BlockInfo>>(),
   };
+  citekeyCache: Map<string, Set<string>> = new Map();
 
   /**
    * @returns — true if cache has been updated
    */
-  #setFileCache(file: string, cache: CachedMetadata | null): boolean {
+  #setNoteCache(file: string, cache: CachedMetadata | null): boolean {
     const itemKey = getItemKeyFromFrontmatter(cache);
 
     if (itemKey) {
@@ -145,6 +146,33 @@ export default class NoteIndex extends Service {
     return true;
   }
 
+  /**
+   * @returns — true if cache has been updated
+   */
+  #setCitekeyCache(file: string, cache: CachedMetadata | null): boolean {
+    const citekey = cache?.frontmatter?.citekey;
+
+    if (citekey) {
+      if (!this.citekeyCache.has(citekey)) {
+        this.citekeyCache.set(citekey, new Set([file]));
+        return true;
+      }
+      const files = this.citekeyCache.get(citekey)!;
+      const prevSize = files.size;
+      return files.add(file).size !== prevSize;
+    }
+
+    let updated = false;
+    for (const [key, files] of this.citekeyCache.entries()) {
+      const deleted = files.delete(file);
+      updated ||= deleted;
+      if (deleted && files.size === 0) {
+        this.citekeyCache.delete(key);
+      }
+    }
+    return updated;
+  }
+
   getNotesFor(item: ItemKeyGroup): string[] {
     const files = this.noteCache.get(getItemKeyGroupID(item, true));
     if (!files) return [];
@@ -180,9 +208,12 @@ export default class NoteIndex extends Service {
       cache = this.meta.getCache(file);
     }
 
-    const fileUpdated = this.#setFileCache(file, cache),
-      blockUpdated = this.#setBlockCache(file, cache);
-    if (fileUpdated || blockUpdated) {
+    const results = [
+      this.#setNoteCache(file, cache),
+      this.#setBlockCache(file, cache),
+      this.#setCitekeyCache(file, cache),
+    ];
+    if (results.some((updated) => updated)) {
       this.meta.trigger("zotero:index-update", file);
     }
   }
