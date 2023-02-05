@@ -34,6 +34,11 @@ interface WaitUntilOptions {
   debounce?: number | null;
 }
 
+export const untilWorkspaceReady = (app: App) =>
+  new Promise<void>((resolve) => {
+    app.workspace.onLayoutReady(resolve);
+  });
+
 export const waitUntil = ({
   register,
   unregister,

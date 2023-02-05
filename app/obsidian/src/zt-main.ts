@@ -14,6 +14,7 @@ import registerNoteFeature from "./note-feature";
 import { NoteFields } from "./note-feature/note-fields/service";
 import { createNoteForDocItem, openNote } from "./note-feature/open-create";
 import { AnnotBlock } from "./services/annot-block/service";
+import { CitekeyClick } from "./services/citekey-click/service";
 import NoteIndex from "./services/note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
@@ -47,7 +48,6 @@ export default class ZoteroPlugin extends Plugin {
     if (!checkLib(manifest)) {
       throw new Error("Library check failed");
     }
-    // this.annotBlockWorker = new AnnotBlockWorker(this);
     // this.noteParser = new NoteParser(this);
     // this.pdfCache = new PDFCache(this);
   }
@@ -58,6 +58,7 @@ export default class ZoteroPlugin extends Plugin {
   noteFields = this.use(NoteFields);
   server = this.use(Server);
   topicImport = this.use(TopicImport);
+  citekeyClick = this.use(CitekeyClick);
 
   get databaseAPI() {
     return this.dbWorker.api;

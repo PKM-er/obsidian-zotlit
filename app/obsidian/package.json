@@ -56,7 +56,8 @@
     "semver": "~7.3.8",
     "@obzt/esbuild-plugin-inline-worker": "workspace:*",
     "@types/mdast": "~3.0.10",
-    "@types/turndown": "~5.0.1"
+    "@types/turndown": "~5.0.1",
+    "@codemirror/language": "https://github.com/lishid/cm-language/tarball/master"
   },
   "config": {
     "commitizen": {
