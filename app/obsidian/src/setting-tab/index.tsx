@@ -19,9 +19,9 @@ import { DatabaseSetting } from "./database-path.js";
 import { addTextComfirm, addTextField, addToggle, getPipeFunc } from "./utils";
 import log from "@/log";
 import { InVaultPath } from "@/settings/invault-path";
-import { ejectableTemplateTypes } from "@/template";
-import type { TemplateType } from "@/template/settings";
-import { nonEjectableTemplateTypes } from "@/template/settings";
+import { ejectableTemplateTypes } from "@/services/template";
+import type { TemplateType } from "@/services/template/settings";
+import { nonEjectableTemplateTypes } from "@/services/template/settings";
 import { promptOpenLog } from "@/utils/index.js";
 import type ZoteroPlugin from "@/zt-main.js";
 

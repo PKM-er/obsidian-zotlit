@@ -5,29 +5,33 @@ import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Notice, Plugin } from "obsidian";
 
-import { AnnotBlock } from "./annot-block/service";
 import {
   CitationEditorSuggest,
   insertCitation,
-} from "./insert-citation/index.js";
+} from "./components/citation-suggest/index.js";
 import checkLib from "./install-guide/index.jsx";
 import registerNoteFeature from "./note-feature";
 import { NoteFields } from "./note-feature/note-fields/service";
 import { createNoteForDocItem, openNote } from "./note-feature/open-create";
-import NoteIndex from "./note-index/service.js";
+import { AnnotBlock } from "./services/annot-block/service";
+import NoteIndex from "./services/note-index/service.js";
 // import NoteParser from "./note-parser";
 // import PDFCache from "./pdf-outline";
-import { Server } from "./server/service";
+import { Server } from "./services/server/service";
+import {
+  TemplateComplier,
+  TemplateLoader,
+  TemplateRenderer,
+} from "./services/template";
+import registerEtaEditorHelper from "./services/template/editor";
+import DatabaseWatcher from "./services/zotero-db/auto-refresh/service";
+import DatabaseWorker from "./services/zotero-db/connector/service";
+import { ZoteroDatabase } from "./services/zotero-db/database";
+import { ImgCacheImporter } from "./services/zotero-db/img-import/service";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import { SettingLoader } from "./settings/service.js";
-import { TemplateComplier, TemplateLoader, TemplateRenderer } from "./template";
-import registerEtaEditorHelper from "./template/editor";
 import { TopicImport } from "./topic";
 import { untilDbRefreshed } from "./utils/once";
-import DatabaseWatcher from "./zotero-db/auto-refresh/service";
-import DatabaseWorker from "./zotero-db/connector/service";
-import { ZoteroDatabase } from "./zotero-db/database";
-import { ImgCacheImporter } from "./zotero-db/img-import/service";
 import log from "@/log";
 
 declare global {

@@ -7,13 +7,13 @@ import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 import workerCode from "worker:@/worker/annot-block/main";
 
 import log, { logError } from "@/log";
+import type { ZoteroDatabase } from "@/services/zotero-db/database";
 import { createWorkerProxy } from "@/utils/worker";
 import type {
   AnnotBlockWorkerAPI,
   AnnotDetails,
   AnnotInfo,
 } from "@/worker/annot-block";
-import type { ZoteroDatabase } from "@/zotero-db/database";
 import ZoteroPlugin from "@/zt-main";
 
 export class AnnotBlock extends Service {

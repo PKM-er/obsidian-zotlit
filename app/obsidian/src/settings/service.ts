@@ -6,13 +6,13 @@ import { Service } from "@ophidian/core";
 import Settings from "./base";
 import log, { LogSettings } from "@/log";
 import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
-import { NoteIndexSettings } from "@/note-index/settings.js";
-import { ServerSettings } from "@/server/settings.js";
-import { SuggesterSettings } from "@/suggester/settings.js";
-import { TemplateSettings } from "@/template/settings.js";
-import { WatcherSettings } from "@/zotero-db/auto-refresh/settings.js";
-import { DatabaseSettings } from "@/zotero-db/connector/settings.js";
-import { ImgImporterSettings } from "@/zotero-db/img-import/settings.js";
+import { NoteIndexSettings } from "@/services/note-index/settings.js";
+import { ServerSettings } from "@/services/server/settings.js";
+import { SuggesterSettings } from "@/components/suggester/settings.js";
+import { TemplateSettings } from "@/services/template/settings.js";
+import { WatcherSettings } from "@/services/zotero-db/auto-refresh/settings.js";
+import { DatabaseSettings } from "@/services/zotero-db/connector/settings.js";
+import { ImgImporterSettings } from "@/services/zotero-db/img-import/settings.js";
 import ZoteroPlugin from "@/zt-main.js";
 
 export interface ZoteroSettings {

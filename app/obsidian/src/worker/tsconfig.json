@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": "src",
-    "outDir": "dist",
+    "outDir": "../../dist/worker",
     "target": "ES2022",
     "lib": ["ES2022", "WebWorker"],
     "declaration": true,

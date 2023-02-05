@@ -14,10 +14,10 @@ import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
 import { context } from "@/components/context";
-import { getItemKeyOf } from "@/note-index";
+import { getItemKeyOf } from "@/services/note-index";
+import { DatabaseStatus } from "@/services/zotero-db/connector/service";
 import { isMarkdownFile } from "@/utils";
 import { waitUntil } from "@/utils/once";
-import { DatabaseStatus } from "@/zotero-db/connector/service";
 import type ZoteroPlugin from "@/zt-main";
 
 import "./style.less";

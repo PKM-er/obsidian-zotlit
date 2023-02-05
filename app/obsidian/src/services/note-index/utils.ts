@@ -6,7 +6,7 @@ import {
 } from "@obzt/common";
 import { TFile } from "obsidian";
 import type { CachedMetadata, SectionCache, TAbstractFile } from "obsidian";
-import { ZOTERO_KEY_FIELDNAME } from "@/template";
+import { ZOTERO_KEY_FIELDNAME } from "@/services/template";
 import { getFilePath } from "@/utils";
 
 export const getItemKeyFromFrontmatter = (

@@ -4,9 +4,9 @@ import type { RegularItemInfoBase } from "@obzt/database";
 import { BaseError } from "make-error";
 
 import { Notice } from "obsidian";
-import { getItemKeyOf } from "@/note-index";
-import type { TemplateRenderer } from "@/template";
-import type { Context } from "@/template/helper/base.js";
+import { getItemKeyOf } from "@/services/note-index";
+import type { TemplateRenderer } from "@/services/template";
+import type { Context } from "@/services/template/helper/base.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
 export class NoteExistsError extends BaseError {

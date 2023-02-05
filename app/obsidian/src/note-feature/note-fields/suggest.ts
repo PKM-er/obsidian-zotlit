@@ -11,7 +11,7 @@ import type {
 import { prepareFuzzySearch, EditorSuggest } from "obsidian";
 import { NoteFieldsSettings } from "./settings";
 import log from "@/log";
-import { isLiteratureNote } from "@/note-index";
+import { isLiteratureNote } from "@/services/note-index";
 import ZoteroPlugin from "@/zt-main";
 // >:noteFields
 const pattern = /^\s*>\s*:(\w*)$/;
