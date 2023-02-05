@@ -159,7 +159,7 @@ export class AnnotationView extends DerivedFileView {
       <ObsidianContext.Provider value={context}>
         <AnnotsViewContext.Provider value={this.getContext()}>
           <AnnotsView />
-        </AnnotsViewContext.Provider>{" "}
+        </AnnotsViewContext.Provider>
       </ObsidianContext.Provider>,
       this.contentEl,
     );

@@ -1,5 +1,6 @@
 import type { Statement } from "@aidenlx/better-sqlite3";
 import { checkItemID, PreparedWithParser } from "../../utils/index.js";
+import { sortBySortIndex } from "../../utils/misc.js";
 import type { Parsed, OutputBase, WithParentItem } from "./base.js";
 import { toParsed, from, select } from "./base.js";
 
@@ -49,8 +50,8 @@ export class AnnotByParent extends PreparedWithParser<
     if (parentItemKey === undefined) {
       throw new Error("Parent item not found");
     }
-    return this.runAll(input).map((output) =>
-      this.parse(output, input, parentItemKey),
-    );
+    return this.runAll(input)
+      .map((output) => this.parse(output, input, parentItemKey))
+      .sort((a, b) => sortBySortIndex(a.sortIndex, b.sortIndex));
   }
 }
