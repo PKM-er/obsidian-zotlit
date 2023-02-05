@@ -1,107 +1,201 @@
-import type { ItemKeyGroup, KeyFileInfo } from "@obzt/common";
+import { pipe } from "@mobily/ts-belt";
+
+import { groupBy } from "@mobily/ts-belt/Array";
+import { mapWithKey, values } from "@mobily/ts-belt/Dict";
+import type { ItemKeyGroup } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
 import { Service } from "@ophidian/core";
-import { assertNever } from "assert-never";
-import type {
-  BlockCache,
-  CachedMetadata,
-  MetadataCache,
-  TAbstractFile,
-  Vault,
-} from "obsidian";
-import { TFile, TFolder } from "obsidian";
+import type { CachedMetadata, Pos, TAbstractFile, TFile } from "obsidian";
+import { NoteIndexSettings } from "./settings";
+import {
+  getItemKeyFromFrontmatter,
+  isAnnotCodeblock,
+  splitMultipleAnnotKey,
+} from "./utils";
 
-import { untilMetaReady } from "@/utils/once.js";
-import ZoteroPlugin from "@/zt-main.js";
-import { NoteIndexSettings } from "./settings.js";
-import getZoteroKeyFileMap, { getItemKeyOf } from "./ztkey-file-map.js";
 import log from "@/log";
-
-export { getItemKeyGroupID };
+import { isMarkdownFile } from "@/utils";
+import { untilMetaReady } from "@/utils/once";
+import ZoteroPlugin from "@/zt-main";
 
 declare module "obsidian" {
   interface MetadataCache {
     on(
       name: "zotero:index-update",
-      callback: (
-        key: string,
-        prev: KeyFileInfo | null,
-        curr: KeyFileInfo | null,
-      ) => any,
+      callback: (file: string) => any,
       ctx?: any,
     ): EventRef;
     on(name: "zotero:index-clear", callback: () => any, ctx?: any): EventRef;
-    trigger(
-      name: "zotero:index-update",
-      key: string,
-      prev: KeyFileInfo | undefined,
-      curr: KeyFileInfo | undefined,
-    ): void;
+    trigger(name: "zotero:index-update", file: string): void;
     trigger(name: "zotero:index-clear"): void;
   }
 }
+
+interface BlockInfo {
+  blocks: Pos[];
+  file: string;
+  key: string;
+}
+
 export default class NoteIndex extends Service {
-  get meta(): MetadataCache {
-    return app.metadataCache;
+  plugin = this.use(ZoteroPlugin);
+  settings = this.use(NoteIndexSettings);
+
+  get meta() {
+    return this.plugin.app.metadataCache;
   }
-  get vault(): Vault {
-    return app.vault;
+  get vault() {
+    return this.plugin.app.vault;
   }
   get template() {
     return this.plugin.settings.template;
   }
-  settings = this.use(NoteIndexSettings);
 
-  keyFileMap: Map<string, KeyFileInfo> = new Map();
-  #set(key: string, value: KeyFileInfo) {
-    const prev = this.keyFileMap.get(key);
-    this.keyFileMap.set(key, value);
-    app.metadataCache.trigger("zotero:index-update", key, prev, value);
+  /** key -> file[] */
+  noteCache: Map<string, Set<string>> = new Map();
+  blockCache = {
+    byFile: new Map<string, readonly BlockInfo[]>(),
+    byKey: new Map<string, Set<BlockInfo>>(),
+  };
+
+  /**
+   * @returns — true if cache has been updated
+   */
+  #setFileCache(file: string, cache: CachedMetadata | null): boolean {
+    const itemKey = getItemKeyFromFrontmatter(cache);
+
+    if (itemKey) {
+      if (!this.noteCache.has(itemKey)) {
+        this.noteCache.set(itemKey, new Set([file]));
+        return true;
+      }
+      const files = this.noteCache.get(itemKey)!;
+      const prevSize = files.size;
+      return files.add(file).size !== prevSize;
+    }
+
+    let updated = false;
+    for (const [key, files] of this.noteCache.entries()) {
+      const deleted = files.delete(file);
+      updated ||= deleted;
+      if (deleted && files.size === 0) {
+        this.noteCache.delete(key);
+      }
+    }
+    return updated;
   }
 
   /**
-   * @returns true if an element in the Map existed and has been removed, or false if the element does not exist.
+   * @returns — true if cache has been updated
    */
-  #delete(key: string) {
-    const prev = this.keyFileMap.get(key);
-    const result = this.keyFileMap.delete(key);
-    app.metadataCache.trigger("zotero:index-update", key, prev, undefined);
-    return result;
+  #setBlockCache(file: string, cache: CachedMetadata | null): boolean {
+    const removeFile = (file: string): boolean => {
+      const blocks = this.blockCache.byFile.get(file);
+      if (!blocks) return false;
+      this.blockCache.byFile.delete(file);
+      for (const block of blocks) {
+        const blocks = this.blockCache.byKey.get(block.key)!;
+        blocks.delete(block);
+        if (blocks.size === 0) {
+          this.blockCache.byKey.delete(block.key);
+        }
+      }
+      return true;
+    };
+    if (!cache) {
+      return removeFile(file);
+    }
+
+    const { blocks, sections } = cache;
+    if (!sections || !blocks) {
+      return removeFile(file);
+    }
+
+    const annotCodeblocks = sections.filter(isAnnotCodeblock);
+    if (annotCodeblocks.length === 0) {
+      return removeFile(file);
+    }
+
+    removeFile(file);
+
+    const blockInfo = pipe(
+      annotCodeblocks.flatMap((s) =>
+        splitMultipleAnnotKey(s.id!).map((key) => [key, s.position] as const),
+      ),
+      groupBy(([key]) => key),
+      mapWithKey(
+        (key, pos): BlockInfo => ({
+          file,
+          key: key as string,
+          blocks: pos.map(([_, pos]) => pos),
+        }),
+      ),
+      values,
+    );
+
+    this.blockCache.byFile.set(file, blockInfo);
+    for (const info of blockInfo) {
+      const blocks = this.blockCache.byKey.get(info.key);
+      if (!blocks) {
+        this.blockCache.byKey.set(info.key, new Set([info]));
+      } else {
+        blocks.add(info);
+      }
+    }
+    return true;
+  }
+
+  getNotesFor(item: ItemKeyGroup): string[] {
+    const files = this.noteCache.get(getItemKeyGroupID(item, true));
+    if (!files) return [];
+    return [...files];
+  }
+  getBlocksFor({
+    file,
+    item,
+  }: Partial<{ item: ItemKeyGroup; file: string }>): BlockInfo[] {
+    if (!file && !item) {
+      throw new Error("no file or item provided");
+    }
+    const withKey = item
+        ? this.blockCache.byKey.get(getItemKeyGroupID(item, true))
+        : null,
+      withinFile = file ? this.blockCache.byFile.get(file) : null;
+
+    if (withinFile && withKey) {
+      return withinFile.filter((info) => withKey.has(info));
+    }
+    if (withinFile) return [...withinFile];
+    if (withKey) return [...withKey];
+    return [];
+  }
+  getBlocksIn(file: string): BlockInfo[] | null {
+    const info = this.blockCache.byFile.get(file);
+    if (!info) return null;
+    return [...info];
+  }
+
+  #setFile(file: string, cache?: CachedMetadata | null) {
+    if (cache === undefined) {
+      cache = this.meta.getCache(file);
+    }
+
+    const fileUpdated = this.#setFileCache(file, cache),
+      blockUpdated = this.#setBlockCache(file, cache);
+    if (fileUpdated || blockUpdated) {
+      this.meta.trigger("zotero:index-update", file);
+    }
+  }
+  #removeFile(file: string) {
+    this.#setFile(file, null);
   }
   #clear() {
-    this.keyFileMap.clear();
-    app.metadataCache.trigger("zotero:index-clear");
-  }
-  deleteFromIndex(k: string, use: "itemKey" | "file"): boolean {
-    if (use === "itemKey") {
-      return this.#delete(k);
-    } else if (use === "file") {
-      let match = false;
-      for (const [key, { file }] of this.keyFileMap) {
-        if (file !== k) continue;
-        this.#delete(key);
-        match = true;
-      }
-      return match;
-    } else assertNever(use);
+    this.noteCache.clear();
+    this.blockCache.byFile.clear();
+    this.blockCache.byKey.clear();
+    this.meta.trigger("zotero:index-clear");
   }
 
-  getNoteFromItem(item: ItemKeyGroup): KeyFileInfo | undefined {
-    log.debug("getNoteFromKey: ", item, getItemKeyGroupID(item, true));
-    return this.keyFileMap.get(getItemKeyGroupID(item, true));
-  }
-  getBlockInfoFromItem(item: ItemKeyGroup): BlockCache | null {
-    const note = this.getNoteFromItem(item);
-    if (!note || !note.blockId) return null;
-    const cache = this.meta.getCache(note.file);
-    if (!cache) return null;
-    const block = cache?.blocks?.[note.blockId.toLowerCase()];
-    return block || null;
-  }
-
-  // buildFilemapWorker: PromiseWorker<Input, Output>;
-
-  plugin = this.use(ZoteroPlugin);
   onload(): void {
     // plugin.register(() => this.buildFilemapWorker.terminate());
     [
@@ -116,107 +210,24 @@ export default class NoteIndex extends Service {
     }).then(() => this.onMetaBuilt());
   }
 
-  getItemKeyOf(file: TAbstractFile | string): string | null {
-    const path = getFilePath(file),
-      itemKey = getItemKeyOf(path);
-    if (!(itemKey && this.keyFileMap.has(itemKey))) return null;
-    return itemKey;
-  }
-
-  isLiteratureNote(file: string): boolean;
-  isLiteratureNote(file: TAbstractFile): file is TFile;
-  isLiteratureNote(file: TAbstractFile | string): boolean {
-    const path = getFilePath(file),
-      itemKey = getItemKeyOf(path);
-    if (!itemKey) return false;
-    return this.keyFileMap.has(itemKey);
-  }
-
-  /** check if file belongs to literature note folder */
-  #isLiteratureNote(file: string): boolean;
-  #isLiteratureNote(file: TAbstractFile): file is TFile;
-  #isLiteratureNote(file: TAbstractFile | string): boolean {
-    if (typeof file === "string") {
-      return file.endsWith(".md") && file.startsWith(this.settings.joinPath);
-    } else
-      return (
-        file instanceof TFile &&
-        file.extension === "md" &&
-        file.path.startsWith(this.settings.joinPath)
-      );
-  }
-
   onMetaBuilt() {
-    const folder = this.vault.getAbstractFileByPath(
-      this.settings.literatureNoteFolder,
-    );
-    if (folder && folder instanceof TFolder)
-      for (const file of getAllMarkdownIn(folder)) {
-        this.addFileRecord(file);
-      }
+    for (const file of this.vault.getMarkdownFiles()) {
+      this.#setFile(file.path);
+    }
   }
   onMetaChanged(file: TFile, _data: string, cache: CachedMetadata) {
-    if (!this.#isLiteratureNote(file)) {
-      if (!this.getItemKeyOf(file)) return;
-      this.removeFileRecord(file);
-    } else {
-      this.updateFileRecord(file, cache);
-    }
+    this.#setFile(file.path, cache);
   }
 
   onFileRemoved(file: TAbstractFile) {
-    if (!this.#isLiteratureNote(file)) return;
-    this.removeFileRecord(file);
+    if (!isMarkdownFile(file)) return;
+    this.#removeFile(file.path);
   }
   onFileRenamed(file: TAbstractFile, oldPath: string) {
-    const isCurrNote = this.#isLiteratureNote(file);
-    // file renamed
-    const isOldNote = this.#isLiteratureNote(oldPath);
-    if (!isCurrNote && !isOldNote) {
-      return; // not inside note folder
-    } else if (isCurrNote && isOldNote) {
-      this.renameFileRecord(file, oldPath);
-    } else if (isCurrNote) {
-      this.addFileRecord(file);
-    } else {
-      this.removeFileRecord(oldPath);
+    this.#removeFile(oldPath);
+    if (isMarkdownFile(file)) {
+      this.#setFile(file.path);
     }
-  }
-
-  addFileRecord(file: TFile | string): void {
-    const path = getFilePath(file),
-      cache = this.meta.getCache(path);
-    if (cache) this.updateFileRecord(path, cache);
-  }
-  removeFileRecord(file: TFile | string): void {
-    const path = getFilePath(file);
-    this.deleteFromIndex(path, "file");
-    log.debug("Note Index: Remove File Record", path, this.keyFileMap.size);
-  }
-  renameFileRecord(file: TFile | string, oldPath: string): void {
-    const path = getFilePath(file);
-    const info = [...this.keyFileMap.values()].find(
-      ({ file }) => file === oldPath,
-    );
-    if (info) {
-      info.file = path;
-    }
-    log.debug("Note Index: Rename File Record", path, this.keyFileMap.size);
-  }
-  updateFileRecord(file: TFile | string, cache: CachedMetadata): void {
-    const path = getFilePath(file);
-    const stillExist: Set<string> = new Set();
-    for (const info of getZoteroKeyFileMap(path, cache)) {
-      this.#set(info.key, info);
-      stillExist.add(info.key);
-    }
-    // remove old records that no longer exist
-    for (const [key, { file }] of this.keyFileMap) {
-      if (file === path && !stillExist.has(key)) {
-        this.#delete(key);
-      }
-    }
-    log.debug("Note Index: Update File Record", path, this.keyFileMap.size);
   }
 
   reload(): void {
@@ -224,19 +235,4 @@ export default class NoteIndex extends Service {
     this.onMetaBuilt();
     log.info("Note Index: Reloaded");
   }
-
-  // trigger(name: string, ...data: any[]): void {}
 }
-
-function* getAllMarkdownIn(folder: TFolder): IterableIterator<TFile> {
-  for (const af of folder.children) {
-    if (af instanceof TFolder) {
-      yield* getAllMarkdownIn(af);
-    } else if (af instanceof TFile && af.extension === "md") {
-      yield af;
-    }
-  }
-}
-
-const getFilePath = (file: TAbstractFile | string): string =>
-  typeof file === "string" ? file : file.path;

@@ -4,15 +4,14 @@ import type { RegularItemInfoBase } from "@obzt/database";
 import { BaseError } from "make-error";
 
 import { Notice } from "obsidian";
-import { getItemKeyGroupID } from "@/note-index/service.js";
+import { getItemKeyOf } from "@/note-index";
 import type { TemplateRenderer } from "@/template";
-import { ZOTERO_KEY_FIELDNAME } from "@/template";
 import type { Context } from "@/template/helper/base.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
 export class NoteExistsError extends BaseError {
-  constructor(public target: string, public key: string) {
-    super(`Note linked to ${key} already exists: ${target}`);
+  constructor(public targets: string[], public key: string) {
+    super(`Note linked to ${key} already exists: ${targets.join(",")}`);
     this.name = "NoteExistsError";
   }
 }
@@ -22,32 +21,28 @@ export async function createNoteForDocItem(
   docItem: RegularItemInfoBase,
   render: (template: TemplateRenderer, ctx: Context) => string,
 ) {
-  const info = this.noteIndex.getNoteFromItem(docItem);
-  if (info) {
+  const info = this.noteIndex.getNotesFor(docItem);
+  if (info.length) {
     // only throw error if the note is linked to the same zotero item
-    throw new NoteExistsError(info.file, docItem.key);
+    throw new NoteExistsError(info, docItem.key);
   }
 
-  const { vault, fileManager, metadataCache: meta } = this.app,
+  const { vault, fileManager } = this.app,
     { literatureNoteFolder: folder } = this.settings.noteIndex,
     template = this.templateRenderer;
+
   const filepath = join(folder, template.renderFilename(docItem));
   const existingFile = vault.getAbstractFileByPath(filepath);
   if (existingFile) {
-    const metadata = meta.getCache(existingFile.path);
-    if (
-      metadata?.frontmatter &&
-      metadata.frontmatter[ZOTERO_KEY_FIELDNAME] ===
-        getItemKeyGroupID(docItem, true)
-    ) {
+    if (getItemKeyOf(existingFile)) {
       // only throw error if the note is linked to the same zotero item
-      throw new NoteExistsError(filepath, docItem.key);
+      throw new NoteExistsError([filepath], docItem.key);
     }
   }
 
   // filepath with suffix if file already exists
   const note = await fileManager.createNewMarkdownFile(
-    app.vault.getRoot(),
+    vault.getRoot(),
     filepath,
     render(template, {
       plugin: this,
@@ -64,8 +59,8 @@ export async function openNote(
 ): Promise<boolean> {
   const { workspace } = this.app;
 
-  const info = this.noteIndex.getNoteFromItem(item);
-  if (!info) {
+  const info = this.noteIndex.getNotesFor(item);
+  if (!info.length) {
     !slience &&
       new Notice(
         `No literature note found for zotero item with key ${item.key}`,
@@ -73,11 +68,8 @@ export async function openNote(
     return false;
   }
 
-  let linktext = info.file;
-  if (info.blockId) {
-    linktext += "#^" + info.blockId;
-  }
-
-  await workspace.openLinkText(linktext, "", false);
+  // TODO: support multiple notes
+  const firstNote = info.sort().shift()!;
+  await workspace.openLinkText(firstNote, "", false);
   return true;
 }

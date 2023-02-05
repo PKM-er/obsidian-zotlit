@@ -1,15 +1,2 @@
-
-## Page <%= it.pageLabel %> ^<%= it.blockID %>
-\n
-[Zotero](<%= it.backlink %>) <%= it.fileLink %>
-\n
-<%= it.textBlock %>
-<%= it.imgEmbed %>
-\n
-<% if (it.comment) { %>
-comment: <%= it.commentMd %>
-<% } %>
-\n
-<% if (it.tags.length > 0) { %>
-tags: <%= it.tags.map((tag) => tag.name).join(", ") %>
-<% } %>
+<%= it.textBlock %><%= it.imgEmbed %>\n
+^<%= it.blockID %>

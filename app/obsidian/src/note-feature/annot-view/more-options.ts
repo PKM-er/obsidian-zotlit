@@ -26,11 +26,22 @@ export const getMoreOptionsHandler =
   };
 const jumpToAnnotNote =
   (annot: AnnotationInfo, view: AnnotationView) => async () => {
-    const block = view.plugin.noteIndex.getBlockInfoFromItem(annot);
-    if (!block) {
-      new Notice("No note for this annotation");
+    const blockInfo = view.plugin.noteIndex
+      .getBlocksFor({ item: annot, file: view.file.path })
+      .shift();
+
+    if (!blockInfo) {
+      new Notice("No embed for this annotation in current note");
       return;
     }
+
+    // TODO: handle multiple blocks
+    const block = blockInfo.blocks.sort((a, b) => {
+      const start = a.start.offset - b.start.offset;
+      if (start !== 0) return start;
+      return a.end.offset - b.end.offset;
+    })[0];
+
     await sleep(10);
     const { leaf } = view,
       { workspace } = app;
@@ -43,7 +54,7 @@ const jumpToAnnotNote =
       activeFileView && groupLeaves.push(activeFileView.leaf);
     }
     let hasMarkdownView = false;
-    const startLine = block.position.start.line;
+    const endLine = block.end.line + 1;
     for (const leaf of groupLeaves) {
       if (
         leaf &&
@@ -51,7 +62,7 @@ const jumpToAnnotNote =
         leaf.view.file === view.file
       ) {
         leaf.view.setEphemeralState({
-          line: startLine,
+          line: endLine,
         });
         hasMarkdownView = !0;
       }
@@ -59,7 +70,7 @@ const jumpToAnnotNote =
     if (!hasMarkdownView) {
       workspace.getLeaf().openFile(view.file, {
         eState: {
-          line: startLine,
+          line: endLine,
         },
       });
     }

@@ -9,10 +9,10 @@ import type {
   TFile,
 } from "obsidian";
 import { prepareFuzzySearch, EditorSuggest } from "obsidian";
-import NoteIndex from "@/note-index/service";
-import ZoteroPlugin from "@/zt-main";
 import { NoteFieldsSettings } from "./settings";
 import log from "@/log";
+import { isLiteratureNote } from "@/note-index";
+import ZoteroPlugin from "@/zt-main";
 // >:noteFields
 const pattern = /^\s*>\s*:(\w*)$/;
 
@@ -33,7 +33,7 @@ export class NoteFieldsSuggest extends EditorSuggest<Result> {
       !this.settings.noteFieldsSuggester ||
       !this.settings.noteFields.size ||
       !file ||
-      !this.use(NoteIndex).isLiteratureNote(file)
+      !isLiteratureNote(file)
     )
       return null;
 

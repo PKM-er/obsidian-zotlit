@@ -14,9 +14,12 @@ import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
 import { context } from "@/components/context";
+import { getItemKeyOf } from "@/note-index";
+import { isMarkdownFile } from "@/utils";
 import { waitUntil } from "@/utils/once";
 import { DatabaseStatus } from "@/zotero-db/connector/service";
 import type ZoteroPlugin from "@/zt-main";
+
 import "./style.less";
 
 export const annotViewType = "zotero-annotation-view";
@@ -45,10 +48,9 @@ export class AnnotationView extends DerivedFileView {
     super.onload();
     this.contentEl.addClass("obzt");
     this.registerEvent(
-      app.metadataCache.on("zotero:index-update", this.loadDocItem),
-    );
-    this.registerEvent(
-      app.metadataCache.on("zotero:index-clear", this.loadDocItem),
+      app.metadataCache.on("changed", (file) => {
+        if (file.path === this.file.path) this.loadDocItem();
+      }),
     );
   }
 
@@ -111,10 +113,7 @@ export class AnnotationView extends DerivedFileView {
   /** @returns null if current file not literature note */
   getFile() {
     let itemKey;
-    if (
-      this.file?.extension === "md" &&
-      (itemKey = this.plugin.noteIndex.getItemKeyOf(this.file))
-    ) {
+    if (isMarkdownFile(this.file) && (itemKey = getItemKeyOf(this.file))) {
       return { path: this.file.path, itemKey };
     }
     return null;
