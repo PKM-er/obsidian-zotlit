@@ -1,5 +1,5 @@
 import type { Extension } from "@codemirror/state";
-import { D } from "@mobily/ts-belt";
+import { deleteKeys, keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { getConfig } from "eta";
@@ -71,8 +71,8 @@ export const TEMPLATE_FILES: Record<EjectableTemplate, string> = {
 export const FILE_TEMPLATE_MAP: Record<string, EjectableTemplate> =
   Object.fromEntries(Object.entries(TEMPLATE_FILES).map((kv) => kv.reverse()));
 
-export const ejectableTemplateTypes = D.keys(TEMPLATE_FILES),
-  templateTypes = D.keys(DEFAULT_TEMPLATE),
+export const ejectableTemplateTypes = keys(TEMPLATE_FILES),
+  templateTypes = keys(DEFAULT_TEMPLATE),
   nonEjectableTemplateTypes = enumerate<NonEjectableTemplate>()(
     "filename",
     "citation",
@@ -84,7 +84,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
     return {
       ejected: false,
       folder: "ZtTemplates",
-      templates: D.deleteKeys(DEFAULT_TEMPLATE, ejectableTemplateTypes),
+      templates: deleteKeys(DEFAULT_TEMPLATE, ejectableTemplateTypes),
       fmFields: {
         mode: "whitelist",
         mapping: {
@@ -161,7 +161,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
   fromJSON(json: SettingOptionsJSON): void {
     super.fromJSON({
       ...(json.template ?? {}),
-      ...D.selectKeys(json, ["autoPairEta", "fmFields"]),
+      ...selectKeys(json, ["autoPairEta", "fmFields"]),
     });
   }
 }

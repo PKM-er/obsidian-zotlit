@@ -1,6 +1,6 @@
 import type { FSWatcher } from "fs";
 import { watch } from "fs";
-import { D } from "@mobily/ts-belt";
+import { map } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
 import DatabaseWorker from "../connector/service";
 import { DatabaseSettings } from "../connector/settings";
@@ -26,7 +26,7 @@ export default class DatabaseWatcher extends Service {
 
   #unloadWatchers() {
     this.#enabled = false;
-    this.#watcher = D.map(this.#watcher, (w) => {
+    this.#watcher = map(this.#watcher, (w) => {
       w?.close();
       return null;
     });

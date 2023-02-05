@@ -1,4 +1,5 @@
-import { A, D } from "@mobily/ts-belt";
+import { append, removeAt, updateAt } from "@mobily/ts-belt/Array";
+import { update } from "@mobily/ts-belt/Dict";
 import { NoteFields } from "@obzt/components";
 import { useDebounceFn } from "ahooks";
 import { debounce } from "obsidian";
@@ -69,23 +70,23 @@ export function NoteFieldsMain({ view }: { view: NoteFieldsView }) {
       }}
       onAdd={(field) =>
         setFields(
-          D.update(fields, field, (prev) =>
-            A.append(prev ?? [], { content: "", id: nanoid() }),
+          update(fields, field, (prev) =>
+            append(prev ?? [], { content: "", id: nanoid() }),
           ),
         )
       }
       onChange={(content, field, index, id) => {
         setFields(
-          D.update(fields, field, (prev) =>
+          update(fields, field, (prev) =>
             prev
-              ? A.updateAt(prev, index, () => ({ content, id }))
+              ? updateAt(prev, index, () => ({ content, id }))
               : [{ content, id }],
           ),
         );
       }}
       onDelete={(field, index, id) => {
         setFields(
-          D.update(fields, field, (prev) => prev && A.removeAt(prev, index)),
+          update(fields, field, (prev) => prev && removeAt(prev, index)),
         );
         // setSaving();
         saveField(null, field, index, id);

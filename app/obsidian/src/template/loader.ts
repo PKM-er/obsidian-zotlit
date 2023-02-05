@@ -1,5 +1,5 @@
 import { join } from "path";
-import { D } from "@mobily/ts-belt";
+import { keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile } from "obsidian";
 import { Notice, TFile } from "obsidian";
@@ -22,9 +22,9 @@ import log, { logError } from "@/log";
 
 export class TemplateLoader extends Service {
   settings = this.use(TemplateSettings);
-  #templates: Record<EjectableTemplate, string> = D.selectKeys(
+  #templates: Record<EjectableTemplate, string> = selectKeys(
     DEFAULT_TEMPLATE,
-    D.keys(TEMPLATE_FILES),
+    keys(TEMPLATE_FILES),
   );
   getTemplate(name: TemplateType) {
     return (

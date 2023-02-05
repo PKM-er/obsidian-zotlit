@@ -1,4 +1,4 @@
-import { D } from "@mobily/ts-belt";
+import { keys, mapWithKey, selectKeys } from "@mobily/ts-belt/Dict";
 import { use } from "@ophidian/core";
 import ZoteroPlugin from "@/zt-main";
 
@@ -15,7 +15,7 @@ abstract class Settings<Options extends Record<string, any>> {
     this.value = defaults;
     Object.defineProperties(
       this,
-      D.mapWithKey(defaults, (key) => ({
+      mapWithKey(defaults, (key) => ({
         get: () => this.value[key],
       })),
     );
@@ -37,7 +37,7 @@ abstract class Settings<Options extends Record<string, any>> {
     return;
   }
   async applyAll() {
-    await Promise.all(D.keys(this.value).map((k) => this.apply(k)));
+    await Promise.all(keys(this.value).map((k) => this.apply(k)));
   }
 
   toJSON(): unknown {
@@ -49,10 +49,10 @@ abstract class Settings<Options extends Record<string, any>> {
    * override this method if you want to use nested json
    */
   fromJSON(json: unknown): void {
-    const optKeys = D.keys(this.getDefaults());
+    const optKeys = keys(this.getDefaults());
     this.value = {
       ...this.value,
-      ...D.selectKeys(json as Options, optKeys),
+      ...selectKeys(json as Options, optKeys),
     };
   }
 }

@@ -1,4 +1,4 @@
-import { D } from "@mobily/ts-belt";
+import { selectKeys } from "@mobily/ts-belt/Dict";
 import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -53,7 +53,7 @@ export const getAnnotRenderer = (
   plugin: ZoteroPlugin,
 ): AnnotsViewContextType<AnnotRendererProps>["annotRenderer"] => ({
   storeSelector: (state) =>
-    D.selectKeys(state, [
+    selectKeys(state, [
       "doc",
       "attachment",
       "allAttachments",

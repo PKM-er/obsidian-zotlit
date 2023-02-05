@@ -1,6 +1,8 @@
 import "./styles.less";
 
-import { A, D, pipe } from "@mobily/ts-belt";
+import { pipe } from "@mobily/ts-belt";
+import { map } from "@mobily/ts-belt/Array";
+import { fromPairs } from "@mobily/ts-belt/Dict";
 import type { LogLevel } from "@obzt/common";
 import { logLevels } from "@obzt/common";
 import getPort from "get-port";
@@ -288,7 +290,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
         dd.addOptions(
           pipe(
             libs,
-            A.map(({ libraryID, name, groupID }) => {
+            map(({ libraryID, name, groupID }) => {
               const display = name
                 ? groupID
                   ? `${name} (Group)`
@@ -296,7 +298,7 @@ export class ZoteroSettingTab extends PluginSettingTab {
                 : `Library ${libraryID}`;
               return [libraryID.toString(), display] as const;
             }),
-            D.fromPairs,
+            fromPairs,
           ),
         )
           .setValue(database.citationLibrary.toString())

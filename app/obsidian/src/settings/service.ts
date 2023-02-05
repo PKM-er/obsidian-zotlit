@@ -1,7 +1,10 @@
-import { D, pipe } from "@mobily/ts-belt";
+import { pipe } from "@mobily/ts-belt";
+import { mapWithKey, selectKeys, values } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
 
+import Settings from "./base";
+import log, { LogSettings } from "@/log";
 import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
 import { NoteIndexSettings } from "@/note-index/settings.js";
 import { ServerSettings } from "@/server/settings.js";
@@ -11,8 +14,6 @@ import { WatcherSettings } from "@/zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "@/zotero-db/connector/settings.js";
 import { ImgImporterSettings } from "@/zotero-db/img-import/settings.js";
 import ZoteroPlugin from "@/zt-main.js";
-import Settings from "./base";
-import log, { LogSettings } from "@/log";
 
 export interface ZoteroSettings {
   database: DatabaseSettings;
@@ -62,7 +63,7 @@ export class SettingLoader extends Service implements ZoteroSettings {
   async onload(): Promise<void> {
     log.debug("Loading Settings...");
     const json = (await this.plugin.loadData()) ?? {};
-    pipe(this, D.selectKeys(settingNames), D.values).forEach((setting) =>
+    pipe(this, selectKeys(settingNames), values).forEach((setting) =>
       setting.fromJSON(json),
     );
     // call this manually since no Sevice is used to apply settings on load
@@ -77,13 +78,13 @@ export class SettingLoader extends Service implements ZoteroSettings {
 
   async save() {
     // pick settings fields from loader, return an array of json objects
-    const values = pipe(
+    const settings = pipe(
       this,
-      D.selectKeys(settingNames),
-      D.mapWithKey((k, v) => (v instanceof Settings ? v.toJSON() : { [k]: v })),
-      D.values,
+      selectKeys(settingNames),
+      mapWithKey((k, v) => (v instanceof Settings ? v.toJSON() : { [k]: v })),
+      values,
     );
     // merge all json objects into one and save
-    await this.plugin.saveData(Object.assign({}, ...values));
+    await this.plugin.saveData(Object.assign({}, ...settings));
   }
 }
