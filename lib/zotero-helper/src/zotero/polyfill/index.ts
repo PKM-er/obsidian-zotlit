@@ -14,6 +14,8 @@ export function polyfill(ctx: { Zotero: typeof Zotero; Services: any }): {
   Zotero: Zotero7;
   unload: () => void;
 } {
+  if (ctx.Zotero.PreferencePanes)
+    return { Zotero: Zotero as Zotero7, unload: () => void 0 };
   const PreferencePanes = new PreferencePanesPolyfill(ctx);
   const p = Proxy.revocable(ctx.Zotero as Zotero7, {
     get(target, prop, receiver) {
@@ -46,8 +48,8 @@ export function polyfill(ctx: { Zotero: typeof Zotero; Services: any }): {
   return {
     Zotero: p.proxy,
     unload: () => {
-      p.revoke();
       PreferencePanes.__pp_unload__();
+      p.revoke();
     },
   };
 }

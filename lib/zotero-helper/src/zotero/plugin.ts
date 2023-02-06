@@ -17,6 +17,7 @@ import { ReaderEventHelper } from "./reader/event.js";
 import { ReaderMenuHelper } from "./reader/menu.js";
 import type { AnnotPopupData } from "./reader/menu.js";
 import type { IPaneDescriptor } from "./index.js";
+import { isZotero7 } from "./index.js";
 
 declare global {
   var mainWindow: typeof window;
@@ -131,6 +132,7 @@ abstract class Plugin_2<
     });
   }
 
+  polyfillUnloader?: () => void;
   load(manifest: Manifest, Services: any) {
     this.manifest = manifest;
     this.Services = Services;
@@ -138,14 +140,15 @@ abstract class Plugin_2<
       Zotero: this.app,
       Services,
     });
-    this.register(unload);
     this.app = Zotero;
+    this.polyfillUnloader = unload;
     super.load(manifest, Services);
   }
   abstract onload(manifest: Manifest, services: any): void;
   unload(): void {
     super.unload();
     delete this.manifest;
+    this.polyfillUnloader?.();
   }
   async install() {
     await this.onInstall();
