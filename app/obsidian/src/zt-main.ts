@@ -1,30 +1,22 @@
 import "./main.less";
 
-import type { Extension } from "@codemirror/state";
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
-import { Notice, Plugin } from "obsidian";
+import { Plugin } from "obsidian";
 
-import {
-  CitationEditorSuggest,
-  insertCitation,
-} from "./components/citation-suggest/index.js";
 import checkLib from "./install-guide/index.jsx";
-import registerNoteFeature from "./note-feature";
 import { NoteFields } from "./note-feature/note-fields/service";
-import { createNoteForDocItem, openNote } from "./note-feature/open-create";
+import NoteFeatures from "./note-feature/service";
 import { AnnotBlock } from "./services/annot-block/service";
 import { CitekeyClick } from "./services/citekey-click/service";
 import NoteIndex from "./services/note-index/service.js";
-// import NoteParser from "./note-parser";
-// import PDFCache from "./pdf-outline";
 import { Server } from "./services/server/service";
 import {
   TemplateComplier,
   TemplateLoader,
   TemplateRenderer,
 } from "./services/template";
-import registerEtaEditorHelper from "./services/template/editor";
+import { TemplateEditorHelper } from "./services/template/editor/service";
 import { TopicImport } from "./services/topic-import/service";
 import DatabaseWatcher from "./services/zotero-db/auto-refresh/service";
 import DatabaseWorker from "./services/zotero-db/connector/service";
@@ -58,6 +50,8 @@ export default class ZoteroPlugin extends Plugin {
   server = this.use(Server);
   topicImport = this.use(TopicImport);
   citekeyClick = this.use(CitekeyClick);
+  templateEditor = this.use(TemplateEditorHelper);
+  noteFeatures = this.use(NoteFeatures);
 
   get databaseAPI() {
     return this.dbWorker.api;
@@ -71,45 +65,10 @@ export default class ZoteroPlugin extends Plugin {
   templateComplier = this.use(TemplateComplier);
   templateLoader = this.use(TemplateLoader);
 
-  // noteParser: NoteParser;
-  // pdfCache: PDFCache;
   annotBlockWorker = this.use(AnnotBlock);
 
-  createNoteForDocItem = createNoteForDocItem;
-  openNote = openNote;
-
-  editorExtensions: Extension[] = [];
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
-    registerEtaEditorHelper(this);
-    this.addCommand({
-      id: "insert-markdown-citation",
-      name: "Insert Markdown citation",
-      editorCallback: insertCitation(this),
-    });
-    this.registerEditorSuggest(new CitationEditorSuggest(this));
-    this.addCommand({
-      id: "refresh-zotero-data",
-      name: "Refresh Zotero Data",
-      callback: async () => {
-        await this.dbWorker.refresh({ task: "full" });
-      },
-    });
-    this.addCommand({
-      id: "refresh-zotero-search-index",
-      name: "Refresh Zotero Search Index",
-      callback: async () => {
-        await this.dbWorker.refresh({ task: "searchIndex" });
-      },
-    });
-    this.addCommand({
-      id: "refresh-note-index",
-      name: "Refresh Literature Notes Index",
-      callback: () => {
-        this.noteIndex.reload();
-        new Notice("Literature notes re-indexed");
-      },
-    });
     this.addSettingTab(new ZoteroSettingTab(this));
 
     // globalThis.zt = this;
@@ -121,9 +80,6 @@ export default class ZoteroPlugin extends Plugin {
     // this.registerEvent(
     //   this.server.on("zotero/open", (p) => console.warn(parseQuery(p))),
     // );
-
-    registerNoteFeature(this);
-    console.log("loading done");
   }
 
   onunload() {

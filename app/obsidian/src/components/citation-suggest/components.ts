@@ -7,13 +7,13 @@ import type {
   EditorSuggestTriggerInfo,
 } from "obsidian";
 
-import type { TemplateRenderer } from "@/services/template";
 import type { FuzzyMatch } from "@/components/suggester";
 import {
   isAlternative,
   ZoteroItemEditorSuggest,
   ZoteroItemSuggestModal,
 } from "@/components/suggester";
+import type { TemplateRenderer } from "@/services/template";
 import type ZoteroPlugin from "@/zt-main.js";
 
 const instructions = [

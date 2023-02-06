@@ -1,4 +1,3 @@
-import type { Extension } from "@codemirror/state";
 import { deleteKeys, keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
@@ -6,7 +5,6 @@ import type { getConfig } from "eta";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
-import { bracketExtension } from "./editor/bracket";
 import type { FmBlackList, FmWhiteList } from "./frontmatter";
 import { FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
@@ -105,9 +103,6 @@ export class TemplateSettings extends Settings<SettingOptions> {
     return true;
   }
 
-  /** null if not registered */
-  #editorExtensions: Extension[] | null = null;
-
   async apply(key: keyof SettingOptions): Promise<void> {
     const loader = this.use(TemplateLoader),
       plugin = this.use(ZoteroPlugin);
@@ -122,20 +117,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       case "fmFields":
         return;
       case "autoPairEta": {
-        const loadedBefore = this.#editorExtensions !== null;
-        if (this.#editorExtensions === null) {
-          this.#editorExtensions = [];
-          plugin.registerEditorExtension(this.#editorExtensions);
-        } else {
-          this.#editorExtensions.length = 0;
-        }
-        if (this.autoPairEta) {
-          this.#editorExtensions.push(bracketExtension);
-        }
-        if (loadedBefore) {
-          app.workspace.updateOptions();
-        }
-        break;
+        return plugin.templateEditor.setEtaBracketPairing(this.autoPairEta);
       }
       default:
         assertNever(key);

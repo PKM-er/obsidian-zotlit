@@ -11,6 +11,7 @@ import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
 import log, { LogSettings } from "@/log";
 import { createWorkerProxy } from "@/utils/worker";
+import ZoteroPlugin from "@/zt-main";
 
 export const enum DatabaseStatus {
   NotInitialized,
@@ -40,6 +41,21 @@ export default class DatabaseWorker extends Service {
         process.hrtime(start),
       )}`,
     );
+    const plugin = this.use(ZoteroPlugin);
+    plugin.addCommand({
+      id: "refresh-zotero-data",
+      name: "Refresh Zotero Data",
+      callback: async () => {
+        await this.refresh({ task: "full" });
+      },
+    });
+    plugin.addCommand({
+      id: "refresh-zotero-search-index",
+      name: "Refresh Zotero Search Index",
+      callback: async () => {
+        await this.refresh({ task: "searchIndex" });
+      },
+    });
   }
   async onunload(): Promise<void> {
     await this.#instance.terminate();

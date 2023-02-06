@@ -6,6 +6,7 @@ import type { ItemKeyGroup } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
 import { Service } from "@ophidian/core";
 import type { CachedMetadata, Pos, TAbstractFile, TFile } from "obsidian";
+import { Notice } from "obsidian";
 import { NoteIndexSettings } from "./settings";
 import {
   getItemKeyFromFrontmatter,
@@ -238,7 +239,17 @@ export default class NoteIndex extends Service {
 
     untilMetaReady(this.plugin.app, {
       onRegister: (r) => this.registerEvent(r),
-    }).then(() => this.onMetaBuilt());
+    }).then(() => {
+      this.onMetaBuilt();
+      this.plugin.addCommand({
+        id: "refresh-note-index",
+        name: "Refresh Literature Notes Index",
+        callback: () => {
+          this.reload();
+          new Notice("Literature notes re-indexed");
+        },
+      });
+    });
   }
 
   onMetaBuilt() {

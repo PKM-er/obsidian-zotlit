@@ -22,7 +22,7 @@ export async function createNote(
     const attachments = await plugin.databaseAPI.getAttachments(
       ...data.ids[index],
     );
-    await plugin.createNoteForDocItem(item, (template, ctx) =>
+    await plugin.noteFeatures.createNoteForDocItem(item, (template, ctx) =>
       template.renderNote(
         {
           docItem: item,

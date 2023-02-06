@@ -4,9 +4,9 @@ import type {
   ItemIDLibID,
 } from "@obzt/database";
 import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
+import { AttachmentSelectModal } from "./atch-select.js";
 import { ZoteroItemSuggestModal } from "@/components/suggester/index.js";
 import type ZoteroPlugin from "@/zt-main.js";
-import { AttachmentSelectModal } from "./atch-select.js";
 
 const instructions = [
   { command: "↑↓", purpose: "to navigate" },
@@ -24,7 +24,7 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
     const result = await (this.promise ?? this.open());
     if (!result) return false;
     const { item } = result.value;
-    if (await this.plugin.openNote(item, true)) return true;
+    if (await this.plugin.noteFeatures.openNote(item, true)) return true;
     const { database } = this.plugin;
     const defaultLibId = database.settings.citationLibrary;
     const allAttachments = await database.api.getAttachments(
@@ -55,17 +55,19 @@ export class CitationSuggestModal extends ZoteroItemSuggestModal {
       ...annotations.map((i): ItemIDLibID => [i.itemID, defaultLibId]),
     ]);
 
-    const note = await this.plugin.createNoteForDocItem(item, (template, ctx) =>
-      template.renderNote(
-        {
-          docItem: item,
-          attachment,
-          tags: tagsRecord,
-          allAttachments,
-          annotations,
-        },
-        ctx,
-      ),
+    const note = await this.plugin.noteFeatures.createNoteForDocItem(
+      item,
+      (template, ctx) =>
+        template.renderNote(
+          {
+            docItem: item,
+            attachment,
+            tags: tagsRecord,
+            allAttachments,
+            annotations,
+          },
+          ctx,
+        ),
     );
     await app.workspace.openLinkText(note.path, "", false);
     return true;
