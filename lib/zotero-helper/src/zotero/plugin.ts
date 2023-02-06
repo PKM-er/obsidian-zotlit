@@ -6,6 +6,11 @@ import { enumerate } from "@obzt/common";
 
 import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
+import type {
+  ZoteroEventMap,
+  ZoteroEvents,
+  ZoteroEventWarpper,
+} from "./events.js";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
 import { Component } from "./misc.js";
@@ -22,11 +27,6 @@ declare global {
   var mainWindow: typeof window;
   var mainDocument: typeof window.document;
 }
-
-type ZoteroEvent = Record<
-  _ZoteroTypes.Notifier.Event,
-  (ids: string[], extraData: _ZoteroTypes.anyObj) => any
->;
 
 const eventSources = enumerate<_ZoteroTypes.Notifier.Type>()(
   "collection",
@@ -169,17 +169,18 @@ abstract class Plugin_2<
       }
       return Reflect.get(target, p, receiver);
     },
-  }) as Record<_ZoteroTypes.Notifier.Type, Emitter<ZoteroEvent>>;
+  }) as ZoteroEventWarpper;
 
-  registerNotifier(types: _ZoteroTypes.Notifier.Type[]) {
+  registerNotifier<T extends ZoteroEvents>(types: T[]) {
     types
       .filter((type) => this.#events[type] === null)
       .map((type) => {
-        const emitter = createNanoEvents<ZoteroEvent>();
+        const emitter = createNanoEvents<ZoteroEventMap<T>>();
         this.#events[type] = emitter;
         const notifierID = this.app.Notifier.registerObserver(
           {
             notify: (event, _type, ids, extraData) => {
+              // @ts-ignore
               emitter.emit(event, ids, extraData);
             },
           },
