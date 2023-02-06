@@ -1,3 +1,7 @@
 export * from "./url.js";
 
-export type { INotifyRegularItem } from "./bg.js";
+export type {
+  INotifyRegularItem,
+  INotifyReaderAnnotSelect,
+  INotify,
+} from "./bg.js";

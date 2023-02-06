@@ -163,6 +163,21 @@ export class AnnotationView extends DerivedFileView {
       </ObsidianContext.Provider>,
       this.contentEl,
     );
+    this.registerEvent(
+      this.plugin.server.on("bg:notify", (_, data) => {
+        if (data.event !== "reader/annot-select") return;
+        const update = data.updates.filter(([, selected]) => selected).pop();
+        if (!update) return;
+        const [annotId] = update;
+        const element = this.contentEl.querySelector(
+          `.annot-preview[data-id="${annotId}"]`,
+        );
+        if (!(element instanceof HTMLElement)) return;
+        element.addClass("select-flashing");
+        sleep(1500).then(() => element.removeClass("select-flashing"));
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }),
+    );
   }
   protected async onClose() {
     ReactDOM.unmountComponentAtNode(this.contentEl);

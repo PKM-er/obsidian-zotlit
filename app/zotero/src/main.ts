@@ -2,9 +2,10 @@ import "./style.css";
 
 import { Plugin } from "@aidenlx/zotero-helper/zotero";
 import { uniqBy } from "@mobily/ts-belt/Array";
-import { debounce } from "@mobily/ts-belt/Function";
 import type {
   AnnotationsQuery,
+  INotify,
+  INotifyReaderAnnotSelect,
   INotifyRegularItem,
   ItemQuery,
   ItemsQuery,
@@ -13,6 +14,7 @@ import type {
 import { stringifyQuery } from "@obzt/protocol";
 import { assertNever } from "assert-never";
 import type settings from "../prefs.json";
+import { Debouncer } from "./debounced.js";
 
 export default class ZoteroPlugin extends Plugin<typeof settings> {
   onInstall(): void | Promise<void> {
@@ -36,14 +38,22 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
             ids.forEach((id) => {
               const item = this.app.Items.get(id);
               if (!item.isRegularItem()) return;
-              this.#addedItemsNotifyQueue.set(item.id, [
-                item.id,
-                item.libraryID,
-              ]);
+              this.request.nItemAdded(item.id, item.libraryID);
             });
-            this.requestNotifyItemAdded();
           }),
         );
+        this.registerReaderEvent("annot-select", (key, selected, reader) => {
+          if (this.settings.notify === false) return;
+          const libId = this.app.Items.get(reader.itemID).libraryID;
+          const annotItem = this.app.Items.getByLibraryAndKey(libId, key);
+          if (!annotItem) {
+            this.app.logError(
+              new Error(`Can't get annotation item by key ${key}`),
+            );
+            return;
+          }
+          this.request.nReaderAnnotSelect(annotItem.id, selected);
+        });
       },
       true,
     );
@@ -110,27 +120,37 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     this.app.log("zotero-obsidian-note unloaded");
   }
 
-  #addedItemsNotifyQueue = new Map<number, [id: number, lib: number]>();
-  requestNotifyItemAdded = debounce(async () => {
-    if (this.#addedItemsNotifyQueue.size === 0) return;
-    const ids = Array.from(this.#addedItemsNotifyQueue.values());
-    this.#addedItemsNotifyQueue.clear();
+  request = {
+    nItemAdded: Debouncer.create<number, number>(async (ids) => {
+      await this.#notify<INotifyRegularItem>({
+        event: "regular-item/add",
+        /** itemid -> libid */
+        ids,
+      });
+      this.app.log(`notify item added: ${ids.map((a) => a[0]).join(", ")}`);
+    }),
+    nReaderAnnotSelect: Debouncer.create<boolean, number>(async (updates) => {
+      await this.#notify<INotifyReaderAnnotSelect>({
+        event: "reader/annot-select",
+        updates,
+      });
+      this.app.log(
+        `notify annot select: ${updates.map((a) => a[0]).join(", ")}`,
+      );
+    }),
+  };
 
+  async #notify<T extends INotify>(content: T) {
     const target = this.settings["notify-url"];
-    this.app.log(`send to: ${target}`);
-
+    // this.app.log(`send to: ${target}`);
     await fetch(new URL("/notify", target), {
       method: "POST",
-      body: JSON.stringify({
-        event: "regular-item/add",
-        ids,
-      } satisfies INotifyRegularItem),
+      body: JSON.stringify(content),
       headers: {
         "Content-Type": "application/json",
       },
     });
-    this.app.log(`notify item added: ${ids.join(", ")}`);
-  }, 500);
+  }
 
   handleSelectedItems(action: QueryAction) {
     let items: readonly Zotero.Item[] = this.app

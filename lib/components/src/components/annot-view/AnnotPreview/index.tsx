@@ -55,9 +55,10 @@ export default function AnnotPreview({
     <div
       className={clsx(
         "annot-preview",
-        "bg-primary shadow-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm",
+        "bg-primary shadow-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm transition-colors",
         className,
       )}
+      data-id={annotation.itemID}
       {...props}
     >
       <Header

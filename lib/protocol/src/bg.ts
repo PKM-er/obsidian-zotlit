@@ -3,4 +3,9 @@ export interface INotifyRegularItem {
   ids: [id: number, lib: number][];
 }
 
-export type INotify = INotifyRegularItem;
+export interface INotifyReaderAnnotSelect {
+  event: "reader/annot-select";
+  updates: [id: number, selected: boolean][];
+}
+
+export type INotify = INotifyRegularItem | INotifyReaderAnnotSelect;
