@@ -4,11 +4,9 @@ import { Component } from "../misc.js";
 import { onReaderOpen } from "./utils.js";
 
 export interface ReaderEvent {
-  "annot-select": (
-    key: string,
-    selected: boolean,
-    reader: _ZoteroTypes.ReaderInstance,
-  ) => void;
+  "annot-select": (key: string, selected: boolean, itemId: number) => void;
+  focus: (attachmentId: number, instanceId: string) => void;
+  blur: (attachmentId: number, instanceId: string) => void;
 }
 
 export class ReaderEventHelper extends Component {
@@ -58,26 +56,36 @@ export class ReaderEventHelper extends Component {
   }
 
   public onunload(): void {
-    this.app.Reader._readers.forEach((r) =>
-      this.observers.get(r)?.disconnect(),
-    );
+    this.app.Reader._readers.forEach((r) => {
+      this.observers.get(r)?.disconnect();
+      const onFocus = this.focusHandlers.get(r),
+        onBlur = this.blurHandlers.get(r);
+      onFocus && r._iframeWindow?.removeEventListener("focus", onFocus);
+      onBlur && r._iframeWindow?.removeEventListener("blur", onBlur);
+    });
   }
 
   async #hookIframeWindow(reader: _ZoteroTypes.ReaderInstance) {
-    const self = this;
-
     await reader._initPromise;
     const window = reader._iframeWindow as unknown as typeof globalThis | null;
     if (!window) {
-      self.app.logError(new Error("iframeWindow not found"));
+      this.app.logError(new Error("iframeWindow not found"));
       return;
     }
-
+    this.#watchAnnotSelect(window, reader);
+    this.#watchFocusChange(window, reader);
+  }
+  #watchAnnotSelect(
+    window: typeof globalThis,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) {
+    const self = this;
     const annotSidebar = window.document.getElementById("annotations");
     if (!annotSidebar) {
       self.app.logError(new Error("annotSidebar not found"));
       return;
     }
+    const itemId = reader.itemID;
     const observer = new window.MutationObserver((mutations) => {
       mutations.forEach(function ({ target, oldValue }) {
         if (
@@ -96,7 +104,7 @@ export class ReaderEventHelper extends Component {
           "annot-select",
           target.dataset.sidebarAnnotationId,
           currSelected,
-          reader,
+          itemId,
         );
       });
     });
@@ -106,5 +114,21 @@ export class ReaderEventHelper extends Component {
       subtree: true,
     });
     self.observers.set(reader, observer);
+  }
+
+  focusHandlers = new WeakMap<_ZoteroTypes.ReaderInstance, () => void>();
+  blurHandlers = new WeakMap<_ZoteroTypes.ReaderInstance, () => void>();
+  #watchFocusChange(
+    window: typeof globalThis,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) {
+    const { itemID: attachmentId, _instanceID } = reader;
+    const focusHandler = () =>
+        this.event.emit("focus", attachmentId, _instanceID),
+      blurHandler = () => this.event.emit("blur", attachmentId, _instanceID);
+    window.addEventListener("focus", focusHandler);
+    window.addEventListener("blur", blurHandler);
+    this.focusHandlers.set(reader, focusHandler);
+    this.blurHandlers.set(reader, blurHandler);
   }
 }

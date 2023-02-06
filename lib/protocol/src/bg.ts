@@ -8,4 +8,13 @@ export interface INotifyReaderAnnotSelect {
   updates: [id: number, selected: boolean][];
 }
 
-export type INotify = INotifyRegularItem | INotifyReaderAnnotSelect;
+export interface INotifyActiveReader {
+  event: "reader/active";
+  itemId: number;
+  attachmentId: number;
+}
+
+export type INotify =
+  | INotifyRegularItem
+  | INotifyReaderAnnotSelect
+  | INotifyActiveReader;

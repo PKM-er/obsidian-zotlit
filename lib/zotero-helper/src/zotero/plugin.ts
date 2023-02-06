@@ -17,7 +17,6 @@ import { ReaderEventHelper } from "./reader/event.js";
 import { ReaderMenuHelper } from "./reader/menu.js";
 import type { AnnotPopupData } from "./reader/menu.js";
 import type { IPaneDescriptor } from "./index.js";
-import { isZotero7 } from "./index.js";
 
 declare global {
   var mainWindow: typeof window;

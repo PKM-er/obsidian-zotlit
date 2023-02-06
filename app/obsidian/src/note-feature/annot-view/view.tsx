@@ -5,18 +5,17 @@ import {
   AnnotsView,
 } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
+import type { INotifyActiveReader } from "@obzt/protocol";
 import { assertNever } from "assert-never";
-import type { WorkspaceLeaf } from "obsidian";
+import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
+import { ItemView } from "obsidian";
 import ReactDOM from "react-dom";
-import { DerivedFileView } from "../derived-file-view";
 import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
 import { context } from "@/components/context";
-import { getItemKeyOf } from "@/services/note-index";
 import { DatabaseStatus } from "@/services/zotero-db/connector/service";
-import { isMarkdownFile } from "@/utils";
 import { waitUntil } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -24,21 +23,17 @@ import "./style.less";
 
 export const annotViewType = "zotero-annotation-view";
 
-// interface Events {
-//   "load-file": (file: string | null) => void;
-//   "load-doc-item": (item: RegularItemInfo, sourcePath: string) => void;
-//   "load-doc-tags": (tags: number[]) => void;
-//   "load-attachments": (attachments: AttachmentInfo[]) => void;
-//   "load-annotations": (annotations: AnnotationInfo[]) => void;
-//   "load-annot-tags": (tags: Map<number, number[]>) => void;
-// }
+interface State {
+  itemId: number;
+  attachmentId: number;
+  followZotero?: boolean;
+}
 
-export class AnnotationView extends DerivedFileView {
+export class AnnotationView extends ItemView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
     this.store = createStore(plugin);
   }
-  // root = createRoot(this.contentEl);
 
   public getViewType(): string {
     return annotViewType;
@@ -47,9 +42,34 @@ export class AnnotationView extends DerivedFileView {
   onload(): void {
     super.onload();
     this.contentEl.addClass("obzt");
+
+    let nextReader: INotifyActiveReader | null = null,
+      locked = false;
+    const update = (data: INotifyActiveReader) => {
+      if (locked) {
+        nextReader = data;
+      } else {
+        locked = true;
+        const { itemId, attachmentId } = data;
+        this.setState({ itemId, attachmentId }).then(() => {
+          locked = false;
+          if (nextReader === null) return;
+          const next = nextReader;
+          nextReader = null;
+          update(next);
+        });
+      }
+    };
     this.registerEvent(
-      app.metadataCache.on("changed", (file) => {
-        if (file.path === this.file.path) this.loadDocItem();
+      this.plugin.server.on("bg:notify", (_, data) => {
+        if (
+          !this.followZotero ||
+          data.event !== "reader/active" ||
+          data.itemId < 0 ||
+          data.attachmentId < 0
+        )
+          return;
+        update(data);
       }),
     );
   }
@@ -63,29 +83,6 @@ export class AnnotationView extends DerivedFileView {
 
   public getIcon(): string {
     return "highlighter";
-  }
-
-  loadDocItem = () => {
-    this.store.getState().loadDocItem(this.getFile(), this.lib);
-  };
-
-  // emitter = createNanoEvents<Events>();
-
-  // on<E extends keyof Events>(event: E, callback: Events[E]) {
-  //   return this.emitter.on(event, callback);
-  // }
-
-  update() {
-    // const file = this.getFile();
-    this.untilZoteroReady().then(this.loadDocItem);
-    // this.emitter.emit("load-file", file?.path);
-  }
-  canAcceptExtension(_extension: string): boolean {
-    // accept all extensions
-    // otherwise the leaf will be re-opened with linked file
-    // whenever the linked file changes
-    // (default syncstate behavior for grouped leaves)
-    return true;
   }
 
   untilZoteroReady() {
@@ -110,16 +107,26 @@ export class AnnotationView extends DerivedFileView {
   get lib() {
     return this.plugin.settings.database.citationLibrary;
   }
-  /** @returns null if current file not literature note */
-  getFile() {
-    let itemKey;
-    if (isMarkdownFile(this.file) && (itemKey = getItemKeyOf(this.file))) {
-      return { path: this.file.path, itemKey };
-    }
-    return null;
-  }
-
   store: StoreAPI;
+  followZotero = true;
+  getState(): State {
+    const data = super.getState();
+    return {
+      ...(data && typeof data === "object" ? data : {}),
+      itemId: this.store.getState().doc?.docItem.itemID ?? -1,
+      attachmentId: this.store.getState().attachment?.itemID ?? -1,
+    };
+  }
+  async setState(state: State, _result?: ViewStateResult): Promise<void> {
+    await super.setState(state, _result as any);
+    const { itemId = -1, followZotero } = state;
+    if (!Number.isInteger(+itemId) || +itemId < -1)
+      throw new Error("invalid item id");
+    await this.store.getState().loadDocItem(+itemId, -1, this.lib);
+    if (followZotero !== undefined) {
+      this.followZotero = Boolean(followZotero);
+    }
+  }
 
   getContext(): AnnotsViewContextType<
     Pick<
@@ -169,18 +176,23 @@ export class AnnotationView extends DerivedFileView {
         const update = data.updates.filter(([, selected]) => selected).pop();
         if (!update) return;
         const [annotId] = update;
-        const element = this.contentEl.querySelector(
-          `.annot-preview[data-id="${annotId}"]`,
-        );
-        if (!(element instanceof HTMLElement)) return;
-        element.addClass("select-flashing");
-        sleep(1500).then(() => element.removeClass("select-flashing"));
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        this.highlightAnnot(annotId);
       }),
     );
   }
   protected async onClose() {
     ReactDOM.unmountComponentAtNode(this.contentEl);
     await super.onClose();
+  }
+
+  async highlightAnnot(annotId: number) {
+    const element = this.contentEl.querySelector(
+      `.annot-preview[data-id="${annotId}"]`,
+    );
+    if (!(element instanceof HTMLElement)) return;
+    element.addClass("select-flashing");
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
+    await sleep(1500);
+    element.removeClass("select-flashing");
   }
 }

@@ -2,6 +2,7 @@ import "./style.css";
 
 import { Plugin } from "@aidenlx/zotero-helper/zotero";
 import { uniqBy } from "@mobily/ts-belt/Array";
+import { debounce } from "@mobily/ts-belt/Function";
 import type {
   AnnotationsQuery,
   INotify,
@@ -12,6 +13,7 @@ import type {
   QueryAction,
 } from "@obzt/protocol";
 import { stringifyQuery } from "@obzt/protocol";
+import type { INotifyActiveReader } from "@obzt/protocol/dist/bg.js";
 import { assertNever } from "assert-never";
 import type settings from "../prefs.json";
 import { Debouncer } from "./debounced.js";
@@ -23,8 +25,25 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
   onUninstall(): void | Promise<void> {
     return;
   }
+
+  /**
+   * attachment id is focused in reader, -1 if reader is not focused
+   */
+  readerFocus = new Map<string, number>();
+  lastActiveReader: number | null = null;
   onload(): void {
     this.app.log("zotero-obsidian-note Loaded");
+
+    this.registerReaderEvent("focus", (itemId, instanceId) => {
+      this.readerFocus.set(instanceId, itemId);
+      if (this.settings.notify === false) return;
+      this.request.nActiveReader();
+    });
+    this.registerReaderEvent("blur", (_itemId, instanceId) => {
+      this.readerFocus.set(instanceId, -1);
+      if (this.settings.notify === false) return;
+      this.request.nActiveReader();
+    });
 
     this.registerPref(
       "notify",
@@ -42,9 +61,9 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
             });
           }),
         );
-        this.registerReaderEvent("annot-select", (key, selected, reader) => {
+        this.registerReaderEvent("annot-select", (key, selected, itemId) => {
           if (this.settings.notify === false) return;
-          const libId = this.app.Items.get(reader.itemID).libraryID;
+          const libId = this.app.Items.get(itemId).libraryID;
           const annotItem = this.app.Items.getByLibraryAndKey(libId, key);
           if (!annotItem) {
             this.app.logError(
@@ -89,10 +108,14 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     );
 
     this.registerMenu("reader", (menu, data, reader) => {
-      const libIdKey = this.app.Items.getLibraryAndKeyFromID(reader.itemID);
+      const libIdKey = this.app.Items.getLibraryAndKeyFromID(
+        reader.attachmentId,
+      );
       if (!libIdKey) {
         this.app.logError(
-          new Error(`Can't get library and key from item id ${reader.itemID}`),
+          new Error(
+            `Can't get library and key from item id ${reader.attachmentId}`,
+          ),
         );
         return;
       }
@@ -138,6 +161,24 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         `notify annot select: ${updates.map((a) => a[0]).join(", ")}`,
       );
     }),
+    nActiveReader: debounce(async () => {
+      const active = [...this.readerFocus.values()].filter((a) => a !== -1);
+      const attachmentId = active[active.length - 1] ?? -1;
+      if (attachmentId === this.lastActiveReader) return;
+      const itemId = this.app.Items.get(attachmentId).parentItemID;
+      if (typeof itemId !== "number") {
+        // prevent notify when reader is not attached to an regular item's attachment
+        this.lastActiveReader = attachmentId;
+        return;
+      }
+      await this.#notify<INotifyActiveReader>({
+        event: "reader/active",
+        itemId,
+        attachmentId,
+      });
+      this.lastActiveReader = attachmentId;
+      this.app.log(`notify active reader: ${itemId}, ${attachmentId}`);
+    }, 500),
   };
 
   async #notify<T extends INotify>(content: T) {

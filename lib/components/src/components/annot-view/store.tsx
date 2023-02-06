@@ -7,14 +7,15 @@ import type {
 import type { StoreApi } from "zustand";
 
 export interface DataModel {
-  doc: { sourcePath: string; docItem: RegularItemInfoBase; lib: number } | null;
+  doc: { docItem: RegularItemInfoBase; lib: number } | null;
   attachment: AttachmentInfo | null;
   attachmentID: number | null;
   allAttachments: AttachmentInfo[] | null;
   annotations: AnnotationInfo[] | null;
   tags: Record<number, TagInfo[]>;
   loadDocItem(
-    file: { path: string; itemKey: string } | null,
+    itemId: number,
+    attachmentId: number,
     lib: number,
     force?: boolean,
   ): Promise<void>;

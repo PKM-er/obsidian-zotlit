@@ -14,11 +14,6 @@ import Header from "./Header";
 
 import RefreshButton from "./RefreshButton";
 
-// export interface AnnotsViewProps {
-//   sourcePath: string;
-//   docItem: RegularItemInfo;
-// }
-
 const useOnDbRefresh = () => {
   const { registerDbUpdate, store } = useContext(Context);
   const refresh = useStore(store, (s) => s.refresh);

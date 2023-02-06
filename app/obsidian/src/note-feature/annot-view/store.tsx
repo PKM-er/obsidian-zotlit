@@ -75,21 +75,19 @@ export const createStore = (p: ZoteroPlugin) =>
       };
     return {
       ...getInit(),
-      // setFile: (sourcePath: string) => set((state) => ({ ...state, sourcePath })),
-      loadDocItem: async (file, lib, force = false) => {
-        if (!file) return set(getInit());
-        const curr = get();
-        if (
-          (curr.doc?.docItem.key === file.itemKey ||
-            (curr.doc?.sourcePath === file.path && !force)) &&
-          !force
-        )
-          return;
-        const item = (await api(p).getItems([[file.itemKey, lib]]))[0];
+      loadDocItem: async (itemId, atchId, lib, force = false) => {
+        if (itemId < 0) return set(getInit());
+        if (get().doc?.docItem.itemID === itemId && !force) return;
+        const item = (await api(p).getItems([[itemId, lib]]))[0];
         if (!item) return set(getInit());
-        const doc = { sourcePath: file.path, docItem: item, lib };
-        const attachmentID = getCachedActiveAtch(window.localStorage, item);
-        set({ ...getInit(), doc, attachmentID });
+        const doc = { docItem: item, lib };
+        if (atchId < 0) {
+          const attachmentID = getCachedActiveAtch(window.localStorage, item);
+          set({ ...getInit(), doc, attachmentID });
+        } else {
+          cacheActiveAtch(window.localStorage, item, atchId);
+          set({ ...getInit(), doc, attachmentID: atchId });
+        }
         await loadAtchs(item.itemID, lib);
         await loadDocTags(item.itemID, lib);
         await loadAnnots(lib);
