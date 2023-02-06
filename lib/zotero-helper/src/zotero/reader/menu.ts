@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { around } from "monkey-around";
+import { createNanoEvents } from "nanoevents";
+import { Menu } from "../menu/menu.js";
 import { Component } from "../misc.js";
-import { Menu } from "./menu.js";
+import { onReaderOpen } from "./utils.js";
 
 export interface AnnotPopupData {
   [key: string]: any;
@@ -21,19 +23,19 @@ export interface AnnotPopupData {
   ids: string[];
 }
 
-export class ReaderMenuHelper extends Component {
-  private menuCallbacks: ((
+interface Event {
+  menu: (
     menu: Menu,
     data: AnnotPopupData,
     reader: _ZoteroTypes.ReaderInstance,
-  ) => any)[] = [];
+  ) => any;
+}
+
+export class ReaderMenuHelper extends Component {
+  event = createNanoEvents<Event>();
 
   constructor(public app: typeof Zotero) {
     super();
-  }
-
-  registerMenu(cb: (menu: Menu) => any): void {
-    this.menuCallbacks.push(cb);
   }
 
   public onload(): void {
@@ -41,18 +43,9 @@ export class ReaderMenuHelper extends Component {
 
     self.app.log("hooking into _openAnnotationPopup");
     if (this.#hookOpenAnnotPopup()) return;
-    const unload = around(self.app.Reader, {
-      open: (next) =>
-        function (this: _ZoteroTypes.Reader, ...args) {
-          const result = next.apply(this, args);
-          self.app.log("Reader opened, hooking into _openAnnotationPopup");
-          if (self.#hookOpenAnnotPopup()) {
-            unload();
-          }
-          return result;
-        },
-    });
-    this.register(unload);
+    this.register(
+      onReaderOpen(this.app.Reader, () => this.#hookOpenAnnotPopup()),
+    );
   }
 
   patchedPopups = new WeakSet<Element>();
@@ -79,7 +72,7 @@ export class ReaderMenuHelper extends Component {
                 element: popup as XUL.MenuPopup,
                 removeSelf: false,
               });
-              self.menuCallbacks.forEach((cb) => cb(menu, data, this));
+              self.event.emit("menu", menu, data, this);
               self.patchedPopups.add(popup);
             }
             return result;
@@ -90,6 +83,6 @@ export class ReaderMenuHelper extends Component {
   }
 
   public onunload(): void {
-    this.menuCallbacks.length = 0;
+    return;
   }
 }

@@ -6,15 +6,17 @@ import { enumerate } from "@obzt/common";
 
 import type { Emitter } from "nanoevents";
 import { createNanoEvents } from "nanoevents";
-import type { IPaneDescriptor } from "./index.js";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
-import type { AnnotPopupData } from "./menu/reader-menu.js";
-import { ReaderMenuHelper } from "./menu/reader-menu.js";
 import { Component } from "./misc.js";
 import { polyfill } from "./polyfill/index.js";
 import type { Zotero7 } from "./polyfill/index.js";
 import { PreferencePane } from "./pref/index.js";
+import type { ReaderEvent } from "./reader/event.js";
+import { ReaderEventHelper } from "./reader/event.js";
+import { ReaderMenuHelper } from "./reader/menu.js";
+import type { AnnotPopupData } from "./reader/menu.js";
+import type { IPaneDescriptor } from "./index.js";
 
 declare global {
   var mainWindow: typeof window;
@@ -105,7 +107,8 @@ abstract class Plugin_2<
       // @ts-ignore
       delete globalThis.mainDocument;
     });
-    this.#readerHelper = this.addChild(new ReaderMenuHelper(app));
+    this.#readerMenu = this.addChild(new ReaderMenuHelper(app));
+    this.#readerEvent = this.addChild(new ReaderEventHelper(app));
     this.settings = new Proxy({} as Settings, {
       get(target, p, receiver) {
         if (typeof p === "string") {
@@ -137,7 +140,6 @@ abstract class Plugin_2<
     });
     this.register(unload);
     this.app = Zotero;
-    this.app.log(Zotero.PreferencePanes);
     super.load(manifest, Services);
   }
   abstract onload(manifest: Manifest, services: any): void;
@@ -211,8 +213,14 @@ abstract class Plugin_2<
   }
   // #endregion
 
+  #readerEvent: ReaderEventHelper;
+
+  registerReaderEvent<K extends keyof ReaderEvent>(key: K, cb: ReaderEvent[K]) {
+    this.register(this.#readerEvent.event.on(key, cb));
+  }
+
   // # menu
-  #readerHelper: ReaderMenuHelper;
+  #readerMenu: ReaderMenuHelper;
   registerMenu(
     selector: "reader",
     cb: (
@@ -231,7 +239,7 @@ abstract class Plugin_2<
     cb: (menu: Menu, ...args: any[]) => any,
   ): void {
     if (selector === "reader") {
-      this.#readerHelper.registerMenu(cb);
+      this.register(this.#readerMenu.event.on("menu", cb));
     } else {
       const menu = this.addChild(new Menu({ selector }));
       cb(menu);
