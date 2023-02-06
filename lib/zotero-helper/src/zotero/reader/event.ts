@@ -24,7 +24,8 @@ export class ReaderEventHelper extends Component {
 
     // if reader is available, hook into existing iframe
     if (this.#hookInitIframeWindow(reader._readers)) {
-      reader._readers.forEach((r) => this.#hookIframeWindow(r));
+      reader._readers.map((r) => this.#hookIframeWindow(r));
+      return;
     }
     this.register(
       onReaderOpen(this.app.Reader, () =>
@@ -48,7 +49,7 @@ export class ReaderEventHelper extends Component {
         _initIframeWindow: (next) =>
           function (this: _ZoteroTypes.ReaderInstance) {
             const result = next.call(this);
-            this._initPromise.then(() => self.#hookIframeWindow(this));
+            self.#hookIframeWindow(this);
             return result;
           },
       }),
@@ -62,9 +63,15 @@ export class ReaderEventHelper extends Component {
     );
   }
 
-  #hookIframeWindow(reader: _ZoteroTypes.ReaderInstance) {
-    const self = this,
-      window = reader._iframeWindow as unknown as typeof globalThis;
+  async #hookIframeWindow(reader: _ZoteroTypes.ReaderInstance) {
+    const self = this;
+
+    await reader._initPromise;
+    const window = reader._iframeWindow as unknown as typeof globalThis | null;
+    if (!window) {
+      self.app.logError(new Error("iframeWindow not found"));
+      return;
+    }
 
     const annotSidebar = window.document.getElementById("annotations");
     if (!annotSidebar) {
