@@ -151,7 +151,8 @@
       "lib/common",
       "lib/zotero-type",
       "readme",
-      "overview"
+      "overview",
+      "obsidian/topic-import"
     ],
     "[sql]": {
       "editor.defaultFormatter": "lea21st.vscode-sql-formatter"

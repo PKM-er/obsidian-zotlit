@@ -25,14 +25,13 @@ import {
   TemplateRenderer,
 } from "./services/template";
 import registerEtaEditorHelper from "./services/template/editor";
+import { TopicImport } from "./services/topic-import/service";
 import DatabaseWatcher from "./services/zotero-db/auto-refresh/service";
 import DatabaseWorker from "./services/zotero-db/connector/service";
 import { ZoteroDatabase } from "./services/zotero-db/database";
 import { ImgCacheImporter } from "./services/zotero-db/img-import/service";
 import { ZoteroSettingTab } from "./setting-tab/index.js";
 import { SettingLoader } from "./settings/service.js";
-import { TopicImport } from "./topic";
-import { untilDbRefreshed } from "./utils/once";
 import log from "@/log";
 
 declare global {
@@ -116,46 +115,6 @@ export default class ZoteroPlugin extends Plugin {
     // globalThis.zt = this;
     // this.register(() => delete globalThis.zt);
 
-    this.registerEvent(
-      this.server.on("bg:notify", async (_p, data) => {
-        const currTopic = this.topicImport.topic;
-        if (data.event !== "regular-item/add" || !currTopic) return;
-        await untilDbRefreshed(this.app, {
-          onRegister: (r) => this.registerEvent(r),
-          waitAfterEvent: 1e3,
-        });
-        const items = (await this.databaseAPI.getItems(data.ids, true)).flatMap(
-          (item, index) => {
-            if (item === null) {
-              log.warn("item not found", data.ids[index]);
-              return [];
-            }
-            return [[item, index] as const];
-          },
-        );
-        const tags = await this.databaseAPI.getTags(data.ids);
-
-        for (const [item, index] of items) {
-          const attachments = await this.databaseAPI.getAttachments(
-            ...data.ids[index],
-          );
-          await this.createNoteForDocItem(item, (template, ctx) =>
-            template.renderNote(
-              {
-                docItem: item,
-                tags,
-                attachment: null,
-                allAttachments: attachments,
-                annotations: [],
-              },
-              ctx,
-              { tags: [currTopic] },
-            ),
-          );
-          new Notice(`Created note for ${item.title}`, 1e3);
-        }
-      }),
-    );
     // this.registerEvent(
     //   this.server.on("zotero/export", (p) => console.warn(parseQuery(p))),
     // );
