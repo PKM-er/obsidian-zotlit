@@ -107,8 +107,6 @@ abstract class Plugin_2<
       // @ts-ignore
       delete globalThis.mainDocument;
     });
-    this.#readerMenu = this.addChild(new ReaderMenuHelper(app));
-    this.#readerEvent = this.addChild(new ReaderEventHelper(app));
     this.settings = new Proxy({} as Settings, {
       get(target, p, receiver) {
         if (typeof p === "string") {
@@ -216,14 +214,17 @@ abstract class Plugin_2<
   }
   // #endregion
 
-  #readerEvent: ReaderEventHelper;
+  #readerEvent?: ReaderEventHelper;
 
   registerReaderEvent<K extends keyof ReaderEvent>(key: K, cb: ReaderEvent[K]) {
+    if (!this.loaded) throw new Error("registerReaderEvent before loaded");
+
+    this.#readerEvent ??= this.addChild(new ReaderEventHelper(this.app));
     this.register(this.#readerEvent.event.on(key, cb));
   }
 
   // # menu
-  #readerMenu: ReaderMenuHelper;
+  #readerMenu?: ReaderMenuHelper;
   registerMenu(
     selector: "reader",
     cb: (
@@ -242,6 +243,8 @@ abstract class Plugin_2<
     cb: (menu: Menu, ...args: any[]) => any,
   ): void {
     if (selector === "reader") {
+      if (!this.loaded) throw new Error("register reader Menu before loaded");
+      this.#readerMenu ??= this.addChild(new ReaderMenuHelper(this.app));
       this.register(this.#readerMenu.event.on("menu", cb));
     } else {
       const menu = this.addChild(new Menu({ selector }));

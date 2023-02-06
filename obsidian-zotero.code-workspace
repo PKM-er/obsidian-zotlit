@@ -150,6 +150,7 @@
       "utils/esbuild-inline-worker",
       "lib/common",
       "lib/zotero-type",
+      "lib/zotero-helper",
       "readme",
       "overview",
       "obsidian/topic-import"
