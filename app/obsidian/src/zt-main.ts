@@ -10,6 +10,7 @@ import NoteFeatures from "./note-feature/service";
 import { AnnotBlock } from "./services/annot-block/service";
 import { CitekeyClick } from "./services/citekey-click/service";
 import NoteIndex from "./services/note-index/service.js";
+import PDFParser from "./services/pdf-parser/service";
 import { Server } from "./services/server/service";
 import {
   TemplateComplier,
@@ -40,7 +41,6 @@ export default class ZoteroPlugin extends Plugin {
       throw new Error("Library check failed");
     }
     // this.noteParser = new NoteParser(this);
-    // this.pdfCache = new PDFCache(this);
   }
 
   settings = this.use(SettingLoader);
@@ -66,6 +66,7 @@ export default class ZoteroPlugin extends Plugin {
   templateLoader = this.use(TemplateLoader);
 
   annotBlockWorker = this.use(AnnotBlock);
+  pdfParser = this.use(PDFParser);
 
   async onload() {
     log.info("loading Obsidian Zotero Plugin");

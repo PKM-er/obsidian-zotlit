@@ -4,11 +4,11 @@ import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
 
 import Settings from "./base";
+import { SuggesterSettings } from "@/components/suggester/settings.js";
 import log, { LogSettings } from "@/log";
 import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
 import { NoteIndexSettings } from "@/services/note-index/settings.js";
 import { ServerSettings } from "@/services/server/settings.js";
-import { SuggesterSettings } from "@/components/suggester/settings.js";
 import { TemplateSettings } from "@/services/template/settings.js";
 import { WatcherSettings } from "@/services/zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "@/services/zotero-db/connector/settings.js";
@@ -25,7 +25,6 @@ export interface ZoteroSettings {
   suggester: SuggesterSettings;
   noteFields: NoteFieldsSettings;
   server: ServerSettings;
-  // mutoolPath: string | null;
 }
 const settingNames = enumerate<keyof ZoteroSettings>()(
   "database",
@@ -37,7 +36,6 @@ const settingNames = enumerate<keyof ZoteroSettings>()(
   "suggester",
   "noteFields",
   "server",
-  // "mutoolPath",
 );
 
 export type SettingKeyWithType<T> = {
