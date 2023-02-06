@@ -7,6 +7,7 @@ import { context, build as _build } from "esbuild";
 import { styleCss, bootstrapJs } from "../const.js";
 import { toIdShort } from "../utils.js";
 import { getContentURIDef, parseChromeManifest } from "./chrome.js";
+import { defineGlobals } from "./global-patch.js";
 import { getInfoFromPackageJson } from "./parse.js";
 
 export async function build(
@@ -30,10 +31,7 @@ export async function build(
     platform: "browser",
     globalName: "Hooks",
     define: {
-      // zotero has no window.setTimeout in extension context...
-      setTimeout: "mainWindow.setTimeout",
-      fetch: "mainWindow.fetch",
-      URL: "mainWindow.URL",
+      ...defineGlobals,
     },
     bundle: true,
     entryPoints: [bootstrapFile],
@@ -80,31 +78,28 @@ const resolvePlugin = (entryPoint: string): Plugin => ({
     build.onResolve({ filter: /^@manifest$/ }, () => {
       return { path: resolve("package.json"), namespace: "pkg" };
     });
-    build.onLoad(
-      { filter: /package\.json$/, namespace: "pkg" },
-      async ({ path }) => {
-        const { id, version } = info,
-          idShort = toIdShort(id),
-          icons = JSON.stringify(
-            D.map(info.icons, (relative) => join(contentURI.root, relative)),
-          );
-        return {
-          loader: "js",
-          contents: `
+    build.onLoad({ filter: /package\.json$/, namespace: "pkg" }, async () => {
+      const { id, version } = info,
+        idShort = toIdShort(id),
+        icons = JSON.stringify(
+          D.map(info.icons, (relative) => join(contentURI.root, relative)),
+        );
+      return {
+        loader: "js",
+        contents: `
 export const id = "${id}";
 export const idShort = "${idShort}";
 export const version = "${version}";
 export const icons = ${icons}
 `,
-        };
-      },
-    );
+      };
+    });
     build.onResolve({ filter: /^@chrome$/, namespace: "file" }, () => {
       return { path: resolve("chrome.manifest"), namespace: "pkg" };
     });
     build.onLoad(
       { filter: /chrome\.manifest$/, namespace: "pkg" },
-      async ({ path }) => {
+      async () => {
         return {
           contents: `const manifest = ${JSON.stringify(
             manifest,
