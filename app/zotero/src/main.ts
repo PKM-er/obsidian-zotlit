@@ -188,15 +188,25 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
   };
 
   async #notify<T extends INotify>(content: T) {
-    const target = this.settings["notify-url"];
+    const targets = this.settings["notify-url"].split(";");
     // this.app.log(`send to: ${target}`);
-    await fetch(new URL("/notify", target), {
-      method: "POST",
-      body: JSON.stringify(content),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // broadcast to all targets
+    try {
+      await Promise.all(
+        targets.map((url) =>
+          fetch(new URL("/notify", url), {
+            method: "POST",
+            body: JSON.stringify(content),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }),
+        ),
+      );
+    } catch (error) {
+      this.app.log(`failed to notify to targets: ${targets.join(";")}`);
+      throw error;
+    }
   }
 
   handleSelectedItems(action: QueryAction) {
