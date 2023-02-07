@@ -28,7 +28,7 @@ export interface AnnotPreviewProps extends Attributes {
   tags: TagInfo[] | undefined;
 }
 
-export default function AnnotPreview({
+export default function Annotation({
   collapsed = false,
   annotation,
   checkbox,

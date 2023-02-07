@@ -1,9 +1,5 @@
-import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
-import {
-  ObsidianContext,
-  AnnotsViewContext,
-  AnnotsView,
-} from "@obzt/components";
+import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
+import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
 import type { INotifyActiveReader } from "@obzt/protocol";
 import { assertNever } from "assert-never";
@@ -129,9 +125,9 @@ export class AnnotationView extends ItemView {
     }
   }
 
-  getContext(): AnnotsViewContextType<
+  getContext(): AnnotViewContextType<
     Pick<
-      AnnotsViewStore,
+      AnnotViewStore,
       "doc" | "attachment" | "allAttachments" | "tags" | "annotations"
     >
   > {
@@ -165,9 +161,9 @@ export class AnnotationView extends ItemView {
     await this.untilZoteroReady();
     ReactDOM.render(
       <ObsidianContext.Provider value={context}>
-        <AnnotsViewContext.Provider value={this.getContext()}>
-          <AnnotsView />
-        </AnnotsViewContext.Provider>
+        <AnnotViewContext.Provider value={this.getContext()}>
+          <AnnotView />
+        </AnnotViewContext.Provider>
       </ObsidianContext.Provider>,
       this.contentEl,
     );

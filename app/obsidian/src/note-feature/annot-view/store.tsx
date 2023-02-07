@@ -1,4 +1,4 @@
-import type { AnnotsViewStore } from "@obzt/components";
+import type { AnnotViewStore } from "@obzt/components";
 import { createStore as create } from "@obzt/components";
 import type { AttachmentInfo } from "@obzt/database";
 import {
@@ -22,7 +22,7 @@ const getActiveAttachment = (
 };
 
 const getInit = (): Pick<
-  AnnotsViewStore,
+  AnnotViewStore,
   | "doc"
   | "tags"
   | "annotations"
@@ -43,7 +43,7 @@ const api = (p: ZoteroPlugin) => p.databaseAPI;
 export type StoreAPI = ReturnType<typeof createStore>;
 
 export const createStore = (p: ZoteroPlugin) =>
-  create<AnnotsViewStore>((set, get) => {
+  create<AnnotViewStore>((set, get) => {
     /**
      * @param docItem if provided, load active attachment from localStorage
      */

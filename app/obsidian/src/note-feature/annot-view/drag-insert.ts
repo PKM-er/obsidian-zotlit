@@ -1,10 +1,10 @@
 import { selectKeys } from "@mobily/ts-belt/Dict";
-import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
+import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
 import { isMarkdownFile } from "@/utils";
 import type ZoteroPlugin from "@/zt-main";
 
 export const getDragStartHandler =
-  (plugin: ZoteroPlugin): AnnotsViewContextType["onDragStart"] =>
+  (plugin: ZoteroPlugin): AnnotViewContextType["onDragStart"] =>
   (evt, render, container) => {
     // if (!render) {
     //   evt.dataTransfer.dropEffect = "none";
@@ -46,13 +46,13 @@ export const getDragStartHandler =
   };
 
 export type AnnotRendererProps = Pick<
-  AnnotsViewStore,
+  AnnotViewStore,
   "doc" | "attachment" | "allAttachments" | "tags" | "annotations"
 >;
 
 export const getAnnotRenderer = (
   plugin: ZoteroPlugin,
-): AnnotsViewContextType<AnnotRendererProps>["annotRenderer"] => ({
+): AnnotViewContextType<AnnotRendererProps>["annotRenderer"] => ({
   storeSelector: (state) =>
     selectKeys(state, [
       "doc",

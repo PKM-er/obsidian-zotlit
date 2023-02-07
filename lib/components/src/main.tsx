@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { AnnotsViewContext, ObsidianContext } from "./components";
+import { AnnotViewContext, ObsidianContext } from "./components";
 import { PrepareNote } from "./components/note-fields";
 import { CheckboxDemo } from "./components/status/importing";
 import "./index.css";
@@ -11,9 +11,9 @@ import { NoteFieldsMock } from "./mock/note-fields";
 //   ReactDOM.render(
 //     <React.StrictMode>
 //       <ObsidianContext.Provider value={context}>
-//         <AnnotsViewContext.Provider value={annotViewCtx}>
+//         <AnnotViewContext.Provider value={annotViewCtx}>
 //           <PrepareNote onClick={() => void 0} />
-//         </AnnotsViewContext.Provider>
+//         </AnnotViewContext.Provider>
 //       </ObsidianContext.Provider>
 //     </React.StrictMode>,
 //     document.getElementById(id) as HTMLElement,

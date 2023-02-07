@@ -1,10 +1,10 @@
 /* eslint-disable no-var */
 import { createStore } from "zustand";
-import type { AnnotsViewContextType, AnnotsViewStore } from "../components";
+import type { AnnotViewContextType, AnnotViewStore } from "../components";
 import type { ObsidianContextType } from "../components/obsidian";
 import data from "./data.json";
-export const store = createStore<AnnotsViewStore>((set) => ({
-  ...(data as unknown as AnnotsViewStore),
+export const store = createStore<AnnotViewStore>((set) => ({
+  ...(data as unknown as AnnotViewStore),
   setActiveAtch(id) {
     console.log("setActiveAtch", id);
   },
@@ -33,7 +33,7 @@ const icon = (() => {
   return template.content.firstElementChild as SVGSVGElement;
 })();
 
-export const annotViewCtx: AnnotsViewContextType = {
+export const annotViewCtx: AnnotViewContextType = {
   store,
   registerDbUpdate(callback) {
     window.triggerDbUpdate = callback;

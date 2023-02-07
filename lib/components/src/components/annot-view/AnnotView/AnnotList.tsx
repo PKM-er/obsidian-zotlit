@@ -1,6 +1,6 @@
 import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { useSet } from "ahooks";
-import AnnotPreview from "../AnnotPreview";
+import Annotation from "../Annotation";
 
 export interface AnnotListProps {
   annotations: AnnotationInfo[];
@@ -23,7 +23,7 @@ export default function AnnotList({
       className="@md:grid-cols-2 @md:gap-3 @3xl:grid-cols-4 grid grid-cols-1 gap-2"
     >
       {annotations.map((annot) => (
-        <AnnotPreview
+        <Annotation
           checkbox={
             selectable && (
               <Checkbox

@@ -1,4 +1,4 @@
-export type { ContextType as AnnotsViewContextType } from "./context";
-export { Context as AnnotsViewContext } from "./context";
-export { default as AnnotsView } from "./AnnotsView";
-export type { DataModel as AnnotsViewStore } from "./store";
+export type { ContextType as AnnotViewContextType } from "./context";
+export { Context as AnnotViewContext } from "./context";
+export { default as AnnotView } from "./AnnotView";
+export type { DataModel as AnnotViewStore } from "./store";

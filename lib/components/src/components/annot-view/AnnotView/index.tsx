@@ -20,7 +20,7 @@ const useOnDbRefresh = () => {
   useEffect(() => registerDbUpdate(refresh), [registerDbUpdate, refresh]);
 };
 
-export default function AnnotsView() {
+export default function AnnotView() {
   const { store } = useContext(Context);
 
   useOnDbRefresh();
