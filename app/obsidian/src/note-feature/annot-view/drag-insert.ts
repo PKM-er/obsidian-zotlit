@@ -1,5 +1,6 @@
 import { selectKeys } from "@mobily/ts-belt/Dict";
 import type { AnnotsViewContextType, AnnotsViewStore } from "@obzt/components";
+import { isMarkdownFile } from "@/utils";
 import type ZoteroPlugin from "@/zt-main";
 
 export const getDragStartHandler =
@@ -70,8 +71,11 @@ export const getAnnotRenderer = (
     )
       return null;
 
-    return () =>
-      plugin.templateRenderer.renderAnnot(
+    return () => {
+      const activeFile = plugin.app.workspace.getActiveFile();
+      const sourcePath =
+        activeFile && isMarkdownFile(activeFile) ? activeFile.path : null;
+      return plugin.templateRenderer.renderAnnot(
         annotation,
         {
           tags,
@@ -82,8 +86,9 @@ export const getAnnotRenderer = (
         },
         {
           plugin,
-          sourcePath: doc.sourcePath,
+          sourcePath,
         },
       );
+    };
   },
 });

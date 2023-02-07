@@ -1,6 +1,7 @@
 import type { AnnotsViewContextType } from "@obzt/components";
 import type { AnnotationInfo } from "@obzt/database";
 import { MarkdownView, Menu, Notice } from "obsidian";
+import { isMarkdownFile } from "../../utils";
 import type { AnnotationView } from "@/note-feature/annot-view/view";
 
 export const getMoreOptionsHandler =
@@ -26,8 +27,11 @@ export const getMoreOptionsHandler =
   };
 const jumpToAnnotNote =
   (annot: AnnotationInfo, view: AnnotationView) => async () => {
+    const activeFile = view.app.workspace.getActiveFile();
+    const file =
+      activeFile && isMarkdownFile(activeFile) ? activeFile.path : undefined;
     const blockInfo = view.plugin.noteIndex
-      .getBlocksFor({ item: annot, file: view.file.path })
+      .getBlocksFor({ item: annot, file })
       .shift();
 
     if (!blockInfo) {
@@ -44,7 +48,7 @@ const jumpToAnnotNote =
 
     await sleep(10);
     const { leaf } = view,
-      { workspace } = app;
+      { workspace, vault } = app;
     // MobileDrawer.collapseFor(n);
     let groupLeaves;
     if (leaf.group) groupLeaves = app.workspace.getGroupLeaves(leaf.group);
@@ -59,19 +63,17 @@ const jumpToAnnotNote =
       if (
         leaf &&
         leaf.view instanceof MarkdownView &&
-        leaf.view.file === view.file
+        leaf.view.file.path === blockInfo.file
       ) {
-        leaf.view.setEphemeralState({
-          line: endLine,
-        });
+        leaf.view.setEphemeralState({ line: endLine });
         hasMarkdownView = !0;
       }
     }
     if (!hasMarkdownView) {
-      workspace.getLeaf().openFile(view.file, {
-        eState: {
-          line: endLine,
-        },
-      });
+      const file = vault.getAbstractFileByPath(blockInfo.file);
+      if (!file || !isMarkdownFile(file))
+        throw new Error("File from block info not found: " + blockInfo.file);
+
+      workspace.getLeaf().openFile(file, { eState: { line: endLine } });
     }
   };
