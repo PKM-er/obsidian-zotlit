@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { INotifyRegularItem } from "@/../../../lib/protocol/dist";
 import workerpool from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
 import { toObjectURL } from "@obzt/esbuild-plugin-inline-worker/utils";
 import { Service } from "@ophidian/core";
 import { assertNever } from "assert-never";
+import type { EventRef } from "obsidian";
 import { debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";
 import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
 import log, { LogSettings } from "@/log";
+import { CancelledError, TimeoutError, untilDbRefreshed } from "@/utils/once";
 import { createWorkerProxy } from "@/utils/worker";
 import ZoteroPlugin from "@/zt-main";
 
@@ -56,7 +59,84 @@ export default class DatabaseWorker extends Service {
         await this.refresh({ task: "searchIndex" });
       },
     });
+
+    const requestRefresh = this.genAutoRefresh(plugin);
+    this.registerEvent(
+      plugin.server.on("bg:notify", async (_, data) => {
+        if (data.event !== "regular-item/update") return;
+        requestRefresh(data);
+      }),
+    );
   }
+  private genAutoRefresh(plugin: ZoteroPlugin) {
+    let dbRefreshed = false;
+    let _cancel: (() => void) | null = null;
+    const cancelWaitRefresh = () => {
+      if (!_cancel) return;
+      log.debug("unregistering db refresh watcher");
+      _cancel();
+      _cancel = null;
+    };
+    const tryRefresh = debounce(
+      async () => {
+        cancelWaitRefresh();
+        log.debug("Auto Refreshing Zotero Search Index");
+        if (!dbRefreshed) {
+          dbRefreshed = false;
+          try {
+            log.debug("Db not refreshed, waiting before auto refresh");
+            const [task] = untilDbRefreshed(plugin.app, { timeout: 10e3 });
+            await task;
+          } catch (error) {
+            if (error instanceof TimeoutError) {
+              log.warn(
+                "no db refreshed event received in 10s, skip refresh search index",
+              );
+              return;
+            } else {
+              console.error(
+                "error while waiting for db refresh during execute",
+                error,
+              );
+              return;
+            }
+          }
+        }
+        await this.refresh({ task: "searchIndex", force: true });
+        log.debug("Auto Refreshing Zotero Search Index Success");
+      },
+      5000,
+      true,
+    );
+    return (data: INotifyRegularItem) => {
+      log.debug(
+        `Request to auto refresh search index: (refreshed ${dbRefreshed})`,
+        data,
+      );
+      tryRefresh();
+      cancelWaitRefresh();
+      if (dbRefreshed) return;
+      log.debug(
+        "watching db refresh while waiting for search index auto refresh",
+      );
+      const [task, cancel] = untilDbRefreshed(plugin.app, { timeout: null });
+      _cancel = cancel;
+      task
+        .then(() => {
+          log.debug("db refresh while requesting auto refresh search index");
+          dbRefreshed = true;
+          _cancel = null;
+        })
+        .catch((err) => {
+          if (err instanceof CancelledError) return;
+          console.error(
+            "error while waiting for db refresh during request",
+            err,
+          );
+        });
+    };
+  }
+
   async onunload(): Promise<void> {
     await this.#instance.terminate();
     URL.revokeObjectURL(this.#url);

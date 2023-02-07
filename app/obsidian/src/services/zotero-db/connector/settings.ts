@@ -1,10 +1,10 @@
 import { homedir } from "os";
 import { join } from "path";
 import assertNever from "assert-never";
+import DatabaseWorker from "./service";
 import { getBinaryFullPath } from "@/install-guide/version";
 
 import Settings from "@/settings/base";
-import DatabaseWorker from "./service";
 
 interface SettingOptions {
   zoteroDataDir: string;

@@ -72,9 +72,9 @@ export class NoteFieldsView extends DerivedFileView {
 
   protected async onOpen() {
     await super.onOpen();
-    await untilMetaReady(this.app, {
-      onRegister: (r) => this.registerEvent(r),
-    });
+    const [task, cancel] = untilMetaReady(this.app, {});
+    cancel && this.register(cancel);
+    await task;
     const ErrorFallback = this.ErrorFallback;
     ReactDOM.render(
       <ObsidianContext.Provider value={context}>

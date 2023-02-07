@@ -86,7 +86,7 @@ export class AnnotationView extends ItemView {
   }
 
   untilZoteroReady() {
-    return waitUntil({
+    const [task, cancel] = waitUntil({
       unregister: (ref) => app.vault.offref(ref),
       escape: () => this.plugin.dbWorker.status === DatabaseStatus.Ready,
       register: (cb) => {
@@ -100,8 +100,9 @@ export class AnnotationView extends ItemView {
         }
         assertNever(status);
       },
-      onRegister: (ref) => this.registerEvent(ref),
     });
+    cancel && this.register(cancel);
+    return task;
   }
 
   get lib() {

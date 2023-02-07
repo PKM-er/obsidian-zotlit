@@ -237,9 +237,9 @@ export default class NoteIndex extends Service {
       this.vault.on("delete", this.onFileRemoved, this),
     ].forEach(this.registerEvent.bind(this));
 
-    untilMetaReady(this.plugin.app, {
-      onRegister: (r) => this.registerEvent(r),
-    }).then(() => {
+    const [task, cancel] = untilMetaReady(this.plugin.app, {});
+    cancel && this.register(cancel);
+    task.then(() => {
       this.onMetaBuilt();
       this.plugin.addCommand({
         id: "refresh-note-index",

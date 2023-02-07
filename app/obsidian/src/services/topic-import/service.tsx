@@ -73,10 +73,12 @@ export class TopicImport extends Service {
           !data.add.length
         )
           return;
-        await untilDbRefreshed(this.plugin.app, {
-          onRegister: (r) => this.plugin.registerEvent(r),
+
+        const [task, cancel] = untilDbRefreshed(this.plugin.app, {
           waitAfterEvent: 1e3,
         });
+        cancel && this.register(cancel);
+        await task;
         await createNote(data.add, {
           currTopic: this.topic,
           plugin: this.plugin,
