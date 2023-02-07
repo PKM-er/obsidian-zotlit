@@ -4,8 +4,8 @@ import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
 
 import Settings from "./base";
-import { SuggesterSettings } from "@/components/suggester/settings.js";
 import log, { LogSettings } from "@/log";
+import { SuggesterSettings } from "@/note-feature/citation-suggest";
 import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
 import { NoteIndexSettings } from "@/services/note-index/settings.js";
 import { ServerSettings } from "@/services/server/settings.js";

@@ -14,7 +14,7 @@ import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
-import { context } from "@/components/context";
+import { context } from "@/components/basic/context";
 import { DatabaseStatus } from "@/services/zotero-db/connector/service";
 import { waitUntil } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";

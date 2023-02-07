@@ -7,10 +7,10 @@ import { Notice } from "obsidian";
 import ReactDOM from "react-dom";
 import type { FallbackProps } from "react-error-boundary";
 import { ErrorBoundary } from "react-error-boundary";
-import { DerivedFileView } from "../derived-file-view";
 import { NoteFieldsMain } from "./component";
 import { buildId, extractId } from "./uuid";
-import { context } from "@/components/context";
+import { context } from "@/components/basic/context";
+import { DerivedFileView } from "@/components/derived-file-view";
 import { untilMetaReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 

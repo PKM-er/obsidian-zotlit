@@ -2,16 +2,12 @@ import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
 import type { RegularItemInfoBase } from "@obzt/database";
 import { Service } from "@ophidian/core";
-import { BaseError } from "make-error";
 
 import { Notice } from "obsidian";
 import { AnnotationView, annotViewType } from "./annot-view/view";
+import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
-import { CitationSuggestModal } from "./quick-switcher";
-import {
-  CitationEditorSuggest,
-  insertCitation,
-} from "@/components/citation-suggest";
+import { openNote } from "./quick-switch";
 import { getItemKeyOf } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import type { Context } from "@/services/template/helper/base.js";
@@ -25,9 +21,7 @@ class NoteFeatures extends Service {
     plugin.addCommand({
       id: "note-quick-switcher",
       name: "Open quick switcher for literature notes",
-      callback: () => {
-        new CitationSuggestModal(plugin).goToNote();
-      },
+      callback: () => openNote(plugin),
     });
     plugin.registerView(
       annotViewType,
@@ -68,7 +62,7 @@ class NoteFeatures extends Service {
     plugin.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",
-      editorCallback: insertCitation(plugin),
+      editorCallback: (editor) => insertCitationTo(editor, plugin),
     });
     plugin.registerEditorSuggest(new CitationEditorSuggest(plugin));
   }
@@ -131,7 +125,7 @@ class NoteFeatures extends Service {
 
 export default NoteFeatures;
 
-export class NoteExistsError extends BaseError {
+export class NoteExistsError extends Error {
   constructor(public targets: string[], public key: string) {
     super(`Note linked to ${key} already exists: ${targets.join(",")}`);
     this.name = "NoteExistsError";
