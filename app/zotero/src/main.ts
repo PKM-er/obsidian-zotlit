@@ -16,7 +16,7 @@ import { stringifyQuery } from "@obzt/protocol";
 import type { INotifyActiveReader } from "@obzt/protocol/dist/bg.js";
 import { assertNever } from "assert-never";
 import type settings from "../prefs.json";
-import { Debouncer } from "./debounced.js";
+import { Debouncer, ItemUpdateDebouncer } from "./debounced.js";
 
 export default class ZoteroPlugin extends Plugin<typeof settings> {
   onInstall(): void | Promise<void> {
@@ -50,17 +50,23 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       (value) => {
         if (!value) return;
         this.registerNotifier(["item"]);
-        this.register(
-          this.events.item.on("add", (ids) => {
-            if (this.settings.notify === false) return;
-            this.app.log(`try notify items added: ${ids.join(", ")}`);
-            ids.forEach((id) => {
-              const item = this.app.Items.get(id);
-              if (!item.isRegularItem()) return;
-              this.request.nItemAdded(item.id, item.libraryID);
-            });
-          }),
-        );
+        const registerItemUpdate = (type: "add" | "modify" | "trash") => {
+          this.register(
+            this.events.item.on(type, (ids) => {
+              if (this.settings.notify === false) return;
+              this.app.log(`try notify items ${type}: ${ids.join(", ")}`);
+              ids.forEach((id) => {
+                const item = this.app.Items.get(id);
+                if (!item.isRegularItem()) return;
+                this.request.nItemUpdated(item.id, item.libraryID, type);
+              });
+            }),
+          );
+        };
+        registerItemUpdate("add");
+        registerItemUpdate("modify");
+        registerItemUpdate("trash");
+
         this.registerReaderEvent("annot-select", (key, selected, itemId) => {
           if (this.settings.notify === false) return;
           const libId = this.app.Items.get(itemId).libraryID;
@@ -144,13 +150,13 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
   }
 
   request = {
-    nItemAdded: Debouncer.create<number, number>(async (ids) => {
+    nItemUpdated: ItemUpdateDebouncer.create(async (ids) => {
       await this.#notify<INotifyRegularItem>({
-        event: "regular-item/add",
+        event: "regular-item/update",
         /** itemid -> libid */
-        ids,
+        ...ids,
       });
-      this.app.log(`notify item added: ${ids.map((a) => a[0]).join(", ")}`);
+      this.app.log(`notify item added: ${JSON.stringify(ids)}`);
     }),
     nReaderAnnotSelect: Debouncer.create<boolean, number>(async (updates) => {
       await this.#notify<INotifyReaderAnnotSelect>({

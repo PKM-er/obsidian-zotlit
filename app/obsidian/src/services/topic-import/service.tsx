@@ -67,12 +67,20 @@ export class TopicImport extends Service {
   onload(): void {
     this.plugin.registerEvent(
       this.plugin.server.on("bg:notify", async (_p, data) => {
-        if (data.event !== "regular-item/add" || !this.topic) return;
+        if (
+          data.event !== "regular-item/update" ||
+          !this.topic ||
+          !data.add.length
+        )
+          return;
         await untilDbRefreshed(this.plugin.app, {
           onRegister: (r) => this.plugin.registerEvent(r),
           waitAfterEvent: 1e3,
         });
-        await createNote(data, { currTopic: this.topic, plugin: this.plugin });
+        await createNote(data.add, {
+          currTopic: this.topic,
+          plugin: this.plugin,
+        });
       }),
     );
     this.registerEvent(

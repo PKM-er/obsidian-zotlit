@@ -1,6 +1,8 @@
 export interface INotifyRegularItem {
-  event: "regular-item/add";
-  ids: [id: number, lib: number][];
+  event: "regular-item/update";
+  add: [id: number, lib: number][];
+  modify: [id: number, lib: number][];
+  trash: [id: number, lib: number][];
 }
 
 export interface INotifyReaderAnnotSelect {
