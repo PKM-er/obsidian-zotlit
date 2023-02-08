@@ -9,10 +9,11 @@ import { EditorSuggest } from "obsidian";
 
 import type { SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
+import type { SearchResult } from "@/services/zotero-db/database.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
 export abstract class ZoteroItemEditorSuggest
-  extends EditorSuggest<RegularItemInfo>
+  extends EditorSuggest<SearchResult>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {
@@ -30,7 +31,7 @@ export abstract class ZoteroItemEditorSuggest
   renderSuggestion = renderSuggestion.bind(this);
 
   abstract selectSuggestion(
-    suggestion: RegularItemInfo,
+    suggestion: SearchResult,
     evt: MouseEvent | KeyboardEvent,
   ): void;
 }

@@ -15,7 +15,7 @@ export async function insertCitationTo(editor: Editor, plugin: ZoteroPlugin) {
   const result = await chooseLiterature(plugin);
   if (!result) return false;
   insertCitation(
-    { item: result.value, alt: isShift(result.evt) },
+    { item: result.value.item, alt: isShift(result.evt) },
     undefined,
     editor,
     plugin.templateRenderer,

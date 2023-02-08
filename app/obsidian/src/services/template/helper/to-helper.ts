@@ -1,9 +1,9 @@
 import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
 import type { AnnotationExtra } from "./annot";
-import type { Context, AnnotHelper, DocItemHelper } from ".";
 import { withAnnotHelper } from "./annot";
 import type { RegularItemInfoExtra } from "./item";
 import { withDocItemHelper } from "./item";
+import type { Context, AnnotHelper, DocItemHelper } from ".";
 
 export type HelperExtra = RegularItemInfoExtra & {
   annotations: AnnotationInfo[];

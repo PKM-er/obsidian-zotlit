@@ -22,7 +22,9 @@ class NoteQuickSwitch extends ZoteroItemPopupSuggest {
 export async function openNote(plugin: ZoteroPlugin): Promise<boolean> {
   const result = await openModal(new NoteQuickSwitch(plugin));
   if (!result) return false;
-  const { value: item } = result;
+  const {
+    value: { item },
+  } = result;
   if (await plugin.noteFeatures.openNote(item, true)) return true;
 
   const libId = plugin.database.settings.citationLibrary;

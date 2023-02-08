@@ -167,7 +167,7 @@ export class AnnotationView extends ItemView {
 
             const literature = await chooseLiterature(plugin);
             if (!literature) return;
-            const { itemID } = literature.value;
+            const { itemID } = literature.value.item;
 
             const lib = plugin.settings.database.citationLibrary;
             const attachments = await plugin.databaseAPI.getAttachments(

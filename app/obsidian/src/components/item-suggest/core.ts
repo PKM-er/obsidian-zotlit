@@ -3,9 +3,10 @@ import { isCreatorFullName, isCreatorNameOnly } from "@obzt/database";
 import type { JournalArticleItem } from "@obzt/zotero-type";
 
 // import unionRanges from "@/utils/union.js";
+import { setIcon } from "obsidian";
+import type { SearchResult } from "@/services/zotero-db/database";
 import type ZoteroPlugin from "@/zt-main.js";
 
-const PRIMARY_MATCH_FIELD = "title";
 export const CLASS_ID = "zt-citations";
 
 export interface SuggesterBase {
@@ -14,14 +15,9 @@ export interface SuggesterBase {
 export const getSuggestions = async (
   input: string,
   plugin: ZoteroPlugin,
-): Promise<RegularItemInfo[]> => {
+): Promise<SearchResult[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
-    return await plugin.database.search(
-      input,
-      // input.replace(/^\+|\+$/g, "").split(/\+/),
-      PRIMARY_MATCH_FIELD,
-      50,
-    );
+    return await plugin.database.search(input);
   } else {
     return await plugin.database.getItemsOf(50);
   }
@@ -29,12 +25,37 @@ export const getSuggestions = async (
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function renderSuggestion(
   this: SuggesterBase,
-  item: RegularItemInfo,
+  { item, fields }: SearchResult,
   el: HTMLElement,
 ): void {
-  const [title] = item[PRIMARY_MATCH_FIELD];
+  el.addClass("mod-complex");
+  const contentEl = el
+    .createDiv("suggestion-content")
+    .createDiv("suggestion-title")
+    .createSpan();
+  const auxEl = el.createDiv("suggestion-aux");
 
-  const titleEl = el.createDiv({ cls: "title" });
+  for (const field of fields) {
+    const label = auxEl.createEl("kbd", "suggestion-hotkey");
+    label.setAttribute("aria-label", field);
+    switch (field) {
+      case "title":
+        setIcon(label, "type");
+        break;
+      case "creators":
+        setIcon(label, "user");
+        break;
+      case "date":
+        setIcon(label, "calendar");
+        break;
+      default:
+        label.setText(field);
+        break;
+    }
+  }
+
+  const [title] = item.title ?? [];
+  const titleEl = contentEl.createDiv({ cls: "title" });
   if (!(typeof title === "string" && title)) {
     titleEl.setText("Title missing");
   } /* else if (matches) {
@@ -53,10 +74,10 @@ export function renderSuggestion(
     titleEl.setText(title);
   }
   if (this.plugin.settings.suggester.showCitekeyInSuggester && item.citekey) {
-    el.createDiv({ cls: "citekey", text: item.citekey });
+    contentEl.createDiv({ cls: "citekey", text: item.citekey });
   }
   if (isJournalArticleItem(item)) {
-    el.append(getArticleMeta(item));
+    contentEl.append(getArticleMeta(item));
   }
 }
 

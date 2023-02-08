@@ -1,12 +1,11 @@
-import type { RegularItemInfo } from "@obzt/database";
-
 import { DebouncedSuggeestModal } from "../basic/modal.js";
 import type { SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
+import type { SearchResult } from "@/services/zotero-db/database.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
 export class ZoteroItemPopupSuggest
-  extends DebouncedSuggeestModal<RegularItemInfo>
+  extends DebouncedSuggeestModal<SearchResult>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {

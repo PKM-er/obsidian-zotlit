@@ -6,6 +6,7 @@ import type {
 } from "obsidian";
 import { insertCitation, instructions, isShift } from "./basic";
 import { ZoteroItemEditorSuggest } from "@/components/item-suggest";
+import type { SearchResult } from "@/services/zotero-db/database";
 import type ZoteroPlugin from "@/zt-main";
 
 export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
@@ -36,12 +37,12 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   }
 
   selectSuggestion(
-    item: RegularItemInfo,
+    suggestion: SearchResult,
     evt: MouseEvent | KeyboardEvent,
   ): void {
     if (!this.context) return;
     insertCitation(
-      { item, alt: isShift(evt) },
+      { item: suggestion.item, alt: isShift(evt) },
       this.context,
       this.context.editor,
       this.plugin.templateRenderer,

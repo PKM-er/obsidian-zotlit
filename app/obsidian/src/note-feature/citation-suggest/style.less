@@ -1,6 +1,19 @@
 .zt-citations .suggestion-item {
+  padding-right: var(--size-2-3);
+  .suggestion-aux {
+    gap: var(--size-2-2)
+  }
+  .suggestion-hotkey {
+    display: flex;
+    --icon-size: var(--font-ui-smaller);
+    padding: 2px;
+    &:not(:last-child) {
+      margin-left: var(--size-2-2);
+    }
+  }
   .title {
-    font-weight: 500;
+    font-weight: var(--file-header-font-weight);
+    font-size: var(--font-ui-small);
     .suggestion-highlight {
       color: var(--text-accent);
     }
@@ -20,6 +33,7 @@
   }
   .meta {
     color: var(--text-faint);
+    font-size: var(--font-ui-smaller);
     .commas-between();
     .author-year {
       .space-between();
