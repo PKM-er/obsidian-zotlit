@@ -7,9 +7,9 @@ import type {
   RegularItemInfoBase,
 } from "@obzt/database";
 import {
+  BibtexGetCitekey,
   Items,
   ItemsByKey,
-  BetterBibtex,
   Creators,
   ItemFields,
 } from "@obzt/database";
@@ -42,7 +42,7 @@ const readCitekeys = (items: ItemIDLibID[]) => {
     log.info("Better BibTex database not enabled, skipping...");
     return [];
   }
-  const result = databases.bbt.prepare(BetterBibtex).query({ items });
+  const result = databases.bbt.prepare(BibtexGetCitekey).query({ items });
   log.info("Finished reading Better BibTex");
   return result;
 };

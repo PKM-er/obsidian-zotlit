@@ -1,7 +1,13 @@
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
 import type { ItemIDLibID } from "@obzt/database";
-import { AnnotByKeys, AnnotByParent, Attachements, Tags } from "@obzt/database";
+import {
+  BibtexGetId,
+  AnnotByKeys,
+  AnnotByParent,
+  Attachements,
+  Tags,
+} from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import localforage from "localforage";
 import { cache, databases, getGroupID, getLibInfo } from "./init.js";
@@ -25,13 +31,17 @@ const methods: DbWorkerAPI = {
     (items: ItemIDLibID[]) => databases.main.prepare(Tags).query(items),
     "tags",
   ),
+  getItemIDsFromCitekey(citekeys) {
+    const result = databases.bbt.prepare(BibtexGetId).query({ citekeys });
+    return result;
+  },
   getItemsFromCache: (limit, lib) => {
     const items = cache.items.get(lib);
-    if (limit <= 0) {
-      return [...items.byId.values()];
-    }
     if (!items) {
       throw new Error("get items before cache ready");
+    }
+    if (limit <= 0) {
+      return [...items.byId.values()];
     }
     const output = [];
     for (const item of items.byId.values()) {

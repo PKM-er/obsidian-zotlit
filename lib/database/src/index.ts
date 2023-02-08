@@ -1,7 +1,8 @@
 export { AnnotByKeys } from "./sql/annotations/by-keys.js";
 export { AnnotByParent } from "./sql/annotations/by-parent.js";
 export { Attachements } from "./sql/attachments.js";
-export { BetterBibtex } from "./sql/better-bibtex.js";
+export { BibtexGetCitekey } from "./sql/bibtex/get-citekey.js";
+export { BibtexGetId } from "./sql/bibtex/get-id.js";
 export { CreatorsFull } from "./sql/creator/full.js";
 export { Creators } from "./sql/creator/part.js";
 export { ItemFieldsFull } from "./sql/item-fields/full.js";

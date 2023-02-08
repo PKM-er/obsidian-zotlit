@@ -1,7 +1,5 @@
-import type { AnnotationInfo, ItemIDLibID } from "@obzt/database";
-import { cacheActiveAtch } from "@obzt/database";
+import { Keymap } from "obsidian";
 import { openModal } from "../../components/basic/modal";
-import { chooseFileAtch } from "@/components/atch-suggest.js";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest/popup.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
@@ -19,48 +17,20 @@ class NoteQuickSwitch extends ZoteroItemPopupSuggest {
   }
 }
 
-export async function openNote(plugin: ZoteroPlugin): Promise<boolean> {
+export async function openOrCreateNote(plugin: ZoteroPlugin): Promise<boolean> {
   const result = await openModal(new NoteQuickSwitch(plugin));
   if (!result) return false;
   const {
     value: { item },
+    evt,
   } = result;
   if (await plugin.noteFeatures.openNote(item, true)) return true;
-
-  const libId = plugin.database.settings.citationLibrary;
-  const allAttachments = await plugin.databaseAPI.getAttachments(
-    item.itemID,
-    libId,
+  const notePath = await plugin.noteFeatures.createNoteForDocItemFull(item);
+  await plugin.app.workspace.openLinkText(
+    notePath,
+    "",
+    Keymap.isModEvent(evt),
+    { active: true },
   );
-
-  const attachment = await chooseFileAtch(allAttachments);
-  if (attachment) {
-    cacheActiveAtch(window.localStorage, item, attachment.itemID);
-  }
-
-  const annotations: AnnotationInfo[] = attachment
-    ? await plugin.databaseAPI.getAnnotations(attachment.itemID, libId)
-    : [];
-
-  const tagsRecord = await plugin.databaseAPI.getTags([
-    [item.itemID, libId],
-    ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
-  ]);
-
-  const note = await plugin.noteFeatures.createNoteForDocItem(
-    item,
-    (template, ctx) =>
-      template.renderNote(
-        {
-          docItem: item,
-          attachment,
-          tags: tagsRecord,
-          allAttachments,
-          annotations,
-        },
-        ctx,
-      ),
-  );
-  await app.workspace.openLinkText(note.path, "", false);
   return true;
 }

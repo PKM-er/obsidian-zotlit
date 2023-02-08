@@ -1,13 +1,19 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
-import type { RegularItemInfoBase } from "@obzt/database";
+import type {
+  AnnotationInfo,
+  ItemIDLibID,
+  RegularItemInfoBase,
+} from "@obzt/database";
+import { cacheActiveAtch } from "@obzt/database";
 import { Service } from "@ophidian/core";
 
 import { Notice } from "obsidian";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
-import { openNote } from "./quick-switch";
+import { openOrCreateNote } from "./quick-switch";
+import { chooseFileAtch } from "@/components/atch-suggest";
 import { getItemKeyOf } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import type { Context } from "@/services/template/helper/base.js";
@@ -21,7 +27,7 @@ class NoteFeatures extends Service {
     plugin.addCommand({
       id: "note-quick-switcher",
       name: "Open quick switcher for literature notes",
-      callback: () => openNote(plugin),
+      callback: () => openOrCreateNote(plugin),
     });
     plugin.registerView(
       annotViewType,
@@ -120,6 +126,43 @@ class NoteFeatures extends Service {
       }),
     );
     return note;
+  }
+
+  async createNoteForDocItemFull(item: RegularItemInfoBase): Promise<string> {
+    const { plugin } = this;
+    const libId = plugin.database.settings.citationLibrary;
+    const allAttachments = await plugin.databaseAPI.getAttachments(
+      item.itemID,
+      libId,
+    );
+
+    const attachment = await chooseFileAtch(allAttachments);
+    if (attachment) {
+      cacheActiveAtch(window.localStorage, item, attachment.itemID);
+    }
+
+    const annotations: AnnotationInfo[] = attachment
+      ? await plugin.databaseAPI.getAnnotations(attachment.itemID, libId)
+      : [];
+
+    const tagsRecord = await plugin.databaseAPI.getTags([
+      [item.itemID, libId],
+      ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
+    ]);
+
+    const note = await this.createNoteForDocItem(item, (template, ctx) =>
+      template.renderNote(
+        {
+          docItem: item,
+          attachment,
+          tags: tagsRecord,
+          allAttachments,
+          annotations,
+        },
+        ctx,
+      ),
+    );
+    return note.path;
   }
 }
 

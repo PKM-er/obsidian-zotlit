@@ -55,6 +55,7 @@ export interface DbWorkerAPI {
   raw<R>(mode: "all", sql: string, args: any[]): R[];
   raw<R>(mode: "get" | "all", sql: string, args: any[]): R | R[];
 
+  getItemIDsFromCitekey(citekeys: string[]): Record<string, number>;
   getAnnotFromKey(
     keys: string[],
     libraryID: number,

@@ -1,1 +1,1 @@
-export { openNote } from "./popup";
+export { openOrCreateNote } from "./popup";

@@ -2,21 +2,36 @@ import { syntaxTree, tokenClassNodeProp } from "@codemirror/language";
 import type { EditorView } from "@codemirror/view";
 import { Service } from "@ophidian/core";
 import { around } from "monkey-around";
-import type { Editor, MarkdownView, EditorPosition } from "obsidian";
+import type {
+  Editor,
+  MarkdownView,
+  EditorPosition,
+  MarkdownEditView,
+} from "obsidian";
+import { Notice } from "obsidian";
 
 import type NoteIndex from "../note-index/service";
 import { untilWorkspaceReady, waitUntil } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
 
+interface ClickableToken {
+  type: string;
+  text: string;
+  start: EditorPosition;
+  end: EditorPosition;
+  [key: string]: any;
+}
+
 declare module "obsidian" {
   interface Editor {
     cm: EditorView;
-    getClickableTokenAt(pos: EditorPosition): {
-      type: string;
-      text: string;
-      start: EditorPosition;
-      end: EditorPosition;
-    } | null;
+    getClickableTokenAt(pos: EditorPosition): ClickableToken | null;
+  }
+  interface MarkdownView {
+    editMode: MarkdownEditView;
+  }
+  interface MarkdownEditView {
+    triggerClickableToken(token: ClickableToken, newLeaf: boolean): void;
   }
 }
 
@@ -29,18 +44,20 @@ export class CitekeyClick extends Service {
 
   async patchEditorClick() {
     const { workspace } = this.plugin.app,
-      { noteIndex } = this.plugin;
-
+      { noteIndex, database, settings, noteFeatures } = this.plugin;
     await untilWorkspaceReady(this.plugin.app);
     const hasMDView = () => workspace.getLeavesOfType("markdown").length > 0;
-    await waitUntil({
+    const [task, cancel] = waitUntil({
       register: (cb) =>
         workspace.on("layout-change", () => {
           hasMDView() && cb();
         }),
       unregister: (ref) => workspace.offref(ref),
       escape: hasMDView,
+      timeout: null,
     });
+    cancel && this.register(cancel);
+    await task;
 
     const mdView = workspace.getLeavesOfType("markdown")[0]!
       .view as MarkdownView;
@@ -55,6 +72,39 @@ export class CitekeyClick extends Service {
           },
       }),
     );
+    this.register(
+      around(mdView.editMode.constructor.prototype as MarkdownEditView, {
+        triggerClickableToken: (next) =>
+          function (this: MarkdownEditView, token, newLeaf) {
+            if (token.type === "internal-link" && token.citekey === "zotero") {
+              (async () => {
+                const citekey = token.text;
+                const { [citekey]: itemID } =
+                  await database.api.getItemIDsFromCitekey([token.text]);
+                if (itemID < 0) {
+                  new Notice(`Citekey ${citekey} not found in Zotero`);
+                  return;
+                }
+                const [item] = await database.api.getItems([
+                  [itemID, settings.database.citationLibrary],
+                ]);
+                if (!item) {
+                  new Notice(`Item not found for citekey ${citekey}`);
+                  return;
+                }
+                const notePath = await noteFeatures.createNoteForDocItemFull(
+                  item,
+                );
+                await workspace.openLinkText(notePath, "", true, {
+                  active: true,
+                });
+              })();
+            } else {
+              return next.call(this, token, newLeaf);
+            }
+          },
+      }),
+    );
   }
 }
 
@@ -62,12 +112,7 @@ function getClickableTokenAt(
   this: Editor,
   pos: EditorPosition,
   noteIndex: NoteIndex,
-): {
-  type: string;
-  text: string;
-  start: EditorPosition;
-  end: EditorPosition;
-} | null {
+): ClickableToken | null {
   const cm = this.cm,
     doc = cm.state.doc,
     tokens = [],
@@ -115,12 +160,23 @@ function getClickableTokenAt(
   const text = doc.sliceString(tokenAtPos.from, tokenAtPos.to);
   if (!text.startsWith("@")) return null;
   const citekey = text.slice(1);
-  if (!noteIndex.citekeyCache.has(citekey)) return null;
-  const [note] = noteIndex.citekeyCache.get(citekey)!;
-  return {
-    type: "internal-link",
-    text: note,
+  const range = {
     start: this.offsetToPos(tokenAtPos.from),
     end: this.offsetToPos(tokenAtPos.to),
   };
+  if (noteIndex.citekeyCache.has(citekey)) {
+    const [notePath] = noteIndex.citekeyCache.get(citekey)!;
+    return {
+      type: "internal-link",
+      text: notePath,
+      ...range,
+    };
+  } else {
+    return {
+      type: "internal-link",
+      text: citekey,
+      citekey: "zotero",
+      ...range,
+    };
+  }
 }
