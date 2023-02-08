@@ -7,12 +7,12 @@ import type {
 } from "obsidian";
 import { EditorSuggest } from "obsidian";
 
-import type { FuzzyMatch, SuggesterBase } from "./core.js";
+import type { SuggesterBase } from "./core.js";
 import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
 export abstract class ZoteroItemEditorSuggest
-  extends EditorSuggest<FuzzyMatch<RegularItemInfo>>
+  extends EditorSuggest<RegularItemInfo>
   implements SuggesterBase
 {
   constructor(public plugin: ZoteroPlugin) {
@@ -30,7 +30,7 @@ export abstract class ZoteroItemEditorSuggest
   renderSuggestion = renderSuggestion.bind(this);
 
   abstract selectSuggestion(
-    suggestion: FuzzyMatch<RegularItemInfo>,
+    suggestion: RegularItemInfo,
     evt: MouseEvent | KeyboardEvent,
   ): void;
 }

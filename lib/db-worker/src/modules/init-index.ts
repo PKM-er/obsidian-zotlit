@@ -1,21 +1,12 @@
 import { getItemKeyGroupID } from "@obzt/common";
-import type { ItemIDLibID, ItemDetails, RegularItemInfo } from "@obzt/database";
+import type { ItemIDLibID, ItemDetails } from "@obzt/database";
 import { ItemsFull } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
-import Fuse from "fuse.js";
 import { databases, cache } from "@init";
 import log from "@log";
 import { getItemObjects } from "./get-item";
 
-const fuseOptions: Fuse.IFuseOptions<RegularItemInfo> = {
-  keys: ["title"],
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-  includeMatches: true,
-  shouldSort: true,
-};
-
-const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
+const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
   log.debug("Reading main Zotero database for index");
 
   const itemsResult = databases.main
@@ -25,30 +16,39 @@ const initIndex: DbWorkerAPI["initIndex"] = (libraryID) => {
     (rec, item) => ((rec[item.itemID] = item), rec),
     {} as Record<number, ItemDetails>,
   );
-  const itemIDs = Object.keys(itemIDMap).map(
+  const itemIDLibs = Object.keys(itemIDMap).map(
     (itemID) => [Number(itemID), libraryID] as ItemIDLibID,
   );
 
-  const items = getItemObjects(itemIDMap, itemIDs);
+  const items = getItemObjects(itemIDMap, itemIDLibs);
   log.info("Finished reading main Zotero database for index");
 
   log.trace("Start fuse indexing");
+
   const regularItems = Object.values(items);
+
+  const itemIDs = regularItems.map((i) => i.itemID),
+    itemIDSet = new Set(itemIDs);
+
+  const prev = cache.items.get(libraryID);
   cache.items.set(libraryID, {
-    fuse: new Fuse(regularItems, fuseOptions),
-    byKey: regularItems.reduce(
-      (record, item) => (
-        (record[getItemKeyGroupID(item, true)] = item), record
-      ),
-      {} as Record<string, RegularItemInfo>,
-    ),
-    byId: regularItems.reduce(
-      (record, item) => (
-        item.itemID !== null && (record[item.itemID] = item), record
-      ),
-      {} as Record<string, RegularItemInfo>,
-    ),
+    byId: new Map(regularItems.map((i) => [i.itemID, i])),
+    byKey: new Map(regularItems.map((i) => [getItemKeyGroupID(i, true), i])),
   });
+  if (!prev) {
+    await Promise.all([
+      ...regularItems.map((i) => cache.search.addAsync(i.itemID, i)),
+    ]);
+  } else {
+    const toRemove = [...prev.byId.keys()].filter((id) => !itemIDSet.has(id));
+    prev.byId.clear();
+    prev.byKey.clear();
+    await Promise.all([
+      ...regularItems.map((i) => cache.search.addAsync(i.itemID, i)),
+      ...toRemove.map((id) => cache.search.removeAsync(id)),
+    ]);
+  }
+
   log.info("Library citation index initialized");
 };
 

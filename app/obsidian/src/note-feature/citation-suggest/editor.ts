@@ -5,7 +5,6 @@ import type {
   EditorSuggestTriggerInfo,
 } from "obsidian";
 import { insertCitation, instructions, isShift } from "./basic";
-import type { FuzzyMatch } from "@/components/item-suggest";
 import { ZoteroItemEditorSuggest } from "@/components/item-suggest";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -37,11 +36,10 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   }
 
   selectSuggestion(
-    suggestion: FuzzyMatch<RegularItemInfo>,
+    item: RegularItemInfo,
     evt: MouseEvent | KeyboardEvent,
   ): void {
     if (!this.context) return;
-    const { item } = suggestion;
     insertCitation(
       { item, alt: isShift(evt) },
       this.context,

@@ -4,23 +4,44 @@ import type { ItemIDLibID } from "@obzt/database";
 import { AnnotByKeys, AnnotByParent, Attachements, Tags } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import localforage from "localforage";
-import { databases, getGroupID, getLibInfo } from "./init.js";
+import { cache, databases, getGroupID, getLibInfo } from "./init.js";
 import logger, { storageKey } from "./logger.js";
 import { getItems } from "./modules/get-item.js";
 import { openDb } from "./modules/init-conn.js";
 import initIndex from "./modules/init-index.js";
-import query from "./modules/search.js";
 import { attachLogger } from "./utils.js";
 
 const methods: DbWorkerAPI = {
   getLibs: () => Object.values(getLibInfo()),
   initIndex,
   openDb,
-  query,
+  search: async (libraryID, options) => {
+    if (!cache.items.has(libraryID)) {
+      throw new Error("Query before index ready");
+    }
+    return await cache.search.searchAsync(options);
+  },
   getTags: attachLogger(
     (items: ItemIDLibID[]) => databases.main.prepare(Tags).query(items),
     "tags",
   ),
+  getItemsFromCache: (limit, lib) => {
+    const items = cache.items.get(lib);
+    if (limit <= 0) {
+      return [...items.byId.values()];
+    }
+    if (!items) {
+      throw new Error("get items before cache ready");
+    }
+    const output = [];
+    for (const item of items.byId.values()) {
+      if (output.length >= limit) {
+        break;
+      }
+      output.push(item);
+    }
+    return output;
+  },
   getAttachments: attachLogger(
     (docId: number, libId: number) =>
       databases.main.prepare(Attachements).query({ itemId: docId, libId }),

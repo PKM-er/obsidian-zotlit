@@ -24,7 +24,11 @@ export {
   getCachedActiveAtch,
 } from "./utils/misc.js";
 export * from "./utils/prepared.js";
-export type { ItemIDLibID } from "./utils/database.js";
+export type {
+  ItemIDLibID,
+  ItemKeyLibID,
+  ItemIDChecked,
+} from "./utils/database.js";
 
 export { getBacklink } from "./utils/zotero-backlink.js";
 export type {

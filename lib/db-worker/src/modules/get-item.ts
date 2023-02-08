@@ -26,12 +26,12 @@ const getItemFromCache = (
   let result;
   if (typeof item === "number") {
     const idIndex = cache.items.get(libId)?.byId;
-    if (!idIndex) throw new Error("Query before init");
-    result = idIndex[item];
+    if (!idIndex) throw new Error("get item by id before cache ready");
+    result = idIndex.get(item);
   } else if (typeof item === "string") {
     const keyIndex = cache.items.get(libId)?.byKey;
-    if (!keyIndex) throw new Error("Query before init");
-    result = keyIndex[item];
+    if (!keyIndex) throw new Error("get item by key before cache ready");
+    result = keyIndex.get(item);
   } else assertNever(item);
   return result ?? null;
 };
@@ -124,7 +124,7 @@ function updateCache(itemIDObjectMap: Record<number, RegularItemInfo>) {
   for (const item of Object.values(itemIDObjectMap)) {
     const cacheForLib = cache.items.get(item.libraryID);
     if (!cacheForLib) throw new Error("Cache not initialized");
-    cacheForLib.byId[item.itemID] = item;
-    cacheForLib.byKey[getItemKeyGroupID(item, true)] = item;
+    cacheForLib.byId.set(item.itemID, item);
+    cacheForLib.byKey.set(getItemKeyGroupID(item, true), item);
   }
 }

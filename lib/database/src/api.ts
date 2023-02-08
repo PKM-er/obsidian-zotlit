@@ -1,8 +1,14 @@
 import type { LogLevel } from "@obzt/common";
-import type Fuse from "fuse.js";
+import type {
+  DocumentSearchOptions,
+  SimpleDocumentSearchResultSetUnit,
+} from "flexsearch";
 import type { AnnotationInfo, RegularItemInfo } from "./item.js";
 import type { ItemIDLibID, ItemKeyLibID } from "./utils/database.js";
 import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
+
+export type QueryOption = DocumentSearchOptions<false>;
+export type { SimpleDocumentSearchResultSetUnit } from "flexsearch";
 
 export interface DbConnParams {
   nativeBinding: string;
@@ -26,11 +32,10 @@ export interface DbWorkerAPI {
   /* start index for library, need to be called before query and after openDb */
   initIndex(libraryID: number): void;
 
-  query(
+  search(
     libraryID: number,
-    pattern: string | Fuse.default.Expression | null,
-    options?: Fuse.default.FuseSearchOptions,
-  ): Fuse.default.FuseResult<RegularItemInfo>[];
+    options: Partial<DocumentSearchOptions<false>>,
+  ): Promise<SimpleDocumentSearchResultSetUnit[]>;
   /**
    * @param item item key or item id
    */
@@ -38,6 +43,8 @@ export interface DbWorkerAPI {
     items: ItemIDLibID[] | ItemKeyLibID[],
     forceUpdate?: boolean,
   ): (RegularItemInfo | null)[];
+
+  getItemsFromCache(limit: number, lib: number): RegularItemInfo[];
 
   getLibs(): LibraryInfo[];
   getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];

@@ -18,11 +18,11 @@
     "typescript": "^4.9.4",
     "eslint": "~8.31.0",
     "cross-env": "^7.0.3",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@types/flexsearch": "~0.7.3"
   },
   "dependencies": {
     "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
-    "fuse.js": "^6.5.3",
     "@obzt/zotero-type": "workspace:*",
     "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
     "@obzt/common": "workspace:*",
@@ -30,6 +30,7 @@
     "assert-never": "^1.2.1",
     "@mobily/ts-belt": "^4.0.0-rc.5",
     "localforage": "~1.10.0",
-    "@obzt/database": "workspace:*"
+    "@obzt/database": "workspace:*",
+    "flexsearch": "~0.7.31"
   }
 }

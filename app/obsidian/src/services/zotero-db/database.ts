@@ -1,5 +1,5 @@
+import type { RegularItemInfo } from "@/../../../lib/database/dist";
 import { Service } from "@ophidian/core";
-import type Fuse from "fuse.js";
 import DatabaseWatcher from "./auto-refresh/service";
 import DatabaseWorker, { DatabaseStatus } from "./connector/service";
 import { DatabaseSettings } from "./connector/settings";
@@ -25,23 +25,26 @@ export class ZoteroDatabase extends Service {
   }
 
   async search(
-    query: string[],
+    query: string,
     matchField: string,
     limit = 20,
     lib = this.defaultLibId,
   ) {
     if (this.#worker.status !== DatabaseStatus.Ready)
       throw new Error("Search index not ready");
-    const exp = query.map<Fuse.Expression>((s) => ({
-      [matchField]: s,
-    }));
-    const result = await this.api.query(lib, { $and: exp }, { limit });
-    return result;
+    const raw = await this.api.search(lib, { query, limit, index: matchField });
+    if (raw.length === 0) return [];
+    const [{ result }] = raw;
+    if (result.length === 0) return [];
+    const items = (await this.api.getItems(
+      result.map((i) => [Number(i), lib]),
+    )) as RegularItemInfo[];
+    return items;
   }
-  async getAll(limit = 20, lib = this.defaultLibId) {
+  async getItemsOf(limit = 20, lib = this.defaultLibId) {
     if (this.#worker.status !== DatabaseStatus.Ready)
       throw new Error("Search index not ready");
-    const result = await this.api.query(lib, null, { limit });
+    const result = await this.api.getItemsFromCache(limit, lib);
     return result;
   }
 }

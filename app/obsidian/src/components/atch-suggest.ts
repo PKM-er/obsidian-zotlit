@@ -2,7 +2,7 @@ import type { AttachmentInfo } from "@obzt/database";
 import { isFileAttachment } from "@obzt/database";
 import type { FuzzyMatch } from "obsidian";
 import { Notice, FuzzySuggestModal } from "obsidian";
-import { openModal } from "./basic/modal";
+import { openModalFuzzy } from "./basic/modal";
 
 export class AttachmentPopupSuggest extends FuzzySuggestModal<AttachmentInfo> {
   constructor(public attachments: AttachmentInfo[]) {
@@ -40,7 +40,7 @@ export async function chooseAttachment(attachments: AttachmentInfo[]) {
     new Notice("No attachment found for this item");
     return null;
   }
-  const result = await openModal(new AttachmentPopupSuggest(attachments));
+  const result = await openModalFuzzy(new AttachmentPopupSuggest(attachments));
   return result?.value ?? null;
 }
 

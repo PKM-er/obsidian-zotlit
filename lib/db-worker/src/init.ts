@@ -1,6 +1,6 @@
-import type { RegularItemInfo, LibraryInfo } from "@obzt/database";
-import type Fuse from "fuse.js";
+import type { LibraryInfo, RegularItemInfo } from "@obzt/database";
 import Database from "./database";
+import { createDocument } from "./search";
 
 export const databases = {
     main: new Database(),
@@ -8,12 +8,12 @@ export const databases = {
   },
   cache = {
     libraries: null as Record<number, LibraryInfo> | null,
+    search: createDocument(),
     items: new Map<
       number,
       {
-        byKey: Record<string, RegularItemInfo>;
-        byId: Record<number, RegularItemInfo>;
-        fuse: Fuse<RegularItemInfo>;
+        byKey: Map<string, RegularItemInfo>;
+        byId: Map<number, RegularItemInfo>;
       }
     >(),
   };

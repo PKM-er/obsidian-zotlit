@@ -1,12 +1,9 @@
 import type { RegularItemInfo, Creator } from "@obzt/database";
 import { isCreatorFullName, isCreatorNameOnly } from "@obzt/database";
 import type { JournalArticleItem } from "@obzt/zotero-type";
-import type Fuse from "fuse.js";
 
-import unionRanges from "@/utils/union.js";
+// import unionRanges from "@/utils/union.js";
 import type ZoteroPlugin from "@/zt-main.js";
-
-export type FuzzyMatch<T> = Fuse.FuseResult<T>;
 
 const PRIMARY_MATCH_FIELD = "title";
 export const CLASS_ID = "zt-citations";
@@ -17,31 +14,30 @@ export interface SuggesterBase {
 export const getSuggestions = async (
   input: string,
   plugin: ZoteroPlugin,
-): Promise<FuzzyMatch<RegularItemInfo>[]> => {
+): Promise<RegularItemInfo[]> => {
   if (typeof input === "string" && input.trim().length > 0) {
     return await plugin.database.search(
-      input.replace(/^\+|\+$/g, "").split(/\+/),
+      input,
+      // input.replace(/^\+|\+$/g, "").split(/\+/),
       PRIMARY_MATCH_FIELD,
       50,
     );
   } else {
-    return await plugin.database.getAll(50);
+    return await plugin.database.getItemsOf(50);
   }
 };
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
 export function renderSuggestion(
   this: SuggesterBase,
-  suggestion: FuzzyMatch<RegularItemInfo>,
+  item: RegularItemInfo,
   el: HTMLElement,
 ): void {
-  const item = suggestion.item;
-  const [title] = item[PRIMARY_MATCH_FIELD],
-    { matches } = suggestion;
+  const [title] = item[PRIMARY_MATCH_FIELD];
 
   const titleEl = el.createDiv({ cls: "title" });
   if (!(typeof title === "string" && title)) {
     titleEl.setText("Title missing");
-  } else if (matches) {
+  } /* else if (matches) {
     const indices =
       matches.length === 1
         ? matches[0].key === PRIMARY_MATCH_FIELD
@@ -53,7 +49,7 @@ export function renderSuggestion(
             ),
           );
     renderMatches(titleEl, title, indices);
-  } else {
+  } */ else {
     titleEl.setText(title);
   }
   if (this.plugin.settings.suggester.showCitekeyInSuggester && item.citekey) {
@@ -110,35 +106,35 @@ const creatorToString = (creators: Creator[] | undefined) => {
 };
 
 /** highlight matches */
-const renderMatches = (
-  el: HTMLElement,
-  text: string,
-  indices?: readonly Fuse.RangeTuple[],
-  offset?: number,
-) => {
-  if (indices) {
-    if (offset === undefined) offset = 0;
-    let textIndex = 0;
-    for (
-      let rangeIndex = 0;
-      rangeIndex < indices.length && textIndex < text.length;
-      rangeIndex++
-    ) {
-      const range = indices[rangeIndex];
-      let start = range[0] + offset;
-      const end = range[1] + offset + 1; // patch for Fuse.RangeTuple
-      if (!(end <= 0)) {
-        if (start >= text.length) break;
-        if (start < 0) start = 0;
-        if (start !== textIndex)
-          el.appendText(text.substring(textIndex, start));
-        el.createSpan({
-          cls: "suggestion-highlight",
-          text: text.substring(start, end),
-        });
-        textIndex = end;
-      }
-    }
-    textIndex < text.length && el.appendText(text.substring(textIndex));
-  } else el.appendText(text);
-};
+// const renderMatches = (
+//   el: HTMLElement,
+//   text: string,
+//   indices?: readonly Fuse.RangeTuple[],
+//   offset?: number,
+// ) => {
+//   if (indices) {
+//     if (offset === undefined) offset = 0;
+//     let textIndex = 0;
+//     for (
+//       let rangeIndex = 0;
+//       rangeIndex < indices.length && textIndex < text.length;
+//       rangeIndex++
+//     ) {
+//       const range = indices[rangeIndex];
+//       let start = range[0] + offset;
+//       const end = range[1] + offset + 1; // patch for Fuse.RangeTuple
+//       if (!(end <= 0)) {
+//         if (start >= text.length) break;
+//         if (start < 0) start = 0;
+//         if (start !== textIndex)
+//           el.appendText(text.substring(textIndex, start));
+//         el.createSpan({
+//           cls: "suggestion-highlight",
+//           text: text.substring(start, end),
+//         });
+//         textIndex = end;
+//       }
+//     }
+//     textIndex < text.length && el.appendText(text.substring(textIndex));
+//   } else el.appendText(text);
+// };

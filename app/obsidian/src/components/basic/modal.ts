@@ -1,20 +1,29 @@
 import { around } from "monkey-around";
 import type { FuzzyMatch as FuzzyMatchOb } from "obsidian";
 import { SuggestModal, debounce } from "obsidian";
-import type { FuzzyMatch as FuzzyMatchFuse } from "../item-suggest";
 
 type Result<T> = { value: T; evt: MouseEvent | KeyboardEvent };
 
-type FuzzyMatch<T> = FuzzyMatchOb<T> | FuzzyMatchFuse<T>;
+type FuzzyMatch<T> = FuzzyMatchOb<T>;
 
 type FromFuzzyMatch<T> = T extends FuzzyMatch<infer V> ? V : never;
 
-export function openModal<F extends FuzzyMatch<any>, V = FromFuzzyMatch<F>>(
+export async function openModalFuzzy<
+  F extends FuzzyMatch<any>,
+  V = FromFuzzyMatch<F>,
+>(modal: SuggestModal<F>): Promise<Result<V> | null> {
+  const result = await openModal(modal);
+  if (!result) return null;
+  const { value, evt } = result;
+  return { value: value.item, evt };
+}
+
+export function openModal<F>(
   modal: SuggestModal<F>,
-): Promise<Result<V> | null> {
-  let resolve!: (value: Result<V> | null) => void;
+): Promise<Result<F> | null> {
+  let resolve!: (value: Result<F> | null) => void;
   // reject!: (reason?: any) => void;
-  const promise = new Promise<Result<V> | null>((_resolve, _reject) => {
+  const promise = new Promise<Result<F> | null>((_resolve, _reject) => {
     resolve = _resolve;
     // reject = _reject;
   });
@@ -23,7 +32,7 @@ export function openModal<F extends FuzzyMatch<any>, V = FromFuzzyMatch<F>>(
       function selectSuggestion(this: SuggestModal<F>, value, evt, ...args) {
         // super.selectSuggestion call onClose before onChooseSelection
         // so we need to resolve the promise before calling original method
-        resolve(value !== null ? { value: value.item, evt } : null);
+        resolve(value !== null ? { value, evt } : null);
         return next.call(this, value, evt, ...args);
       },
     onClose: (next) =>
@@ -37,7 +46,6 @@ export function openModal<F extends FuzzyMatch<any>, V = FromFuzzyMatch<F>>(
   modal.open();
   return promise;
 }
-
 declare module "obsidian" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface SuggestModal<T> {

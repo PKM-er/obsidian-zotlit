@@ -16,7 +16,8 @@
     "@aidenlx/eslint-config": "workspace:*",
     "typescript": "^4.9.4",
     "eslint": "~8.31.0",
-    "@types/eslint": "~8.4.6"
+    "@types/eslint": "~8.4.6",
+    "@types/flexsearch": "~0.7.3"
   },
   "dependencies": {
     "@obzt/zotero-type": "workspace:*",
@@ -25,7 +26,6 @@
     "@mobily/ts-belt": "^4.0.0-rc.5"
   },
   "peerDependencies": {
-    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
-    "fuse.js": "^6.5.3"
+    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2"
   }
 }
