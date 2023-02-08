@@ -9,7 +9,7 @@ FROM
   citekeys
 WHERE
   itemID = $itemID
-  AND libraryID IS NULL
+  AND (libraryID IS NULL OR libraryID = 1)
 `;
 
 const queryAltLib = `--sql
@@ -19,7 +19,7 @@ FROM
   citekeys
 WHERE
   itemID = $itemID
-  AND libraryID = $libId
+  AND (libraryID IS NULL OR libraryID = $libId)
 `;
 
 interface InputSql {
