@@ -1,4 +1,5 @@
 import type { AnnotationInfo } from "@obzt/database";
+import type { KeyboardEvent, MouseEvent } from "react";
 import { createContext } from "react";
 import type { DataModel, StoreAPI } from "./store";
 
@@ -6,6 +7,7 @@ import type { DataModel, StoreAPI } from "./store";
 export interface ContextType<R = {}> {
   store: StoreAPI;
   getImgSrc(annotation: AnnotationInfo): string;
+  onSetFollow(event: KeyboardEvent | MouseEvent): any;
   annotRenderer: {
     storeSelector(store: DataModel): R;
     get(annot: AnnotationInfo, props: R): (() => string) | null;

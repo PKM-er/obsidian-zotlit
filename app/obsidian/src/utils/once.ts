@@ -1,28 +1,54 @@
+import { assertNever } from "assert-never";
 import type { App, EventRef } from "obsidian";
 import { debounce } from "obsidian";
+import { DatabaseStatus } from "../services/zotero-db/connector/service";
+import type ZoteroPlugin from "../zt-main";
 
-export const untilMetaReady = (
+export function untilMetaReady(
   app: App,
-  options: Omit<WaitUntilOptions, "register" | "unregister" | "escape">,
-) =>
-  waitUntil({
+  options: Omit<WaitUntilOptions, "register" | "unregister" | "escape"> = {},
+) {
+  return waitUntil({
     ...options,
     register: (cb) => app.metadataCache.on("initialized", cb),
     unregister: (ref) => app.metadataCache.offref(ref),
     escape: () => app.metadataCache.initialized,
     timeout: options.timeout ?? null,
   });
+}
 
-export const untilDbRefreshed = (
+export function untilDbRefreshed(
   app: App,
-  options: Omit<WaitUntilOptions, "register" | "unregister">,
-) => {
+  options: Omit<WaitUntilOptions, "register" | "unregister"> = {},
+) {
   return waitUntil({
     ...options,
     register: (cb) => app.vault.on("zotero:db-refresh", cb),
     unregister: (ref: EventRef) => app.vault.offref(ref),
   });
-};
+}
+
+export function untilZoteroReady(
+  plugin: ZoteroPlugin,
+  options: Omit<WaitUntilOptions, "register" | "unregister" | "escape"> = {},
+) {
+  return waitUntil({
+    ...options,
+    unregister: (ref) => plugin.app.vault.offref(ref),
+    escape: () => plugin.dbWorker.status === DatabaseStatus.Ready,
+    register: (cb) => {
+      const status = plugin.dbWorker.status;
+      if (status === DatabaseStatus.NotInitialized) {
+        return plugin.app.vault.on("zotero:db-ready", cb);
+      } else if (status === DatabaseStatus.Pending) {
+        return plugin.app.vault.on("zotero:db-refresh", cb);
+      } else if (status === DatabaseStatus.Ready) {
+        throw new Error("should not be called when db is ready");
+      }
+      assertNever(status);
+    },
+  });
+}
 
 interface WaitUntilOptions {
   register: (callback: () => void) => EventRef;

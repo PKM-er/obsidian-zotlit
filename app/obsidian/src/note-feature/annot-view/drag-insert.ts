@@ -1,5 +1,6 @@
 import { selectKeys } from "@mobily/ts-belt/Dict";
-import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
+import type { AnnotViewContextType } from "@obzt/components";
+import type { AnnotViewStoreValues } from "./store";
 import { isMarkdownFile } from "@/utils";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -46,7 +47,7 @@ export const getDragStartHandler =
   };
 
 export type AnnotRendererProps = Pick<
-  AnnotViewStore,
+  AnnotViewStoreValues,
   "doc" | "attachment" | "allAttachments" | "tags" | "annotations"
 >;
 

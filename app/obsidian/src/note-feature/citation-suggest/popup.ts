@@ -12,17 +12,18 @@ class CitationPopupSuggest extends ZoteroItemPopupSuggest {
 }
 
 export async function insertCitationTo(editor: Editor, plugin: ZoteroPlugin) {
-  const result = await openModal(new CitationPopupSuggest(plugin));
+  const result = await chooseLiterature(plugin);
   if (!result) return false;
-  const {
-    value: { item },
-    evt,
-  } = result;
   insertCitation(
-    { item, alt: isShift(evt) },
+    { item: result.value, alt: isShift(result.evt) },
     undefined,
     editor,
     plugin.templateRenderer,
   );
   return true;
+}
+
+export async function chooseLiterature(plugin: ZoteroPlugin) {
+  const result = await openModal(new CitationPopupSuggest(plugin));
+  return result;
 }

@@ -21,6 +21,8 @@ export interface DataModel {
   ): Promise<void>;
   refresh: () => Promise<void>;
   setActiveAtch: (id: number) => void;
+  follow: "zt-reader" | "ob-note" | null;
+  setFollow: (follow: DataModel["follow"]) => void;
 }
 
 export type StoreAPI = StoreApi<DataModel>;

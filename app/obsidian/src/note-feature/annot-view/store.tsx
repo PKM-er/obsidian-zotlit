@@ -21,15 +21,28 @@ const getActiveAttachment = (
   return attachments.find((a) => a.itemID === cachedID) ?? attachments[0];
 };
 
-const getInit = (): Pick<
-  AnnotViewStore,
-  | "doc"
-  | "tags"
-  | "annotations"
-  | "attachment"
-  | "allAttachments"
-  | "attachmentID"
-> => ({
+type PickNonFunctionKeys<T extends Record<string, any>> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  [P in keyof T]: T[P] extends Function ? never : P;
+}[keyof T];
+type PickNonFunction<T extends Record<string, any>> = Pick<
+  T,
+  PickNonFunctionKeys<T>
+>;
+
+export type AnnotViewStoreValues = PickNonFunction<AnnotViewStore>;
+
+const getInitData = (): Partial<AnnotViewStoreValues> => ({
+  doc: null,
+  allAttachments: null,
+  attachmentID: null,
+  annotations: null,
+  attachment: null,
+  tags: {},
+});
+
+const getInit = (): AnnotViewStoreValues => ({
+  follow: "zt-reader",
   doc: null,
   allAttachments: null,
   attachmentID: null,
@@ -76,17 +89,17 @@ export const createStore = (p: ZoteroPlugin) =>
     return {
       ...getInit(),
       loadDocItem: async (itemId, atchId, lib, force = false) => {
-        if (itemId < 0) return set(getInit());
+        if (itemId < 0) return set(getInitData());
         if (get().doc?.docItem.itemID === itemId && !force) return;
         const item = (await api(p).getItems([[itemId, lib]]))[0];
-        if (!item) return set(getInit());
+        if (!item) return set(getInitData());
         const doc = { docItem: item, lib };
         if (atchId < 0) {
           const attachmentID = getCachedActiveAtch(window.localStorage, item);
-          set({ ...getInit(), doc, attachmentID });
+          set({ ...getInitData(), doc, attachmentID });
         } else {
           cacheActiveAtch(window.localStorage, item, atchId);
-          set({ ...getInit(), doc, attachmentID: atchId });
+          set({ ...getInitData(), doc, attachmentID: atchId });
         }
         await loadAtchs(item.itemID, lib);
         await loadDocTags(item.itemID, lib);
@@ -116,5 +129,6 @@ export const createStore = (p: ZoteroPlugin) =>
           }));
         }
       },
+      setFollow: (follow) => set({ follow }),
     };
   });

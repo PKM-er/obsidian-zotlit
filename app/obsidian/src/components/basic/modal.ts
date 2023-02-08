@@ -1,27 +1,33 @@
 import { around } from "monkey-around";
+import type { FuzzyMatch as FuzzyMatchOb } from "obsidian";
 import { SuggestModal, debounce } from "obsidian";
+import type { FuzzyMatch as FuzzyMatchFuse } from "../item-suggest";
 
 type Result<T> = { value: T; evt: MouseEvent | KeyboardEvent };
 
-export function openModal<T>(
-  modal: SuggestModal<T>,
-): Promise<Result<T> | null> {
-  let resolve!: (value: Result<T> | null) => void;
+type FuzzyMatch<T> = FuzzyMatchOb<T> | FuzzyMatchFuse<T>;
+
+type FromFuzzyMatch<T> = T extends FuzzyMatch<infer V> ? V : never;
+
+export function openModal<F extends FuzzyMatch<any>, V = FromFuzzyMatch<F>>(
+  modal: SuggestModal<F>,
+): Promise<Result<V> | null> {
+  let resolve!: (value: Result<V> | null) => void;
   // reject!: (reason?: any) => void;
-  const promise = new Promise<Result<T> | null>((_resolve, _reject) => {
+  const promise = new Promise<Result<V> | null>((_resolve, _reject) => {
     resolve = _resolve;
     // reject = _reject;
   });
   const unload = around(modal, {
     selectSuggestion: (next) =>
-      function selectSuggestion(this: SuggestModal<T>, value, evt, ...args) {
+      function selectSuggestion(this: SuggestModal<F>, value, evt, ...args) {
         // super.selectSuggestion call onClose before onChooseSelection
         // so we need to resolve the promise before calling original method
-        resolve(value === null ? { value, evt } : null);
+        resolve(value !== null ? { value: value.item, evt } : null);
         return next.call(this, value, evt, ...args);
       },
     onClose: (next) =>
-      function onClose(this: SuggestModal<T>, ...args) {
+      function onClose(this: SuggestModal<F>, ...args) {
         // won't be resolve again if called from selectSuggestion
         resolve(null);
         return next.call(this, ...args);

@@ -1,6 +1,8 @@
 import type { AttachmentInfo } from "@obzt/database";
+import { isFileAttachment } from "@obzt/database";
 import type { FuzzyMatch } from "obsidian";
-import { FuzzySuggestModal } from "obsidian";
+import { Notice, FuzzySuggestModal } from "obsidian";
+import { openModal } from "./basic/modal";
 
 export class AttachmentPopupSuggest extends FuzzySuggestModal<AttachmentInfo> {
   constructor(public attachments: AttachmentInfo[]) {
@@ -30,4 +32,26 @@ export class AttachmentPopupSuggest extends FuzzySuggestModal<AttachmentInfo> {
   onChooseItem() {
     return;
   }
+}
+
+export async function chooseAttachment(attachments: AttachmentInfo[]) {
+  if (attachments.length === 1) return attachments[0];
+  if (!attachments.length) {
+    new Notice("No attachment found for this item");
+    return null;
+  }
+  const result = await openModal(new AttachmentPopupSuggest(attachments));
+  return result?.value ?? null;
+}
+
+export async function chooseFileAtch(attachments: AttachmentInfo[]) {
+  const fileAttachments = attachments.filter(isFileAttachment);
+  return await chooseAttachment(fileAttachments);
+}
+
+export async function choosePDFAtch(attachments: AttachmentInfo[]) {
+  const fileAttachments = attachments.filter(
+    (i) => isFileAttachment(i) && i.path?.endsWith(".pdf"),
+  );
+  return await chooseAttachment(fileAttachments);
 }

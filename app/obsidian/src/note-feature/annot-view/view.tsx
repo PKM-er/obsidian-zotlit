@@ -1,18 +1,21 @@
+import { deleteKeys } from "@mobily/ts-belt/Dict";
+
 import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
 import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
 import type { INotifyActiveReader } from "@obzt/protocol";
-import { assertNever } from "assert-never";
 import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
-import { ItemView } from "obsidian";
+import { Menu, ItemView } from "obsidian";
 import ReactDOM from "react-dom";
+import { chooseLiterature } from "../citation-suggest";
+import type { AnnotRendererProps } from "./drag-insert";
 import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
+import { choosePDFAtch } from "@/components/atch-suggest";
 import { context } from "@/components/basic/context";
-import { DatabaseStatus } from "@/services/zotero-db/connector/service";
-import { waitUntil } from "@/utils/once";
+import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 
 import "./style.less";
@@ -21,8 +24,8 @@ export const annotViewType = "zotero-annotation-view";
 
 interface State {
   itemId: number;
-  attachmentId: number;
-  followZotero?: boolean;
+  attachmentId?: number;
+  follow: AnnotViewStore["follow"];
 }
 
 export class AnnotationView extends ItemView {
@@ -35,6 +38,7 @@ export class AnnotationView extends ItemView {
     return annotViewType;
   }
 
+  #zoteroActiveItem: number | null = null;
   onload(): void {
     super.onload();
     this.contentEl.addClass("obzt");
@@ -47,7 +51,11 @@ export class AnnotationView extends ItemView {
       } else {
         locked = true;
         const { itemId, attachmentId } = data;
-        this.setState({ itemId, attachmentId }).then(() => {
+        this.setStatePrev((state) => ({
+          itemId,
+          attachmentId,
+          ...deleteKeys(state, ["itemId", "attachmentId"]),
+        })).then(() => {
           locked = false;
           if (nextReader === null) return;
           const next = nextReader;
@@ -58,9 +66,10 @@ export class AnnotationView extends ItemView {
     };
     this.registerEvent(
       this.plugin.server.on("bg:notify", (_, data) => {
+        if (data.event !== "reader/active") return;
+        this.#zoteroActiveItem = data.itemId;
         if (
-          !this.followZotero ||
-          data.event !== "reader/active" ||
+          this.follow !== "zt-reader" ||
           data.itemId < 0 ||
           data.attachmentId < 0
         )
@@ -71,42 +80,27 @@ export class AnnotationView extends ItemView {
   }
 
   public getDisplayText(): string {
-    const activeDoc = this.plugin.app.workspace.getActiveFile();
-    let suffix = "";
-    if (activeDoc?.extension === "md") suffix = ` for ${activeDoc.basename}`;
-    return "Zotero Annotations" + suffix;
+    // TODO: show current literature name
+    return "Zotero Annotations";
+    // const activeDoc = this.plugin.app.workspace.getActiveFile();
+    // let suffix = "";
+    // if (activeDoc?.extension === "md") suffix = ` for ${activeDoc.basename}`;
+    // return "Zotero Annotations" + suffix;
   }
 
   public getIcon(): string {
     return "highlighter";
   }
 
-  untilZoteroReady() {
-    const [task, cancel] = waitUntil({
-      unregister: (ref) => app.vault.offref(ref),
-      escape: () => this.plugin.dbWorker.status === DatabaseStatus.Ready,
-      register: (cb) => {
-        const status = this.plugin.dbWorker.status;
-        if (status === DatabaseStatus.NotInitialized) {
-          return app.vault.on("zotero:db-ready", cb);
-        } else if (status === DatabaseStatus.Pending) {
-          return app.vault.on("zotero:db-refresh", cb);
-        } else if (status === DatabaseStatus.Ready) {
-          throw new Error("should not be called when db is ready");
-        }
-        assertNever(status);
-      },
-    });
-    cancel && this.register(cancel);
-    return task;
-  }
-
   get lib() {
     return this.plugin.settings.database.citationLibrary;
   }
   store: StoreAPI;
-  followZotero = true;
+  get follow() {
+    return this.store.getState().follow;
+  }
   getState(): State {
+    // TODO: method to trigger state save?
     const data = super.getState();
     return {
       ...(data && typeof data === "object" ? data : {}),
@@ -116,30 +110,26 @@ export class AnnotationView extends ItemView {
   }
   async setState(state: State, _result?: ViewStateResult): Promise<void> {
     await super.setState(state, _result as any);
-    const { itemId = -1, followZotero } = state;
-    if (!Number.isInteger(+itemId) || +itemId < -1)
-      throw new Error("invalid item id");
-    await this.store.getState().loadDocItem(+itemId, -1, this.lib);
-    if (followZotero !== undefined) {
-      this.followZotero = Boolean(followZotero);
-    }
+    const { itemId = -1, attachmentId = -1, follow = "zt-reader" } = state;
+    this.store.getState().setFollow(follow);
+    await this.store.getState().loadDocItem(itemId, attachmentId, this.lib);
+  }
+  async setStatePrev(update: (state: State) => State) {
+    await this.setState(update(this.getState()));
   }
 
-  getContext(): AnnotViewContextType<
-    Pick<
-      AnnotViewStore,
-      "doc" | "attachment" | "allAttachments" | "tags" | "annotations"
-    >
-  > {
-    const plugin = this.plugin;
+  getContext(): AnnotViewContextType<AnnotRendererProps> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    const { plugin, store, app } = self;
     return {
-      store: this.store,
+      store,
       registerDbUpdate(callback) {
         app.vault.on("zotero:db-refresh", callback);
         return () => app.vault.off("zotero:db-refresh", callback);
       },
       refreshConn: async () => {
-        await this.plugin.dbWorker.refresh({ task: "dbConn" });
+        await plugin.dbWorker.refresh({ task: "dbConn" });
       },
       getImgSrc: (annotation) => {
         return `app://local${getCacheImagePath(
@@ -151,14 +141,62 @@ export class AnnotationView extends ItemView {
         console.log("show details", itemId);
       },
       onDragStart: getDragStartHandler(plugin),
-      onMoreOptions: getMoreOptionsHandler(this),
+      onMoreOptions: getMoreOptionsHandler(self),
       annotRenderer: getAnnotRenderer(plugin),
+      onSetFollow(event) {
+        const menu = new Menu();
+        const follow = store.getState().follow;
+
+        if (follow !== "zt-reader") {
+          menu.addItem((i) =>
+            i.setTitle("Follow Zotero Reader").onClick(() => {
+              store.getState().setFollow("zt-reader");
+              self.setStatePrev(({ attachmentId, ...state }) => ({
+                ...state,
+                follow: "zt-reader",
+                ...(self.#zoteroActiveItem === null
+                  ? { attachmentId }
+                  : { itemId: self.#zoteroActiveItem }),
+              }));
+            }),
+          );
+        }
+        menu.addItem((i) =>
+          i.setTitle("Choose Literature").onClick(async () => {
+            store.getState().setFollow(null);
+
+            const literature = await chooseLiterature(plugin);
+            if (!literature) return;
+            const { itemID } = literature.value;
+
+            const lib = plugin.settings.database.citationLibrary;
+            const attachments = await plugin.databaseAPI.getAttachments(
+              itemID,
+              lib,
+            );
+
+            const atch = await choosePDFAtch(attachments);
+            if (!atch) return;
+
+            store.getState().loadDocItem(itemID, atch.itemID, lib);
+          }),
+        );
+        if (event.nativeEvent instanceof MouseEvent) {
+          menu.showAtMouseEvent(event.nativeEvent);
+        } else {
+          const target = event.target as HTMLElement;
+          const rect = target.getBoundingClientRect();
+          menu.showAtPosition({ x: rect.x, y: rect.y });
+        }
+      },
     };
   }
 
   protected async onOpen() {
     await super.onOpen();
-    await this.untilZoteroReady();
+    const [task, cancel] = untilZoteroReady(this.plugin);
+    cancel && this.register(cancel);
+    await task;
     ReactDOM.render(
       <ObsidianContext.Provider value={context}>
         <AnnotViewContext.Provider value={this.getContext()}>

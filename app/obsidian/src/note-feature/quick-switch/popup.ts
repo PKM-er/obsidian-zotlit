@@ -1,11 +1,7 @@
-import type {
-  AttachmentInfo,
-  AnnotationInfo,
-  ItemIDLibID,
-} from "@obzt/database";
-import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
+import type { AnnotationInfo, ItemIDLibID } from "@obzt/database";
+import { cacheActiveAtch } from "@obzt/database";
 import { openModal } from "../../components/basic/modal";
-import { AttachmentPopupSuggest } from "@/components/atch-suggest.js";
+import { chooseFileAtch } from "@/components/atch-suggest.js";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest/popup.js";
 import type ZoteroPlugin from "@/zt-main.js";
 
@@ -26,38 +22,27 @@ class NoteQuickSwitch extends ZoteroItemPopupSuggest {
 export async function openNote(plugin: ZoteroPlugin): Promise<boolean> {
   const result = await openModal(new NoteQuickSwitch(plugin));
   if (!result) return false;
-  const {
-    value: { item },
-  } = result;
+  const { value: item } = result;
   if (await plugin.noteFeatures.openNote(item, true)) return true;
-  const { database } = plugin;
-  const defaultLibId = database.settings.citationLibrary;
-  const allAttachments = await database.api.getAttachments(
+
+  const libId = plugin.database.settings.citationLibrary;
+  const allAttachments = await plugin.databaseAPI.getAttachments(
     item.itemID,
-    defaultLibId,
+    libId,
   );
 
-  let attachment: AttachmentInfo | null = null;
-  const fileAttachments = allAttachments.filter(isFileAttachment);
-  if (fileAttachments.length > 1) {
-    // prompt for attachment selection
-    const result = await openModal(new AttachmentPopupSuggest(fileAttachments));
-    attachment = result?.value.item ?? null;
-  } else {
-    attachment = fileAttachments[0] ?? null;
-  }
-
+  const attachment = await chooseFileAtch(allAttachments);
   if (attachment) {
     cacheActiveAtch(window.localStorage, item, attachment.itemID);
   }
 
   const annotations: AnnotationInfo[] = attachment
-    ? await database.api.getAnnotations(attachment.itemID, defaultLibId)
+    ? await plugin.databaseAPI.getAnnotations(attachment.itemID, libId)
     : [];
 
-  const tagsRecord = await database.api.getTags([
-    [item.itemID, defaultLibId],
-    ...annotations.map((i): ItemIDLibID => [i.itemID, defaultLibId]),
+  const tagsRecord = await plugin.databaseAPI.getTags([
+    [item.itemID, libId],
+    ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
   ]);
 
   const note = await plugin.noteFeatures.createNoteForDocItem(

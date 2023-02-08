@@ -37,11 +37,14 @@ export default function AnnotView() {
 }
 
 function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
-  const { refreshConn, onShowDetails } = useContext(Context);
+  const { refreshConn, onShowDetails, onSetFollow, store } =
+    useContext(Context);
 
   const [isCollapsed, { toggle: toggleCollapsed }] = useBoolean(false);
 
   const annotListProps = useAnnotList();
+
+  const follow = useStore(store, (s) => s.follow);
 
   return (
     <>
@@ -61,6 +64,14 @@ function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
               className="nav-action-button"
               onClick={refreshConn}
             />
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onSetFollow}
+              onKeyUp={onSetFollow}
+            >
+              {follow === null ? "detached" : follow}
+            </div>
           </>
         }
       >
