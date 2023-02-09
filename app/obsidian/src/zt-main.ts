@@ -5,26 +5,26 @@ import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";
 
 import checkLib from "./install-guide/index.jsx";
-import { NoteFields } from "./note-feature/note-fields/service";
 import NoteFeatures from "./note-feature/service";
 import { AnnotBlock } from "./services/annot-block/service";
 import { CitekeyClick } from "./services/citekey-click/service";
-import NoteIndex from "./services/note-index/service.js";
+import NoteIndex from "./services/note-index/service";
 import PDFParser from "./services/pdf-parser/service";
 import { Server } from "./services/server/service";
 import {
   TemplateComplier,
   TemplateLoader,
   TemplateRenderer,
+  TemplateEditorHelper,
 } from "./services/template";
-import { TemplateEditorHelper } from "./services/template/editor/service";
-import { TopicImport } from "./services/topic-import/service";
-import DatabaseWatcher from "./services/zotero-db/auto-refresh/service";
-import DatabaseWorker from "./services/zotero-db/connector/service";
-import { ZoteroDatabase } from "./services/zotero-db/database";
-import { ImgCacheImporter } from "./services/zotero-db/img-import/service";
-import { ZoteroSettingTab } from "./setting-tab/index.js";
-import { SettingLoader } from "./settings/service.js";
+import {
+  DatabaseWorker,
+  ImgCacheImporter,
+  DatabaseWatcher,
+  ZoteroDatabase,
+} from "./services/zotero-db";
+import { ZoteroSettingTab } from "./setting-tab";
+import { SettingLoader } from "./settings/service";
 import log from "@/log";
 
 declare global {
@@ -46,9 +46,7 @@ export default class ZoteroPlugin extends Plugin {
   settings = this.use(SettingLoader);
 
   noteIndex = this.use(NoteIndex);
-  noteFields = this.use(NoteFields);
   server = this.use(Server);
-  topicImport = this.use(TopicImport);
   citekeyClick = this.use(CitekeyClick);
   templateEditor = this.use(TemplateEditorHelper);
   noteFeatures = this.use(NoteFeatures);

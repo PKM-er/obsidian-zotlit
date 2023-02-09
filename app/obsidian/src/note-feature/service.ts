@@ -11,8 +11,10 @@ import { Service } from "@ophidian/core";
 import { Notice } from "obsidian";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
+import { NoteFields } from "./note-fields/service";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
 import { openOrCreateNote } from "./quick-switch";
+import { TopicImport } from "./topic-import/service";
 import { chooseFileAtch } from "@/components/atch-suggest";
 import { getItemKeyOf } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
@@ -21,6 +23,9 @@ import ZoteroPlugin from "@/zt-main";
 
 class NoteFeatures extends Service {
   plugin = this.use(ZoteroPlugin);
+
+  noteFields = this.use(NoteFields);
+  topicImport = this.use(TopicImport);
 
   onload(): void {
     const { plugin } = this;
