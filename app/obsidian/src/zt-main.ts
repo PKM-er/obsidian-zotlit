@@ -27,10 +27,10 @@ import { ZoteroSettingTab } from "./setting-tab";
 import { SettingLoader } from "./settings/service";
 import log from "@/log";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var zt: ZoteroPlugin | undefined;
-}
+// declare global {
+//   // eslint-disable-next-line no-var
+//   var zt: ZoteroPlugin | undefined;
+// }
 
 export default class ZoteroPlugin extends Plugin {
   use = use.plugin(this);
@@ -72,13 +72,6 @@ export default class ZoteroPlugin extends Plugin {
 
     // globalThis.zt = this;
     // this.register(() => delete globalThis.zt);
-
-    // this.registerEvent(
-    //   this.server.on("zotero/export", (p) => console.warn(parseQuery(p))),
-    // );
-    // this.registerEvent(
-    //   this.server.on("zotero/open", (p) => console.warn(parseQuery(p))),
-    // );
   }
 
   onunload() {

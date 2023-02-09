@@ -91,6 +91,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     });
     this.registerMenu("item", (menu) =>
       menu
+        .addSeparator()
         .addItem((item) =>
           item
             .setTitle("Open Note in Obsidian")
@@ -131,7 +132,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
           `Can't get annotations from reader data: ${JSON.stringify(data)}`,
         );
       };
-      menu.addItem((item) =>
+      menu.addSeparator().addItem((item) =>
         item
           .setTitle("Export to Obsidian Note")
           .onClick(() =>
@@ -139,6 +140,25 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
           )
           .onShowing((item) => item.toggle(data.ids.length > 0)),
       );
+    });
+    this.registerMenu("reader:page", (menu, _data, itemID) => {
+      const attachment = this.app.Items.get(itemID);
+      if (!attachment) {
+        this.app.logError(new Error(`Can't get item from item id ${itemID}`));
+        return;
+      }
+      if (!attachment.parentItem?.isRegularItem()) {
+        this.app.logError(new Error(`Item ${itemID} has no parent doc item`));
+        return;
+      }
+      const docItem = attachment.parentItem;
+      menu
+        .addSeparator()
+        .addItem((item) =>
+          item
+            .setTitle("Open Note in Obsidian")
+            .onClick(() => this.sendToObsidian("item", "open", [docItem])),
+        );
     });
   }
   onunload(): void {

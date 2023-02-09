@@ -13,6 +13,7 @@ import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
 import { NoteFields } from "./note-fields/service";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
+import { ProtocolHandler } from "./protocol/service";
 import { openOrCreateNote } from "./quick-switch";
 import { TopicImport } from "./topic-import/service";
 import { chooseFileAtch } from "@/components/atch-suggest";
@@ -26,6 +27,7 @@ class NoteFeatures extends Service {
 
   noteFields = this.use(NoteFields);
   topicImport = this.use(TopicImport);
+  protocol = this.use(ProtocolHandler);
 
   onload(): void {
     const { plugin } = this;
@@ -92,7 +94,7 @@ class NoteFeatures extends Service {
 
     // TODO: support multiple notes
     const firstNote = info.sort().shift()!;
-    await workspace.openLinkText(firstNote, "", false);
+    await workspace.openLinkText(firstNote, "", false, { active: true });
     return true;
   }
 
