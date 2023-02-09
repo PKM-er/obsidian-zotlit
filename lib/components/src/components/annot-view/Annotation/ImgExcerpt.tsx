@@ -1,5 +1,5 @@
-import clsx from "clsx";
-import type { Attributes } from "../../utils";
+import type { Attributes } from "@c/utils";
+import { cn as clsx } from "@c/utils";
 
 interface ImgExcerptProps extends Attributes<HTMLImageElement> {
   text: string | null;

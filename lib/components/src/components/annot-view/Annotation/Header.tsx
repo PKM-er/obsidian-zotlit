@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import type { PropsWithChildren, ReactNode } from "react";
-import type { Attributes } from "../../utils";
+import type { Attributes } from "@c/utils";
+import { cn as clsx } from "@c/utils";
 
 interface HeaderProps extends Attributes {
   drag: ReactNode;

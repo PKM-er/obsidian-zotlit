@@ -1,5 +1,5 @@
-import clsx from "clsx";
 import { forwardRef } from "react";
+import { cn as clsx } from "@c/utils";
 import type { IconProps } from "./Icon";
 import Icon from "./Icon";
 

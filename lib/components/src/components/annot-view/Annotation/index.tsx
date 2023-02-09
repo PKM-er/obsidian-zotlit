@@ -2,10 +2,10 @@ import { D } from "@mobily/ts-belt";
 import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { getBacklink } from "@obzt/database";
 import { useMemoizedFn } from "ahooks";
-import clsx from "clsx";
 import type { ReactNode } from "react";
 import { useContext, useRef } from "react";
-import type { Attributes } from "../../utils";
+import type { Attributes } from "@c/utils";
+import { cn as clsx } from "@c/utils";
 import { Context } from "../context";
 import DetailsButton from "../DetailsButton";
 
@@ -97,13 +97,12 @@ export default function Annotation({
       </Header>
       <Content ref={containerRef} className="px-2 py-1">
         <blockquote
-          className={clsx(
-            "border-l-blockquote border-l-ia-accent pl-2 leading-tight",
-            {
-              "line-clamp-3": collapsed,
-            },
-          )}
-          style={{ borderColor: annotation.color ?? undefined ?? undefined }}
+          className={clsx("border-l-blockquote pl-2 leading-tight", {
+            "line-clamp-3": collapsed,
+          })}
+          style={{
+            borderColor: annotation.color ?? "var(--interactive-accent)",
+          }}
         >
           <Excerpt
             {...excerptProps}

@@ -1,5 +1,5 @@
 import { forwardRef, memo } from "react";
-import type { Attributes } from "../utils";
+import type { Attributes } from "@c/utils";
 import { useIconRef, mergeRefs } from "./utils";
 
 export interface IconProps extends Attributes<HTMLButtonElement> {

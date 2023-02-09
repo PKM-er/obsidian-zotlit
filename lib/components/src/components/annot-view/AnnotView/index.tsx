@@ -1,9 +1,9 @@
 import type { RegularItemInfoBase } from "@obzt/database";
 import { useBoolean, useMemoizedFn } from "ahooks";
-import clsx from "clsx";
 import { useContext, useEffect } from "react";
 import { useStore } from "zustand";
 import { shallow } from "zustand/shallow";
+import { cn as clsx } from "@c/utils";
 import { Context } from "../context";
 import DetailsButton from "../DetailsButton";
 import type { AnnotListProps } from "./AnnotList";

@@ -20,6 +20,7 @@
     "newLine": "lf",
     "paths": {
       "@/*": ["./*"],
+      "@c/*": ["../../../lib/components/src/components/*"],
       "@log": ["./logger.ts"],
       "support-platform": ["./platform.json"],
     }

@@ -1,6 +1,6 @@
 import type { TagInfo } from "@obzt/database";
-import clsx from "clsx";
 import { memo } from "react";
+import { cn as clsx } from "@c/utils";
 
 interface TagsProps {
   tags: TagInfo[];

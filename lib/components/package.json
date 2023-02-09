@@ -55,7 +55,8 @@
     "postcss-discard": "~2.0.0",
     "@types/lodash-es": "~4.17.6",
     "fs-extra": "~11.1.0",
-    "nanoid": "~4.0.0"
+    "nanoid": "~4.0.0",
+    "vite-tsconfig-paths": "~4.0.5"
   },
   "peerDependencies": {
     "react": "~17.0.2",

@@ -1,7 +1,7 @@
 import type { CheckedState } from "@radix-ui/react-checkbox";
 import { forwardRef, useState } from "react";
-import type { Attributes } from "../utils";
-import { cn } from "../utils";
+import type { Attributes } from "@c/utils";
+import { cn } from "@c/utils";
 import { Checkbox } from "./checkbox";
 
 export interface ImportingStatusProps {

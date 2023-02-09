@@ -1,7 +1,7 @@
 import { AnnotationType } from "@obzt/zotero-type";
-import clsx from "clsx";
 import { startCase } from "lodash-es";
 import { memo } from "react";
+import { cn as clsx } from "@c/utils";
 import type { IconProps } from "../../icon";
 import { Icon } from "../../icon";
 

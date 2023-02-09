@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import { useEffect, useRef } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import { cn as clsx } from "@c/utils";
 import { IconButton } from "../icon";
 
 export interface FieldValueProps {

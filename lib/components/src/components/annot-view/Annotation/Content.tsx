@@ -1,6 +1,6 @@
-import clsx from "clsx";
 import React, { forwardRef } from "react";
-import type { Attributes } from "../../utils";
+import type { Attributes } from "@c/utils";
+import { cn as clsx } from "@c/utils";
 
 export type ContentProps = Attributes;
 export default forwardRef(function Content(

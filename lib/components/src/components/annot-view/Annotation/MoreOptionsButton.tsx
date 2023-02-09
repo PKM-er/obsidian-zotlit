@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn as clsx } from "@c/utils";
 import { IconButton } from "../../icon";
 import type { IconButtonProps } from "../../icon";
 
