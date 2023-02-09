@@ -70,7 +70,8 @@ const baseOpts = {
   mainFields: ["browser", "module", "main"],
   minify: isProd,
   define: {
-    // "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
+    "process.env.NODE_ENV": JSON.stringify(process.env.BUILD ?? ""),
+    "process.env.SQL_VERBOSE": JSON.stringify(process.env.SQL_VERBOSE ?? ""),
   },
 };
 

@@ -12,8 +12,6 @@ export class DatabaseNotSetError extends Error {
 
 const getMtime = (dbPath: string) => statSync(dbPath).mtimeMs;
 
-const isDev = process.env.NODE_ENV === "development";
-
 export default class Database {
   private database: {
     instance: DatabaseInstance;
@@ -39,7 +37,7 @@ export default class Database {
     return new DatabaseConstructor(`file:${filename}?mode=ro&immutable=1`, {
       nativeBinding: binding,
       uriPath: true,
-      verbose: isDev
+      verbose: process.env.SQL_VERBOSE
         ? (message?: any, ...additionalArgs: any[]) =>
             log.trace(`SQL: ${message}`, ...additionalArgs)
         : undefined,
