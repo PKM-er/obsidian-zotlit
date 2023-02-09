@@ -118,6 +118,30 @@ export class AnnotationView extends ItemView {
     await this.setState(update(this.getState()));
   }
 
+  onSetFollowZt = async () => {
+    this.store.getState().setFollow("zt-reader");
+    await this.setStatePrev(({ attachmentId, ...state }) => ({
+      ...state,
+      follow: "zt-reader",
+      ...(this.#zoteroActiveItem === null
+        ? { attachmentId }
+        : { itemId: this.#zoteroActiveItem }),
+    }));
+  };
+  onSetFollowNull = async () => {
+    const { plugin, store } = this;
+    const literature = await chooseLiterature(plugin);
+    if (!literature) return;
+    const { itemID } = literature.value.item;
+
+    const lib = plugin.settings.database.citationLibrary;
+    const attachments = await plugin.databaseAPI.getAttachments(itemID, lib);
+
+    const atch = await choosePDFAtch(attachments);
+    if (!atch) return;
+    store.getState().setFollow(null);
+    await store.getState().loadDocItem(itemID, atch.itemID, lib);
+  };
   getContext(): AnnotViewContextType<AnnotRendererProps> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
@@ -149,37 +173,11 @@ export class AnnotationView extends ItemView {
 
         if (follow !== "zt-reader") {
           menu.addItem((i) =>
-            i.setTitle("Follow Zotero Reader").onClick(() => {
-              store.getState().setFollow("zt-reader");
-              self.setStatePrev(({ attachmentId, ...state }) => ({
-                ...state,
-                follow: "zt-reader",
-                ...(self.#zoteroActiveItem === null
-                  ? { attachmentId }
-                  : { itemId: self.#zoteroActiveItem }),
-              }));
-            }),
+            i.setTitle("Follow Zotero Reader").onClick(self.onSetFollowZt),
           );
         }
         menu.addItem((i) =>
-          i.setTitle("Choose Literature").onClick(async () => {
-            store.getState().setFollow(null);
-
-            const literature = await chooseLiterature(plugin);
-            if (!literature) return;
-            const { itemID } = literature.value.item;
-
-            const lib = plugin.settings.database.citationLibrary;
-            const attachments = await plugin.databaseAPI.getAttachments(
-              itemID,
-              lib,
-            );
-
-            const atch = await choosePDFAtch(attachments);
-            if (!atch) return;
-
-            store.getState().loadDocItem(itemID, atch.itemID, lib);
-          }),
+          i.setTitle("Choose Literature").onClick(self.onSetFollowNull),
         );
         if (event.nativeEvent instanceof MouseEvent) {
           menu.showAtMouseEvent(event.nativeEvent);
