@@ -153,7 +153,8 @@
       "lib/zotero-helper",
       "readme",
       "overview",
-      "obsidian/topic-import"
+      "obsidian/topic-import",
+      "obsidian/protocol"
     ],
     "[sql]": {
       "editor.defaultFormatter": "lea21st.vscode-sql-formatter"
