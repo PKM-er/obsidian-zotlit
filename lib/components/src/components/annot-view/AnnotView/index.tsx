@@ -39,7 +39,7 @@ export default function AnnotView() {
                 role="button"
                 tabIndex={0}
                 onClick={onSetFollow}
-                onKeyUp={onSetFollow}
+                onKeyUp={(evt) => evt.key === "Enter" && onSetFollow(evt)}
               >
                 {follow === null ? "detached" : follow}
               </div>

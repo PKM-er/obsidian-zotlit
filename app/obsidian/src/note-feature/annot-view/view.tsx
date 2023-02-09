@@ -170,14 +170,18 @@ export class AnnotationView extends ItemView {
       onSetFollow(event) {
         const menu = new Menu();
         const follow = store.getState().follow;
-
         if (follow !== "zt-reader") {
           menu.addItem((i) =>
             i.setTitle("Follow Zotero Reader").onClick(self.onSetFollowZt),
           );
         }
         menu.addItem((i) =>
-          i.setTitle("Choose Literature").onClick(self.onSetFollowNull),
+          i.setTitle("Choose Literature").onClick(async () => {
+            // prevent focus from transfering back from modal,
+            // triggering another keyup event
+            (event.target as HTMLElement).blur();
+            await self.onSetFollowNull();
+          }),
         );
         if (event.nativeEvent instanceof MouseEvent) {
           menu.showAtMouseEvent(event.nativeEvent);
