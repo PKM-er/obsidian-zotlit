@@ -62,7 +62,7 @@ export default function Annotation({
       {...props}
     >
       <Header
-        className="bg-primary-alt"
+        className="bg-primary-alt py-1 pl-2 pr-1"
         checkbox={checkbox}
         drag={
           <HeaderIcon
@@ -75,11 +75,16 @@ export default function Annotation({
                 renderer &&
                 handleDragStart(evt, renderer, containerRef.current),
             )}
+            size={16}
           />
         }
         buttons={
           <>
-            <DetailsButton onClick={handleShowDetails} />
+            <DetailsButton
+              className="p-0.5"
+              size={14}
+              onClick={handleShowDetails}
+            />
             <MoreOptionsButton className="p-0" onClick={handleMoreOptions} />
           </>
         }
@@ -90,11 +95,14 @@ export default function Annotation({
           backlink={getBacklink(annotation)}
         />
       </Header>
-      <Content ref={containerRef} className="px-3 py-2">
+      <Content ref={containerRef} className="px-2 py-1">
         <blockquote
-          className={clsx("border-l-blockquote border-l-ia-accent pl-2", {
-            "line-clamp-3": collapsed,
-          })}
+          className={clsx(
+            "border-l-blockquote border-l-ia-accent pl-2 leading-tight",
+            {
+              "line-clamp-3": collapsed,
+            },
+          )}
           style={{ borderColor: annotation.color ?? undefined ?? undefined }}
         >
           <Excerpt

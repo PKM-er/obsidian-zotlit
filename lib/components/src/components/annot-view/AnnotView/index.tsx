@@ -21,14 +21,31 @@ const useOnDbRefresh = () => {
 };
 
 export default function AnnotView() {
-  const { store } = useContext(Context);
+  const { store, onSetFollow } = useContext(Context);
 
   useOnDbRefresh();
+
+  const follow = useStore(store, (s) => s.follow);
+
   const doc = useStore(store, (s) => s.doc);
 
   if (!doc) {
     return (
       <>
+        <Header
+          buttons={
+            <>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={onSetFollow}
+                onKeyUp={onSetFollow}
+              >
+                {follow === null ? "detached" : follow}
+              </div>
+            </>
+          }
+        ></Header>
         <div className="pane-empty p-2">Active file not literature note</div>
       </>
     );
@@ -80,7 +97,7 @@ function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
       <div
         className={clsx(
           "annots-container @container",
-          "overflow-auto px-3 pt-1 pb-8 text-sm",
+          "overflow-auto px-3 pt-1 pb-8 text-xs",
         )}
       >
         {annotListProps ? (

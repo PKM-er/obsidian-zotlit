@@ -21,7 +21,7 @@ export default memo(function PageLabel({
         className={clsx(
           "annot-page",
           "external-link",
-          "bg-[length:12px] bg-[center_right_3px] pr-[18px] text-sm",
+          "bg-[length:12px] bg-[center_right_3px] pr-[18px] text-xs",
           className,
         )}
         href={backlink}

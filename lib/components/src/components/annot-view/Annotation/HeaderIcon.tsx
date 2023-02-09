@@ -2,8 +2,8 @@ import { AnnotationType } from "@obzt/zotero-type";
 import clsx from "clsx";
 import { startCase } from "lodash-es";
 import { memo } from "react";
+import type { IconProps } from "../../icon";
 import { Icon } from "../../icon";
-import type { Attributes } from "../../utils";
 
 export interface HeaderIconProps {
   icon: string;
@@ -17,7 +17,7 @@ export default memo(function HeaderIcon({
   type,
   className,
   ...props
-}: HeaderIconProps & Attributes) {
+}: HeaderIconProps & IconProps) {
   const label = startCase(AnnotationType[type]);
   return (
     <Icon
