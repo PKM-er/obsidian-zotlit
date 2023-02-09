@@ -86,6 +86,12 @@ export class ReaderEventHelper extends Component {
       return;
     }
     const itemId = reader.itemID;
+    if (!itemId) {
+      self.app.logError(
+        new Error("No itemID for reader " + reader._instanceID),
+      );
+      return;
+    }
     const observer = new window.MutationObserver((mutations) => {
       mutations.forEach(function ({ target, oldValue }) {
         if (
@@ -122,7 +128,14 @@ export class ReaderEventHelper extends Component {
     window: typeof globalThis,
     reader: _ZoteroTypes.ReaderInstance,
   ) {
-    const { itemID: attachmentId, _instanceID } = reader;
+    const { _instanceID } = reader;
+    const attachmentId = reader.itemID;
+    if (!attachmentId) {
+      this.app.logError(
+        new Error("No itemID for reader " + reader._instanceID),
+      );
+      return;
+    }
     const focusHandler = () =>
         this.event.emit("focus", attachmentId, _instanceID),
       blurHandler = () => this.event.emit("blur", attachmentId, _instanceID);

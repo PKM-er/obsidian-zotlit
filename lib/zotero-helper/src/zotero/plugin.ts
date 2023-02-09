@@ -227,11 +227,7 @@ abstract class Plugin_2<
   #readerMenu?: ReaderMenuHelper;
   registerMenu(
     selector: "reader",
-    cb: (
-      menu: Menu,
-      data: AnnotPopupData,
-      reader: _ZoteroTypes.ReaderInstance,
-    ) => any,
+    cb: (menu: Menu, data: AnnotPopupData, itemID: number) => any,
   ): void;
   registerMenu(
     selector: keyof typeof MenuSelector,

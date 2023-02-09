@@ -24,11 +24,7 @@ export interface AnnotPopupData {
 }
 
 interface Event {
-  menu: (
-    menu: Menu,
-    data: AnnotPopupData,
-    reader: _ZoteroTypes.ReaderInstance,
-  ) => any;
+  menu: (menu: Menu, data: AnnotPopupData, itemID: number) => any;
 }
 
 export class ReaderMenuHelper extends Component {
@@ -68,11 +64,19 @@ export class ReaderMenuHelper extends Component {
               ) {
                 continue;
               }
+              const itemID = this.itemID;
+              if (typeof itemID !== "number") {
+                self.app.logError(
+                  new Error("No itemID for reader " + this._instanceID),
+                );
+                continue;
+              }
               const menu = new Menu({
                 element: popup as XUL.MenuPopup,
                 removeSelf: false,
               });
-              self.event.emit("menu", menu, data, this);
+
+              self.event.emit("menu", menu, data, itemID);
               self.patchedPopups.add(popup);
             }
             return result;

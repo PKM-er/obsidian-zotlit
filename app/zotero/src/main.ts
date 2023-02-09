@@ -113,15 +113,11 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         ),
     );
 
-    this.registerMenu("reader", (menu, data, reader) => {
-      const libIdKey = this.app.Items.getLibraryAndKeyFromID(
-        reader.attachmentId,
-      );
+    this.registerMenu("reader", (menu, data, itemID) => {
+      const libIdKey = this.app.Items.getLibraryAndKeyFromID(itemID);
       if (!libIdKey) {
         this.app.logError(
-          new Error(
-            `Can't get library and key from item id ${reader.attachmentId}`,
-          ),
+          new Error(`Can't get library and key from item id ${itemID}`),
         );
         return;
       }
