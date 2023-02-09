@@ -191,11 +191,12 @@ export default class NoteIndex extends Service {
         : null,
       withinFile = file ? this.blockCache.byFile.get(file) : null;
 
-    if (withinFile && withKey) {
+    if (file && item) {
+      if (!withinFile || !withKey) return [];
       return withinFile.filter((info) => withKey.has(info));
     }
-    if (withinFile) return [...withinFile];
-    if (withKey) return [...withKey];
+    if (file) return withinFile ? [...withinFile] : [];
+    if (item) return withKey ? [...withKey] : [];
     return [];
   }
   getBlocksIn(file: string): BlockInfo[] | null {
