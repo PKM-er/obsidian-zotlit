@@ -113,7 +113,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         ),
     );
 
-    this.registerMenu("reader", (menu, data, itemID) => {
+    this.registerMenu("reader:annot", (menu, data, itemID) => {
       const libIdKey = this.app.Items.getLibraryAndKeyFromID(itemID);
       if (!libIdKey) {
         this.app.logError(

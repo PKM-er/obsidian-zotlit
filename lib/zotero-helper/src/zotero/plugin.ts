@@ -20,7 +20,7 @@ import { PreferencePane } from "./pref/index.js";
 import type { ReaderEvent } from "./reader/event.js";
 import { ReaderEventHelper } from "./reader/event.js";
 import { ReaderMenuHelper } from "./reader/menu.js";
-import type { AnnotPopupData } from "./reader/menu.js";
+import type { ReaderMenuEvent } from "./reader/menu.js";
 import type { IPaneDescriptor } from "./index.js";
 
 declare global {
@@ -225,9 +225,9 @@ abstract class Plugin_2<
 
   // # menu
   #readerMenu?: ReaderMenuHelper;
-  registerMenu(
-    selector: "reader",
-    cb: (menu: Menu, data: AnnotPopupData, itemID: number) => any,
+  registerMenu<K extends keyof ReaderMenuEvent>(
+    selector: `reader:${K}`,
+    cb: ReaderMenuEvent[K],
   ): void;
   registerMenu(
     selector: keyof typeof MenuSelector,
@@ -238,10 +238,10 @@ abstract class Plugin_2<
     selector: string,
     cb: (menu: Menu, ...args: any[]) => any,
   ): void {
-    if (selector === "reader") {
+    if (selector.startsWith(readerPrefix)) {
       if (!this.loaded) throw new Error("register reader Menu before loaded");
       this.#readerMenu ??= this.addChild(new ReaderMenuHelper(this.app));
-      this.register(this.#readerMenu.event.on("menu", cb));
+      this.register(this.#readerMenu.event.on(toReaderEventName(selector), cb));
     } else {
       const menu = this.addChild(new Menu({ selector }));
       cb(menu);
@@ -255,6 +255,10 @@ abstract class Plugin_2<
     this.addChild(new PreferencePane(des, this.app));
   }
 }
+
+const readerPrefix = "reader:",
+  toReaderEventName = (name: string) =>
+    name.substring(readerPrefix.length) as keyof ReaderMenuEvent;
 
 export interface Manifest {
   id: string;
