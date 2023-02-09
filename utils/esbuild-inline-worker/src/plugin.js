@@ -5,7 +5,7 @@ import { basename, join } from "path";
 import esbuild from "esbuild";
 import { nanoid } from "nanoid/async";
 import { tmpdir } from "os";
-import { rmdirSync } from "fs";
+import { rmSync } from "fs";
 
 const namespace = "inline-worker";
 const toUniqueFilename = async (/** @type {string} */ path) => {
@@ -116,7 +116,7 @@ export const inlineWorkerPlugin = ({
       build.onDispose(() => {
         Promise.all(
           Object.values(workerBuilders).map((ctx) => ctx.dispose())
-        ).then(() => rmdirSync(cacheDir, { recursive: true }));
+        ).then(() => rmSync(cacheDir, { recursive: true, force: true }));
       });
     }
   },

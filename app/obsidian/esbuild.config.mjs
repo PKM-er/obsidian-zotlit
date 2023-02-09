@@ -47,7 +47,7 @@ const cmExternals = [
   "@codemirror/tooltip",
 ];
 
-const isProd = process.env.BUILD === "production";
+const isProd = process.env?.BUILD === "production";
 
 const preactCompatPlugin = {
   name: "preact-compat",
@@ -70,7 +70,7 @@ const baseOpts = {
   mainFields: ["browser", "module", "main"],
   minify: isProd,
   define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
+    // "process.env.NODE_ENV": JSON.stringify(process.env.BUILD),
   },
 };
 
@@ -107,13 +107,21 @@ const opts = {
     PostcssPlugin({}),
   ],
 };
-try {
-  if (!isProd) {
-    await (await context(opts)).watch();
-  } else {
-    await build(opts);
+
+if (!isProd) {
+  const ctx = await context(opts);
+  const exit = async () => {
+    await ctx.dispose();
+    // scheduleOnDisposeCallbacks defer function calls using setTimeout(...,0), so we need to wait a bit
+    setTimeout(() => process.exit(), 100);
+  };
+  try {
+    await ctx.watch();
+  } catch (err) {
+    console.error(err);
+    await exit();
   }
-} catch (err) {
-  console.error(err);
-  process.exit(1);
+  process.on("SIGINT", exit);
+} else {
+  await build(opts);
 }
