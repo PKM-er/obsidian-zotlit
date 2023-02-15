@@ -21,7 +21,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
     if (!this.plugin.settings.suggester.citationEditorSuggester) return null;
     const line = editor.getLine(cursor.line),
       sub = line.substring(0, cursor.ch);
-    const match = sub.match(/\[@([\w ]*)$/);
+    const match = sub.match(/\[@([\w\- ]*)$/);
     if (!match) return null;
     const end = { ...cursor };
     // if `]` is next to cursor (auto-complete), include it to replace range as well
