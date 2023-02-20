@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "allOf": [
+    {
+      "$ref": "https://json.schemastore.org/package.json"
+    }
+  ],
+  "properties": {
+    "zotero": {
+      "type": "object",
+      "description": "Zotero plugin metadata",
+      "required": ["name", "id", "icons", "update"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name of the plugin"
+        },
+        "id": {
+          "type": "string",
+          "description": "Internal ID of the plugin",
+          "format": "email"
+        },
+        "icons": {
+          "type": "object",
+          "description": "Path to icon of different sizes for the plugin",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          },
+          "properties": {
+            "32": {
+              "type": "string",
+              "description": "Path to icon of size 32x32"
+            },
+            "48": {
+              "type": "string",
+              "description": "Path to icon of size 48x48"
+            },
+            "64": {
+              "type": "string",
+              "description": "Path to icon of size 64x64"
+            },
+            "96": {
+              "type": "string",
+              "description": "Path to icon of size 96x96"
+            }
+          }
+        },
+        "update": {
+          "type": "object",
+          "required": ["versions", "download", "info"],
+          "description": "Metadata for plugin update",
+          "additionalProperties": false,
+          "properties": {
+            "versions": {
+              "type": "string",
+              "description": "URL of `update.json`",
+              "format": "uri"
+            },
+            "download": {
+              "type": "string",
+              "description": "download URL, `{version}` will be replaced with the version number from `update.json`",
+              "format": "uri"
+            },
+            "info": {
+              "type": "string",
+              "description": "URL to the update log, `{version}` will be replaced with the version number from `update.json`",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}
