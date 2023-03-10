@@ -128,7 +128,7 @@ export const withAnnotHelper = (
           }
           return extra.tags[data.itemID];
         }
-        if (p === "annotations") {
+        if (p === "docItem") {
           if (target.docItem === "not-loaded") {
             throw new Error("Doc Item not loaded for item " + data.itemID);
           }
