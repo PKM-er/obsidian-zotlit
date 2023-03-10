@@ -1,26 +1,36 @@
 // @ts-check
 
+import { rmSync } from "fs";
 import { mkdtemp, readFile } from "fs/promises";
+import { tmpdir } from "os";
 import { basename, join } from "path";
 import esbuild from "esbuild";
+import type { BuildOptions, PluginBuild, Plugin, BuildContext } from "esbuild";
 import { nanoid } from "nanoid/async";
-import { tmpdir } from "os";
-import { rmSync } from "fs";
 
 const namespace = "inline-worker";
-const toUniqueFilename = async (/** @type {string} */ path) => {
+const toUniqueFilename = async (/** @type {string} */ path: string) => {
   const base = basename(path).split("."),
     ext = base.pop();
   return `${base.join(".")}_${await nanoid(5)}.${ext}`;
 };
 
-/**
- *
- * @param {{ watch: boolean; cachedir?: string; codeLoader?: "dataurl" | "text"; filter?: { pattern: RegExp; transform?: (path: string, pattern: RegExp) => string; }; buildOptions: (ctx: {path: string, resolveDir: string; entryPoint: string;}) => import("esbuild").BuildOptions; }} param0
- * @returns {import("esbuild").Plugin}
- */
+interface WorkerOptions {
+  watch?: boolean;
+  cachedir?: string;
+  codeLoader?: "dataurl" | "text";
+  filter?: {
+    pattern: RegExp;
+    transform?: (path: string, pattern: RegExp) => string;
+  };
+  buildOptions: (
+    ctx: { path: string; resolveDir: string; entryPoint: string },
+    resolve: PluginBuild["resolve"],
+  ) => Promise<BuildOptions> | BuildOptions;
+}
+
 export const inlineWorkerPlugin = ({
-  watch,
+  watch = false,
   cachedir: cacheDirRoot = tmpdir(),
   codeLoader = "text",
   filter = {
@@ -28,7 +38,7 @@ export const inlineWorkerPlugin = ({
     transform: (path, pattern) => path.replace(pattern, ""),
   },
   buildOptions,
-}) => ({
+}: WorkerOptions): Plugin => ({
   name: "esbuild-plugin-inline-worker",
   setup: async (build) => {
     if (!watch) {
@@ -47,33 +57,34 @@ export const inlineWorkerPlugin = ({
             namespace,
             pluginData: { path, resolveDir },
           };
-        }
+        },
       );
       build.onLoad(
         { filter: /.*/, namespace },
         async ({ path: workerPath, pluginData }) => {
           const code = await buildWorker(
             workerPath,
-            buildOptions({
-              path: pluginData.path,
-              entryPoint: workerPath,
-              resolveDir: pluginData.resolveDir,
-            })
+            await buildOptions(
+              {
+                path: pluginData.path,
+                entryPoint: workerPath,
+                resolveDir: pluginData.resolveDir,
+              },
+              build.resolve.bind(build),
+            ),
           );
           return { contents: code, loader: codeLoader };
-        }
+        },
       );
     } else {
       /**
-       * @type {Record<string, string>}
        * id -> entryPoint
        */
-      const workerEntryPoints = {};
+      const workerEntryPoints: Record<string, string> = {};
       /**
-       * @type {Record<string, import("esbuild").BuildContext>}
        * id -> context
        */
-      const workerBuilders = {};
+      const workerBuilders: Record<string, BuildContext> = {};
 
       const cacheDir = await mkdtemp(join(cacheDirRoot, "epiw-"));
       build.onResolve(
@@ -89,7 +100,7 @@ export const inlineWorkerPlugin = ({
           const id =
             workerEntryPoints[entryPoint] ??
             (workerEntryPoints[entryPoint] = await toUniqueFilename(
-              entryPoint
+              entryPoint,
             ));
 
           const outfile = join(cacheDir, id);
@@ -100,14 +111,18 @@ export const inlineWorkerPlugin = ({
             return output;
           }
           const builder = await prepareWorkerBuilder(entryPoint, {
-            ...buildOptions({ path, resolveDir, entryPoint }),
+            ...(await buildOptions(
+              { path, resolveDir, entryPoint },
+              build.resolve.bind(build),
+            )),
             outfile,
           });
+
           workerBuilders[id] = builder;
           await builder.rebuild();
           await builder.watch();
           return output;
-        }
+        },
       );
       build.onLoad({ filter: /.*/, namespace }, async ({ path }) => {
         const code = await readFile(path, "utf-8");
@@ -115,20 +130,17 @@ export const inlineWorkerPlugin = ({
       });
       build.onDispose(() => {
         Promise.all(
-          Object.values(workerBuilders).map((ctx) => ctx.dispose())
+          Object.values(workerBuilders).map((ctx) => ctx.dispose()),
         ).then(() => rmSync(cacheDir, { recursive: true, force: true }));
       });
     }
   },
 });
 
-/**
- *
- * @param {string} entryPoint
- * @param {import("esbuild").BuildOptions} extraConfig
- * @returns {Promise<string>}
- */
-async function buildWorker(entryPoint, { outdir, outfile, ...extraConfig }) {
+async function buildWorker(
+  entryPoint: string,
+  { outdir, outfile, ...extraConfig }: BuildOptions,
+): Promise<string> {
   const result = await esbuild.build({
     target: "es2017",
     format: "esm",
@@ -141,13 +153,13 @@ async function buildWorker(entryPoint, { outdir, outfile, ...extraConfig }) {
   return result.outputFiles[0].text;
 }
 
-/**
- *
- * @param {string} entryPoint
- * @param {import("esbuild").BuildOptions & Required<Pick<import("esbuild").BuildOptions, "outfile">>} extraConfig
- * @returns {Promise<import("esbuild").BuildContext>}
- */
-const prepareWorkerBuilder = async (entryPoint, { outdir, ...extraConfig }) => {
+const prepareWorkerBuilder = async (
+  entryPoint: string,
+  {
+    outdir,
+    ...extraConfig
+  }: BuildOptions & Required<Pick<BuildOptions, "outfile">>,
+): Promise<BuildContext> => {
   if (!extraConfig.outfile) {
     throw new Error("outfile is required");
   }

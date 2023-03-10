@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 import obPlugin from "@aidenlx/esbuild-plugin-obsidian";
 import { inlineWorkerPlugin } from "@obzt/esbuild-plugin-inline-worker";
 import { build, context } from "esbuild";
@@ -111,18 +112,19 @@ const opts = {
 
 if (!isProd) {
   const ctx = await context(opts);
-  const exit = async () => {
-    await ctx.dispose();
-    // scheduleOnDisposeCallbacks defer function calls using setTimeout(...,0), so we need to wait a bit
-    setTimeout(() => process.exit(), 100);
-  };
   try {
     await ctx.watch();
   } catch (err) {
     console.error(err);
-    await exit();
+    await cleanup();
   }
-  process.on("SIGINT", exit);
+  process.on("SIGINT", cleanup);
+  async function cleanup() {
+    await ctx.dispose();
+    // scheduleOnDisposeCallbacks defer function calls using setTimeout(...,0)
+    // so we need to wait a bit before exiting
+    // setTimeout(() => process.exit(), 100);
+  }
 } else {
   await build(opts);
 }

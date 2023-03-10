@@ -1,6 +1,5 @@
 {
-  // Change this to match your project
-  "include": ["src/**/*.js"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "allowJs": true,
@@ -9,7 +8,6 @@
     "moduleResolution": "node16",
     "skipLibCheck": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "outDir": "dist",
     "declarationMap": true
   }
