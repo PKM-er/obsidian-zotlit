@@ -1,10 +1,13 @@
 {
   "name": "@aidenlx/esbuild-plugin-inline-worker",
-  "description": "Esbuild loader for inline Web Workers",
-  "version": "1.0.0",
+  "description": "Esbuild inline web workers loader",
+  "version": "1.0.1",
   "keywords": [
     "workers",
     "esbuild"
+  ],
+  "files": [
+    "dist"
   ],
   "license": "MIT",
   "type": "module",

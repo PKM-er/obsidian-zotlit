@@ -1,6 +1,8 @@
 # Inline Worker Plugin for esbuild 0.17+
 
-This is a plugin for [esbuild](https://esbuild.github.io) which allows you to import module as bundled script text for usage in Web Workers.
+This is a plugin for [esbuild](https://esbuild.github.io) which allows you to import module as bundled script text for usage in Web Workers. Support watch mode, and custom worker import pattern and build options.
+
+Special thanks to [esbuild-plugin-inline-import](https://github.com/mitschabaude/esbuild-plugin-inline-worker) for the idea.
 
 ## Installation
 
@@ -137,7 +139,7 @@ await build({
   plugins: [
     inlineWorkerPlugin({
       // `entryPoint` point to the full path to the worker file
-      // `path` is the path used in `import` statement, 
+      // `path` is the path used in `import` statement,
       // and it's relative to `resolveDir`
       // `resolve` method is used by esbuild to resolve the import paths
       buildOptions: ({ path, resolveDir, entryPoint }, resolve) => {
@@ -152,7 +154,7 @@ await build({
         return {
           sourcemap: !isProd ? "inline" : undefined,
           tsconfig,
-        }
+        };
       },
     }),
   ],
