@@ -49,7 +49,9 @@ export default function Annotation({
   const handleMoreOptions = useMemoizedFn((evt) =>
       onMoreOptions(evt, annotation),
     ),
-    handleShowDetails = useMemoizedFn(() => onShowDetails(annotation.itemID));
+    handleShowDetails = useMemoizedFn(() =>
+      onShowDetails("annot", annotation.itemID),
+    );
 
   return (
     <div

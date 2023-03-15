@@ -65,7 +65,7 @@ export const labelRenderer: LabelRenderer = (
       menu.addItem((i) =>
         i.setTitle("Copy Template (render when present)").onClick(() => {
           navigator.clipboard.writeText(
-            `<% if ${path} { %>\n  <%= ${path} %>\n<% } %>`,
+            `<% if (${path}) { %>\n  <%= ${path} %>\n<% } %>`,
           );
         }),
       );

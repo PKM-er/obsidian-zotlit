@@ -43,7 +43,7 @@ export class TemplateLoader extends Service {
     if (!this.settings.ejected) {
       return;
     }
-    const type = this.#getTemplateTypeOf(file);
+    const type = this.getTemplateTypeOf(file);
     if (!type) return;
     const prev = this.#templates[type],
       curr = await app.vault.cachedRead(file as TFile);
@@ -55,7 +55,7 @@ export class TemplateLoader extends Service {
   get folder() {
     return this.settings.folder;
   }
-  #getTemplateTypeOf(file: TAbstractFile): EjectableTemplate | undefined {
+  getTemplateTypeOf(file: TAbstractFile): EjectableTemplate | undefined {
     if (
       file instanceof TFile &&
       file.parent.path === this.folder &&
@@ -63,7 +63,7 @@ export class TemplateLoader extends Service {
     ) {
       return FILE_TEMPLATE_MAP[file.name];
     }
-    return undefined;
+    return;
   }
 
   async loadTemplates(mode: "full" | "eject" | "noneject" = "full") {

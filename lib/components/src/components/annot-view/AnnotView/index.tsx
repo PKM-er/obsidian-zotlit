@@ -70,7 +70,9 @@ function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
           <>
             <DetailsButton
               className="nav-action-button"
-              onClick={useMemoizedFn(() => onShowDetails(docItem.itemID))}
+              onClick={useMemoizedFn(() =>
+                onShowDetails("doc-item", docItem.itemID),
+              )}
             />
             <CollapseButton
               className="nav-action-button"

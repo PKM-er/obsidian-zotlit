@@ -15,6 +15,15 @@ import { NoteFields } from "./note-fields/service";
 import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
 import { ProtocolHandler } from "./protocol/service";
 import { openOrCreateNote } from "./quick-switch";
+import {
+  ItemDetailsView,
+  itemDetailsViewType,
+} from "./template-preview/details";
+import { openTemplatePreview } from "./template-preview/open";
+import {
+  TemplatePreview,
+  templatePreviewViewType,
+} from "./template-preview/preview";
 import { TopicImport } from "./topic-import/service";
 import { chooseFileAtch } from "@/components/atch-suggest";
 import { getItemKeyOf } from "@/services/note-index";
@@ -39,6 +48,29 @@ class NoteFeatures extends Service {
     plugin.registerView(
       annotViewType,
       (leaf) => new AnnotationView(leaf, plugin),
+    );
+    plugin.registerView(
+      templatePreviewViewType,
+      (leaf) => new TemplatePreview(leaf, plugin),
+    );
+    plugin.registerView(
+      itemDetailsViewType,
+      (leaf) => new ItemDetailsView(leaf, plugin),
+    );
+    plugin.registerEvent(
+      plugin.app.workspace.on("file-menu", (menu, file) => {
+        const type = plugin.templateLoader.getTemplateTypeOf(file);
+        if (!type) return;
+        console.log(menu);
+        menu.addItem((i) =>
+          i
+            .setIcon("edit")
+            .setTitle("Open Template Preview")
+            .onClick(() => {
+              openTemplatePreview(type, null, plugin);
+            }),
+        );
+      }),
     );
     plugin.registerView(
       noteFieldsViewType,
@@ -156,7 +188,6 @@ class NoteFeatures extends Service {
       [item.itemID, libId],
       ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
     ]);
-
     const note = await this.createNoteForDocItem(item, (template, ctx) =>
       template.renderNote(
         {

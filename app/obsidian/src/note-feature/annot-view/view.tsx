@@ -1,5 +1,3 @@
-import { deleteKeys } from "@mobily/ts-belt/Dict";
-
 import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
 import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
@@ -8,6 +6,7 @@ import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Menu, ItemView } from "obsidian";
 import ReactDOM from "react-dom";
 import { chooseLiterature } from "../citation-suggest";
+import { openTemplatePreview } from "../template-preview/open";
 import type { AnnotRendererProps } from "./drag-insert";
 import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
@@ -52,9 +51,9 @@ export class AnnotationView extends ItemView {
         locked = true;
         const { itemId, attachmentId } = data;
         this.setStatePrev((state) => ({
+          ...state,
           itemId,
           attachmentId,
-          ...deleteKeys(state, ["itemId", "attachmentId"]),
         })).then(() => {
           locked = false;
           if (nextReader === null) return;
@@ -161,8 +160,26 @@ export class AnnotationView extends ItemView {
           plugin.settings.database.zoteroDataDir,
         )}`;
       },
-      onShowDetails: (itemId) => {
-        console.log("show details", itemId);
+      onShowDetails: async (type, itemId) => {
+        const state = store.getState(),
+          attachment = state.attachmentID ?? undefined;
+        if (type === "doc-item") {
+          await openTemplatePreview(
+            "note",
+            { docItem: itemId, attachment },
+            plugin,
+          );
+        } else {
+          const docItem = state.doc?.docItem.itemID;
+          if (!docItem) {
+            throw new Error("Missing doc item when showing annotation details");
+          }
+          await openTemplatePreview(
+            "annotation",
+            { docItem, attachment, annot: itemId },
+            plugin,
+          );
+        }
       },
       onDragStart: getDragStartHandler(plugin),
       onMoreOptions: getMoreOptionsHandler(self),

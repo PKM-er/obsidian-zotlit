@@ -49,17 +49,18 @@ const themeDark = {
   base0F: "#d33682",
 };
 
-const registerCssChange = (callback: () => void) => {
-  app.workspace.on("css-change", callback);
-  return () => app.workspace.off("css-change", callback);
-};
-
-export default function ItemDetails({ item }: { item: any }) {
+export default function ItemDetails({
+  item,
+  registerCssChange,
+}: {
+  item: any;
+  registerCssChange?: (callback: () => void) => () => void;
+}) {
   const [isDarkMode, setDarkMode] = useState(false);
 
   useEffect(
-    () => registerCssChange(() => setDarkMode(queryDarkMode())),
-    [setDarkMode],
+    () => registerCssChange?.(() => setDarkMode(queryDarkMode())),
+    [registerCssChange],
   );
   if (!item) return <div>No Details Available</div>;
   return (
