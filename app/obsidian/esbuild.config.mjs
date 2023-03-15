@@ -8,7 +8,7 @@ import { createRequire } from "module";
 import { join, resolve } from "path";
 // import myPackage from "./package.json" assert { type: "json" };
 import semverPrerelease from "semver/functions/prerelease.js";
-import PostcssPlugin from "@obzt/components/esbuild-postcss";
+import PostcssPlugin from "./esbuild-postcss.mjs";
 
 const myPackage = JSON.parse(await readFile("./package.json"));
 const isPreRelease = semverPrerelease(myPackage.version) !== null;

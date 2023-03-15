@@ -57,7 +57,12 @@
     "@types/mdast": "~3.0.10",
     "@types/turndown": "~5.0.1",
     "@codemirror/language": "https://github.com/lishid/cm-language/tarball/master",
-    "pdfjs-dist": "~3.3.122"
+    "pdfjs-dist": "~3.3.122",
+    "postcss": "~8.4.21",
+    "postcss-discard": "~2.0.0",
+    "postcss-prefix-selector": "~1.16.0",
+    "autoprefixer": "~10.4.13",
+    "tailwindcss": "~3.2.4"
   },
   "config": {
     "commitizen": {

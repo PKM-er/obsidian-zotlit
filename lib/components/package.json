@@ -11,9 +11,7 @@
   "main": "./src/components/index.tsx",
   "exports": {
     ".": "./src/components/index.tsx",
-    "./esbuild-postcss": {
-      "import": "./src/postcss.js"
-    }
+    "./tailwind": "./tailwind.config.cjs"
   },
   "dependencies": {
     "@obzt/common": "workspace:*",

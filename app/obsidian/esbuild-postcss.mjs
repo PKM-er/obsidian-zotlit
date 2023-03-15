@@ -1,7 +1,7 @@
 // @ts-check
 
 import postcss from "postcss";
-import postcssConfig from "../postcss.config.js";
+import postcssConfig from "./postcss.config.mjs";
 import { readFile } from "fs/promises";
 
 /**
