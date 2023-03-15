@@ -33,7 +33,7 @@
     "nanoid": "~4.0.0"
   },
   "devDependencies": {
-    "typescript": "^4.9.4",
+    "typescript": "5.0.1-rc",
     "@types/node": "^17.0.10",
     "rimraf": "^3.0.2"
   }

@@ -1,5 +1,5 @@
 import workerpool from "@aidenlx/workerpool";
-import { toObjectURL } from "@obzt/esbuild-plugin-inline-worker/utils";
+import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
 import { Service } from "@ophidian/core";
 
 import workerCode from "worker:@/worker/note-parser/main";

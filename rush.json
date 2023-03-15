@@ -314,7 +314,7 @@
       "projectFolder": "lib/zotero-helper"
     },
     {
-      "packageName": "@obzt/esbuild-plugin-inline-worker",
+      "packageName": "@aidenlx/esbuild-plugin-inline-worker",
       "projectFolder": "utils/esbuild-inline-worker"
     },
     {

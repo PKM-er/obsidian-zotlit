@@ -2,7 +2,7 @@
 import type { INotifyRegularItem } from "@/../../../lib/protocol/dist";
 import workerpool from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
-import { toObjectURL } from "@obzt/esbuild-plugin-inline-worker/utils";
+import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
 import { Service } from "@ophidian/core";
 import { assertNever } from "assert-never";
 import type { EventRef } from "obsidian";

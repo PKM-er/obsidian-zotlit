@@ -56,7 +56,6 @@
      * (in addition to whatever "usual" version is being used by other projects in the repo):
      */
     "react-dom": ["npm:@preact/compat@~17.1.2"],
-    "react": ["npm:@preact/compat@~17.1.2"],
-    "typescript": ["^5.0.0-beta"]
+    "react": ["npm:@preact/compat@~17.1.2"]
   }
 }

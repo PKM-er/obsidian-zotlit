@@ -1,6 +1,6 @@
 /* eslint-disable no-inner-declarations */
 import obPlugin from "@aidenlx/esbuild-plugin-obsidian";
-import { inlineWorkerPlugin } from "@obzt/esbuild-plugin-inline-worker";
+import { inlineWorkerPlugin } from "@aidenlx/esbuild-plugin-inline-worker";
 import { build, context } from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { readFile } from "fs/promises";

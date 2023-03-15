@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",
-    "typescript": "^4.9.4",
+    "typescript": "5.0.1-rc",
     "eslint": "~8.31.0",
     "@types/eslint": "~8.4.6",
     "zotero-types": "~1.0.4",
