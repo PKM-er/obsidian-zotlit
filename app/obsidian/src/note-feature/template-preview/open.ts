@@ -32,7 +32,20 @@ export async function openTemplatePreview(
     );
 
   if (existing.length > 0) {
-    await existing[0].openFile(file);
+    const markdown = existing[0];
+    await markdown.openFile(file);
+    if (!markdown.group) return;
+    const inGroup = workspace.getGroupLeaves(markdown.group);
+    for (const leaf of inGroup) {
+      const viewType = leaf.view.getViewType();
+      if (
+        viewType === templatePreviewViewType ||
+        viewType === itemDetailsViewType
+      ) {
+        const prev = leaf.view.getState();
+        await leaf.view.setState({ ...prev, preview: data }, {});
+      }
+    }
     return;
   }
   const left = workspace.openPopoutLeaf(),
