@@ -39,9 +39,7 @@ button.obzt-btn-reset {
 */
 
   input,
-  optgroup,
-  select,
-  textarea {
+  optgroup {
     font-family: inherit; /* 1 */
     font-size: 100%; /* 1 */
     font-weight: inherit; /* 1 */

@@ -109,6 +109,9 @@
     "remark-parse": "~10.0.1",
     "unified": "~10.1.2",
     "unist-util-select": "~4.0.1",
-    "mdast-builder": "~1.1.1"
+    "mdast-builder": "~1.1.1",
+    "@radix-ui/react-tabs": "~1.0.3",
+    "@mui/base": "~5.0.0-alpha.121",
+    "react-async-hook": "~4.0.0"
   }
 }

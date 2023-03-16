@@ -11,6 +11,7 @@
   "main": "./src/components/index.tsx",
   "exports": {
     ".": "./src/components/index.tsx",
+    "./utils": "./src/components/utils.tsx",
     "./tailwind": "./tailwind.config.cjs"
   },
   "dependencies": {

@@ -1,4 +1,5 @@
 import "./main.less";
+import "./index.css";
 
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
@@ -23,7 +24,7 @@ import {
   DatabaseWatcher,
   ZoteroDatabase,
 } from "./services/zotero-db";
-import { ZoteroSettingTab } from "./setting-tab";
+import ZoteroSettingTab from "./setting-tab";
 import { SettingLoader } from "./settings/service";
 import log from "@/log";
 

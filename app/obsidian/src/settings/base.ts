@@ -2,7 +2,7 @@ import { keys, mapWithKey, selectKeys } from "@mobily/ts-belt/Dict";
 import { use } from "@ophidian/core";
 import ZoteroPlugin from "@/zt-main";
 
-abstract class Settings<Options extends Record<string, any>> {
+export abstract class Settings<Options extends Record<string, any>> {
   protected use = use.this;
   protected get manifest() {
     return this.use(ZoteroPlugin).manifest;

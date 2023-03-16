@@ -1,5 +1,3 @@
-import "./index.css";
-
 export type { ObsidianContextType } from "./obsidian";
 export { ObsidianContext } from "./obsidian";
 
