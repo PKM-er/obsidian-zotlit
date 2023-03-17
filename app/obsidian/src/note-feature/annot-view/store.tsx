@@ -62,7 +62,7 @@ export const createStore = (p: ZoteroPlugin) =>
      */
     const loadAtchs = async (itemID: number, lib: number) => {
         const attachments = (await api(p).getAttachments(itemID, lib)).filter(
-          isFileAttachment,
+          (f) => isFileAttachment(f) && f.path?.endsWith(".pdf"),
         );
         set((state) => ({
           ...state,
