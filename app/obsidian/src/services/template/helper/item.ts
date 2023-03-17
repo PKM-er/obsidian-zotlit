@@ -4,7 +4,7 @@ import type {
   RegularItemInfoBase,
   TagInfo,
 } from "@obzt/database";
-import { getBacklink } from "@obzt/database";
+import { getCreatorName, getBacklink } from "@obzt/database";
 import { fileLink } from "../utils";
 import type { AnnotHelper } from "./annot";
 import type { Context } from "./base";
@@ -35,6 +35,7 @@ export type DocItemHelper = Readonly<
     } & {
       backlink: string;
       fileLink: string;
+      authors: string[];
     }
 > & { annotations: AnnotHelper[] };
 
@@ -53,6 +54,9 @@ export const withDocItemHelper = (
       },
       annotations: "not-loaded",
       creators: creators.map((c) => withCreatorHelper(c)),
+      authors: creators
+        .filter((c) => c.creatorType === "author" && getCreatorName(c))
+        .map(getCreatorName),
     },
     {
       get(target, p, receiver) {
