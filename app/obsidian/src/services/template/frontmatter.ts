@@ -19,3 +19,13 @@ export const DEFAULT_FMFIELD_MAPPING: FmFieldsMapping = {
 export const fmModes = ["whitelist", "blacklist"] as const;
 
 export type FmMode = (typeof fmModes)[number];
+
+export const blacklistIgnore = new Set([
+  "annotations",
+  "attachment",
+  "allAttachments",
+  "creators",
+  "fileLink",
+  "itemID",
+  "libraryID",
+]);

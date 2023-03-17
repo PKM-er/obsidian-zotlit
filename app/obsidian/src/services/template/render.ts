@@ -1,13 +1,18 @@
 // @ts-ignore
 import { merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
-import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
+import type {
+  AnnotationInfo,
+  RegularItemInfoBase,
+  TagInfo,
+} from "@obzt/database";
+import { TagType } from "@obzt/zotero-type";
 import { use } from "@ophidian/core";
 import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
 import type { FmFieldsMapping } from "./frontmatter";
-import { ZOTERO_KEY_FIELDNAME } from "./frontmatter";
+import { blacklistIgnore, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
 import type { HelperExtra } from "./helper/to-helper";
@@ -72,7 +77,11 @@ export class TemplateRenderer {
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
 
-    for (const [key, val] of Object.entries(data as Record<string, any>)) {
+    // eslint-disable-next-line prefer-const
+    for (let [key, val] of Object.entries(data as Record<string, any>)) {
+      if (mode === "blacklist" && blacklistIgnore.has(key)) {
+        continue;
+      }
       const action = mapping[key as keyof FmFieldsMapping];
       if (typeof action === "string") {
         record[action] = val;
