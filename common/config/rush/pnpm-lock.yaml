@@ -31,6 +31,7 @@ importers:
       '@obzt/zotero-type': workspace:*
       '@ophidian/core': workspace:*
       '@preact/compat': ~17.1.2
+      '@radix-ui/react-collapsible': ~1.0.2
       '@radix-ui/react-tabs': ~1.0.3
       '@release-it/bumper': ^4.0.0
       '@release-it/conventional-changelog': ^5.1.0
@@ -106,6 +107,7 @@ importers:
       '@obzt/zotero-type': link:../../lib/zotero-type
       '@ophidian/core': link:../../lib/ophidian-lib-core
       '@preact/compat': 17.1.2_preact@10.11.3
+      '@radix-ui/react-collapsible': 1.0.2_ive3jjn476xyi3ikfsqwmh5x74
       '@radix-ui/react-tabs': 1.0.3_ive3jjn476xyi3ikfsqwmh5x74
       ahooks: 3.7.4_@preact+compat@17.1.2
       assert-never: 1.2.1
@@ -2081,13 +2083,13 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.11
+    dev: false
 
   /@babel/runtime/7.21.0:
     resolution: {integrity: sha512-xwII0//EObnq89Ji5AKYQaRYiW/nZ3llSv29d49IuxPhKbtJoLP+9QUUZ4nVragQVtaVGeZrpB+ZtG/Pdy/POw==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.11
-    dev: false
 
   /@babel/template/7.20.7:
     resolution: {integrity: sha512-8SegXApWe6VoNw0r9JHpSteLKTpTiLZ4rMlGIm9JQ18KiCtyQiAMEazujAHrUS5flrcqYZa75ukev3P6QmUwUw==}
@@ -4284,7 +4286,7 @@ packages:
   /@radix-ui/primitive/1.0.0:
     resolution: {integrity: sha512-3e7rn8FDMin4CgeL7Z/49smCA3rFYY3Ha2rUQ7HRWFadS5iCRw08ZgVT1LaNTCNqgvrUiyczLflrVrF0SRQtNA==}
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
     dev: false
 
   /@radix-ui/react-checkbox/1.0.1_sfoxds7t5ydpegc3knd667wn6m:
@@ -4304,6 +4306,25 @@ packages:
       '@radix-ui/react-use-size': 1.0.0_react@17.0.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+    dev: false
+
+  /@radix-ui/react-collapsible/1.0.2_ive3jjn476xyi3ikfsqwmh5x74:
+    resolution: {integrity: sha512-QNiDT6Au8jUU0K1WV+HEd4loH7C5CKQjeXxskwqyiyAkyCmW7qlQM5vSSJCIoQC+OVPyhgafSmGudRP8Qm1/gA==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@babel/runtime': 7.21.0
+      '@radix-ui/primitive': 1.0.0
+      '@radix-ui/react-compose-refs': 1.0.0_@preact+compat@17.1.2
+      '@radix-ui/react-context': 1.0.0_@preact+compat@17.1.2
+      '@radix-ui/react-id': 1.0.0_@preact+compat@17.1.2
+      '@radix-ui/react-presence': 1.0.0_ive3jjn476xyi3ikfsqwmh5x74
+      '@radix-ui/react-primitive': 1.0.2_ive3jjn476xyi3ikfsqwmh5x74
+      '@radix-ui/react-use-controllable-state': 1.0.0_@preact+compat@17.1.2
+      '@radix-ui/react-use-layout-effect': 1.0.0_@preact+compat@17.1.2
+      react: /@preact/compat/17.1.2_preact@10.11.3
+      react-dom: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
   /@radix-ui/react-collection/1.0.2_ive3jjn476xyi3ikfsqwmh5x74:
@@ -4344,7 +4365,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
@@ -4353,7 +4374,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react: 17.0.2
     dev: false
 
@@ -4362,7 +4383,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
 
@@ -4371,7 +4392,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-use-layout-effect': 1.0.0_@preact+compat@17.1.2
       react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
@@ -4382,7 +4403,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-compose-refs': 1.0.0_@preact+compat@17.1.2
       '@radix-ui/react-use-layout-effect': 1.0.0_@preact+compat@17.1.2
       react: /@preact/compat/17.1.2_preact@10.11.3
@@ -4395,7 +4416,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-compose-refs': 1.0.0_react@17.0.2
       '@radix-ui/react-use-layout-effect': 1.0.0_react@17.0.2
       react: 17.0.2
@@ -4408,7 +4429,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-slot': 1.0.1_react@17.0.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -4420,7 +4441,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-slot': 1.0.1_@preact+compat@17.1.2
       react: /@preact/compat/17.1.2_preact@10.11.3
       react-dom: /@preact/compat/17.1.2_preact@10.11.3
@@ -4432,7 +4453,7 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
       react-dom: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/primitive': 1.0.0
       '@radix-ui/react-collection': 1.0.2_ive3jjn476xyi3ikfsqwmh5x74
       '@radix-ui/react-compose-refs': 1.0.0_@preact+compat@17.1.2
@@ -4522,7 +4543,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-use-callback-ref': 1.0.0_@preact+compat@17.1.2
       react: /@preact/compat/17.1.2_preact@10.11.3
     dev: false
@@ -4532,7 +4553,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-use-callback-ref': 1.0.0_react@17.0.2
       react: 17.0.2
     dev: false
@@ -4560,7 +4581,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react: 17.0.2
     dev: false
 
@@ -4569,7 +4590,7 @@ packages:
     peerDependencies:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       '@radix-ui/react-use-layout-effect': 1.0.0_react@17.0.2
       react: 17.0.2
     dev: false
@@ -13758,7 +13779,7 @@ packages:
       react: ^16.6.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.6.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       invariant: 2.2.4
       prop-types: 15.8.1
       react: 17.0.2
@@ -13813,7 +13834,7 @@ packages:
       react-loadable: '*'
       webpack: '>=4.41.1 || 5.x'
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react-loadable: /@docusaurus/react-loadable/5.5.2_react@17.0.2
       webpack: 5.75.0
     dev: false
@@ -13824,7 +13845,7 @@ packages:
       react: '>=15'
       react-router: '>=5'
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       react: 17.0.2
       react-router: 5.3.4_react@17.0.2
     dev: false
@@ -13834,7 +13855,7 @@ packages:
     peerDependencies:
       react: '>=15'
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       history: 4.10.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -13849,7 +13870,7 @@ packages:
     peerDependencies:
       react: '>=15'
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -13880,7 +13901,7 @@ packages:
     peerDependencies:
       react: ^15.3.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.20.13
+      '@babel/runtime': 7.21.0
       consolidated-events: 2.0.2
       prop-types: 15.8.1
       react: 17.0.2

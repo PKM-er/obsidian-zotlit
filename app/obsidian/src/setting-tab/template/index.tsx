@@ -4,6 +4,7 @@ import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
 import { EjectableTemplate } from "./EjectableTemplate";
+import { FmFields } from "./FmFields";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
 import { EjectableTemplateHeading, useEjected } from "./useEjected";
 import {
@@ -33,6 +34,7 @@ export default function Template() {
         If you have issue with native auto pair features, you can disable this
         option and report the bug in GitHub
       </BooleanSetting>
+      <FmFields />
       <Setting heading name="Simple" />
       {nonEjectableTemplateTypes.map((type) => (
         <SimpleTemplateEdit key={type} type={type} />

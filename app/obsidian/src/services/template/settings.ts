@@ -5,8 +5,8 @@ import type { getConfig } from "eta";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
-import type { FmBlackList, FmWhiteList } from "./frontmatter";
-import { FMFIELD_MAPPING } from "./frontmatter";
+import type { FmFieldsMapping, FmMode } from "./frontmatter";
+import { DEFAULT_FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
 import Settings from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
@@ -40,7 +40,8 @@ interface SettingOptions {
   ejected: boolean;
   folder: string;
   templates: Record<NonEjectableTemplate, string>;
-  fmFields: FmWhiteList | FmBlackList;
+  fmFieldsMode: FmMode;
+  fmFieldsMapping: FmFieldsMapping;
   autoPairEta: boolean;
 }
 
@@ -83,12 +84,10 @@ export class TemplateSettings extends Settings<SettingOptions> {
       ejected: false,
       folder: "ZtTemplates",
       templates: deleteKeys(DEFAULT_TEMPLATE, ejectableTemplateTypes),
-      fmFields: {
-        mode: "whitelist",
-        mapping: {
-          ...FMFIELD_MAPPING,
-        },
-      } satisfies FmWhiteList,
+      fmFieldsMode: "whitelist",
+      fmFieldsMapping: {
+        ...DEFAULT_FMFIELD_MAPPING,
+      },
       autoPairEta: false,
     } satisfies SettingOptions;
   }
@@ -114,7 +113,8 @@ export class TemplateSettings extends Settings<SettingOptions> {
         return await loader.loadTemplates("full");
       case "templates":
         return await loader.loadTemplates("noneject");
-      case "fmFields":
+      case "fmFieldsMode":
+      case "fmFieldsMapping":
         return;
       case "autoPairEta": {
         return plugin.templateEditor.setEtaBracketPairing(this.autoPairEta);
@@ -135,7 +135,8 @@ export class TemplateSettings extends Settings<SettingOptions> {
         folder: this.folder,
         templates: this.templates,
       },
-      fmFields: this.fmFields,
+      fmFieldsMode: this.fmFieldsMode,
+      fmFieldsMapping: this.fmFieldsMapping,
       autoPairEta: this.autoPairEta,
     };
   }
@@ -143,7 +144,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
   fromJSON(json: SettingOptionsJSON): void {
     super.fromJSON({
       ...(json.template ?? {}),
-      ...selectKeys(json, ["autoPairEta", "fmFields"]),
+      ...selectKeys(json, ["autoPairEta", "fmFieldsMode", "fmFieldsMapping"]),
     });
   }
 }

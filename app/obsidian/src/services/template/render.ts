@@ -6,7 +6,7 @@ import { use } from "@ophidian/core";
 import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
-import type { FieldsInFrontmatter } from "./frontmatter";
+import type { FmFieldsMapping } from "./frontmatter";
 import { ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
@@ -66,13 +66,14 @@ export class TemplateRenderer {
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
-    const { mode, mapping } = this.use(TemplateSettings).fmFields;
+    const mode = this.use(TemplateSettings).fmFieldsMode,
+      mapping = this.use(TemplateSettings).fmFieldsMapping;
     const record: Record<string, any> = {};
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
 
     for (const [key, val] of Object.entries(data as Record<string, any>)) {
-      const action = mapping[key as keyof FieldsInFrontmatter];
+      const action = mapping[key as keyof FmFieldsMapping];
       if (typeof action === "string") {
         record[action] = val;
       } else if (
@@ -99,7 +100,8 @@ export class TemplateRenderer {
         "Failed to renderYaml",
         err,
         item,
-        this.use(TemplateSettings).fmFields,
+        this.use(TemplateSettings).fmFieldsMode,
+        this.use(TemplateSettings).fmFieldsMapping,
       );
       new Notice("Failed to renderYaml");
     }
@@ -115,7 +117,8 @@ export class TemplateRenderer {
         "Failed to set frontmatter to file " + file.path,
         err,
         data,
-        this.use(TemplateSettings).fmFields,
+        this.use(TemplateSettings).fmFieldsMode,
+        this.use(TemplateSettings).fmFieldsMapping,
       );
       new Notice("Failed to set frontmatter to file " + file.path);
     }

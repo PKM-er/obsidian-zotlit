@@ -1,0 +1,149 @@
+import { deleteKey, update } from "@mobily/ts-belt/Dict";
+import { useMemoizedFn } from "ahooks";
+import { debounce } from "obsidian";
+import { useContext, useMemo, useState } from "react";
+import * as React from "react";
+import { SettingTabCtx } from "../common";
+import Setting, { useApplySetting } from "../components/Setting";
+import useExtraButton from "../components/useExtraButton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import type { FmFieldsMapping, FmMode } from "@/services/template/frontmatter";
+import { fmModes } from "@/services/template/frontmatter";
+import { useIconRef } from "@/utils/icon";
+function FmFieldModeSelect() {
+  const { plugin } = useContext(SettingTabCtx);
+  const { template } = plugin.settings;
+  const [mode, setMode] = useState(() => template.fmFieldsMode);
+  const applySeting = useApplySetting(template, "fmFieldsMode");
+  const onModeChange = useMemoizedFn(async function onChange(
+    evt: React.ChangeEvent<HTMLSelectElement>,
+  ) {
+    const val = evt.target.value as FmMode;
+    setMode(val);
+    await applySeting(val);
+  });
+  return (
+    <Setting name="Mode">
+      <select className="dropdown" onChange={onModeChange} value={mode}>
+        {fmModes.map((mode) => (
+          <option key={mode} value={mode}>
+            {mode}
+          </option>
+        ))}
+      </select>
+    </Setting>
+  );
+}
+
+export function FmFields() {
+  const { plugin } = useContext(SettingTabCtx);
+  const { template } = plugin.settings;
+  const [mapping, setMapping] = useState(() => template.fmFieldsMapping);
+  const applySeting = useApplySetting(template, "fmFieldsMapping");
+  const applyMapping = useMemo(
+    () => debounce((mapping: FmFieldsMapping) => applySeting(mapping), 500),
+    [applySeting],
+  );
+
+  const [newField, setNewField] = useState("");
+  const addMappingRef = useExtraButton(
+    () => {
+      if (!newField) return;
+      const next = { ...mapping, [newField]: true };
+      setMapping(next);
+      applyMapping(next);
+      setNewField("");
+    },
+    { icon: "plus", desc: "Add" },
+  );
+
+  const [isOpen, setIsOpen] = React.useState(true);
+  const [collapsibleRef] = useIconRef<HTMLButtonElement>(
+    isOpen ? "chevrons-down-up" : "chevrons-up-down",
+  );
+  return (
+    <>
+      <Setting
+        heading
+        name="Metadata Fields"
+        description="Specify metadata fields that will be added to the frontmatter of the note."
+      />
+      <FmFieldModeSelect />
+      <Setting name="Mapping" ref={addMappingRef}>
+        <input
+          type="text"
+          value={newField}
+          onChange={(evt) => setNewField(evt.target.value)}
+          placeholder="Name of new field"
+        />
+      </Setting>
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className="flex flex-col items-end"
+      >
+        <CollapsibleTrigger asChild>
+          <button
+            ref={collapsibleRef}
+            aria-label={isOpen ? "Show All Fields" : "Hide Fields"}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="p-3 divide-y">
+          {Object.entries(mapping).map(([field, alias]) => (
+            <Setting key={field} name={<code>{field}</code>}>
+              <Field
+                alias={alias}
+                onAliasChange={(alias) => {
+                  const next = update(
+                    mapping,
+                    field as keyof FmFieldsMapping,
+                    () => alias,
+                  );
+                  setMapping(next);
+                  applyMapping(next);
+                }}
+                onDelete={() => {
+                  const next = deleteKey(
+                    mapping,
+                    field as keyof FmFieldsMapping,
+                  );
+                  setMapping(next);
+                  applyMapping(next);
+                }}
+              />
+            </Setting>
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
+    </>
+  );
+}
+
+function Field({
+  alias,
+  onAliasChange,
+  onDelete,
+}: {
+  alias: string | true;
+  onAliasChange: (alias: string | true) => void;
+  onDelete: () => void;
+}) {
+  const [deleteIconRef] = useIconRef<HTMLButtonElement>("trash");
+  return (
+    <>
+      <input
+        type="text"
+        placeholder="Specify Alias Here"
+        value={alias === true ? "" : alias}
+        onChange={(evt) =>
+          onAliasChange(evt.target.value ? evt.target.value : true)
+        }
+      />
+      <button aria-label="Remove" ref={deleteIconRef} onClick={onDelete} />
+    </>
+  );
+}
