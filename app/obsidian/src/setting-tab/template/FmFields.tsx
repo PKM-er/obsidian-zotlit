@@ -5,6 +5,7 @@ import { useContext, useMemo, useState } from "react";
 import * as React from "react";
 import { SettingTabCtx } from "../common";
 import Setting, { useApplySetting } from "../components/Setting";
+import TextComfirmSetting from "../components/TextComfirm";
 import useExtraButton from "../components/useExtraButton";
 import {
   Collapsible,
@@ -73,7 +74,26 @@ export function FmFields() {
         description="Specify metadata fields that will be added to the frontmatter of the note."
       />
       <FmFieldModeSelect />
-      <Setting name="Mapping" ref={addMappingRef}>
+      <TextComfirmSetting
+        name="Tag Prefix"
+        settings={template}
+        prop="fmTagPrefix"
+      >
+        If you want all the tags imported from zotero to be included in a
+        certain category, you can specify it here. For example: <code>zt/</code>
+      </TextComfirmSetting>
+      <Setting
+        name="Mapping"
+        description={
+          <>
+            Specify the fields to import to the frontmatter of the note.
+            <br />
+            You can also specify the alias of the field here if you don't like
+            the default field name from Zotero.
+          </>
+        }
+        ref={addMappingRef}
+      >
         <input
           type="text"
           value={newField}
@@ -89,7 +109,7 @@ export function FmFields() {
         <CollapsibleTrigger asChild>
           <button
             ref={collapsibleRef}
-            aria-label={isOpen ? "Show All Fields" : "Hide Fields"}
+            aria-label={isOpen ? "Hide Fields" : "Show All Fields"}
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="p-3 divide-y">

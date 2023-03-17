@@ -42,6 +42,7 @@ interface SettingOptions {
   templates: Record<NonEjectableTemplate, string>;
   fmFieldsMode: FmMode;
   fmFieldsMapping: FmFieldsMapping;
+  fmTagPrefix: string;
   autoPairEta: boolean;
 }
 
@@ -88,6 +89,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       fmFieldsMapping: {
         ...DEFAULT_FMFIELD_MAPPING,
       },
+      fmTagPrefix: "",
       autoPairEta: false,
     } satisfies SettingOptions;
   }
@@ -115,6 +117,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
         return await loader.loadTemplates("noneject");
       case "fmFieldsMode":
       case "fmFieldsMapping":
+      case "fmTagPrefix":
         return;
       case "autoPairEta": {
         return plugin.templateEditor.setEtaBracketPairing(this.autoPairEta);
@@ -137,6 +140,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       },
       fmFieldsMode: this.fmFieldsMode,
       fmFieldsMapping: this.fmFieldsMapping,
+      fmTagPrefix: this.fmTagPrefix,
       autoPairEta: this.autoPairEta,
     };
   }
@@ -144,7 +148,12 @@ export class TemplateSettings extends Settings<SettingOptions> {
   fromJSON(json: SettingOptionsJSON): void {
     super.fromJSON({
       ...(json.template ?? {}),
-      ...selectKeys(json, ["autoPairEta", "fmFieldsMode", "fmFieldsMapping"]),
+      ...selectKeys(json, [
+        "autoPairEta",
+        "fmFieldsMode",
+        "fmFieldsMapping",
+        "fmTagPrefix",
+      ]),
     });
   }
 }

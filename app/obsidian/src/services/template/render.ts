@@ -71,8 +71,11 @@ export class TemplateRenderer {
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
-    const mode = this.use(TemplateSettings).fmFieldsMode,
-      mapping = this.use(TemplateSettings).fmFieldsMapping;
+    const {
+      fmFieldsMode: mode,
+      fmFieldsMapping: mapping,
+      fmTagPrefix: tagPrefix,
+    } = this.use(TemplateSettings);
     const record: Record<string, any> = {};
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
@@ -81,6 +84,12 @@ export class TemplateRenderer {
     for (let [key, val] of Object.entries(data as Record<string, any>)) {
       if (mode === "blacklist" && blacklistIgnore.has(key)) {
         continue;
+      }
+      if (key === "tags") {
+        val = (val as TagInfo[])
+          // only include manually added tags for now
+          .filter((tag) => tag.type === TagType.manual)
+          .map((v) => (tagPrefix ?? "") + v.name);
       }
       const action = mapping[key as keyof FmFieldsMapping];
       if (typeof action === "string") {
