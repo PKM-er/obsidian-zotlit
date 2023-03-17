@@ -35,7 +35,7 @@ class NoteFeatures extends Service {
   plugin = this.use(ZoteroPlugin);
 
   noteFields = this.use(NoteFields);
-  topicImport = this.use(TopicImport);
+  // topicImport = this.use(TopicImport);
   protocol = this.use(ProtocolHandler);
 
   onload(): void {
