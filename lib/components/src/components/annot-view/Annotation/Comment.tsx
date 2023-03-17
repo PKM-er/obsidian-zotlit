@@ -13,7 +13,10 @@ export default memo(function Comment({
 }: CommentProp) {
   const html = useRawHtml(content);
   return (
-    <div className={clsx("annot-comment", className)} {...props}>
+    <div
+      className={clsx("annot-comment select-text px-2 py-1", className)}
+      {...props}
+    >
       <p {...html} />
     </div>
   );
