@@ -28,4 +28,5 @@ export const blacklistIgnore = new Set([
   "fileLink",
   "itemID",
   "libraryID",
+  "backlink",
 ]);
