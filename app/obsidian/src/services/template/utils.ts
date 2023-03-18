@@ -8,9 +8,8 @@ import log from "@/log";
 import type ZoteroPlugin from "@/zt-main";
 
 export const toFileUrl = (path: string) => `file://${path}`;
-export const toMdLinkComponent = (path: string): string => {
-  const fileUrl = toFileUrl(path);
-  return encodeURI(fileUrl) === fileUrl ? fileUrl : `<${fileUrl}>`;
+export const toMdLinkComponent = (url: string): string => {
+  return encodeURI(url) === url ? url : `<${url}>`;
 };
 
 export const isEtaFile = (file: TFile) => file.name.endsWith(".eta.md");
@@ -32,7 +31,10 @@ export const fileLink = (
     ),
     relativePath = relative(vaultPath, filePath);
   if (relativePath.startsWith("..")) {
-    return `[attachment](${toMdLinkComponent(filePath + (hash ?? ""))})`;
+    // file outside of vault
+    return `[attachment](${toMdLinkComponent(
+      toFileUrl(filePath + (hash ?? "")),
+    )})`;
   } else {
     const file = app.metadataCache.getFirstLinkpathDest(relativePath, "");
     if (!file) {
@@ -73,7 +75,7 @@ export const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
     const linktext = plugin.imgCacheImporter.import(item);
     if (!linktext) {
       const path = plugin.imgCacheImporter.getCachePath(item);
-      return `[Annotation ${item.key}](${toMdLinkComponent(path)})`;
+      return `[Annotation ${item.key}](${toMdLinkComponent(toFileUrl(path))})`;
     } else {
       return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
     }
