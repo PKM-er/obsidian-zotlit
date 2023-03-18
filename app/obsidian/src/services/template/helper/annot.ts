@@ -96,8 +96,9 @@ export const withAnnotHelper = (
           case "#FF6666":
             return "red";
           case "#FF8C19":
+          case "#F19837":
             return "orange";
-          case "#ffd400":
+          case "#FFD400":
             return "yellow";
           case "#999999":
             return "gray";
@@ -113,6 +114,8 @@ export const withAnnotHelper = (
             return "purple";
           case "#A6507B":
             return "brown";
+          case "#E56EEE":
+            return "magenta";
           default:
             return this.color;
         }
