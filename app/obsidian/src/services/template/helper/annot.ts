@@ -41,6 +41,10 @@ export const withAnnotHelper = (
 ) =>
   new Proxy(
     {
+      /** pdf page number (1-based) */
+      get page(): number {
+        return toPage(data.position.pageIndex, true) ?? NaN;
+      },
       get backlink(): string {
         return getBacklink(data);
       },
