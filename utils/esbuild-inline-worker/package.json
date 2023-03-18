@@ -11,17 +11,11 @@
   ],
   "license": "MIT",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/plugin.js",
+  "types": "./dist/plugin.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/plugin.js",
-      "types": "./dist/plugin.d.ts"
-    },
-    "./utils": {
-      "import": "./dist/utils.js",
-      "types": "./dist/utils.d.ts"
-    }
+    ".": "./dist/plugin.js",
+    "./utils": "./dist/utils.js"
   },
   "scripts": {
     "build": "rimraf dist && tsc"
