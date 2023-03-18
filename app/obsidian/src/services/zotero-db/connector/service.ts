@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { INotifyRegularItem } from "@/../../../lib/protocol/dist";
+import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
 import workerpool from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
-import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
+import type { INotifyRegularItem } from "@obzt/protocol";
 import { Service } from "@ophidian/core";
 import { assertNever } from "assert-never";
-import type { EventRef } from "obsidian";
 import { debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";

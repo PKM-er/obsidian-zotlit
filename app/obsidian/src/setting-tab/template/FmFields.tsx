@@ -28,7 +28,18 @@ function FmFieldModeSelect() {
     await applySeting(val);
   });
   return (
-    <Setting name="Mode">
+    <Setting
+      name="Mode"
+      description={
+        <>
+          Use whitelist to include only the fields specified in{" "}
+          <code>Mapping</code>
+          <br />
+          Use blacklist to include all fields available except the fields
+          specified in <code>Mapping</code>
+        </>
+      }
+    >
       <select className="dropdown" onChange={onModeChange} value={mode}>
         {fmModes.map((mode) => (
           <option key={mode} value={mode}>
