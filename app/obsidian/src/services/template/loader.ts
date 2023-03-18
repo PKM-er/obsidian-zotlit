@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join } from "path/posix";
 import { keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile } from "obsidian";
@@ -58,7 +58,7 @@ export class TemplateLoader extends Service {
   getTemplateTypeOf(file: TAbstractFile): EjectableTemplate | undefined {
     if (
       file instanceof TFile &&
-      file.parent.path === this.folder &&
+      file.parent?.path === this.folder &&
       isEtaFile(file)
     ) {
       return FILE_TEMPLATE_MAP[file.name];
