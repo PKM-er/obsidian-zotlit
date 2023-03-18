@@ -24,22 +24,44 @@ export interface AnnotPopupData {
 }
 
 export interface ReaderMenuEvent {
-  annot: (menu: Menu, data: AnnotPopupData, docItemID: number) => any;
+  annot: (
+    menu: Menu,
+    data: AnnotPopupData,
+    docItemID: number,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) => any;
   page: (
     menu: Menu,
     data: any,
     docItemID: number,
     secondView: boolean | undefined,
+    reader: _ZoteroTypes.ReaderInstance,
   ) => any;
   tags: (
     menu: Menu,
     tag: Zotero.Item,
     docItemID: number,
     selector: string,
+    reader: _ZoteroTypes.ReaderInstance,
   ) => any;
-  color: (menu: Menu, data: any, docItemID: number) => any;
-  thumbnail: (menu: Menu, data: any, docItemID: number) => any;
-  selector: (menu: Menu, data: any, docItemID: number) => any;
+  color: (
+    menu: Menu,
+    data: any,
+    docItemID: number,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) => any;
+  thumbnail: (
+    menu: Menu,
+    data: any,
+    docItemID: number,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) => any;
+  selector: (
+    menu: Menu,
+    data: any,
+    docItemID: number,
+    reader: _ZoteroTypes.ReaderInstance,
+  ) => any;
 }
 
 export class ReaderMenuHelper extends Component {
@@ -99,11 +121,12 @@ export class ReaderMenuHelper extends Component {
             data: AnnotPopupData,
             ...args
           ) {
+            const reader = this;
             const result = next.call(this, data, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset)) {
-                self.event.emit("annot", menu, data, itemID);
+                self.event.emit("annot", menu, data, itemID, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);
@@ -117,11 +140,12 @@ export class ReaderMenuHelper extends Component {
             secondView,
             ...args
           ) {
+            const reader = this;
             const result = next.call(this, data, secondView, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("page", menu, data, itemID, secondView);
+                self.event.emit("page", menu, data, itemID, secondView, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);
@@ -135,11 +159,12 @@ export class ReaderMenuHelper extends Component {
             selector: string,
             ...args
           ) {
+            const reader = this;
             const result = next.call(this, item, selector, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("tags", menu, item, itemID, selector);
+                self.event.emit("tags", menu, item, itemID, selector, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);
@@ -148,11 +173,12 @@ export class ReaderMenuHelper extends Component {
           },
         _openColorPopup: (next) =>
           function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
+            const reader = this;
             const result = next.call(this, data, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("color", menu, data, itemID);
+                self.event.emit("color", menu, data, itemID, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);
@@ -161,11 +187,12 @@ export class ReaderMenuHelper extends Component {
           },
         _openThumbnailPopup: (next) =>
           function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
+            const reader = this;
             const result = next.call(this, data, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("thumbnail", menu, data, itemID);
+                self.event.emit("thumbnail", menu, data, itemID, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);
@@ -174,11 +201,12 @@ export class ReaderMenuHelper extends Component {
           },
         _openSelectorPopup: (next) =>
           function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
+            const reader = this;
             const result = next.call(this, data, ...args);
             try {
               const itemID = getItemID(this);
               for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("selector", menu, data, itemID);
+                self.event.emit("selector", menu, data, itemID, reader);
               }
             } catch (error) {
               self.app.logError(error as Error);

@@ -6,3 +6,5 @@ export type {
   INotifyActiveReader,
   INotify,
 } from "./bg.js";
+
+export * from "./symbols.js";

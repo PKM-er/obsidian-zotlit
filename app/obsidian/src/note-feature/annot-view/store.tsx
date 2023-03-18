@@ -7,6 +7,7 @@ import {
   isFileAttachment,
 } from "@obzt/database";
 import type ZoteroPlugin from "@/zt-main";
+import { mergeAnnots } from "./merge";
 
 const getActiveAttachment = (
   cachedID: number | null,
@@ -79,12 +80,32 @@ export const createStore = (p: ZoteroPlugin) =>
         const { attachment } = get();
         if (!attachment) return;
         const annotations = await api(p).getAnnotations(attachment.itemID, lib);
-        set((state) => ({ ...state, annotations, attachment }));
+        const mergedAnnots = mergeAnnots(annotations);
+        set((state) => ({
+          ...state,
+          annotations: mergedAnnots.map((arr) => arr[0]),
+          attachment,
+        }));
         const annotTags = await api(p).getTags(
           annotations.map((a) => [a.itemID, lib]),
         );
-        set((state) => ({ ...state, tags: { ...state.tags, ...annotTags } }));
-        return { annotations, annotTags };
+        const mergedAnnotTags = mergedAnnots.map(([target, ...annots]) => {
+          if (annots.length === 0)
+            return [target.itemID, annotTags[target.itemID]] as const;
+          const tags = new Map(
+            annotTags[target.itemID].map((t) => [t.tagID, t]),
+          );
+          annots.forEach((a) => {
+            annotTags[a.itemID].forEach((t) => {
+              tags.set(t.tagID, t);
+            });
+          });
+          return [target.itemID, Array.from(tags.values())] as const;
+        });
+        set((state) => ({
+          ...state,
+          tags: { ...state.tags, ...Object.fromEntries(mergedAnnotTags) },
+        }));
       };
     return {
       ...getInit(),

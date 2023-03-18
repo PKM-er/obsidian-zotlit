@@ -12,11 +12,12 @@ import type {
   ItemsQuery,
   QueryAction,
 } from "@obzt/protocol";
-import { stringifyQuery } from "@obzt/protocol";
+import { toMergedAnnotation, stringifyQuery } from "@obzt/protocol";
 import type { INotifyActiveReader } from "@obzt/protocol/dist/bg.js";
 import { assertNever } from "assert-never";
 import type settings from "../prefs.json";
 import { Debouncer, ItemUpdateDebouncer } from "./debounced.js";
+import { updateAnnotations } from "./update-annots.js";
 
 export default class ZoteroPlugin extends Plugin<typeof settings> {
   onInstall(): void | Promise<void> {
@@ -114,7 +115,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         ),
     );
 
-    this.registerMenu("reader:annot", (menu, data, itemID) => {
+    this.registerMenu("reader:annot", (menu, data, itemID, reader) => {
       const libIdKey = this.app.Items.getLibraryAndKeyFromID(itemID);
       if (!libIdKey) {
         this.app.logError(
@@ -127,19 +128,49 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         const annots = data.ids.map((key) =>
           this.app.Items.getByLibraryAndKey(libraryID, key),
         ) as Zotero.Item[];
-        if (annots.every((a) => a.isAnnotation())) return annots;
-        throw new Error(
-          `Can't get annotations from reader data: ${JSON.stringify(data)}`,
+        if (!annots.every((a) => a.isAnnotation()))
+          throw new Error(
+            `Can't get annotations from reader data: ${JSON.stringify(data)}`,
+          );
+        return annots;
+      };
+      const mergeAnnotations = async () => {
+        const annots = data.ids.map((key) =>
+          this.app.Items.getByLibraryAndKey(libraryID, key),
+        ) as Zotero.Item[];
+        if (!annots.every((a) => a.isAnnotation()))
+          throw new Error(
+            `Can't get annotations from reader data: ${JSON.stringify(data)}`,
+          );
+        annots.sort((a, b) => a.annotationSortIndex - b.annotationSortIndex);
+        await updateAnnotations(
+          reader,
+          annots.map((a, i) => ({
+            id: a.key,
+            comment: toMergedAnnotation(
+              a.annotationComment,
+              annots[0].id,
+              i === 0,
+            ),
+          })),
         );
       };
-      menu.addSeparator().addItem((item) =>
-        item
-          .setTitle("Export to Obsidian Note")
-          .onClick(() =>
-            this.sendToObsidian("annotation", "export", getAnnotations()),
-          )
-          .onShowing((item) => item.toggle(data.ids.length > 0)),
-      );
+      menu
+        .addSeparator()
+        .addItem((item) =>
+          item
+            .setTitle("Merge Annotations")
+            .onClick(mergeAnnotations)
+            .onShowing((item) => item.toggle(data.ids.length > 1)),
+        )
+        .addItem((item) =>
+          item
+            .setTitle("Export to Obsidian Note")
+            .onClick(() =>
+              this.sendToObsidian("annotation", "export", getAnnotations()),
+            )
+            .onShowing((item) => item.toggle(data.ids.length > 0)),
+        );
     });
     this.registerMenu("reader:page", (menu, _data, itemID) => {
       const attachment = this.app.Items.get(itemID);

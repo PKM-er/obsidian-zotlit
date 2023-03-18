@@ -8,7 +8,6 @@ export interface AnnotListProps {
   selectable?: boolean;
   collapsed: boolean;
 }
-
 export default function AnnotList({
   selectable = false,
   collapsed,
@@ -16,7 +15,6 @@ export default function AnnotList({
   getTags,
 }: AnnotListProps) {
   const [selected, { add, remove }] = useSet<number>();
-
   return (
     <div
       role="list"
