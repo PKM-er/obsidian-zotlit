@@ -5,7 +5,7 @@ export class DerivedFileView extends FileView {
     super(leaf);
     this.navigation = false;
     this.allowNoFile = true;
-    this.requestUpdate = debounce(this.update, 0);
+    this.requestUpdate = debounce(() => this.update(), 0);
   }
   load() {
     super.load();

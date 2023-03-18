@@ -10,6 +10,7 @@ import type { AnnotListProps } from "./AnnotList";
 import AnnotList from "./AnnotList";
 import AttachmentSelector from "./AttachmentSelector";
 import CollapseButton from "./CollapseButton";
+import FollowButton from "./FollowButton";
 import Header from "./Header";
 
 import RefreshButton from "./RefreshButton";
@@ -21,31 +22,14 @@ const useOnDbRefresh = () => {
 };
 
 export default function AnnotView() {
-  const { store, onSetFollow } = useContext(Context);
-
   useOnDbRefresh();
-
-  const follow = useStore(store, (s) => s.follow);
-
+  const { store } = useContext(Context);
   const doc = useStore(store, (s) => s.doc);
 
   if (!doc) {
     return (
       <>
-        <Header
-          buttons={
-            <>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={onSetFollow}
-                onKeyUp={(evt) => evt.key === "Enter" && onSetFollow(evt)}
-              >
-                {follow === null ? "detached" : follow}
-              </div>
-            </>
-          }
-        ></Header>
+        <Header buttons={<FollowButton />}></Header>
         <div className="pane-empty p-2">Active file not literature note</div>
       </>
     );
@@ -54,14 +38,11 @@ export default function AnnotView() {
 }
 
 function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
-  const { refreshConn, onShowDetails, onSetFollow, store } =
-    useContext(Context);
+  const { refreshConn, onShowDetails } = useContext(Context);
 
   const [isCollapsed, { toggle: toggleCollapsed }] = useBoolean(false);
 
   const annotListProps = useAnnotList();
-
-  const follow = useStore(store, (s) => s.follow);
 
   return (
     <>
@@ -83,14 +64,7 @@ function AnnotsViewMain({ docItem }: { docItem: RegularItemInfoBase }) {
               className="nav-action-button"
               onClick={refreshConn}
             />
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onSetFollow}
-              onKeyUp={onSetFollow}
-            >
-              {follow === null ? "detached" : follow}
-            </div>
+            <FollowButton />
           </>
         }
       >

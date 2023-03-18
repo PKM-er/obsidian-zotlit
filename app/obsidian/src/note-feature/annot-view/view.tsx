@@ -3,7 +3,7 @@ import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
 import type { INotifyActiveReader } from "@obzt/protocol";
 import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
-import { Menu, ItemView } from "obsidian";
+import { Menu } from "obsidian";
 import ReactDOM from "react-dom";
 import { chooseLiterature } from "../citation-suggest";
 import { openTemplatePreview } from "../template-preview/open";
@@ -14,6 +14,8 @@ import type { StoreAPI } from "./store";
 import { createStore } from "./store";
 import { choosePDFAtch } from "@/components/atch-suggest";
 import { context } from "@/components/basic/context";
+import { DerivedFileView } from "@/components/derived-file-view";
+import { getItemKeyOf } from "@/services/note-index";
 import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -27,10 +29,34 @@ interface State {
   follow: AnnotViewStore["follow"];
 }
 
-export class AnnotationView extends ItemView {
+export class AnnotationView extends DerivedFileView {
   constructor(leaf: WorkspaceLeaf, public plugin: ZoteroPlugin) {
     super(leaf);
     this.store = createStore(plugin);
+  }
+  update() {
+    if (this.follow !== "ob-note") return;
+    const lib = this.plugin.settings.database.citationLibrary;
+    (async () => {
+      if (this.file?.extension !== "md") return false;
+      const itemKey = getItemKeyOf(this.file);
+      if (!itemKey) return false;
+      const [item] = await this.plugin.databaseAPI.getItems([[itemKey, lib]]);
+      if (!item) return false;
+      this.setStatePrev((state) => ({
+        ...state,
+        follow: "ob-note",
+        itemId: item.itemID,
+      }));
+      return true;
+    })().then((result) => {
+      if (!result)
+        this.setStatePrev((state) => ({
+          ...state,
+          follow: "ob-note",
+          itemId: -1,
+        }));
+    });
   }
 
   public getViewType(): string {
@@ -44,7 +70,7 @@ export class AnnotationView extends ItemView {
 
     let nextReader: INotifyActiveReader | null = null,
       locked = false;
-    const update = (data: INotifyActiveReader) => {
+    const updateZtReader = (data: INotifyActiveReader) => {
       if (locked) {
         nextReader = data;
       } else {
@@ -59,7 +85,7 @@ export class AnnotationView extends ItemView {
           if (nextReader === null) return;
           const next = nextReader;
           nextReader = null;
-          update(next);
+          updateZtReader(next);
         });
       }
     };
@@ -73,18 +99,16 @@ export class AnnotationView extends ItemView {
           data.attachmentId < 0
         )
           return;
-        update(data);
+        updateZtReader(data);
       }),
     );
   }
 
   public getDisplayText(): string {
-    // TODO: show current literature name
-    return "Zotero Annotations";
-    // const activeDoc = this.plugin.app.workspace.getActiveFile();
-    // let suffix = "";
-    // if (activeDoc?.extension === "md") suffix = ` for ${activeDoc.basename}`;
-    // return "Zotero Annotations" + suffix;
+    if (this.follow !== "ob-note" || !this.file?.basename) {
+      return "Zotero Annotations";
+    }
+    return `Zotero Annotations for ${this.file.basename}`;
   }
 
   public getIcon(): string {
@@ -99,16 +123,20 @@ export class AnnotationView extends ItemView {
     return this.store.getState().follow;
   }
   getState(): State {
-    // TODO: method to trigger state save?
     const data = super.getState();
+    const curr = this.store.getState();
+    const output: State = {
+      itemId: curr.doc?.docItem.itemID ?? -1,
+      attachmentId: curr.attachment?.itemID ?? -1,
+      follow: curr.follow,
+    };
     return {
       ...(data && typeof data === "object" ? data : {}),
-      itemId: this.store.getState().doc?.docItem.itemID ?? -1,
-      attachmentId: this.store.getState().attachment?.itemID ?? -1,
+      ...output,
     };
   }
   async setState(state: State, _result?: ViewStateResult): Promise<void> {
-    await super.setState(state, _result as any);
+    await super.setState(state, (_result ?? {}) as any);
     const { itemId = -1, attachmentId = -1, follow = "zt-reader" } = state;
     this.store.getState().setFollow(follow);
     await this.store.getState().loadDocItem(itemId, attachmentId, this.lib);
@@ -118,7 +146,7 @@ export class AnnotationView extends ItemView {
   }
 
   onSetFollowZt = async () => {
-    this.store.getState().setFollow("zt-reader");
+    this.setStatePrev((state) => ({ ...state, follow: "zt-reader" }));
     await this.setStatePrev(({ attachmentId, ...state }) => ({
       ...state,
       follow: "zt-reader",
@@ -127,8 +155,12 @@ export class AnnotationView extends ItemView {
         : { itemId: this.#zoteroActiveItem }),
     }));
   };
+  onSetFollowOb = () => {
+    this.store.getState().setFollow("ob-note");
+    this.update();
+  };
   onSetFollowNull = async () => {
-    const { plugin, store } = this;
+    const { plugin } = this;
     const literature = await chooseLiterature(plugin);
     if (!literature) return;
     const { itemID } = literature.value.item;
@@ -138,8 +170,12 @@ export class AnnotationView extends ItemView {
 
     const atch = await choosePDFAtch(attachments);
     if (!atch) return;
-    store.getState().setFollow(null);
-    await store.getState().loadDocItem(itemID, atch.itemID, lib);
+    await this.setStatePrev(({ attachmentId, ...state }) => ({
+      ...state,
+      follow: null,
+      itemId: itemID,
+      attachmentId: atch.itemID,
+    }));
   };
   getContext(): AnnotViewContextType<AnnotRendererProps> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -189,16 +225,30 @@ export class AnnotationView extends ItemView {
         const follow = store.getState().follow;
         if (follow !== "zt-reader") {
           menu.addItem((i) =>
-            i.setTitle("Follow Zotero Reader").onClick(self.onSetFollowZt),
+            i
+              .setIcon("book")
+              .setTitle("Follow Active Literature in Zotero Reader")
+              .onClick(self.onSetFollowZt),
+          );
+        }
+        if (follow !== "ob-note") {
+          menu.addItem((i) =>
+            i
+              .setIcon("file-edit")
+              .setTitle("Follow Active Literature Note")
+              .onClick(self.onSetFollowOb),
           );
         }
         menu.addItem((i) =>
-          i.setTitle("Choose Literature").onClick(async () => {
-            // prevent focus from transfering back from modal,
-            // triggering another keyup event
-            (event.target as HTMLElement).blur();
-            await self.onSetFollowNull();
-          }),
+          i
+            .setIcon("file-lock-2")
+            .setTitle("Link with Selected Literature")
+            .onClick(async () => {
+              // prevent focus from transfering back from modal,
+              // triggering another keyup event
+              (event.target as HTMLElement).blur();
+              await self.onSetFollowNull();
+            }),
         );
         if (event.nativeEvent instanceof MouseEvent) {
           menu.showAtMouseEvent(event.nativeEvent);
