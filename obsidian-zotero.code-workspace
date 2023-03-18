@@ -161,6 +161,7 @@
     },
     "[properties]": {
       "editor.defaultFormatter": "foxundermoon.shell-format"
-    }
+    },
+    "typescript.tsdk": "obsidian/node_modules/typescript/lib"
   }
 }

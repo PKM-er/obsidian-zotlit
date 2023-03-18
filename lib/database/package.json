@@ -14,8 +14,8 @@
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",
-    "typescript": "5.0.1-rc",
-    "eslint": "~8.31.0",
+    "typescript": "~5.0.2",
+    "eslint": "~8.36.0",
     "@types/eslint": "~8.4.6",
     "@types/flexsearch": "~0.7.3"
   },

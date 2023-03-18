@@ -31,10 +31,10 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.1.0",
     "@tsconfig/docusaurus": "^1.0.5",
-    "typescript": "5.0.1-rc",
+    "typescript": "~5.0.2",
     "@docusaurus/types": "2.1.0",
     "@docusaurus/eslint-plugin": "2.1.0",
-    "eslint": "~8.31.0",
+    "eslint": "~8.36.0",
     "@types/node": "^17.0.10",
     "@types/react": "~17.0.8",
     "eslint-plugin-mdx": "~2.0.5"

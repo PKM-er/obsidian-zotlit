@@ -49,8 +49,8 @@
     "esbuild": "^0.17.4",
     "@types/eslint": "~8.4.6",
     "zotero-types": "~1.0.4",
-    "eslint": "~8.31.0",
-    "typescript": "5.0.1-rc"
+    "eslint": "~8.36.0",
+    "typescript": "~5.0.2"
   },
   "browserslist": [
     "firefox >= 60"

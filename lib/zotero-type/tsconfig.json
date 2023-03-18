@@ -1,5 +1,5 @@
 {
-  "extends": "@aidenlx/eslint-config",
+  "extends": "./node_modules/@aidenlx/eslint-config/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "src",
     "outDir": "dist",

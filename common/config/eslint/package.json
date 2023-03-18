@@ -8,7 +8,7 @@
     "url": "https://github.com/aidenlx/eslint-config"
   },
   "type": "commonjs",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "exports": {
     ".": {
       "require": "./src/index.js"
@@ -66,8 +66,8 @@
   "dependencies": {
     "@graphql-eslint/eslint-plugin": "^3.10.6",
     "@rushstack/eslint-patch": "^1.1.4",
-    "@typescript-eslint/eslint-plugin": "^5.48.1",
-    "@typescript-eslint/parser": "^5.48.1",
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.3.0",
     "eslint-plugin-import": "^2.26.0",
@@ -86,7 +86,7 @@
     "@types/shell-quote": "~1.7.1",
     "eslint-plugin-prefer-arrow": "~1.2.3",
     "eslint-plugin-simple-import-sort": "~7.0.0",
-    "eslint": "~8.31.0",
+    "eslint": "~8.36.0",
     "graphql": "16.5.0"
   },
   "devDependencies": {
@@ -99,6 +99,6 @@
     "react": "~17.0.2",
     "react-dom": "~17.0.2",
     "rimraf": "^3.0.2",
-    "typescript": "5.0.1-rc"
+    "typescript": "~5.0.2"
   }
 }
