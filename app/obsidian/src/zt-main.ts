@@ -5,6 +5,7 @@ import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";
 
+import log from "@/log";
 import checkLib from "./install-guide/index.jsx";
 import NoteFeatures from "./note-feature/service";
 import { AnnotBlock } from "./services/annot-block/service";
@@ -26,7 +27,6 @@ import {
 } from "./services/zotero-db";
 import ZoteroSettingTab from "./setting-tab";
 import { SettingLoader } from "./settings/service";
-import log from "@/log";
 
 // declare global {
 //   // eslint-disable-next-line no-var

@@ -5,6 +5,12 @@ import type { INotifyActiveReader } from "@obzt/protocol";
 import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Menu } from "obsidian";
 import ReactDOM from "react-dom";
+import { choosePDFAtch } from "@/components/atch-suggest";
+import { context } from "@/components/basic/context";
+import { DerivedFileView } from "@/components/derived-file-view";
+import { getItemKeyOf } from "@/services/note-index";
+import { untilZoteroReady } from "@/utils/once";
+import type ZoteroPlugin from "@/zt-main";
 import { chooseLiterature } from "../citation-suggest";
 import { openTemplatePreview } from "../template-preview/open";
 import type { AnnotRendererProps } from "./drag-insert";
@@ -12,12 +18,6 @@ import { getAnnotRenderer, getDragStartHandler } from "./drag-insert";
 import { getMoreOptionsHandler } from "./more-options";
 import type { StoreAPI } from "./store";
 import { createStore } from "./store";
-import { choosePDFAtch } from "@/components/atch-suggest";
-import { context } from "@/components/basic/context";
-import { DerivedFileView } from "@/components/derived-file-view";
-import { getItemKeyOf } from "@/services/note-index";
-import { untilZoteroReady } from "@/utils/once";
-import type ZoteroPlugin from "@/zt-main";
 
 import "./style.less";
 

@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useContext, useMemo } from "react";
+import { ObsidianContext } from "@c/obsidian";
 import type { Attributes } from "@c/utils";
-import { cn as clsx, useRawHtml } from "@c/utils";
+import { cn as clsx } from "@c/utils";
 
 interface CommentProp extends Attributes {
   content: string;
@@ -11,13 +12,20 @@ export default memo(function Comment({
   className,
   ...props
 }: CommentProp) {
-  const html = useRawHtml(content.replaceAll("\n", "<br />"));
+  const { sanitize, renderMarkdown } = useContext(ObsidianContext);
+  const markdown = useMemo(
+    () =>
+      sanitize(content)
+        .replace(/<\/?b>/g, "**")
+        .replace(/<\/?i>/g, "*"),
+    [content, sanitize],
+  );
   return (
     <div
       className={clsx("annot-comment select-text px-2 py-1", className)}
       {...props}
     >
-      <p {...html} />
+      {renderMarkdown(markdown)}
     </div>
   );
 });

@@ -6,7 +6,7 @@ module.exports = {
   // `ui.content` includes a path to the components that are using tailwind in @acme/ui
   content: ui.content.concat([
     "./src/setting-tab/**/*.{ts,tsx}",
-    "./src/components/ui/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
   ]),
   theme: {
     fontSize: {
