@@ -1,3 +1,9 @@
-<%= it.textBlock %><%= it.imgEmbed %>\n
-^<%= it.blockID %>\n
-\n
+[!note] Page <%= it.pageLabel %>
+
+<%= it.imgEmbed %>
+<%= it.text %>
+
+<% if (it.comment) { %>
+---
+<%= it.comment %>
+<% } %>

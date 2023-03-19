@@ -2,14 +2,14 @@ import { deleteKeys, keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { getConfig } from "eta";
+import Settings from "@/settings/base";
+import ZoteroPlugin from "@/zt-main";
 import annotation from "./defaults/zt-annot.ejs";
 import annots from "./defaults/zt-annots.ejs";
 import note from "./defaults/zt-note.ejs";
 import type { FmFieldsMapping, FmMode } from "./frontmatter";
 import { DEFAULT_FMFIELD_MAPPING } from "./frontmatter";
 import { TemplateLoader } from "./loader";
-import Settings from "@/settings/base";
-import ZoteroPlugin from "@/zt-main";
 
 export type EjectableTemplate = "note" | "annotation" | "annots";
 export type NonEjectableTemplate = "filename" | "citation" | "altCitation";
