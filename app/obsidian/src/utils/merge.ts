@@ -1,6 +1,6 @@
 import { groupBy } from "@mobily/ts-belt/Array";
 import { toMutable } from "@mobily/ts-belt/Function";
-import type { AnnotationInfo } from "@obzt/database";
+import type { AnnotationInfo, TagInfo } from "@obzt/database";
 import { sortBySortIndex } from "@obzt/database";
 import { mergeAnnotationPattern } from "@obzt/protocol";
 
@@ -55,4 +55,37 @@ export function mergeAnnots(annotations: AnnotationInfo[]): AnnotationInfo[][] {
       target.comment?.replace(/\n+/, "\n").replace(/^\s+|\s+$/g, "") ?? null;
   }
   return [...output.values()];
+}
+
+export function mergedToAnnots(mergedAnnots: AnnotationInfo[][]) {
+  return mergedAnnots.map((arr) => arr[0]);
+}
+
+export function mergeTags(
+  mergedAnnots: AnnotationInfo[][],
+  tags: Record<number, TagInfo[]>,
+) {
+  const mergedTags = mergedAnnots.map(([target, ...annots]) => {
+    if (annots.length === 0)
+      return [target.itemID, tags[target.itemID]] as const;
+    const mergedTags = new Map(tags[target.itemID].map((t) => [t.tagID, t]));
+    annots.forEach((a) => {
+      tags[a.itemID].forEach((t) => {
+        mergedTags.set(t.tagID, t);
+      });
+    });
+    return [target.itemID, Array.from(mergedTags.values())] as const;
+  });
+  return Object.fromEntries(mergedTags);
+}
+
+export function merge(
+  annotations: AnnotationInfo[],
+  tags: Record<number, TagInfo[]>,
+) {
+  const mergedAnnots = mergeAnnots(annotations);
+  return {
+    annotations: mergedToAnnots(mergedAnnots),
+    tags: mergeTags(mergedAnnots, tags),
+  };
 }

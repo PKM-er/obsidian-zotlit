@@ -1,8 +1,8 @@
 import { selectKeys } from "@mobily/ts-belt/Dict";
 import type { AnnotViewContextType } from "@obzt/components";
-import type { AnnotViewStoreValues } from "./store";
 import { isMarkdownFile } from "@/utils";
 import type ZoteroPlugin from "@/zt-main";
+import type { AnnotViewStoreValues } from "./store";
 
 export const getDragStartHandler =
   (plugin: ZoteroPlugin): AnnotViewContextType["onDragStart"] =>
@@ -88,6 +88,8 @@ export const getAnnotRenderer = (
         {
           plugin,
           sourcePath,
+          // disable merge, already handled in store
+          merge: false,
         },
       );
     };

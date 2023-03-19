@@ -1,7 +1,7 @@
 import { loadPrism, Component, TFile, Notice } from "obsidian";
+import type { EjectableTemplate } from "@/services/template/settings";
 import { TemplatePreviewBase, asyncDebounce, toCtx } from "./base";
 import { getTemplateEditorInGroup, getTemplateFile } from "./open";
-import type { EjectableTemplate } from "@/services/template/settings";
 
 export const templatePreviewViewType = "zotero-template-preview";
 

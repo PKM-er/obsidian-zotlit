@@ -11,6 +11,8 @@ import { use } from "@ophidian/core";
 import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
+import { logError } from "@/log";
+import { merge as mergeAnnotsTags } from "@/utils/merge";
 import type { FmFieldsMapping } from "./frontmatter";
 import { blacklistIgnore, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
@@ -19,7 +21,6 @@ import type { HelperExtra } from "./helper/to-helper";
 import { toHelper } from "./helper/to-helper";
 import type { TemplateType } from "./settings";
 import { TemplateSettings } from "./settings";
-import { logError } from "@/log";
 
 export interface TemplateDataMap {
   note: DocItemHelper;
@@ -32,6 +33,14 @@ export interface TemplateDataMap {
 
 export class TemplateRenderer {
   use = use.this;
+
+  private mergeAnnotTags(extra: HelperExtra): HelperExtra {
+    if (extra.annotations.length === 0) return extra;
+    const merged = mergeAnnotsTags(extra.annotations, extra.tags);
+    extra.annotations = merged.annotations;
+    extra.tags = { ...extra.tags, ...merged.tags };
+    return extra;
+  }
 
   private render<T extends TemplateType>(target: T, obj: TemplateDataMap[T]) {
     try {
@@ -48,17 +57,26 @@ export class TemplateRenderer {
   }
 
   renderAnnot(annotation: AnnotationInfo, extra: HelperExtra, ctx: Context) {
+    if (ctx.merge !== false) {
+      extra = this.mergeAnnotTags(extra);
+    }
     const data = toHelper(extra, ctx, annotation);
     const str = this.render("annotation", data.annotation);
     return str;
   }
   renderNote(extra: HelperExtra, ctx: Context, fm?: Record<string, any>) {
+    if (ctx.merge !== false) {
+      extra = this.mergeAnnotTags(extra);
+    }
     const data = toHelper(extra, ctx);
     const frontmatter = this.renderFrontmatter(data.docItem, fm);
     const content = this.render("note", data.docItem);
     return ["", frontmatter, content].join("---\n");
   }
   renderAnnots(extra: HelperExtra, ctx: Context) {
+    if (ctx.merge !== false) {
+      extra = this.mergeAnnotTags(extra);
+    }
     const data = toHelper(extra, ctx);
     const str = this.render("annots", data.annotations);
     return str;

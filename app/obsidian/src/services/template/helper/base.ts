@@ -3,6 +3,7 @@ import type ZoteroPlugin from "@/zt-main";
 export interface Context {
   sourcePath?: string | null;
   plugin: ZoteroPlugin;
+  merge?: boolean;
 }
 
 export const zoteroDataDir = (ctx: Context) =>
