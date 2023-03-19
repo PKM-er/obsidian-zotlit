@@ -11,7 +11,7 @@ export default memo(function Comment({
   className,
   ...props
 }: CommentProp) {
-  const html = useRawHtml(content);
+  const html = useRawHtml(content.replaceAll("\n", "<br />"));
   return (
     <div
       className={clsx("annot-comment select-text px-2 py-1", className)}
