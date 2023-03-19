@@ -14,7 +14,11 @@ import { Notice, stringifyYaml } from "obsidian";
 import { logError } from "@/log";
 import { merge as mergeAnnotsTags } from "@/utils/merge";
 import type { FmFieldsMapping } from "./frontmatter";
-import { blacklistIgnore, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
+import {
+  ZOTERO_ATCHS_FIELDNAME,
+  blacklistIgnore,
+  ZOTERO_KEY_FIELDNAME,
+} from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
 import type { HelperExtra } from "./helper/to-helper";
@@ -97,6 +101,7 @@ export class TemplateRenderer {
     const record: Record<string, any> = {};
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
+    record[ZOTERO_ATCHS_FIELDNAME] = [data.attachment?.itemID];
 
     // eslint-disable-next-line prefer-const
     for (let [key, val] of Object.entries(data as Record<string, any>)) {

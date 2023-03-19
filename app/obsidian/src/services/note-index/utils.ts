@@ -33,8 +33,8 @@ export const getItemKeyOf = (file: string | TFile | TAbstractFile | null) => {
 // export const hasBlockWithZtKey = (blocks: Record<string, BlockCache>) =>
 //   // must use BlockCache.id, the Record key is converted to lowercase
 //   Object.values(blocks).some(({ id }) => multipleAnnotKeyPagePattern.test(id));
-export const isAnnotCodeblock = ({ type, id }: SectionCache) =>
-  !!id && type === "code" && multipleAnnotKeyPagePattern.test(id);
+export const isAnnotBlock = ({ id }: SectionCache) =>
+  !!id && multipleAnnotKeyPagePattern.test(id);
 
 export const splitMultipleAnnotKey = (key: string): string[] =>
   key.split("n").map((annotKeyWithPage) => {

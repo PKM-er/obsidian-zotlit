@@ -1,14 +1,15 @@
 import { join } from "path/posix";
 import type { ItemKeyGroup } from "@obzt/common";
-import type {
-  AnnotationInfo,
-  ItemIDLibID,
-  RegularItemInfoBase,
-} from "@obzt/database";
-import { cacheActiveAtch } from "@obzt/database";
+import type { RegularItemInfoBase } from "@obzt/database";
 import { Service } from "@ophidian/core";
 
+import type { TFile } from "obsidian";
 import { Notice } from "obsidian";
+import { chooseFileAtchAndCache } from "@/components/atch-suggest";
+import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
+import type { TemplateRenderer } from "@/services/template";
+import type { Context } from "@/services/template/helper/base.js";
+import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
 import { NoteFields } from "./note-fields/service";
@@ -24,12 +25,7 @@ import {
   TemplatePreview,
   templatePreviewViewType,
 } from "./template-preview/preview";
-import { TopicImport } from "./topic-import/service";
-import { chooseFileAtch } from "@/components/atch-suggest";
-import { getItemKeyOf } from "@/services/note-index";
-import type { TemplateRenderer } from "@/services/template";
-import type { Context } from "@/services/template/helper/base.js";
-import ZoteroPlugin from "@/zt-main";
+import { getHelperExtraByAtch, updateNote } from "./update-note";
 
 class NoteFeatures extends Service {
   plugin = this.use(ZoteroPlugin);
@@ -110,6 +106,46 @@ class NoteFeatures extends Service {
       editorCallback: (editor) => insertCitationTo(editor, plugin),
     });
     plugin.registerEditorSuggest(new CitationEditorSuggest(plugin));
+
+    const updateNote = async (file: TFile) => {
+      const lib = plugin.settings.database.citationLibrary;
+      const itemKey = getItemKeyOf(file);
+      if (!itemKey) {
+        new Notice("Cannot get zotero item key from file name");
+        return false;
+      }
+      const [item] = await plugin.databaseAPI.getItems([[itemKey, lib]]);
+      if (!item) {
+        new Notice("Cannot find zotero item with key " + itemKey);
+        return false;
+      }
+      await this.updateNoteForDocItemFull(item);
+    };
+    plugin.addCommand({
+      id: "update-literature-note",
+      name: "Update Literature Note",
+      editorCheckCallback(checking, _editor, ctx) {
+        const shouldContinue = ctx.file && isLiteratureNote(ctx.file);
+        if (checking) {
+          return !!shouldContinue;
+        } else if (shouldContinue) {
+          updateNote(ctx.file);
+        }
+      },
+    });
+    plugin.registerEvent(
+      plugin.app.workspace.on("file-menu", (menu, file) => {
+        if (!isLiteratureNote(file)) {
+          return;
+        }
+        menu.addItem((i) =>
+          i
+            .setTitle("Update Literature Note")
+            .setIcon("sync")
+            .onClick(() => updateNote(file)),
+        );
+      }),
+    );
   }
   async openNote(item: ItemKeyGroup, slience = false): Promise<boolean> {
     const { workspace } = this.plugin.app;
@@ -168,39 +204,37 @@ class NoteFeatures extends Service {
   }
 
   async createNoteForDocItemFull(item: RegularItemInfoBase): Promise<string> {
-    const { plugin } = this;
-    const libId = plugin.database.settings.citationLibrary;
-    const allAttachments = await plugin.databaseAPI.getAttachments(
+    const libId = this.plugin.database.settings.citationLibrary;
+    const allAttachments = await this.plugin.databaseAPI.getAttachments(
       item.itemID,
       libId,
     );
-
-    const attachment = await chooseFileAtch(allAttachments);
-    if (attachment) {
-      cacheActiveAtch(window.localStorage, item, attachment.itemID);
-    }
-
-    const annotations: AnnotationInfo[] = attachment
-      ? await plugin.databaseAPI.getAnnotations(attachment.itemID, libId)
-      : [];
-
-    const tagsRecord = await plugin.databaseAPI.getTags([
-      [item.itemID, libId],
-      ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
-    ]);
+    const selected = await chooseFileAtchAndCache(item, allAttachments);
+    const extraByAtch = await getHelperExtraByAtch(
+      item,
+      { all: allAttachments, selected: selected ? [selected] : [] },
+      this.plugin,
+    );
+    const extra = Object.values(extraByAtch)[0];
     const note = await this.createNoteForDocItem(item, (template, ctx) =>
-      template.renderNote(
-        {
-          docItem: item,
-          attachment,
-          tags: tagsRecord,
-          allAttachments,
-          annotations,
-        },
-        ctx,
-      ),
+      template.renderNote(extra, ctx),
     );
     return note.path;
+  }
+
+  async updateNoteForDocItemFull(item: RegularItemInfoBase) {
+    const summary = await updateNote(item, this.plugin);
+    if (summary) {
+      if (summary.addedAnnots > 0 || summary.updatedAnnots > 0)
+        new Notice(
+          `Affected ${summary.notes} notes, ` +
+            `annotations: ${summary.addedAnnots} added, ` +
+            `${summary.updatedAnnots} updated`,
+        );
+      else new Notice(`Affected ${summary.notes} notes, no annotation updated`);
+    } else {
+      new Notice("No note found for this literature");
+    }
   }
 }
 

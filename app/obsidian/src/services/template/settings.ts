@@ -43,6 +43,7 @@ interface SettingOptions {
   fmFieldsMode: FmMode;
   fmFieldsMapping: FmFieldsMapping;
   fmTagPrefix: string;
+  updateAnnotBlock: boolean;
   autoPairEta: boolean;
 }
 
@@ -91,6 +92,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       },
       fmTagPrefix: "",
       autoPairEta: false,
+      updateAnnotBlock: false,
     } satisfies SettingOptions;
   }
 
@@ -118,6 +120,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       case "fmFieldsMode":
       case "fmFieldsMapping":
       case "fmTagPrefix":
+      case "updateAnnotBlock":
         return;
       case "autoPairEta": {
         return plugin.templateEditor.setEtaBracketPairing(this.autoPairEta);
@@ -142,6 +145,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       fmFieldsMapping: this.fmFieldsMapping,
       fmTagPrefix: this.fmTagPrefix,
       autoPairEta: this.autoPairEta,
+      updateAnnotBlock: this.updateAnnotBlock,
     };
   }
   // fix compatibility with old settings format
@@ -153,6 +157,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
         "fmFieldsMode",
         "fmFieldsMapping",
         "fmTagPrefix",
+        "updateAnnotBlock",
       ]),
     });
   }

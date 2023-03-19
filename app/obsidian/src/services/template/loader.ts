@@ -3,6 +3,7 @@ import { keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile } from "obsidian";
 import { Notice, TFile } from "obsidian";
+import log, { logError } from "@/log";
 import type {
   EjectableTemplate,
   NonEjectableTemplate,
@@ -18,7 +19,6 @@ import {
   DEFAULT_TEMPLATE,
 } from "./settings";
 import { isEtaFile } from "./utils";
-import log, { logError } from "@/log";
 
 export class TemplateLoader extends Service {
   settings = this.use(TemplateSettings);

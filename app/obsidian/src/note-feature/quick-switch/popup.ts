@@ -1,5 +1,5 @@
 import { Keymap } from "obsidian";
-import { openModal } from "../../components/basic/modal";
+import { openModal } from "@/components/basic/modal";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest/popup.js";
 import type ZoteroPlugin from "@/zt-main.js";
 

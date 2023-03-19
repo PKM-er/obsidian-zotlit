@@ -1,6 +1,6 @@
 import assertNever from "assert-never";
-import NoteIndex from "./service";
 import Settings from "@/settings/base";
+import NoteIndex from "./service";
 
 interface SettingOptions {
   literatureNoteFolder: string;

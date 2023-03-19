@@ -7,17 +7,17 @@ import { getItemKeyGroupID } from "@obzt/common";
 import { Service } from "@ophidian/core";
 import type { CachedMetadata, Pos, TAbstractFile, TFile } from "obsidian";
 import { Notice } from "obsidian";
-import { NoteIndexSettings } from "./settings";
-import {
-  getItemKeyFromFrontmatter,
-  isAnnotCodeblock,
-  splitMultipleAnnotKey,
-} from "./utils";
 
 import log from "@/log";
 import { isMarkdownFile } from "@/utils";
 import { untilMetaReady } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
+import { NoteIndexSettings } from "./settings";
+import {
+  getItemKeyFromFrontmatter,
+  isAnnotBlock,
+  splitMultipleAnnotKey,
+} from "./utils";
 
 declare module "obsidian" {
   interface MetadataCache {
@@ -113,15 +113,15 @@ export default class NoteIndex extends Service {
       return removeFile(file);
     }
 
-    const annotCodeblocks = sections.filter(isAnnotCodeblock);
-    if (annotCodeblocks.length === 0) {
+    const annotBlocks = sections.filter(isAnnotBlock);
+    if (annotBlocks.length === 0) {
       return removeFile(file);
     }
 
     removeFile(file);
 
     const blockInfo = pipe(
-      annotCodeblocks.flatMap((s) =>
+      annotBlocks.flatMap((s) =>
         splitMultipleAnnotKey(s.id!).map((key) => [key, s.position] as const),
       ),
       groupBy(([key]) => key),

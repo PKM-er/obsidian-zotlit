@@ -1,5 +1,5 @@
-import type { AttachmentInfo } from "@obzt/database";
-import { isFileAttachment } from "@obzt/database";
+import type { AttachmentInfo, RegularItemInfoBase } from "@obzt/database";
+import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
 import type { FuzzyMatch } from "obsidian";
 import { Notice, FuzzySuggestModal } from "obsidian";
 import { openModalFuzzy } from "./basic/modal";
@@ -47,6 +47,16 @@ export async function chooseAttachment(attachments: AttachmentInfo[]) {
 export async function chooseFileAtch(attachments: AttachmentInfo[]) {
   const fileAttachments = attachments.filter(isFileAttachment);
   return await chooseAttachment(fileAttachments);
+}
+
+export async function chooseFileAtchAndCache(
+  item: RegularItemInfoBase,
+  allAttachments: AttachmentInfo[],
+) {
+  const selected = await chooseFileAtch(allAttachments);
+  if (!selected) return null;
+  cacheActiveAtch(window.localStorage, item, selected.itemID);
+  return selected;
 }
 
 export async function choosePDFAtch(attachments: AttachmentInfo[]) {
