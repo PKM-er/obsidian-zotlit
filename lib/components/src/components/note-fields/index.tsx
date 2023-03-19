@@ -3,16 +3,14 @@ import { Icon } from "../icon";
 import { FieldName } from "./FieldName";
 import { FieldValue } from "./FieldValue";
 
-export type NoteFieldsData = Record<string, WithID[]>;
-
-type WithID = { id: string; content: string };
+export type NoteFieldsData = Record<string, string[]>;
 
 export interface NoteFieldsProps {
   // saving?: boolean;
   data: NoteFieldsData;
-  onSave?: (field: string, index: number, id: string) => void;
-  onChange: (value: string, field: string, index: number, id: string) => void;
-  onDelete: (field: string, index: number, id: string) => void;
+  onSave?: (field: string, index: number) => void;
+  onChange: (value: string, field: string, index: number) => void;
+  onDelete: (field: string, index: number) => void;
   onAdd: (field: string) => void;
 }
 
@@ -63,8 +61,8 @@ NoteFieldsProps) {
                   editing.index === index;
                 return (
                   <FieldValue
-                    key={content.id}
-                    value={content.content}
+                    key={index}
+                    value={content}
                     editing={isEditing}
                     onFocus={() => {
                       if (isEditing) return;
@@ -75,15 +73,15 @@ NoteFieldsProps) {
                       if (!isEditing) return;
                       setEditing(null);
                       if (onSave && beforeEdit.current !== data) {
-                        onSave(field, index, content.id);
+                        onSave(field, index);
                       }
                       beforeEdit.current = null;
                     }}
                     onChange={(value) => {
-                      onChange(value, field, index, content.id);
+                      onChange(value, field, index);
                     }}
                     onDelete={() => {
-                      onDelete(field, index, content.id);
+                      onDelete(field, index);
                     }}
                   />
                 );

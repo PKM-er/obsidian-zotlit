@@ -9,10 +9,10 @@ import type {
   TFile,
 } from "obsidian";
 import { prepareFuzzySearch, EditorSuggest } from "obsidian";
-import { NoteFieldsSettings } from "./settings";
 import log from "@/log";
 import { isLiteratureNote } from "@/services/note-index";
 import ZoteroPlugin from "@/zt-main";
+import { NoteFieldsSettings } from "./settings";
 // >:noteFields
 const pattern = /^\s*>\s*:(\w*)$/;
 

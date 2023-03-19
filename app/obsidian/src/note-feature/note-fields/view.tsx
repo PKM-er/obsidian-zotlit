@@ -7,12 +7,11 @@ import { Notice } from "obsidian";
 import ReactDOM from "react-dom";
 import type { FallbackProps } from "react-error-boundary";
 import { ErrorBoundary } from "react-error-boundary";
-import { NoteFieldsMain } from "./component";
-import { buildId, extractId } from "./uuid";
 import { context } from "@/components/basic/context";
 import { DerivedFileView } from "@/components/derived-file-view";
 import { untilMetaReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
+import { NoteFieldsMain } from "./component";
 
 export const noteFieldsViewType = "zotero-note-fields";
 
@@ -132,11 +131,10 @@ export class NoteFieldsView extends DerivedFileView {
             fm,
           );
         }
-        acc[fieldName] = values.map((v) => {
-          const result = extractId(v);
-          if (!result)
+        acc[fieldName] = values.map((content) => {
+          if (!content)
             throw new UnpreparedFieldError(`Field ${fieldName}`, fieldName, fm);
-          return result;
+          return content;
         });
         return acc;
       }, {} as NoteFieldsData);
@@ -144,10 +142,9 @@ export class NoteFieldsView extends DerivedFileView {
     } catch (error) {
       if (error instanceof InvaildFieldError) {
         new Notice(error.message);
-      } else if (UnpreparedFieldError) {
+      } else if (error instanceof UnpreparedFieldError) {
         throw error;
-      }
-      {
+      } else {
         new Notice(
           `Failed to load note fields from file ${this.file.path}, check console for details`,
         );
@@ -160,12 +157,7 @@ export class NoteFieldsView extends DerivedFileView {
   /**
    * @param content null to delete the field
    */
-  async setField(
-    content: string | null,
-    field: string,
-    index: number,
-    id: string,
-  ) {
+  async setField(content: string | null, field: string, index: number) {
     try {
       await this.app.fileManager.processFrontMatter(
         this.file,
@@ -178,24 +170,20 @@ export class NoteFieldsView extends DerivedFileView {
           const values = fm[field] as unknown;
           if (values === undefined || values === null) {
             if (!content) return;
-            fm[field] = [buildId(content, id)];
+            fm[field] = [content];
             return;
           }
 
           if (typeof values === "string") {
-            if (extractId(values)?.id === id) {
-              if (content === null) {
-                delete fm[field];
-              } else {
-                fm[field] = [buildId(content, id)];
-              }
-            } else if (content !== null) {
-              fm[field] = [values, buildId(content, id)];
+            if (content !== null) {
+              fm[field] = [values, content];
+            } else {
+              fm[field] = [values];
             }
             return;
           }
           if (typeof values === "number" && content) {
-            fm[field] = [String(values), buildId(content, id)];
+            fm[field] = [String(values), content];
             return;
           }
 
@@ -217,19 +205,12 @@ export class NoteFieldsView extends DerivedFileView {
             },
             insert = (data: string) => (fm[field] as string[]).push(data);
 
-          const data = content ? buildId(content, id) : content;
+          const data = content;
           // if the index is valid, update the value directly
-          if (values[index] && extractId(values[index])?.id === id) {
+          if (values[index]) {
             updateAt(index, data);
             return;
           }
-          // try to find existing value with the same id and update it
-          index = values.findIndex((val) => extractId(val)?.id === id);
-          if (index !== -1) {
-            updateAt(index, data);
-            return;
-          }
-
           if (!data) return;
           // if the id is not found, insert the value at the end
           insert(data);
@@ -264,11 +245,11 @@ export class NoteFieldsView extends DerivedFileView {
               continue;
             }
             if (typeof values === "string") {
-              fm[fieldName] = [buildId(values)];
+              fm[fieldName] = [values];
               continue;
             }
             if (typeof values === "number") {
-              fm[fieldName] = [buildId(String(values))];
+              fm[fieldName] = [String(values)];
               continue;
             }
             if (!isStringArray(values)) {
@@ -278,7 +259,7 @@ export class NoteFieldsView extends DerivedFileView {
                 values,
               );
             }
-            fm[fieldName] = values.map((v) => (extractId(v) ? v : buildId(v)));
+            fm[fieldName] = values;
           }
         },
       );

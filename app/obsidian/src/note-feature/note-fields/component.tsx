@@ -5,7 +5,6 @@ import { useDebounceFn } from "ahooks";
 import { debounce } from "obsidian";
 import { useEffect, useState } from "react";
 import { useErrorHandler } from "react-error-boundary";
-import { nanoid } from "./uuid";
 import type { NoteFieldsView } from "./view";
 
 export function NoteFieldsMain({ view }: { view: NoteFieldsView }) {
@@ -63,33 +62,27 @@ export function NoteFieldsMain({ view }: { view: NoteFieldsView }) {
     <NoteFields
       data={fields}
       // saving={saving}
-      onSave={(field, index, id) => {
+      onSave={(field, index) => {
         if (!fields?.[field]) return;
         // setSaving();
-        saveField(fields[field][index]?.content ?? null, field, index, id);
+        saveField(fields[field][index] ?? null, field, index);
       }}
       onAdd={(field) =>
-        setFields(
-          update(fields, field, (prev) =>
-            append(prev ?? [], { content: "", id: nanoid() }),
-          ),
-        )
+        setFields(update(fields, field, (prev) => append(prev ?? [], "")))
       }
-      onChange={(content, field, index, id) => {
+      onChange={(content, field, index) => {
         setFields(
           update(fields, field, (prev) =>
-            prev
-              ? updateAt(prev, index, () => ({ content, id }))
-              : [{ content, id }],
+            prev ? updateAt(prev, index, () => content) : [content],
           ),
         );
       }}
-      onDelete={(field, index, id) => {
+      onDelete={(field, index) => {
         setFields(
           update(fields, field, (prev) => prev && removeAt(prev, index)),
         );
         // setSaving();
-        saveField(null, field, index, id);
+        saveField(null, field, index);
       }}
     />
   );
