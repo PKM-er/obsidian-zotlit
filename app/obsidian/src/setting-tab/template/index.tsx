@@ -34,23 +34,38 @@ export default function Template() {
         If you have issue with native auto pair features, you can disable this
         option and report the bug in GitHub
       </BooleanSetting>
+      <Setting
+        heading
+        name="Update Note"
+        description={
+          <>
+            You can find update note option in <code>More Options</code> menu
+            and command pallette inside a literature note. When update, all
+            literature notes with the same <code>zotero-key</code> will be
+            updated.
+          </>
+        }
+      />
       <BooleanSetting
-        name="Update Note by Overwriting"
+        name="Overwrite Existing Note"
         settings={template}
         prop="updateOverwrite"
       >
-        <div className="text-txt-error">
-          ⚠ WARNING: This will overwrite the whole note content with latest one
-          when update literature note, make sure you didn't add any custom
-          content in the note before enable this option.
+        <div className="space-y-2">
+          <div className="text-txt-error">
+            ⚠ WARNING: This will overwrite the whole note content with latest
+            one when update literature note, make sure you didn't add any custom
+            content in the note before enable this option.
+          </div>
         </div>
       </BooleanSetting>
       <BooleanSetting
-        name="Update Existing Annotations (Experimental)"
+        name="In-place Update of Existing Annotations"
         settings={template}
         prop="updateAnnotBlock"
       >
         <div className="space-y-2">
+          <div>(Experimental)</div>
           <div className="text-txt-error">
             ⚠ WARNING: When enable, the plugin will try to update existing
             annotaion callouts marked with block-id in addition to appped

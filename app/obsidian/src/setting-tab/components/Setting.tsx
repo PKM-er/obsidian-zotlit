@@ -2,8 +2,8 @@ import { cn } from "@obzt/components/utils";
 import { useMemoizedFn } from "ahooks";
 import type { PropsWithChildren, ReactNode } from "react";
 import { useContext, forwardRef } from "react";
-import { SettingTabCtx } from "../common";
 import type { Settings } from "@/settings/base";
+import { SettingTabCtx } from "../common";
 
 export default forwardRef<
   HTMLDivElement,
@@ -18,7 +18,7 @@ export default forwardRef<
     <div
       className={cn(
         "setting-item",
-        heading && "setting-item-heading",
+        heading && "setting-item-heading border-none",
         className,
       )}
     >
