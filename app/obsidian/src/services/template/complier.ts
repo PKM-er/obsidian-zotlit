@@ -50,9 +50,11 @@ export class TemplateComplier extends Service {
             if (!warpCallout) return body;
             const lines = body.trim().split("\n");
             console.log(lines[0], calloutPattern.test(lines[0]));
-            if (!calloutPattern.test(lines[0])) {
-              lines.unshift(`[!NOTE]`);
-            }
+            // no longer add callout when missing in case that
+            // label added in annotations template
+            // if (!calloutPattern.test(lines[0])) {
+            //   lines.unshift(`[!NOTE]`);
+            // }
             lines.push(`^${(data as AnnotHelper).blockID}`);
             return lines.map((v) => `> ${v}`).join("\n");
           };
