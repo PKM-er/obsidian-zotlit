@@ -35,12 +35,22 @@ export default function Template() {
         option and report the bug in GitHub
       </BooleanSetting>
       <BooleanSetting
+        name="Update Note by Overwriting"
+        settings={template}
+        prop="updateOverwrite"
+      >
+        <div className="text-txt-error">
+          ⚠ WARNING: This will overwrite the whole note content with latest one
+          when update literature note, make sure you didn't add any custom
+          content in the note before enable this option.
+        </div>
+      </BooleanSetting>
+      <BooleanSetting
         name="Update Existing Annotations (Experimental)"
         settings={template}
         prop="updateAnnotBlock"
       >
         <div className="space-y-2">
-          <div>Update existing annotations</div>
           <div className="text-txt-error">
             ⚠ WARNING: When enable, the plugin will try to update existing
             annotaion callouts marked with block-id in addition to appped

@@ -108,6 +108,16 @@ export async function updateNote(
     const file = app.vault.getAbstractFileByPath(notePath) as TFile;
     const ctx = { plugin, sourcePath: notePath };
 
+    if (plugin.settings.template.updateOverwrite) {
+      // TODO: support import from multiple attachments
+      const content = templateRenderer.renderNote(
+        extraByAtch[attachmentIDs[0]],
+        ctx,
+      );
+      await app.vault.modify(file, content);
+      continue;
+    }
+
     const existingAnnots = meta.sections?.filter(isAnnotBlock) ?? [];
     const blockInfo = pipe(
       existingAnnots.flatMap((s) =>
