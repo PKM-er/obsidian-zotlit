@@ -1,5 +1,6 @@
 import type { AnnotationItem, AnnotationPosition, DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../../utils/index.js";
+import { parseSortIndex } from "../../utils/misc.js";
 
 export const select = `--sql
   items.itemID,
@@ -51,18 +52,15 @@ export type WithParentItem<Output> = Output & {
   parentItem: DB.Items["key"];
 };
 
-export const parsePosSortIndex = (position: string, sortIndex: string) => ({
-  sortIndex: sortIndex?.split("|").map((s) => parseInt(s, 10)) ?? [],
-  position: JSON.parse(position),
-});
-
 /** warning: alter existing object */
 export const toParsed = <O extends OutputBase>(
   obj: O,
   libraryID: number,
   groupID: number | null,
 ): Parsed<O> =>
-  Object.assign(obj, parsePosSortIndex(obj.position, obj.sortIndex), {
+  Object.assign(obj, {
+    sortIndex: parseSortIndex(obj.sortIndex),
+    position: JSON.parse(obj.position),
     libraryID,
     groupID,
     itemType: "annotation",

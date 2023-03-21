@@ -193,6 +193,7 @@ importers:
       '@aidenlx/zotero-helper': workspace:*
       '@mobily/ts-belt': ^4.0.0-rc.5
       '@obzt/common': workspace:*
+      '@obzt/database': workspace:*
       '@obzt/protocol': workspace:*
       '@release-it/bumper': ^4.0.0
       '@types/eslint': ~8.4.6
@@ -207,6 +208,7 @@ importers:
       '@aidenlx/zotero-helper': link:../../lib/zotero-helper
       '@mobily/ts-belt': 4.0.0-rc.5
       '@obzt/common': link:../../lib/common
+      '@obzt/database': link:../../lib/database
       '@obzt/protocol': link:../../lib/protocol
       assert-never: 1.2.1
       monkey-around: 2.3.0

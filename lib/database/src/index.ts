@@ -18,12 +18,13 @@ export type { Output as LibraryInfo } from "./sql/libraries/full.js";
 export type { Output as ItemDetails } from "./sql/items/base.js";
 
 export {
-  getCacheImagePath,
   sortBySortIndex,
   isFileAttachment,
+  parseSortIndex,
   cacheActiveAtch,
   getCachedActiveAtch,
 } from "./utils/misc.js";
+export { getCacheImagePath } from "./utils/getCacheImagePath.js";
 export * from "./utils/prepared.js";
 export type {
   ItemIDLibID,

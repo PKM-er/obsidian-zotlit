@@ -40,7 +40,8 @@
     "@obzt/common": "workspace:*",
     "@aidenlx/zotero-helper": "workspace:*",
     "@obzt/protocol": "workspace:*",
-    "@mobily/ts-belt": "^4.0.0-rc.5"
+    "@mobily/ts-belt": "^4.0.0-rc.5",
+    "@obzt/database": "workspace:*"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",

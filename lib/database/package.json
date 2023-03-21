@@ -10,7 +10,8 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./api": "./dist/api.js"
+    "./api": "./dist/api.js",
+    "./utils/*": "./dist/utils/*.js"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",

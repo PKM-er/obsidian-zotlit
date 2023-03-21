@@ -3,6 +3,7 @@ import "./style.css";
 import { Plugin } from "@aidenlx/zotero-helper/zotero";
 import { uniqBy } from "@mobily/ts-belt/Array";
 import { debounce } from "@mobily/ts-belt/Function";
+import { parseSortIndex, sortBySortIndex } from "@obzt/database/utils/misc";
 import type {
   AnnotationsQuery,
   INotify,
@@ -155,10 +156,28 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
           throw new Error(
             `Can't get annotations from reader data: ${JSON.stringify(data)}`,
           );
-        annots.sort((a, b) => a.annotationSortIndex - b.annotationSortIndex);
+        Zotero.log(
+          [
+            annots[0].annotationSortIndex,
+            annots[1].annotationSortIndex,
+            annots[0].annotationPosition,
+            annots[1].annotationPosition,
+          ].join("--"),
+        );
+        const sorted = annots
+          .map(
+            (annot, index) =>
+              [
+                // fix incorrect sort index typing
+                parseSortIndex(annot.annotationSortIndex as unknown as string),
+                index,
+              ] as const,
+          )
+          .sort(([a], [b]) => sortBySortIndex(a, b))
+          .map(([, index]) => annots[index]);
         await updateAnnotations(
           reader,
-          annots.map((a, i) => ({
+          sorted.map((a, i) => ({
             id: a.key,
             comment: toMergedAnnotation(
               a.annotationComment,
