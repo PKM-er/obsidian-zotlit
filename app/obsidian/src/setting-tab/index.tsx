@@ -1,14 +1,15 @@
 import { useLocalStorageState } from "ahooks";
 import ReactDOM from "react-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type ZoteroPlugin from "@/zt-main";
 import { SettingTabCtx } from "./common";
 import Connect from "./connect";
 import General from "./general";
 import Misc from "./misc";
+import NoteFields from "./note-fields";
 import PluginSettingTab from "./patch-tab";
 import Suggester from "./suggester";
 import Template from "./template";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type ZoteroPlugin from "@/zt-main";
 
 export default class ZoteroSettingTab extends PluginSettingTab {
   constructor(public plugin: ZoteroPlugin) {
@@ -47,6 +48,7 @@ export function MainPage() {
         <TabsTrigger value="connect">Connect</TabsTrigger>
         <TabsTrigger value="suggester">Suggester</TabsTrigger>
         <TabsTrigger value="template">Template</TabsTrigger>
+        <TabsTrigger value="note-fields">Fields</TabsTrigger>
         <TabsTrigger value="misc">Misc</TabsTrigger>
       </TabsList>
       <TabsContent
@@ -72,6 +74,12 @@ export function MainPage() {
         className="divide-y flex-grow overflow-y-scroll"
       >
         <Template />
+      </TabsContent>
+      <TabsContent
+        value="note-fields"
+        className="divide-y flex-grow overflow-y-scroll"
+      >
+        <NoteFields />
       </TabsContent>
       <TabsContent
         value="misc"

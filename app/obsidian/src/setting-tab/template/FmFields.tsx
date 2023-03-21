@@ -3,10 +3,6 @@ import { useMemoizedFn } from "ahooks";
 import { debounce } from "obsidian";
 import { useContext, useMemo, useState } from "react";
 import * as React from "react";
-import { SettingTabCtx } from "../common";
-import Setting, { useApplySetting } from "../components/Setting";
-import TextComfirmSetting from "../components/TextComfirm";
-import useExtraButton from "../components/useExtraButton";
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,6 +11,10 @@ import {
 import type { FmFieldsMapping, FmMode } from "@/services/template/frontmatter";
 import { fmModes } from "@/services/template/frontmatter";
 import { useIconRef } from "@/utils/icon";
+import { SettingTabCtx } from "../common";
+import Setting, { useApplySetting } from "../components/Setting";
+import TextComfirmSetting from "../components/TextComfirm";
+import useExtraButton from "../components/useExtraButton";
 function FmFieldModeSelect() {
   const { plugin } = useContext(SettingTabCtx);
   const { template } = plugin.settings;

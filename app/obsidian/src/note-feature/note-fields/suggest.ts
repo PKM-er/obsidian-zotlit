@@ -31,7 +31,7 @@ export class NoteFieldsSuggest extends EditorSuggest<Result> {
   ): EditorSuggestTriggerInfo | null {
     if (
       !this.settings.noteFieldsSuggester ||
-      !this.settings.noteFields.size ||
+      this.settings.noteFields.length === 0 ||
       !file ||
       !isLiteratureNote(file)
     )
@@ -52,16 +52,15 @@ export class NoteFieldsSuggest extends EditorSuggest<Result> {
 
   getSuggestions(context: EditorSuggestContext): Result[] {
     const { query } = context;
-    const { noteFields } = this.settings;
     if (!query)
-      return [...noteFields.keys()].map((field) => ({
+      return this.settings.fieldNames.map((field) => ({
         field,
         matches: [],
         score: 0,
         query: field,
       }));
     const search = prepareFuzzySearch(query);
-    const searchResults = [...noteFields.entries()].flatMap(([field, v]) => {
+    const searchResults = this.settings.noteFields.flatMap(([field, v]) => {
       // if no search keyword specified, fallback to field name
       const query = v.keyword ? v.keyword : field;
       const result = search(query);
@@ -77,9 +76,8 @@ export class NoteFieldsSuggest extends EditorSuggest<Result> {
       );
       return;
     }
-    const { noteFields } = this.settings;
     const { start, end, editor } = this.context;
-    const template = noteFields.get(field)?.template;
+    const template = this.settings.getTemplate(field);
     if (!template) {
       log.error("No template found for field", field);
       return;

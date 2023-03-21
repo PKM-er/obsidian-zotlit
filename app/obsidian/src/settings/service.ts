@@ -3,7 +3,6 @@ import { mapWithKey, selectKeys, values } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { Service } from "@ophidian/core";
 
-import Settings from "./base";
 import log, { LogSettings } from "@/log";
 import { SuggesterSettings } from "@/note-feature/citation-suggest";
 import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
@@ -14,6 +13,7 @@ import { WatcherSettings } from "@/services/zotero-db/auto-refresh/settings.js";
 import { DatabaseSettings } from "@/services/zotero-db/connector/settings.js";
 import { ImgImporterSettings } from "@/services/zotero-db/img-import/settings.js";
 import ZoteroPlugin from "@/zt-main.js";
+import Settings from "./base";
 
 export interface ZoteroSettings {
   database: DatabaseSettings;

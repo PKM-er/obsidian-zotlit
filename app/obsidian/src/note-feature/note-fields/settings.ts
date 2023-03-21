@@ -8,7 +8,7 @@ interface NoteField {
 
 interface SettingOptions {
   noteFieldsSuggester: boolean;
-  noteFields: Map<string, NoteField>;
+  noteFields: [string, NoteField][];
 }
 
 type SettingOptionsJSON = Omit<SettingOptions, "noteFields"> & {
@@ -16,21 +16,30 @@ type SettingOptionsJSON = Omit<SettingOptions, "noteFields"> & {
 };
 
 export class NoteFieldsSettings extends Settings<SettingOptions> {
+  get fieldNames() {
+    return this.noteFields.map(([name]) => name);
+  }
+  getField(name: string) {
+    return this.noteFields.find(([key]) => key === name)?.[1];
+  }
+  getDefaultField() {
+    return {
+      keyword: "",
+      template: "",
+    };
+  }
+  getTemplate(name: string) {
+    return (
+      this.getField(name)?.template || `> <%= it[${JSON.stringify(name)}] %>::`
+    );
+  }
   getDefaults() {
     return {
       noteFieldsSuggester: false,
-      noteFields: new Map(
-        Object.entries({
-          highlights: {
-            keyword: "",
-            template: `> <%= it.field %>::`,
-          },
-          questions: {
-            keyword: "",
-            template: `> <%= it.field %>::`,
-          },
-        } satisfies SettingOptionsJSON["noteFields"]),
-      ),
+      noteFields: Object.entries({
+        highlights: this.getDefaultField(),
+        questions: this.getDefaultField(),
+      }),
     };
   }
   async apply(key: "noteFields"): Promise<void> {
@@ -45,24 +54,14 @@ export class NoteFieldsSettings extends Settings<SettingOptions> {
   fromJSON(json: SettingOptionsJSON): void {
     const { noteFields, ...rest } = json;
     super.fromJSON({
-      ...(noteFields ? { noteFields: recordToMap(noteFields) } : {}),
+      ...(noteFields ? { noteFields: Object.entries(noteFields) } : {}),
       ...rest,
     });
   }
   toJSON(): SettingOptionsJSON {
     return {
-      noteFields: mapToRecord(this.noteFields),
+      noteFields: Object.fromEntries(this.noteFields),
       noteFieldsSuggester: this.noteFieldsSuggester,
     };
   }
-}
-
-function recordToMap(
-  record: Record<string, NoteField>,
-): Map<string, NoteField> {
-  return new Map(Object.entries(record));
-}
-
-function mapToRecord(map: Map<string, NoteField>): Record<string, NoteField> {
-  return Object.fromEntries(map);
 }

@@ -231,7 +231,7 @@ export class NoteFieldsView extends DerivedFileView {
   }
 
   get fieldsToExtract() {
-    return [...this.plugin.settings.noteFields.noteFields.keys()];
+    return this.plugin.settings.noteFields.fieldNames;
   }
 
   async prepareFields() {
