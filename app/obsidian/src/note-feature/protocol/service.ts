@@ -16,6 +16,11 @@ export class ProtocolHandler extends Service {
         this.onZtExport(parseQuery(p)),
       ),
     );
+    this.registerEvent(
+      this.plugin.server.on("zotero/update", (p) =>
+        this.onZtExport(parseQuery(p)),
+      ),
+    );
   }
   async onZtOpen(query: AnnotationsQuery | ItemsQuery) {
     if (query.type === "annotation") {
@@ -27,6 +32,21 @@ export class ProtocolHandler extends Service {
       return;
     }
     await this.plugin.noteFeatures.openNote(query.items[0]);
+  }
+  async onZtUpdate(query: AnnotationsQuery | ItemsQuery) {
+    if (query.type === "annotation") {
+      new Notice("Single annotation update not yet supported");
+      return;
+    }
+    if (query.items.length < 1) {
+      new Notice("No items to open");
+      return;
+    }
+    if (query.items.length > 1) {
+      new Notice("Multiple literature note update not yet supported");
+      return;
+    }
+    await this.plugin.noteFeatures.updateNoteFromId(query.items[0]);
   }
   async onZtExport(query: AnnotationsQuery | ItemsQuery) {
     if (query.type === "annotation") {

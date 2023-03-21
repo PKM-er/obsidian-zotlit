@@ -91,28 +91,41 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       image: this.getResourceURL(this.icons[32]),
     });
     this.registerMenu("item", (menu) =>
-      menu
-        .addSeparator()
-        .addItem((item) =>
-          item
-            .setTitle("Open Note in Obsidian")
-            .onClick(() => this.handleSelectedItems("open"))
-            .onShowing((item) =>
-              item.toggle(
-                this.app.getActiveZoteroPane().getSelectedItems().length === 1,
+      menu.addSeparator().addSubmenu("Obsidian Actions", (menu) =>
+        menu
+          .addItem((item) =>
+            item
+              .setTitle("Open Literature Note")
+              .onClick(() => this.handleSelectedItems("open"))
+              .onShowing((item) =>
+                item.toggle(
+                  this.app.getActiveZoteroPane().getSelectedItems().length ===
+                    1,
+                ),
               ),
-            ),
-        )
-        .addItem((item) =>
-          item
-            .setTitle("Create Notes in Obsidian")
-            .onClick(() => this.handleSelectedItems("export"))
-            .onShowing((item) =>
-              item.toggle(
-                this.app.getActiveZoteroPane().getSelectedItems().length >= 1,
+          )
+          .addItem((item) =>
+            item
+              .setTitle("Update Literature Note")
+              .onClick(() => this.handleSelectedItems("update"))
+              .onShowing((item) =>
+                item.toggle(
+                  this.app.getActiveZoteroPane().getSelectedItems().length ===
+                    1,
+                ),
               ),
-            ),
-        ),
+          )
+          .addItem((item) =>
+            item
+              .setTitle("Create Literature Note(s)")
+              .onClick(() => this.handleSelectedItems("export"))
+              .onShowing((item) =>
+                item.toggle(
+                  this.app.getActiveZoteroPane().getSelectedItems().length >= 1,
+                ),
+              ),
+          ),
+      ),
     );
 
     this.registerMenu("reader:annot", (menu, data, itemID, reader) => {

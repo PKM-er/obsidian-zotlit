@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
 import type { ParseOptions, StringifyOptions } from "query-string";
 import { stringifyUrl } from "query-string";
@@ -14,7 +15,13 @@ export const stringifyOptions: StringifyOptions = {
   arrayFormat: "index",
 };
 
-export type QueryAction = "open" | "export";
+export type QueryAction = "open" | "export" | "update";
+
+export const queryActions = enumerate<QueryAction>()(
+  "open",
+  "export",
+  "update",
+);
 
 export const stringifyQuery = <A extends QueryAction>(
   url: `obsidian://zotero/${A}`,

@@ -4,18 +4,19 @@ import type {
   ServerResponse,
 } from "http";
 import { createServer } from "http";
+import { queryActions } from "@obzt/protocol";
 import type { INotify } from "@obzt/protocol/dist/bg";
 import { Service } from "@ophidian/core";
 import type { EventRef, ObsidianProtocolData } from "obsidian";
 import { Events } from "obsidian";
+import log from "@/log";
 import ZoteroPlugin from "@/zt-main";
 import { ServerSettings } from "./settings";
-import log from "@/log";
 
 /** background actions */
 const bgActions = new Set<string>(["notify"]);
 /** obsidian protocol actions */
-const obActions = new Set<string>(["zotero/open", "zotero/export"]);
+const obActions = new Set<string>([...queryActions.map((v) => `zotero/${v}`)]);
 
 export class Server extends Service implements Events {
   #events = new Events();
@@ -137,6 +138,11 @@ export class Server extends Service implements Events {
   ): EventRef;
   on(
     name: "zotero/export",
+    callback: (param: Record<string, string>) => any,
+    ctx?: any,
+  ): EventRef;
+  on(
+    name: "zotero/update",
     callback: (param: Record<string, string>) => any,
     ctx?: any,
   ): EventRef;

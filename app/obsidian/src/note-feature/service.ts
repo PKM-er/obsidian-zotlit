@@ -119,7 +119,7 @@ class NoteFeatures extends Service {
         new Notice("Cannot find zotero item with key " + itemKey);
         return false;
       }
-      await this.updateNoteForDocItemFull(item);
+      await this.updateNote(item);
     };
     plugin.addCommand({
       id: "update-literature-note",
@@ -222,7 +222,23 @@ class NoteFeatures extends Service {
     return note.path;
   }
 
-  async updateNoteForDocItemFull(item: RegularItemInfoBase) {
+  async updateNoteFromId(id: ItemKeyGroup & { libraryID: number }) {
+    const { noteIndex, databaseAPI } = this.plugin;
+
+    const info = noteIndex.getNotesFor(id);
+    if (!info.length) {
+      new Notice(`No literature note found for zotero item with key ${id.key}`);
+      return;
+    }
+    const [item] = await databaseAPI.getItems([[id.key, id.libraryID]]);
+    if (!item) {
+      new Notice(`Cannot find zotero item with key ${id.key}`);
+      return;
+    }
+    await this.updateNote(item);
+  }
+
+  async updateNote(item: RegularItemInfoBase) {
     const summary = await updateNote(item, this.plugin);
     if (summary) {
       if (summary.addedAnnots > 0 || summary.updatedAnnots > 0)

@@ -449,12 +449,14 @@ importers:
   ../../lib/protocol:
     specifiers:
       '@aidenlx/eslint-config': workspace:*
+      '@obzt/common': workspace:*
       '@types/eslint': ~8.4.6
       assert-never: ^1.2.1
       eslint: ~8.36.0
       query-string: ~7.1.1
       typescript: ~5.0.2
     dependencies:
+      '@obzt/common': link:../common
       assert-never: 1.2.1
       query-string: 7.1.3
     devDependencies:
