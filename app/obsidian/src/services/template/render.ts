@@ -101,7 +101,9 @@ export class TemplateRenderer {
     const record: Record<string, any> = {};
     // Required key for annotation note
     record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
-    record[ZOTERO_ATCHS_FIELDNAME] = [data.attachment?.itemID];
+    if (data.attachment?.itemID) {
+      record[ZOTERO_ATCHS_FIELDNAME] = [data.attachment.itemID];
+    }
 
     // eslint-disable-next-line prefer-const
     for (let [key, val] of Object.entries(data as Record<string, any>)) {
