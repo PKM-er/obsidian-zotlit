@@ -36,21 +36,19 @@ const methods: DbWorkerAPI = {
     return result;
   },
   getItemsFromCache: (limit, lib) => {
-    const items = cache.items.get(lib);
-    if (!items) {
+    const itemsCache = cache.items.get(lib);
+    if (!itemsCache) {
       throw new Error("get items before cache ready");
     }
+    const items = [...itemsCache.byId.values()].sort((a, b) =>
+      b.dateAccessed && a.dateAccessed
+        ? b.dateAccessed.getTime() - a.dateAccessed.getTime()
+        : 0,
+    );
     if (limit <= 0) {
-      return [...items.byId.values()];
+      return items;
     }
-    const output = [];
-    for (const item of items.byId.values()) {
-      if (output.length >= limit) {
-        break;
-      }
-      output.push(item);
-    }
-    return output;
+    return items.slice(0, limit);
   },
   getAttachments: attachLogger(
     (docId: number, libId: number) =>
