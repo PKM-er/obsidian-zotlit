@@ -2,8 +2,8 @@ import { useMemoizedFn } from "ahooks";
 import { ToggleComponent } from "obsidian";
 import type { PropsWithChildren, ReactNode, RefCallback } from "react";
 import { forwardRef, useState, useCallback, useEffect, useRef } from "react";
-import SettingsComponent, { useApplySetting } from "./Setting";
 import type { Settings } from "@/settings/base";
+import SettingsComponent, { useApplySetting } from "./Setting";
 
 function useSwitch(value: boolean, onChange: (value: boolean) => void) {
   const onChangeImmu = useMemoizedFn(onChange);

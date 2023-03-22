@@ -1,12 +1,12 @@
 import { useMemoizedFn } from "ahooks";
 import clsx from "clsx";
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { logError } from "@/log";
+import { useIconRef } from "@/utils/icon";
 import { binaryFullPathAtom, binaryLinkAtom, modalAtom } from "./atom";
 import { ListItem } from "./list-item";
 import { Loading } from "./loading";
 import { checkModuleStatus, downloadModule, importModule } from "./utils";
-import { logError } from "@/log";
-import { useIconRef } from "@/utils/icon";
 
 enum InstallState {
   Idle,

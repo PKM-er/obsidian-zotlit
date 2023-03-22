@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import { SettingTabCtx } from "../common";
-import Setting from "../components/Setting";
-import { templateDesc } from "./shared";
 import { openTemplatePreview } from "@/note-feature/template-preview/open";
 import type { EjectableTemplate } from "@/services/template/settings";
 import { useIconRef } from "@/utils/icon";
+import { SettingTabCtx } from "../common";
+import Setting from "../components/Setting";
+import { templateDesc } from "./shared";
 
 export function EjectableTemplate({
   ejected,

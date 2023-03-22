@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { Notice } from "obsidian";
 import { useState } from "react";
+import log, { logError } from "@/log";
 import {
   binaryFullPathAtom,
   binaryLinkAtom,
@@ -10,7 +11,6 @@ import {
 } from "./atom";
 import { ListItem } from "./list-item";
 import { importModule, uploadModule } from "./utils";
-import log, { logError } from "@/log";
 
 const install = async (binaryPath: string): Promise<boolean> => {
   try {

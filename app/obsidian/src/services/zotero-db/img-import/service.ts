@@ -7,9 +7,9 @@ import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 import type { FileSystemAdapter } from "obsidian";
 import { Notice, TFile } from "obsidian";
+import log, { logError } from "@/log";
 import { DatabaseSettings } from "../connector/settings";
 import { ImgImporterSettings } from "./settings";
-import log, { logError } from "@/log";
 
 export class ImgCacheImporter extends Service {
   onload() {

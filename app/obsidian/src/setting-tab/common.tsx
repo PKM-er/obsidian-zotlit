@@ -1,8 +1,8 @@
 import { createContext, useCallback, useState } from "react";
 import type { UseAsyncOptions, UseAsyncReturn } from "react-async-hook";
 import { useAsync } from "react-async-hook";
-import type ZoteroPlugin from "../zt-main";
 import { InVaultPath } from "@/settings/invault-path";
+import type ZoteroPlugin from "../zt-main";
 
 export const SettingTabCtx = createContext<{
   plugin: ZoteroPlugin;

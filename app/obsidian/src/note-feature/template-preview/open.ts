@@ -1,9 +1,9 @@
 import { MarkdownView, Notice, TFile } from "obsidian";
+import type { EjectableTemplate } from "@/services/template/settings";
+import type ZoteroPlugin from "@/zt-main";
 import type { TemplatePreviewStateData } from "./base";
 import { itemDetailsViewType } from "./details";
 import { templatePreviewViewType } from "./preview";
-import type { EjectableTemplate } from "@/services/template/settings";
-import type ZoteroPlugin from "@/zt-main";
 
 declare module "obsidian" {
   interface WorkspaceItem {

@@ -4,12 +4,12 @@ import { getAllTags, TFile } from "obsidian";
 
 import type { CachedMetadata, TAbstractFile } from "obsidian";
 import ReactDOM from "react-dom";
-import { createNote } from "./create-note";
-import { TopicImportStatus } from "./status";
-import { createStore, selectDisabled, topicPrefix } from "./utils";
 import { context } from "@/components/basic/context";
 import { untilDbRefreshed } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
+import { createNote } from "./create-note";
+import { TopicImportStatus } from "./status";
+import { createStore, selectDisabled, topicPrefix } from "./utils";
 
 export class TopicImport extends Service {
   plugin = this.use(ZoteroPlugin);

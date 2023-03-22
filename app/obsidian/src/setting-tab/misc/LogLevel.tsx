@@ -3,9 +3,9 @@ import type { LogLevel } from "@obzt/common";
 import { useMemoizedFn } from "ahooks";
 import { useContext, useState } from "react";
 
+import { promptOpenLog } from "@/utils";
 import { SettingTabCtx } from "../common";
 import Setting, { useApplySetting } from "../components/Setting";
-import { promptOpenLog } from "@/utils";
 
 export default function LogLevel() {
   const { log } = useContext(SettingTabCtx).plugin.settings;

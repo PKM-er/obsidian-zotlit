@@ -1,6 +1,6 @@
 import { assertNever } from "assert-never";
-import DatabaseWatcher from "./service";
 import Settings from "@/settings/base";
+import DatabaseWatcher from "./service";
 
 interface SettingOptions {
   autoRefresh: boolean;

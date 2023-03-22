@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
+import type { NonEjectableTemplate } from "@/services/template/settings";
 import { SettingTabCtx } from "../common";
 import { TextComfirmSettingBase } from "../components/TextComfirm";
 import { templateDesc } from "./shared";
-import type { NonEjectableTemplate } from "@/services/template/settings";
 
 export function SimpleTemplateEdit({ type }: { type: NonEjectableTemplate }) {
   const { plugin } = useContext(SettingTabCtx);

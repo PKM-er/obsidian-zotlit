@@ -1,9 +1,9 @@
 import { TextareaAutosize as Textarea } from "@mui/base";
 import type { PropsWithChildren, ReactNode } from "react";
 import { useState } from "react";
-import SettingsComponent, { useApplySetting } from "./Setting";
 import type { Settings } from "@/settings/base";
 import { useIconRef } from "@/utils/icon";
+import SettingsComponent, { useApplySetting } from "./Setting";
 
 export default function TextComfirmSetting<Opts extends Record<string, any>>({
   name,

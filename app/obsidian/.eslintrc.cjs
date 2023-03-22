@@ -40,4 +40,12 @@ module.exports = {
       typescript: typescriptOptions,
     },
   },
+  overrides: [
+    {
+      files: "src/worker/**/*.ts",
+      parserOptions: {
+        tsconfigRootDir: "src/worker",
+      },
+    },
+  ],
 };

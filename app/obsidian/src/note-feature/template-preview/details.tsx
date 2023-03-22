@@ -1,12 +1,12 @@
 import { useStore } from "@obzt/components";
 import { useMemo } from "react";
 import ReactDOM from "react-dom";
-import type { IStore, StoreApi } from "./base";
-import { toCtx, TemplatePreviewBase } from "./base";
 import ItemDetails from "@/components/item-details";
 import { withAnnotHelper, withDocItemHelper } from "@/services/template/helper";
 import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
+import { toCtx, TemplatePreviewBase } from "./base";
+import type { IStore, StoreApi } from "./base";
 
 export const itemDetailsViewType = "zotero-item-details";
 

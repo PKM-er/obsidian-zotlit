@@ -1,4 +1,3 @@
-import type { RegularItemInfo } from "@obzt/database";
 import type {
   Editor,
   EditorPosition,
@@ -7,10 +6,10 @@ import type {
 } from "obsidian";
 import { EditorSuggest } from "obsidian";
 
-import type { SuggesterBase } from "./core.js";
-import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 import type { SearchResult } from "@/services/zotero-db/database.js";
 import type ZoteroPlugin from "@/zt-main.js";
+import type { SuggesterBase } from "./core.js";
+import { CLASS_ID, getSuggestions, renderSuggestion } from "./core.js";
 
 export abstract class ZoteroItemEditorSuggest
   extends EditorSuggest<SearchResult>

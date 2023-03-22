@@ -8,12 +8,12 @@ import { assertNever } from "assert-never";
 import { debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";
-import type { DbWorkerAPI } from "../api";
-import { DatabaseSettings } from "./settings";
 import log, { LogSettings } from "@/log";
 import { CancelledError, TimeoutError, untilDbRefreshed } from "@/utils/once";
 import { createWorkerProxy } from "@/utils/worker";
 import ZoteroPlugin from "@/zt-main";
+import type { DbWorkerAPI } from "../api";
+import { DatabaseSettings } from "./settings";
 
 export const enum DatabaseStatus {
   NotInitialized,

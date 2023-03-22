@@ -1,6 +1,6 @@
 import { assertNever } from "assert-never";
-import { Server } from "./service";
 import Settings from "@/settings/base";
+import { Server } from "./service";
 
 interface SettingOptions {
   enableServer: boolean;

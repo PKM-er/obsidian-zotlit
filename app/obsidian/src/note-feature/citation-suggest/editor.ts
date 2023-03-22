@@ -1,13 +1,12 @@
-import type { RegularItemInfo } from "@obzt/database";
 import type {
   EditorPosition,
   Editor,
   EditorSuggestTriggerInfo,
 } from "obsidian";
-import { insertCitation, instructions, isShift } from "./basic";
 import { ZoteroItemEditorSuggest } from "@/components/item-suggest";
 import type { SearchResult } from "@/services/zotero-db/database";
 import type ZoteroPlugin from "@/zt-main";
+import { insertCitation, instructions, isShift } from "./basic";
 
 export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   constructor(public plugin: ZoteroPlugin) {

@@ -1,10 +1,10 @@
 import getPort from "get-port";
 import { Notice } from "obsidian";
 import { useContext, useMemo, useState } from "react";
+import { useIconRef } from "@/utils/icon";
 import { SettingTabCtx } from "../common";
 import { BooleanSettingBase, useBoolean } from "../components/Boolean";
 import Setting from "../components/Setting";
-import { useIconRef } from "@/utils/icon";
 
 export function BackgroundConnectSetting() {
   const { server } = useContext(SettingTabCtx).plugin.settings;

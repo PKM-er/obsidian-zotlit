@@ -1,5 +1,5 @@
-import workerpool from "@aidenlx/workerpool";
 import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
+import workerpool from "@aidenlx/workerpool";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 

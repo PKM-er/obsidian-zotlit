@@ -2,10 +2,10 @@ import type { FSWatcher } from "fs";
 import { watch } from "fs";
 import { map } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
+import log from "@/log";
 import DatabaseWorker from "../connector/service";
 import { DatabaseSettings } from "../connector/settings";
 import { WatcherSettings } from "./settings";
-import log from "@/log";
 
 const onDatabaseUpdate = (target: "main" | "bbt") => () =>
   app.vault.trigger("zotero:db-updated", target);

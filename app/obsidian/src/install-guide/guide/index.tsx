@@ -2,11 +2,11 @@ import { Provider } from "jotai";
 import type { PluginManifest } from "obsidian";
 import { Modal } from "obsidian";
 import ReactDOM from "react-dom";
+import { createInitialValues } from "@/utils/create-initial";
 import type { PlatformDetails } from "../version";
 import type { GuideMode } from "./atom";
 import { modalAtom } from "./atom";
 import { InstallGuide } from "./content";
-import { createInitialValues } from "@/utils/create-initial";
 
 declare module "obsidian" {
   interface App {

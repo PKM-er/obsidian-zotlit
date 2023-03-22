@@ -1,10 +1,10 @@
-import type { RegularItemInfo } from "@/../../../lib/database/dist";
+import type { RegularItemInfo } from "@obzt/database";
 import type { SimpleDocumentSearchResultSetUnit } from "@obzt/database/api";
 import { Service } from "@ophidian/core";
+import log from "@/log";
 import DatabaseWatcher from "./auto-refresh/service";
 import DatabaseWorker, { DatabaseStatus } from "./connector/service";
 import { DatabaseSettings } from "./connector/settings";
-import log from "@/log";
 
 export class ZoteroDatabase extends Service {
   // async onload() {}

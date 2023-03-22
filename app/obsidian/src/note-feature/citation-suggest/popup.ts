@@ -1,8 +1,8 @@
 import type { Editor } from "obsidian";
-import { insertCitation, instructions, isShift } from "./basic";
 import { openModal } from "@/components/basic/modal";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest";
 import type ZoteroPlugin from "@/zt-main";
+import { insertCitation, instructions, isShift } from "./basic";
 
 class CitationPopupSuggest extends ZoteroItemPopupSuggest {
   constructor(public plugin: ZoteroPlugin) {

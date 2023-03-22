@@ -1,9 +1,9 @@
 import { useMemoizedFn } from "ahooks";
 import { Notice } from "obsidian";
 import { useContext, useState } from "react";
+import { useIconRef } from "@/utils/icon";
 import { SettingTabCtx, useRefreshAsync } from "../common";
 import Setting, { useApplySetting } from "../components/Setting";
-import { useIconRef } from "@/utils/icon";
 
 export default function CitationLibrarySelect() {
   const { plugin } = useContext(SettingTabCtx);

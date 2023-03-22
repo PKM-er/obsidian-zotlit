@@ -1,8 +1,8 @@
 import type { Extension } from "@codemirror/state";
 import { Service } from "@ophidian/core";
+import ZoteroPlugin from "@/zt-main";
 import { bracketExtension } from "./bracket";
 import { EtaSuggest } from "./suggester";
-import ZoteroPlugin from "@/zt-main";
 
 export class TemplateEditorHelper extends Service {
   /** null if not registered */

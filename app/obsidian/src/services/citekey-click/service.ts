@@ -10,9 +10,9 @@ import type {
 } from "obsidian";
 import { Notice } from "obsidian";
 
-import type NoteIndex from "../note-index/service";
 import { untilWorkspaceReady, waitUntil } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
+import type NoteIndex from "../note-index/service";
 
 interface ClickableToken {
   type: string;

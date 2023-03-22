@@ -2,8 +2,8 @@ import { initLogger } from "@obzt/common";
 import type { LogLevel } from "@obzt/common";
 import { assertNever } from "assert-never";
 import log4js, { levels } from "log4js";
-import Settings from "./settings/base";
 import DatabaseWorker from "./services/zotero-db/connector/service";
+import Settings from "./settings/base";
 
 const DEFAULT_LOGLEVEL: LogLevel = "INFO";
 export const storageKey = "log4js_loglevel";
