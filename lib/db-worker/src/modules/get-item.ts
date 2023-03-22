@@ -47,6 +47,27 @@ const readCitekeys = (items: ItemIDLibID[]) => {
   return result;
 };
 
+function isWithAccessDate(item: unknown): item is { accessDate: [string] } {
+  const _item = item as { accessDate: unknown };
+  return (
+    Array.isArray(_item.accessDate) &&
+    _item.accessDate.length === 1 &&
+    typeof _item.accessDate[0] === "string"
+  );
+}
+
+/**
+ * convert a `YYYY-MM-DD HH:MM:SS` to a date object
+ */
+function stringToDate(dateString: string): Date | null {
+  const isoDateString = dateString.replace(" ", "T") + "Z";
+  try {
+    return new Date(isoDateString);
+  } catch (error) {
+    return null;
+  }
+}
+
 export function getItemObjects(
   itemIDMap: Record<number, ItemDetails>,
   itemIDs: ItemIDLibID[],
@@ -65,6 +86,14 @@ export function getItemObjects(
     if (!citekey) {
       log.warn(`Citekey: No item found for itemID ${itemID}`, citekey);
     }
+    const fields = itemFields[itemID].reduce((fields, field) => {
+      let { value } = field;
+      if (field.fieldName === "date") {
+        value = multipartToSQL(value as string).split("-")[0];
+      }
+      (fields[field.fieldName] ??= []).push(value);
+      return fields;
+    }, {} as Record<string, unknown[]>);
     const itemObject: RegularItemInfoBase = {
       ...itemIDMap[itemID],
       libraryID,
@@ -72,14 +101,10 @@ export function getItemObjects(
       itemID,
       creators: creators[itemID],
       citekey: citekeyMap[itemID],
-      ...itemFields[itemID].reduce((fields, field) => {
-        let { value } = field;
-        if (field.fieldName === "date") {
-          value = multipartToSQL(value as string).split("-")[0];
-        }
-        (fields[field.fieldName] ??= []).push(value);
-        return fields;
-      }, {} as Record<string, unknown[]>),
+      ...fields,
+      dateAccessed: isWithAccessDate(fields)
+        ? stringToDate(fields.accessDate[0])
+        : null,
     };
     rec[itemID] = itemObject as RegularItemInfo;
     return rec;

@@ -62,6 +62,7 @@ export type ItemCreator = {
 export type RegularItemInfoBase = Item & {
   creators: Omit<ItemCreator, "itemID">[];
   citekey: string | null;
+  dateAccessed: Date | null;
 };
 export type RegularItemInfo = RegularItemInfoBase & Record<string, unknown[]>;
 
