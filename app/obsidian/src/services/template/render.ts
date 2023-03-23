@@ -53,7 +53,7 @@ export class TemplateRenderer {
       console.error(
         "Error while rendering",
         target,
-        JSON.stringify(obj),
+        // JSON.stringify(obj),
         error,
       );
       throw error;

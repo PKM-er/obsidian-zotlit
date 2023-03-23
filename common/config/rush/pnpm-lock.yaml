@@ -49,6 +49,7 @@ importers:
       '@types/react-dom': ~17.0.11
       '@types/turndown': ~5.0.1
       ahooks: ~3.7.1
+      array.prototype.group: ~1.1.2
       assert-never: ^1.2.1
       autoprefixer: ~10.4.13
       builtin-modules: ^3.2.0
@@ -116,6 +117,7 @@ importers:
       '@radix-ui/react-collapsible': 1.0.2_ive3jjn476xyi3ikfsqwmh5x74
       '@radix-ui/react-tabs': 1.0.3_ive3jjn476xyi3ikfsqwmh5x74
       ahooks: 3.7.4_@preact+compat@17.1.2
+      array.prototype.group: 1.1.2
       assert-never: 1.2.1
       clsx: 1.2.1
       escape-string-regexp: 5.0.0
@@ -6196,6 +6198,16 @@ packages:
       define-properties: 1.1.4
       es-abstract: 1.21.1
       es-shim-unscopables: 1.0.0
+    dev: false
+
+  /array.prototype.group/1.1.2:
+    resolution: {integrity: sha512-XTy3DE/Tz1nsrhPaYXgVTzQrRf1/0/RWySM5o5qC6BSBG7NWQ/AxggKNiLyLCRkLxM+mJoq5GEFosYZ846QlHw==}
+    dependencies:
+      call-bind: 1.0.2
+      define-properties: 1.1.4
+      es-abstract: 1.21.1
+      es-shim-unscopables: 1.0.0
+      get-intrinsic: 1.2.0
     dev: false
 
   /array.prototype.map/1.0.5:

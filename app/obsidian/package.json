@@ -116,6 +116,7 @@
     "@radix-ui/react-collapsible": "~1.0.2",
     "@dnd-kit/core": "~6.0.8",
     "@dnd-kit/sortable": "~7.0.2",
-    "@dnd-kit/utilities": "~3.2.1"
+    "@dnd-kit/utilities": "~3.2.1",
+    "array.prototype.group": "~1.1.2"
   }
 }

@@ -1,4 +1,5 @@
 import { Service } from "@ophidian/core";
+import shimArrayGroup from "array.prototype.group/shim";
 import * as Eta from "eta";
 import { Notice, parseYaml } from "obsidian";
 import log, { logError } from "@/log";
@@ -62,7 +63,18 @@ export class TemplateComplier extends Service {
         default:
           break;
       }
-      Eta.templates.define(name, full);
+      // polyfill Array.prototype.group
+      // @ts-expect-error group not yet available
+      const patched: typeof full = Array.prototype.group
+        ? full
+        : (data, opts) => {
+            shimArrayGroup();
+            const output = full(data, opts);
+            // @ts-expect-error group not yet available
+            delete Array.prototype.group;
+            return output;
+          };
+      Eta.templates.define(name, patched);
       log.trace(`Template "${name}" complie success`, converted);
     } catch (error) {
       logError("compling template: " + name, error);
