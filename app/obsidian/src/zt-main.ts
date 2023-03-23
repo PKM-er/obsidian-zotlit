@@ -6,6 +6,7 @@ import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";
 
 import log from "@/log";
+import type { PluginAPI } from "./api";
 import checkLib from "./install-guide/index.jsx";
 import NoteFeatures from "./note-feature/service";
 import { AnnotBlock } from "./services/annot-block/service";
@@ -28,10 +29,10 @@ import {
 import ZoteroSettingTab from "./setting-tab";
 import { SettingLoader } from "./settings/service";
 
-// declare global {
-//   // eslint-disable-next-line no-var
-//   var zt: ZoteroPlugin | undefined;
-// }
+declare global {
+  // eslint-disable-next-line no-var
+  var zoteroAPI: PluginAPI | undefined;
+}
 
 export default class ZoteroPlugin extends Plugin {
   use = use.plugin(this);
@@ -70,7 +71,30 @@ export default class ZoteroPlugin extends Plugin {
   async onload() {
     log.info("loading Obsidian Zotero Plugin");
     this.addSettingTab(new ZoteroSettingTab(this));
-
+    globalThis.zoteroAPI = {
+      version: this.manifest.version,
+      getDocItems: (ids) => {
+        return this.databaseAPI.getItems(ids);
+      },
+      getItemIDsFromCitekey: (...args) => {
+        return this.databaseAPI.getItemIDsFromCitekey(...args);
+      },
+      getAnnotsFromKeys: (...args) => {
+        return this.databaseAPI.getAnnotFromKey(...args);
+      },
+      getAnnotsOfAtch: (...args) => {
+        return this.databaseAPI.getAnnotations(...args);
+      },
+      getAttachments: (...args) => {
+        return this.databaseAPI.getAttachments(...args);
+      },
+      getLibs: () => {
+        return this.databaseAPI.getLibs();
+      },
+    };
+    this.register(() => {
+      delete globalThis.zoteroAPI;
+    });
     // globalThis.zt = this;
     // this.register(() => delete globalThis.zt);
   }
