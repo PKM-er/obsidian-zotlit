@@ -21,7 +21,20 @@ const config = {
     defaultLocale: "en",
     locales: ["en"],
   },
-  plugins: ["@docusaurus/plugin-ideal-image"],
+  plugins: [
+    "@docusaurus/plugin-ideal-image",
+    [
+      "docusaurus-plugin-typedoc",
+      {
+        entryPoints: ["../app/obsidian/src/api.ts"],
+        tsconfig: "../app/obsidian/tsconfig.json",
+        plugin: ["typedoc-plugin-missing-exports"],
+        out: "reference/api",
+        internalModule: "Internals",
+        readme: "none"
+      },
+    ],
+  ],
   presets: [
     [
       "classic",

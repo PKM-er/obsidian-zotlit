@@ -2,6 +2,7 @@ app/*/build
 
 app/zotero/dist
 app/zotero/start.yml
+docs/docs/reference/api
 
 dist
 tsconfig*.tsbuildinfo
