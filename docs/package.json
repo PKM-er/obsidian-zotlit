@@ -41,7 +41,8 @@
     "typedoc": "~0.23.28",
     "typedoc-plugin-missing-exports": "~1.0.0",
     "docusaurus-plugin-typedoc": "~0.18.0",
-    "typedoc-plugin-markdown": "~3.14.0"
+    "typedoc-plugin-markdown": "~3.14.0",
+    "obsidian-zotero-plugin": "workspace:*"
   },
   "browserslist": {
     "production": [
