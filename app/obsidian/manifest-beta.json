@@ -1,7 +1,7 @@
 {
   "id": "obsidian-zotero-plugin",
   "name": "Zotero Plugin",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0",
   "minAppVersion": "1.1.9",
   "versions": {
     "better-sqlite3": "8.0.1-mod.1"
