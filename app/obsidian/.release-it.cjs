@@ -16,10 +16,10 @@ module.exports = {
     addUntrackedFiles: true,
   },
   plugins: {
-    "@release-it/conventional-changelog": {
-      preset: "angular",
-      infile: "CHANGELOG.md",
-    },
+    // "@release-it/conventional-changelog": {
+    //   preset: "angular",
+    //   infile: "CHANGELOG.md",
+    // },
     "./scripts/ob-bumper.mjs": {
       indent: 2,
       copyTo: "../..",

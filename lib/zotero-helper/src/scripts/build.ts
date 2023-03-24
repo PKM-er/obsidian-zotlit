@@ -12,6 +12,7 @@ await build({
   entryPoints: [entryPoint],
   outdir: outDir,
   minify: true,
+  logLevel: "error",
   sourcemap: false,
 });
 

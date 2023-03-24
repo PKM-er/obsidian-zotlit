@@ -113,7 +113,7 @@ const opts = {
 };
 
 if (!isProd) {
-  const ctx = await context(opts);
+  const ctx = await context({ ...opts, logLevel: "error" });
   try {
     await ctx.watch();
   } catch (err) {
