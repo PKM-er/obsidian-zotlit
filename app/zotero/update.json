@@ -11,6 +11,17 @@
             "strict_max_version": "60.9"
           }
         }
+      },
+      {
+        "version": "1.0.0",
+        "update_link": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt1.0.0/zotero-obsidian-note-1.0.0.xpi",
+        "update_info_url": "https://github.com/aidenlx/obsidian-zotero/releases/tag/zt1.0.0",
+        "applications": {
+          "gecko": {
+            "strict_min_version": "6.999",
+            "strict_max_version": "7.0.*"
+          }
+        }
       }
     ]
   }
