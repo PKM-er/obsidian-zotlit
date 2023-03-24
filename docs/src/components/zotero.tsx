@@ -6,7 +6,7 @@ import { Availablity } from "./available";
 import styles from "./available.module.css";
 
 export const updateInfoUrl =
-  "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.rdf";
+  "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.json";
 
 export type ZoteroInfo = [version: string, updateLink: string];
 
@@ -37,25 +37,26 @@ export const useUpdateRDF = (url: string) => {
     const controller = new AbortController();
     const signal = controller.signal;
     fetch(url, { signal })
-      .then((res) => (res.ok ? res.text() : null))
-      .then((xml) => {
-        if (!xml) {
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const versions = data?.addons?.["zotero-obsidian-note@aidenlx.top"] as {
+          version: string;
+          update_link: string;
+          update_info_url: string;
+          applications: {
+            gecko: {
+              strict_min_version: string;
+              strict_max_version: string;
+            };
+          };
+        }[] | undefined;
+        if (!versions || !Array.isArray(versions) || versions.length === 0) {
           setInfo(null);
           setAvailable(Availablity.no);
         } else {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(xml, "application/xml");
-          const version = doc.getElementsByTagNameNS(
-              "http://www.mozilla.org/2004/em-rdf#",
-              "version",
-            )[0].textContent,
-            updateLink = doc.getElementsByTagNameNS(
-              "http://www.mozilla.org/2004/em-rdf#",
-              "updateLink",
-            )[0].textContent;
+          const v = versions.at(-1);
           setAvailable(Availablity.yes);
-
-          setInfo([version, updateLink]);
+          setInfo([v.version, v.update_link]);
         }
       })
       .catch((err) => {
