@@ -10,7 +10,8 @@ const queryDarkMode = () => document.body.classList.contains("theme-dark");
 const themeLight = {
   scheme: "Solarized Light",
   author: "Ethan Schoonover (modified by aramisgithub)",
-  base00: "#fdf6e3",
+  // base00: "#fdf6e3",
+  base00: "transparent",
   base01: "#eee8d5",
   base02: "#93a1a1",
   base03: "#839496",
@@ -31,7 +32,8 @@ const themeLight = {
 const themeDark = {
   scheme: "Solarized Dark",
   author: "Ethan Schoonover (modified by aramisgithub)",
-  base00: "#002b36",
+  // base00: "#002b36",
+  base00: "transparent",
   base01: "#073642",
   base02: "#586e75",
   base03: "#657b83",
@@ -56,7 +58,7 @@ export default function ItemDetails({
   item: any;
   registerCssChange?: (callback: () => void) => () => void;
 }) {
-  const [isDarkMode, setDarkMode] = useState(false);
+  const [isDarkMode, setDarkMode] = useState(() => queryDarkMode());
 
   useEffect(
     () => registerCssChange?.(() => setDarkMode(queryDarkMode())),
