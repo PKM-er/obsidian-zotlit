@@ -265,15 +265,30 @@ export class AnnotationView extends DerivedFileView {
     await super.onOpen();
     const [task, cancel] = untilZoteroReady(this.plugin);
     cancel && this.register(cancel);
-    await task;
-    ReactDOM.render(
-      <ObsidianContext.Provider value={context}>
-        <AnnotViewContext.Provider value={this.getContext()}>
-          <AnnotView />
-        </AnnotViewContext.Provider>
-      </ObsidianContext.Provider>,
-      this.contentEl,
-    );
+
+    this.contentEl.empty();
+    this.contentEl.createDiv({ cls: "pane-empty p-2", text: "Loading..." });
+    // defer to prevent blocking obsidian workspace initial loading
+    task
+      .then(() => {
+        this.contentEl.empty();
+        ReactDOM.render(
+          <ObsidianContext.Provider value={context}>
+            <AnnotViewContext.Provider value={this.getContext()}>
+              <AnnotView />
+            </AnnotViewContext.Provider>
+          </ObsidianContext.Provider>,
+          this.contentEl,
+        );
+      })
+      .catch((err) => {
+        this.contentEl.empty();
+        console.error(`Failed to load annot view: `, err);
+        this.contentEl.createDiv({
+          cls: "pane-empty p-2",
+          text: "Failed to load, Check console for details",
+        });
+      });
     this.registerEvent(
       this.plugin.server.on("bg:notify", (_, data) => {
         if (data.event !== "reader/annot-select") return;

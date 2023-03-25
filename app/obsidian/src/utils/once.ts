@@ -99,7 +99,9 @@ export const waitUntil = ({
     if (timeout === null) return;
     sleep(timeout).then(() => {
       unregister(ref);
-      reject(new TimeoutError(timeout));
+      // check again in case the event was fired just before the timeout
+      if (escape?.()) resolve();
+      else reject(new TimeoutError(timeout));
     });
   });
   return [task, cancel] as const;
