@@ -22,7 +22,10 @@ export default memo(function Comment({
   );
   return (
     <div
-      className={clsx("annot-comment select-text px-2 py-1", className)}
+      className={clsx(
+        "annot-comment select-text overflow-x-auto break-words px-2 py-1",
+        className,
+      )}
       {...props}
     >
       {renderMarkdown(markdown)}
