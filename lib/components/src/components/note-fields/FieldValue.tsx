@@ -1,5 +1,5 @@
+import { TextareaAutosize as Textarea } from "@mui/base";
 import { useEffect, useRef } from "react";
-import TextareaAutosize from "react-textarea-autosize";
 import { cn as clsx } from "@c/utils";
 import { IconButton } from "../icon";
 
@@ -49,7 +49,8 @@ export function FieldValue({
         {editing ? (
           // why min-w-0? https://stackoverflow.com/a/66689926
           <div className="flex min-w-0 flex-1 items-center">
-            <TextareaAutosize
+            {/** @ts-expect-error Pick util in ts5 pick non-existing keys with value unknown */}
+            <Textarea
               ref={textareaRef}
               className={clsx(
                 "text-txt-normal w-full bg-transparent text-sm font-medium",

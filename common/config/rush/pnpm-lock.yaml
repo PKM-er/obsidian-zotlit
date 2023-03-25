@@ -25,7 +25,6 @@ importers:
       '@dnd-kit/sortable': ~7.0.2
       '@dnd-kit/utilities': ~3.2.1
       '@mobily/ts-belt': ^4.0.0-rc.5
-      '@mui/base': ~5.0.0-alpha.121
       '@obzt/common': workspace:*
       '@obzt/components': workspace:*
       '@obzt/database': workspace:*
@@ -105,7 +104,6 @@ importers:
       '@dnd-kit/sortable': 7.0.2_an64wkanyfeje7qqjf6i2xi6ey
       '@dnd-kit/utilities': 3.2.1_@preact+compat@17.1.2
       '@mobily/ts-belt': 4.0.0-rc.5
-      '@mui/base': 5.0.0-alpha.122_lwwtzf4gcoubqagajfkuh3diuq
       '@obzt/common': link:../../lib/common
       '@obzt/components': link:../../lib/components
       '@obzt/database': link:../../lib/database
@@ -302,6 +300,7 @@ importers:
     specifiers:
       '@aidenlx/eslint-config': workspace:*
       '@mobily/ts-belt': ^4.0.0-rc.5
+      '@mui/base': ~5.0.0-alpha.121
       '@obzt/common': workspace:*
       '@obzt/database': workspace:*
       '@obzt/zotero-type': workspace:*
@@ -332,7 +331,6 @@ importers:
       react: ~17.0.2
       react-dom: ~17.0.2
       react-error-boundary: ~3.1.4
-      react-textarea-autosize: ~8.4.0
       tailwind-merge: ~1.9.0
       tailwindcss: ~3.2.4
       tailwindcss-animate: ~1.0.5
@@ -344,6 +342,7 @@ importers:
       zustand: ~4.3.1
     dependencies:
       '@mobily/ts-belt': 4.0.0-rc.5
+      '@mui/base': 5.0.0-alpha.122_zsjcj4gvi24ks76nprapl4hsmq
       '@obzt/common': link:../common
       '@obzt/database': link:../database
       '@obzt/zotero-type': link:../zotero-type
@@ -363,7 +362,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-error-boundary: 3.1.4_react@17.0.2
-      react-textarea-autosize: 8.4.1_h7fc2el62uaa77gho3xhys6ola
       tailwind-merge: 1.9.1
       tailwindcss-animate: 1.0.5_tailwindcss@3.2.7
       use-immer: 0.8.1_immer@9.0.21+react@17.0.2
@@ -3940,7 +3938,7 @@ packages:
     engines: {node: '>= 10.*'}
     dev: false
 
-  /@mui/base/5.0.0-alpha.122_lwwtzf4gcoubqagajfkuh3diuq:
+  /@mui/base/5.0.0-alpha.122_zsjcj4gvi24ks76nprapl4hsmq:
     resolution: {integrity: sha512-IgZEFQyHa39J1+Q3tekVdhPuUm1fr3icddaNLmiAIeYTVXmR7KR5FhBAIL0P+4shlPq0liUPGlXryoTm0iCeFg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -3954,13 +3952,13 @@ packages:
       '@babel/runtime': 7.21.0
       '@emotion/is-prop-valid': 1.2.0
       '@mui/types': 7.2.3_@types+react@17.0.53
-      '@mui/utils': 5.11.13_@preact+compat@17.1.2
+      '@mui/utils': 5.11.13_react@17.0.2
       '@popperjs/core': 2.11.6
       '@types/react': 17.0.53
       clsx: 1.2.1
       prop-types: 15.8.1
-      react: /@preact/compat/17.1.2_preact@10.11.3
-      react-dom: /@preact/compat/17.1.2_preact@10.11.3
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
       react-is: 18.2.0
     dev: false
 
@@ -3975,7 +3973,7 @@ packages:
       '@types/react': 17.0.53
     dev: false
 
-  /@mui/utils/5.11.13_@preact+compat@17.1.2:
+  /@mui/utils/5.11.13_react@17.0.2:
     resolution: {integrity: sha512-5ltA58MM9euOuUcnvwFJqpLdEugc9XFsRR8Gt4zZNb31XzMfSKJPR4eumulyhsOTK1rWf7K4D63NKFPfX0AxqA==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -3985,7 +3983,7 @@ packages:
       '@types/prop-types': 15.7.5
       '@types/react-is': 17.0.3
       prop-types: 15.8.1
-      react: /@preact/compat/17.1.2_preact@10.11.3
+      react: 17.0.2
       react-is: 18.2.0
     dev: false
 

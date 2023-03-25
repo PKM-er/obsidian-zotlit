@@ -30,13 +30,13 @@
     "@tailwindcss/line-clamp": "~0.4.2",
     "use-immer": "~0.8.1",
     "@tailwindcss/forms": "~0.5.3",
-    "react-textarea-autosize": "~8.4.0",
     "@tailwindcss/typography": "~0.5.9",
     "@radix-ui/react-toggle": "~1.0.1",
     "class-variance-authority": "~0.4.0",
     "tailwind-merge": "~1.9.0",
     "tailwindcss-animate": "~1.0.5",
-    "@radix-ui/react-checkbox": "~1.0.1"
+    "@radix-ui/react-checkbox": "~1.0.1",
+    "@mui/base": "~5.0.0-alpha.121"
   },
   "devDependencies": {
     "@types/react": "~17.0.8",

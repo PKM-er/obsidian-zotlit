@@ -13,3 +13,5 @@ export type { CheckedState } from "@radix-ui/react-checkbox";
 
 export type { StoreApi } from "zustand";
 export { createStore, useStore } from "zustand";
+
+export { TextareaAutosize } from "@mui/base";

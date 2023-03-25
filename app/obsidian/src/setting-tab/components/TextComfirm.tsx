@@ -1,4 +1,4 @@
-import { TextareaAutosize as Textarea } from "@mui/base";
+import { TextareaAutosize as Textarea } from "@obzt/components";
 import type { PropsWithChildren, ReactNode } from "react";
 import { useState } from "react";
 import type { Settings } from "@/settings/base";
