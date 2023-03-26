@@ -69,10 +69,13 @@ export class TemplateComplier extends Service {
         ? full
         : (data, opts) => {
             shimArrayGroup();
-            const output = full(data, opts);
-            // @ts-expect-error group not yet available
-            delete Array.prototype.group;
-            return output;
+            try {
+              const output = full(data, opts);
+              return output;
+            } finally {
+              // @ts-expect-error group not yet available
+              delete Array.prototype.group;
+            }
           };
       Eta.templates.define(name, patched);
       log.trace(`Template "${name}" complie success`, converted);
