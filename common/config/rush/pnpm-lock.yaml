@@ -245,6 +245,7 @@ importers:
       prism-react-renderer: ^1.3.5
       react: ~17.0.2
       react-dom: ~17.0.2
+      swr: ~2.1.1
       typedoc: ~0.23.28
       typedoc-plugin-markdown: ~3.14.0
       typedoc-plugin-missing-exports: ~1.0.0
@@ -262,6 +263,7 @@ importers:
       prism-react-renderer: 1.3.5_react@17.0.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      swr: 2.1.1_react@17.0.2
     devDependencies:
       '@docusaurus/eslint-plugin': 2.1.0_j4766f7ecgqbon3u7zlxn5zszu
       '@docusaurus/module-type-aliases': 2.1.0_sfoxds7t5ydpegc3knd667wn6m
@@ -15298,6 +15300,16 @@ packages:
       csso: 4.2.0
       picocolors: 1.0.0
       stable: 0.1.8
+    dev: false
+
+  /swr/2.1.1_react@17.0.2:
+    resolution: {integrity: sha512-OgwqZmpjOgxNbaez6qzTVqiRWn+Ti5Uzmktk2c01Afqwc50q6z15DeNC8m9G1aY+w2BwEAsKvk59iq6aHlhgyw==}
+    engines: {pnpm: '7'}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+      use-sync-external-store: 1.2.0_react@17.0.2
     dev: false
 
   /synckit/0.8.5:

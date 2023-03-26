@@ -22,7 +22,9 @@ export function ManualAvailable() {
 }
 
 export const ReleaseLink = () => {
-  const [, versions] = useManifest(mainManifest, betaManifest);
+  const a = useManifest(mainManifest, betaManifest);
+  console.log(a)
+  const [, versions] = a
   let version = "latest";
   if (versions) {
     [version] = versions;

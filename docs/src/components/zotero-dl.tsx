@@ -8,6 +8,7 @@ import { updateInfoUrl, useUpdateRDF, ZtInfo } from "./zotero";
 
 export function ZoteroDownload() {
   const [available, info] = useUpdateRDF(updateInfoUrl);
+  console.log(available, info)
   return (
     <AvailablityTag available={available} info={info} infoComponent={ZtInfo} />
   );

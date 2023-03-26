@@ -26,7 +26,8 @@
     "@types/node": "^17.0.10",
     "@docusaurus/theme-common": "2.1.0",
     "@giscus/react": "~2.2.0",
-    "@docusaurus/plugin-ideal-image": "~2.1.0"
+    "@docusaurus/plugin-ideal-image": "~2.1.0",
+    "swr": "~2.1.1"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.1.0",
