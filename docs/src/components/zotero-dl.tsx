@@ -4,11 +4,15 @@ import React from "react";
 import { AvailablityTag, releaseUrl } from "./available";
 import styles from "./available.module.css";
 import LatestBadge from "./latest-badge";
-import { updateInfoUrl, useUpdateRDF, ZtInfo } from "./zotero";
+import {
+  updateInfoUrl,
+  useUpdateRDF,
+  useZoteroRelease,
+  ZtInfo,
+} from "./zotero";
 
 export function ZoteroDownload() {
   const [available, info] = useUpdateRDF(updateInfoUrl);
-  console.log(available, info)
   return (
     <AvailablityTag available={available} info={info} infoComponent={ZtInfo} />
   );
@@ -16,11 +20,18 @@ export function ZoteroDownload() {
 
 export const ReleaseLink = () => {
   const [, versions] = useUpdateRDF(updateInfoUrl);
+  const latestRelease = useZoteroRelease();
   let updateLink: string | null = null;
   if (versions) {
     [, updateLink] = versions;
   }
-  return <LatestBadge href={updateLink ?? releaseUrl} type="zotero" newPage />;
+  return (
+    <LatestBadge
+      href={updateLink ?? latestRelease ?? releaseUrl}
+      type="zotero"
+      newPage
+    />
+  );
 };
 
 export const ReleaseTag = () => {

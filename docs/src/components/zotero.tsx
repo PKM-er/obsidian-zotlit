@@ -38,9 +38,7 @@ export const ZtInfo = ({ info }: { info: ZoteroInfo }) => {
 import useSWR from "swr";
 
 export const useUpdateRDF = (url: string) => {
-  const { data, error, isLoading } = useSWR(url, (url) =>
-    fetch(url).then((res) => res.json())
-  );
+  const { data, error, isLoading } = useSWR(url, fetcher);
 
   const updateInfo = useMemo(() => {
     const versions = data?.addons?.["zotero-obsidian-note@aidenlx.top"] as
@@ -90,3 +88,28 @@ export const useUpdateRDF = (url: string) => {
     updateInfo,
   ] as const;
 };
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export function useZoteroRelease() {
+  const { data, error } = useSWR(
+    "https://api.github.com/repos/aidenlx/obsidian-zotero/releases",
+    fetcher
+  );
+
+  if (error) {
+    console.error(error);
+  }
+
+  if (!data) return null;
+
+  const release = data.find((release) => release.tag_name.startsWith("zt"));
+  if (!release) return null;
+
+  const binary = data
+    .find((release) => release.tag_name.startsWith("zt"))
+    .assets.find((asset) => asset.name.endsWith(".xpi"));
+  if (!binary) return null;
+
+  return `https://github.com/aidenlx/obsidian-zotero/releases/download/${release.tag_name}/${binary.name}`;
+}
