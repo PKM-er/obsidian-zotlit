@@ -49,14 +49,11 @@ export async function chooseFileAtch(attachments: AttachmentInfo[]) {
   return await chooseAttachment(fileAttachments);
 }
 
-export async function chooseFileAtchAndCache(
+export function cacheAttachmentSelect(
+  selected: AttachmentInfo,
   item: RegularItemInfoBase,
-  allAttachments: AttachmentInfo[],
 ) {
-  const selected = await chooseFileAtch(allAttachments);
-  if (!selected) return null;
   cacheActiveAtch(window.localStorage, item, selected.itemID);
-  return selected;
 }
 
 export async function choosePDFAtch(attachments: AttachmentInfo[]) {

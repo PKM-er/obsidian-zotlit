@@ -5,7 +5,10 @@ import { Service } from "@ophidian/core";
 
 import type { TFile } from "obsidian";
 import { Notice } from "obsidian";
-import { chooseFileAtchAndCache } from "@/components/atch-suggest";
+import {
+  cacheAttachmentSelect,
+  choosePDFAtch,
+} from "@/components/atch-suggest";
 import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import type { Context } from "@/services/template/helper/base.js";
@@ -209,7 +212,10 @@ class NoteFeatures extends Service {
       item.itemID,
       libId,
     );
-    const selected = await chooseFileAtchAndCache(item, allAttachments);
+    const selected = await choosePDFAtch(allAttachments);
+    if (selected) {
+      cacheAttachmentSelect(selected, item);
+    }
     const extraByAtch = await getHelperExtraByAtch(
       item,
       { all: allAttachments, selected: selected ? [selected] : [] },

@@ -10,8 +10,8 @@ import type {
 } from "@obzt/database";
 import type { CachedMetadata, TFile } from "obsidian";
 import {
-  chooseFileAtchAndCache,
-  chooseFileAtch,
+  choosePDFAtch,
+  cacheAttachmentSelect,
 } from "@/components/atch-suggest";
 import { getItemKeyGroupID } from "@/services/note-index";
 import {
@@ -71,8 +71,9 @@ export async function updateNote(
   // if there is no selected attachment in the note, prompt the user to choose one
   let fallbackAtch: AttachmentInfo | undefined | null;
   if (allSelectedAtchs.length === 0) {
-    fallbackAtch = await chooseFileAtchAndCache(item, allAttachments);
+    fallbackAtch = await choosePDFAtch(allAttachments);
     if (fallbackAtch) {
+      cacheAttachmentSelect(fallbackAtch, item);
       allSelectedAtchs.push(fallbackAtch);
     }
   }
@@ -96,7 +97,7 @@ export async function updateNote(
     let attachmentIDs = getAttachmentIDs(meta);
     if (attachmentIDs.length === 0) {
       if (fallbackAtch === undefined) {
-        fallbackAtch = await chooseFileAtch(allSelectedAtchs);
+        fallbackAtch = await choosePDFAtch(allSelectedAtchs);
       }
       if (fallbackAtch) {
         attachmentIDs = [fallbackAtch.itemID];
