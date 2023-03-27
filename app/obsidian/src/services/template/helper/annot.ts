@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { enumerate, getItemKeyGroupID, toPage } from "@obzt/common";
 import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
 import { getBacklink, getCacheImagePath } from "@obzt/database";
@@ -95,34 +96,8 @@ export const withAnnotHelper = (
         );
       },
       get colorName() {
-        switch (data.color?.toUpperCase()) {
-          // from zotero.tagColorChooser
-          case "#FF6666":
-            return "red";
-          case "#FF8C19":
-          case "#F19837":
-            return "orange";
-          case "#FFD400":
-            return "yellow";
-          case "#999999":
-            return "gray";
-          case "#5FB236":
-            return "green";
-          case "#009980":
-            return "cyan";
-          case "#2EA8E5":
-            return "blue";
-          case "#576DD9":
-            return "navy";
-          case "#A28AE5":
-            return "purple";
-          case "#A6507B":
-            return "brown";
-          case "#E56EEE":
-            return "magenta";
-          default:
-            return this.color;
-        }
+        const color = data.color?.toUpperCase();
+        return colors[color as keyof typeof colors] || this.color;
       },
       docItem: "not-loaded",
     },
@@ -170,4 +145,20 @@ export const withAnnotHelper = (
 export type AnnotationExtra = {
   attachment: AttachmentInfo | null;
   tags: Record<number, TagInfo[]>;
+};
+
+const colors = {
+  "#FF6666": "red",
+  "#FF8C19": "orange",
+  "#F19837": "orange",
+  "#FFD400": "yellow",
+  "#999999": "gray",
+  "#AAAAAA": "gray",
+  "#5FB236": "green",
+  "#009980": "cyan",
+  "#2EA8E5": "blue",
+  "#576DD9": "navy",
+  "#A28AE5": "purple",
+  "#A6507B": "brown",
+  "#E56EEE": "magenta",
 };
