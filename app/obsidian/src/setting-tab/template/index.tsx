@@ -3,7 +3,7 @@ import {
   ejectableTemplateTypes,
   nonEjectableTemplateTypes,
 } from "@/services/template/settings";
-import { SettingTabCtx } from "../common";
+import { SettingTabCtx, normalizePath } from "../common";
 import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
@@ -21,6 +21,7 @@ export default function Template() {
         name="Template Folder"
         settings={template}
         prop="folder"
+        normalize={normalizePath}
       >
         The folder which templates are ejected into and stored
       </TextComfirmSetting>
