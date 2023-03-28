@@ -83,7 +83,7 @@ export default function Fields() {
             aria-label={isOpen ? "Hide Fields" : "Show All Fields"}
           />
         </CollapsibleTrigger>
-        <CollapsibleContent className="p-3 divide-y">
+        <CollapsibleContent className="p-3 divide-y ">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

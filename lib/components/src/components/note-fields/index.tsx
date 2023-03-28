@@ -53,7 +53,7 @@ NoteFieldsProps) {
                 setEditing({ field, index: values.length });
               }}
             />
-            <ul className="divide-mod-border relative z-0 m-0 list-none divide-y p-0">
+            <ul className=" relative z-0 m-0 list-none divide-y p-0">
               {values.map((content, index) => {
                 const isEditing =
                   !!editing &&

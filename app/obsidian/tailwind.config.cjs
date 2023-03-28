@@ -38,6 +38,12 @@ module.exports = {
       full: "9999px",
     },
     extend: {
+      borderColor: {
+        DEFAULT: "var(--background-modifier-border)",
+      },
+      divideColor: {
+        DEFAULT: "var(--background-modifier-border)",
+      },
       borderWidth: {
         DEFAULT: "var(--border-width)",
         callout: "var(--callout-border-width)",

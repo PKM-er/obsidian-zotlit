@@ -123,7 +123,7 @@ export function FmFields() {
             aria-label={isOpen ? "Hide Fields" : "Show All Fields"}
           />
         </CollapsibleTrigger>
-        <CollapsibleContent className="p-3 divide-y">
+        <CollapsibleContent className="p-3 divide-y ">
           {Object.entries(mapping).map(([field, alias]) => (
             <Setting key={field} name={<code>{field}</code>}>
               <Field

@@ -57,7 +57,7 @@ export default function Annotation({
     <div
       className={clsx(
         "annot-preview",
-        "bg-primary shadow-border divide-mod-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm transition-colors",
+        "bg-primary shadow-border col-span-1 flex flex-col divide-y overflow-auto rounded-sm transition-colors",
         className,
       )}
       data-id={annotation.itemID}
