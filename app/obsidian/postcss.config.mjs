@@ -7,7 +7,9 @@ import prefixSelector from "postcss-prefix-selector";
 const prefix = prefixSelector({
   prefix: ".obzt",
   transform: (prefix, selector, prefixedSelector, _filePath, _rule) => {
-    if (selector.includes(".obzt-")) {
+    if (selector.includes(".theme-dark")) {
+      return selector.replace(".theme-dark", `.theme-dark ${prefix}`);
+    } else if (selector.includes(".obzt-")) {
       return selector;
     } else {
       return prefixedSelector;

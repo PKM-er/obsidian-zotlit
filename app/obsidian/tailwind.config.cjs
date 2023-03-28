@@ -8,6 +8,7 @@ module.exports = {
     "./src/setting-tab/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
   ]),
+  darkMode: ["class", ".theme-dark"],
   theme: {
     fontSize: {
       xs: "var(--font-ui-smaller)",
