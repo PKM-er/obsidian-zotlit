@@ -1,6 +1,11 @@
-import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
+import type {
+  AnnotationInfo,
+  AttachmentInfo,
+  RegularItemInfoBase,
+} from "@obzt/database";
 import type { AnnotationExtra } from "./annot";
 import { withAnnotHelper } from "./annot";
+import { isProxied, withAttachmentHelper } from "./attachment";
 import type { RegularItemInfoExtra } from "./item";
 import { withDocItemHelper } from "./item";
 import type { Context, AnnotHelper, DocItemHelper } from ".";
@@ -36,9 +41,18 @@ export function toHelper(
   annotations: AnnotHelper[];
   docItem: DocItemHelper;
 } {
-  const docItemHelper = withDocItemHelper(extra.docItem, extra, ctx);
+  function atchToHelper<T extends AttachmentInfo | null>(attachment: T) {
+    if (!attachment || isProxied(attachment)) return attachment;
+    return withAttachmentHelper(attachment, ctx);
+  }
+  const proxiedExtra = {
+    ...extra,
+    attachement: atchToHelper(extra.attachment),
+    allAttachments: extra.allAttachments.map(atchToHelper),
+  };
+  const docItemHelper = withDocItemHelper(extra.docItem, proxiedExtra, ctx);
   const annotations = extra.annotations.map((annot) => {
-    const annotHelper = withAnnotHelper(annot, extra, ctx);
+    const annotHelper = withAnnotHelper(annot, proxiedExtra, ctx);
     annotHelper.docItem = docItemHelper;
     return annotHelper;
   });

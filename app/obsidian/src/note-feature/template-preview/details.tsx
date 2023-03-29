@@ -2,7 +2,7 @@ import { useStore } from "@obzt/components";
 import { useMemo } from "react";
 import ReactDOM from "react-dom";
 import ItemDetails from "@/components/item-details";
-import { withAnnotHelper, withDocItemHelper } from "@/services/template/helper";
+import { toHelper } from "@/services/template/helper";
 import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 import { toCtx, TemplatePreviewBase } from "./base";
@@ -47,25 +47,22 @@ function Main({ store, plugin }: { store: StoreApi; plugin: ZoteroPlugin }) {
   const item = useMemo(() => {
     const ctx = toCtx(plugin);
     if (!preview) return null;
-    const { docItem, allAttachments, attachment, tags } = preview;
     switch (type) {
       case "note": {
-        const helper = withDocItemHelper(
-          docItem,
-          { tags, attachment, allAttachments },
-          ctx,
-        );
+        const helper = toHelper(preview, ctx);
         // @ts-expect-error no recursive in preview
-        helper.annotations = undefined;
-        return helper;
+        helper.docItem.annotations = undefined;
+        return helper.docItem;
       }
       case "annotation": {
-        const annot = preview.annot ?? preview.annotations[0];
+        const helper = toHelper(preview, ctx);
+        const annot = preview.annot
+          ? helper.annotations.find((a) => a.itemID === preview.annot?.itemID)
+          : helper.annotations[0];
         if (!annot) return null;
-        const helper = withAnnotHelper(annot, { tags, attachment }, ctx);
         // @ts-expect-error no recursive in preview
-        helper.docItem = undefined;
-        return helper;
+        annot.docItem = undefined;
+        return annot;
       }
       default:
         throw new Error("Unsupported template type");

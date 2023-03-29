@@ -60,7 +60,6 @@ class NoteFeatures extends Service {
       plugin.app.workspace.on("file-menu", (menu, file) => {
         const type = plugin.templateLoader.getTemplateTypeOf(file);
         if (!type) return;
-        console.log(menu);
         menu.addItem((i) =>
           i
             .setIcon("edit")

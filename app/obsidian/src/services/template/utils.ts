@@ -14,6 +14,19 @@ export const toMdLinkComponent = (url: string): string => {
 
 export const isEtaFile = (file: TFile) => file.name.endsWith(".eta.md");
 
+export const getAttachmentPath = (
+  dataDir: string,
+  attachment: AttachmentInfo,
+): string => {
+  if (!attachment.path) return "";
+  return join(
+    dataDir,
+    "storage",
+    attachment.key,
+    attachment.path.replace(/^storage:/, ""),
+  );
+};
+
 export const fileLink = (
   dataDir: string,
   sourcePath?: string | null,
@@ -23,12 +36,7 @@ export const fileLink = (
   if (!attachment?.path) return "";
   const hash = page ? `#page=${page}` : undefined,
     vaultPath = (app.vault.adapter as FileSystemAdapter).getBasePath(),
-    filePath = join(
-      dataDir,
-      "storage",
-      attachment.key,
-      attachment.path.replace(/^storage:/, ""),
-    ),
+    filePath = getAttachmentPath(dataDir, attachment),
     relativePath = relative(vaultPath, filePath);
   if (relativePath.startsWith("..")) {
     // file outside of vault
