@@ -119,9 +119,8 @@ export async function updateNote(
       continue;
     }
 
-    const existingAnnots = meta.sections?.filter(isAnnotBlock) ?? [];
-    const blockInfo = pipe(
-      existingAnnots.flatMap((s) =>
+    const annotSections = pipe(
+      (meta.sections?.filter(isAnnotBlock) ?? []).flatMap((s) =>
         splitMultipleAnnotKey(s.id!).map((key) => [key, s.position] as const),
       ),
       groupBy(([key]) => key),
@@ -130,6 +129,11 @@ export async function updateNote(
         blocks: pos.map(([_, pos]) => pos),
       })),
     );
+    const annotBlocks = new Set(
+      Object.values(meta.blocks ?? {})
+        ?.filter(isAnnotBlock)
+        .flatMap((s) => splitMultipleAnnotKey(s.id!).map((key) => key)),
+    );
     const toAdd = new Map<HelperExtra, AnnotationInfo[]>(
         attachmentIDs.map((id) => [extraByAtch[id], []]),
       ),
@@ -137,7 +141,8 @@ export async function updateNote(
     attachmentIDs.forEach((atchID) => {
       const extra = extraByAtch[atchID];
       extra.annotations.forEach((annot) => {
-        const ranges = blockInfo[getItemKeyGroupID(annot, true)];
+        const blockID = getItemKeyGroupID(annot, true);
+        const ranges = annotSections[blockID];
         if (ranges) {
           // only update existing content if explicitly enabled
           if (!plugin.settings.template.updateAnnotBlock) return;
@@ -149,9 +154,10 @@ export async function updateNote(
               insert,
             })),
           );
-        } else {
+        } else if (!annotBlocks.has(blockID)) {
           toAdd.get(extra)!.push(annot);
         }
+        // blocks that are not section do not support in-place update
       });
     });
     if (toUpdate.length > 0) {
