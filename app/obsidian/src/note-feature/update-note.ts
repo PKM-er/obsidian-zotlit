@@ -8,34 +8,20 @@ import type {
   ItemIDLibID,
   RegularItemInfoBase,
 } from "@obzt/database";
-import type { CachedMetadata, TFile } from "obsidian";
+import type { TFile } from "obsidian";
 import {
   choosePDFAtch,
   cacheAttachmentSelect,
 } from "@/components/atch-suggest";
 import { getItemKeyGroupID } from "@/services/note-index";
 import {
+  getAtchIDsOf,
   isAnnotBlock,
   splitMultipleAnnotKey,
 } from "@/services/note-index/utils";
-import { ZOTERO_ATCHS_FIELDNAME } from "@/services/template/frontmatter";
 import type { HelperExtra } from "@/services/template/helper";
 import { toHelper } from "@/services/template/helper";
 import type ZoteroPlugin from "@/zt-main";
-
-function getAttachmentIDs(meta: CachedMetadata) {
-  const attachmentIDs = meta?.frontmatter?.[ZOTERO_ATCHS_FIELDNAME];
-  if (
-    attachmentIDs &&
-    Array.isArray(attachmentIDs) &&
-    attachmentIDs.every(
-      (v): v is number => typeof v === "number" && Number.isInteger(v) && v > 0,
-    )
-  ) {
-    return attachmentIDs;
-  }
-  return [];
-}
 
 interface UpdateSummary {
   notes: number;
@@ -58,13 +44,7 @@ export async function updateNote(
     libId,
   );
 
-  const allSelectedAtchIDs = new Set(
-    notePaths.flatMap((path) => {
-      const meta = app.metadataCache.getCache(path);
-      if (!meta) return [];
-      return getAttachmentIDs(meta);
-    }),
-  );
+  const allSelectedAtchIDs = new Set(notePaths.flatMap(getAtchIDsOf));
   const allSelectedAtchs = allAttachments.filter((a) =>
     allSelectedAtchIDs.has(a.itemID),
   );
@@ -94,8 +74,8 @@ export async function updateNote(
   for (const notePath of notePaths) {
     const meta = app.metadataCache.getCache(notePath);
     if (!meta) continue;
-    let attachmentIDs = getAttachmentIDs(meta);
-    if (attachmentIDs.length === 0) {
+    let attachmentIDs = getAtchIDsOf(notePath);
+    if (!attachmentIDs) {
       if (fallbackAtch === undefined) {
         fallbackAtch = await choosePDFAtch(allSelectedAtchs);
       }

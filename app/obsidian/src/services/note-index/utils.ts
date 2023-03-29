@@ -5,9 +5,10 @@ import {
   multipleAnnotKeyPagePattern,
 } from "@obzt/common";
 import { TFile } from "obsidian";
-import type { CachedMetadata, SectionCache, TAbstractFile } from "obsidian";
+import type { CachedMetadata, TAbstractFile } from "obsidian";
 import { ZOTERO_KEY_FIELDNAME } from "@/services/template";
 import { getFilePath } from "@/utils";
+import { ZOTERO_ATCHS_FIELDNAME } from "../template/frontmatter";
 
 export const getItemKeyFromFrontmatter = (
   cache: CachedMetadata | null,
@@ -28,6 +29,36 @@ export const getItemKeyOf = (file: string | TFile | TAbstractFile | null) => {
       ? app.metadataCache.getFileCache(file)
       : null;
   return getItemKeyFromFrontmatter(cache);
+};
+
+export const getAtchIDsOf = (file: string | TFile | TAbstractFile | null) => {
+  if (!file) return null;
+  const cache =
+    typeof file === "string"
+      ? app.metadataCache.getCache(file)
+      : file instanceof TFile
+      ? app.metadataCache.getFileCache(file)
+      : null;
+  const field = cache?.frontmatter?.[ZOTERO_ATCHS_FIELDNAME];
+  if (field && Array.isArray(field) && field.length > 0) {
+    const ids: number[] = [];
+    for (const id of field) {
+      if (typeof id === "string") {
+        const numId = Number(id);
+        if (!(numId > 0 && Number.isInteger(numId))) {
+          return null;
+        }
+        ids.push(numId);
+      } else if (typeof id === "number") {
+        if (!(id > 0 && Number.isInteger(id))) {
+          return null;
+        }
+        ids.push(id);
+      }
+    }
+    return ids;
+  }
+  return null;
 };
 
 // export const hasBlockWithZtKey = (blocks: Record<string, BlockCache>) =>

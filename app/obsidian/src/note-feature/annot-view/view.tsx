@@ -9,6 +9,7 @@ import { choosePDFAtch } from "@/components/atch-suggest";
 import { context } from "@/components/basic/context";
 import { DerivedFileView } from "@/components/derived-file-view";
 import { getItemKeyOf } from "@/services/note-index";
+import { getAtchIDsOf } from "@/services/note-index/utils";
 import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 import { chooseLiterature } from "../citation-suggest";
@@ -40,6 +41,7 @@ export class AnnotationView extends DerivedFileView {
     (async () => {
       if (this.file?.extension !== "md") return false;
       const itemKey = getItemKeyOf(this.file);
+      const attachments = getAtchIDsOf(this.file);
       if (!itemKey) return false;
       const [item] = await this.plugin.databaseAPI.getItems([[itemKey, lib]]);
       if (!item) return false;
@@ -47,6 +49,7 @@ export class AnnotationView extends DerivedFileView {
         ...state,
         follow: "ob-note",
         itemId: item.itemID,
+        attachmentId: attachments?.[0] ?? undefined,
       }));
       return true;
     })().then((result) => {
