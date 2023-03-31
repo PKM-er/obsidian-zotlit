@@ -32,6 +32,7 @@ interface UpdateSummary {
 export async function updateNote(
   item: RegularItemInfoBase,
   plugin: ZoteroPlugin,
+  overwrite = plugin.settings.template.updateOverwrite,
 ): Promise<UpdateSummary | null> {
   const { app, noteIndex, templateRenderer } = plugin;
 
@@ -89,7 +90,7 @@ export async function updateNote(
     const file = app.vault.getAbstractFileByPath(notePath) as TFile;
     const ctx = { plugin, sourcePath: notePath };
 
-    if (plugin.settings.template.updateOverwrite) {
+    if (overwrite) {
       // TODO: support import from multiple attachments
       const content = templateRenderer.renderNote(
         extraByAtch[attachmentIDs[0]],

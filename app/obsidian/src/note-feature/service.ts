@@ -110,7 +110,7 @@ class NoteFeatures extends Service {
     });
     plugin.registerEditorSuggest(new CitationEditorSuggest(plugin));
 
-    const updateNote = async (file: TFile) => {
+    const updateNote = async (file: TFile, overwrite?: boolean) => {
       const lib = plugin.settings.database.citationLibrary;
       const itemKey = getItemKeyOf(file);
       if (!itemKey) {
@@ -122,7 +122,7 @@ class NoteFeatures extends Service {
         new Notice("Cannot find zotero item with key " + itemKey);
         return false;
       }
-      await this.updateNote(item);
+      await this.updateNote(item, overwrite);
     };
     plugin.addCommand({
       id: "update-literature-note",
@@ -133,6 +133,18 @@ class NoteFeatures extends Service {
           return !!shouldContinue;
         } else if (shouldContinue) {
           updateNote(ctx.file);
+        }
+      },
+    });
+    plugin.addCommand({
+      id: "overwrite-update-literature-note",
+      name: "Force Update Literature Note by Overwriting",
+      editorCheckCallback(checking, _editor, ctx) {
+        const shouldContinue = ctx.file && isLiteratureNote(ctx.file);
+        if (checking) {
+          return !!shouldContinue;
+        } else if (shouldContinue) {
+          updateNote(ctx.file, true);
         }
       },
     });
@@ -147,6 +159,13 @@ class NoteFeatures extends Service {
             .setIcon("sync")
             .onClick(() => updateNote(file)),
         );
+        if (!plugin.settings.template.updateOverwrite)
+          menu.addItem((i) =>
+            i
+              .setTitle("Force Update by Overwriting")
+              .setIcon("sync")
+              .onClick(() => updateNote(file, true)),
+          );
       }),
     );
     plugin.registerEvent(
@@ -264,8 +283,8 @@ class NoteFeatures extends Service {
     await this.updateNote(item);
   }
 
-  async updateNote(item: RegularItemInfoBase) {
-    const summary = await updateNote(item, this.plugin);
+  async updateNote(item: RegularItemInfoBase, overwrite?: boolean) {
+    const summary = await updateNote(item, this.plugin, overwrite);
     if (summary) {
       if (summary.addedAnnots > 0 || summary.updatedAnnots > 0)
         new Notice(
