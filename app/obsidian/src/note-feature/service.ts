@@ -12,6 +12,7 @@ import {
 import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import type { Context } from "@/services/template/helper/base.js";
+import { DEFAULT_TEMPLATE } from "@/services/template/settings";
 import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
@@ -145,6 +146,26 @@ class NoteFeatures extends Service {
             .setTitle("Update Literature Note")
             .setIcon("sync")
             .onClick(() => updateNote(file)),
+        );
+      }),
+    );
+    plugin.registerEvent(
+      plugin.app.workspace.on("file-menu", (menu, file) => {
+        const type = plugin.templateLoader.getTemplateTypeOf(file);
+        if (!type) return;
+        menu.addItem((i) =>
+          i
+            .setTitle("Reset to default")
+            .setIcon("reset")
+            .onClick(async () => {
+              // make sure prompt is shown in the active window
+              const win = app.workspace.activeLeaf?.containerEl.win ?? window;
+              if (!win.confirm("Reset template to default?")) return;
+              await plugin.app.vault.modify(
+                file as TFile,
+                DEFAULT_TEMPLATE[type],
+              );
+            }),
         );
       }),
     );
