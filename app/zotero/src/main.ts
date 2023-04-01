@@ -156,14 +156,6 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
           throw new Error(
             `Can't get annotations from reader data: ${JSON.stringify(data)}`,
           );
-        Zotero.log(
-          [
-            annots[0].annotationSortIndex,
-            annots[1].annotationSortIndex,
-            annots[0].annotationPosition,
-            annots[1].annotationPosition,
-          ].join("--"),
-        );
         const sorted = annots
           .map(
             (annot, index) =>
