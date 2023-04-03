@@ -10,7 +10,7 @@ import type { TemplateType } from "./settings";
 import { defaultEtaConfig } from "./settings";
 import { acceptLineBreak, renderFilename } from "./utils";
 
-const calloutPattern = /^\s*\[!\w+\]/;
+// const calloutPattern = /^\s*\[!\w+\]/;
 
 export class TemplateComplier extends Service {
   loader = this.use(TemplateLoader);
@@ -50,7 +50,7 @@ export class TemplateComplier extends Service {
             }
             if (!warpCallout) return body;
             const lines = body.trim().split("\n");
-            console.log(lines[0], calloutPattern.test(lines[0]));
+            // console.log(lines[0], calloutPattern.test(lines[0]));
             // no longer add callout when missing in case that
             // label added in annotations template
             // if (!calloutPattern.test(lines[0])) {
