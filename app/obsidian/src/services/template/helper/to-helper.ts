@@ -1,13 +1,11 @@
-import type {
-  AnnotationInfo,
-  AttachmentInfo,
-  RegularItemInfoBase,
-} from "@obzt/database";
+import { map } from "@mobily/ts-belt/Dict";
+import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
 import type { AnnotationExtra } from "./annot";
 import { withAnnotHelper } from "./annot";
-import { isProxied, withAttachmentHelper } from "./attachment";
+import { withAttachmentHelper } from "./attachment";
 import type { RegularItemInfoExtra } from "./item";
 import { withDocItemHelper } from "./item";
+import { withTagHelper } from "./tag";
 import type { Context, AnnotHelper, DocItemHelper } from ".";
 
 export type HelperExtra = RegularItemInfoExtra & {
@@ -41,14 +39,13 @@ export function toHelper(
   annotations: AnnotHelper[];
   docItem: DocItemHelper;
 } {
-  function atchToHelper<T extends AttachmentInfo | null>(attachment: T) {
-    if (!attachment || isProxied(attachment)) return attachment;
-    return withAttachmentHelper(attachment, ctx);
-  }
   const proxiedExtra = {
     ...extra,
-    attachement: atchToHelper(extra.attachment),
-    allAttachments: extra.allAttachments.map(atchToHelper),
+    attachement: withAttachmentHelper(extra.attachment, ctx),
+    allAttachments: extra.allAttachments.map((a) =>
+      withAttachmentHelper(a, ctx),
+    ),
+    tags: map(extra.tags, (tags) => tags.map((t) => withTagHelper(t))),
   };
   const docItemHelper = withDocItemHelper(extra.docItem, proxiedExtra, ctx);
   const annotations = extra.annotations.map((annot) => {
