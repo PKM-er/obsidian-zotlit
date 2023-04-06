@@ -9,27 +9,28 @@ export type CreatorHelper = Readonly<
   }
 >;
 
-export const withCreatorHelper = (data: Creator) =>
-  new Proxy(
-    {
-      get fullname(): string {
-        return getCreatorName(data) ?? "";
-      },
+export const withCreatorHelper = (data: Creator) => {
+  const proxy = {
+    get fullname(): string {
+      return getCreatorName(data) ?? "";
     },
-    {
-      get(target, p, receiver) {
-        return (
-          Reflect.get(data, p, receiver) ?? Reflect.get(target, p, receiver)
-        );
-      },
-      ownKeys(target) {
-        return [...Reflect.ownKeys(data), ...Reflect.ownKeys(target)];
-      },
-      getOwnPropertyDescriptor(target, prop) {
-        if (Object.prototype.hasOwnProperty.call(data, prop)) {
-          return Reflect.getOwnPropertyDescriptor(data, prop);
-        }
-        return Reflect.getOwnPropertyDescriptor(target, prop);
-      },
+    toString() {
+      return this.fullname;
     },
-  ) as unknown as CreatorHelper;
+  };
+  return new Proxy(proxy, {
+    get(target, p, receiver) {
+      // proxy properties should override properties of data
+      return Reflect.get(target, p, receiver) ?? Reflect.get(data, p, receiver);
+    },
+    ownKeys(target) {
+      return [...Reflect.ownKeys(data), ...Reflect.ownKeys(target)];
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      if (Object.prototype.hasOwnProperty.call(data, prop)) {
+        return Reflect.getOwnPropertyDescriptor(data, prop);
+      }
+      return Reflect.getOwnPropertyDescriptor(target, prop);
+    },
+  }) as unknown as CreatorHelper;
+};

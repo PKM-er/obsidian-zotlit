@@ -4,7 +4,7 @@ import type {
   RegularItemInfoBase,
   TagInfo,
 } from "@obzt/database";
-import { getCreatorName, getBacklink } from "@obzt/database";
+import { getBacklink } from "@obzt/database";
 import { fileLink } from "../utils";
 import type { AnnotHelper } from "./annot";
 import type { Context } from "./base";
@@ -40,11 +40,12 @@ export type DocItemHelper = Readonly<
 > & { annotations: AnnotHelper[] };
 
 export const withDocItemHelper = (
-  { creators, ...data }: RegularItemInfoBase,
+  { creators: _creators, ...data }: RegularItemInfoBase,
   extra: RegularItemInfoExtra,
   ctx: Context,
-) =>
-  new Proxy(
+) => {
+  const creators = _creators.map((c) => withCreatorHelper(c));
+  return new Proxy(
     {
       get backlink(): string {
         return getBacklink(data);
@@ -52,11 +53,22 @@ export const withDocItemHelper = (
       get fileLink(): string {
         return fileLink(zoteroDataDir(ctx), ctx.sourcePath, extra.attachment);
       },
+      get authorsShort(): string {
+        const authors = this.authors;
+        if (!authors.length) return "";
+        const firstAuthor = authors[0];
+        const firstAuthorName = firstAuthor.lastName ?? firstAuthor.fullname;
+        if (authors.length === 1) {
+          return firstAuthorName;
+        } else {
+          return `${firstAuthorName} et al.`;
+        }
+      },
       annotations: "not-loaded",
-      creators: creators.map((c) => withCreatorHelper(c)),
-      authors: creators
-        .filter((c) => c.creatorType === "author" && getCreatorName(c))
-        .map(getCreatorName),
+      creators,
+      get authors() {
+        return creators.filter((c) => c.creatorType === "author");
+      },
     },
     {
       get(target, p, receiver) {
@@ -97,3 +109,4 @@ export const withDocItemHelper = (
       },
     },
   ) as unknown as DocItemHelper;
+};
