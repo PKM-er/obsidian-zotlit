@@ -28,7 +28,7 @@
   "dependencies": {
     "zx": "~7.1.1",
     "@mobily/ts-belt": "^4.0.0-rc.5",
-    "eta": "^1.14.2",
+    "eta": "~2.0.1",
     "compressing": "~1.7.0",
     "yaml": "~2.2.1",
     "escape-string-regexp": "^5.0.0",

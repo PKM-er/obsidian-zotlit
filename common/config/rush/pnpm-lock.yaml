@@ -61,7 +61,7 @@ importers:
       esbuild-plugin-less: ^1.1.6
       escape-string-regexp: ^5.0.0
       eslint: ~8.36.0
-      eta: ^1.14.2
+      eta: ~2.0.1
       fast-deep-equal: ~3.1.3
       file-select-dialog: ^1.5.4
       filenamify: ~5.1.1
@@ -84,6 +84,7 @@ importers:
       postcss-prefix-selector: ~1.16.0
       preact: ~10.11.3
       pretty-hrtime: ^1.0.3
+      pspdfkit: ~2023.1.4
       query-string: ~7.1.1
       react: npm:@preact/compat@~17.1.2
       react-async-hook: ~4.0.0
@@ -119,7 +120,7 @@ importers:
       assert-never: 1.2.1
       clsx: 1.2.1
       escape-string-regexp: 5.0.0
-      eta: 1.14.2
+      eta: 2.0.1
       fast-deep-equal: 3.1.3
       file-select-dialog: 1.5.4
       filenamify: 5.1.1
@@ -137,6 +138,7 @@ importers:
       obsidian: /@aidenlx/obsidian/1.1.13_ydzx5qoi6374xmclt4keb2sh6a
       preact: 10.11.3
       pretty-hrtime: 1.0.3
+      pspdfkit: 2023.1.4
       query-string: 7.1.3
       react: /@preact/compat/17.1.2_preact@10.11.3
       react-async-hook: 4.0.0_@preact+compat@17.1.2
@@ -497,7 +499,7 @@ importers:
       esbuild: ^0.17.4
       escape-string-regexp: ^5.0.0
       eslint: ~8.36.0
-      eta: ^1.14.2
+      eta: ~2.0.1
       monkey-around: ^2.3.0
       nanoevents: ~7.0.1
       typescript: ~5.0.2
@@ -510,7 +512,7 @@ importers:
       compressing: 1.7.0
       core-js: 3.27.2
       escape-string-regexp: 5.0.0
-      eta: 1.14.2
+      eta: 2.0.1
       monkey-around: 2.3.0
       nanoevents: 7.0.1
       yaml: 2.2.1
@@ -8720,6 +8722,11 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
+  /eta/2.0.1:
+    resolution: {integrity: sha512-46E2qDPDm7QA+usjffUWz9KfXsxVZclPOuKsXs4ZWZdI/X1wpDF7AO424pt7fdYohCzWsIkXAhNGXSlwo5naAg==}
+    engines: {node: '>=6.0.0'}
+    dev: false
+
   /etag/1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
@@ -13620,6 +13627,10 @@ packages:
   /pseudomap/1.0.2:
     resolution: {integrity: sha512-b/YwNhb8lk1Zz2+bXXpS/LK9OisiZZ1SNsSLxN1x2OXVEhW2Ckr/7mWE5vrC1ZTiJlD9g19jWszTmJsB+oEpFQ==}
     dev: true
+
+  /pspdfkit/2023.1.4:
+    resolution: {integrity: sha512-of7uavOLccMVkzy+Yv/+MzQbq7su2Uwn2eJLPH3dgI2AgHL6m1r3M0e8q5BYU48/1wfNgUJHND5zzkacIqYAcg==}
+    dev: false
 
   /pump/3.0.0:
     resolution: {integrity: sha512-LwZy+p3SFs1Pytd/jYct4wpv49HiYCqd9Rlc5ZVdk0V+8Yzv6jR5Blk3TRmPL1ft69TxP0IMZGJ+WPFU2BFhww==}
