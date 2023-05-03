@@ -1,10 +1,3 @@
-export const instructions = [
-  { command: "↑↓", purpose: "to navigate" },
-  { command: "↵", purpose: "to insert Markdown citation" },
-  { command: "shift ↵", purpose: "to insert secondary Markdown citation" },
-  { command: "esc", purpose: "to dismiss" },
-];
-
 import type { RegularItemInfo } from "@obzt/database";
 import type { Editor, EditorPosition } from "obsidian";
 import { Keymap } from "obsidian";

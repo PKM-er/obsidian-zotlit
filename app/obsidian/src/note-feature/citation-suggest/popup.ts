@@ -2,7 +2,14 @@ import type { Editor } from "obsidian";
 import { openModal } from "@/components/basic/modal";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest";
 import type ZoteroPlugin from "@/zt-main";
-import { insertCitation, instructions, isShift } from "./basic";
+import { insertCitation, isShift } from "./basic";
+
+const instructions = [
+  { command: "↑↓", purpose: "to navigate" },
+  { command: "↵", purpose: "to insert Markdown citation" },
+  { command: "shift ↵", purpose: "to insert secondary Markdown citation" },
+  { command: "esc", purpose: "to dismiss" },
+];
 
 class CitationPopupSuggest extends ZoteroItemPopupSuggest {
   constructor(public plugin: ZoteroPlugin) {

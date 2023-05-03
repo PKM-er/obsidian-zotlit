@@ -6,7 +6,17 @@ import type {
 import { ZoteroItemEditorSuggest } from "@/components/item-suggest";
 import type { SearchResult } from "@/services/zotero-db/database";
 import type ZoteroPlugin from "@/zt-main";
-import { insertCitation, instructions, isShift } from "./basic";
+import { insertCitation } from "./basic";
+
+export const instructions = [
+  { command: "↑↓", purpose: "to navigate" },
+  { command: "↵", purpose: "to insert primary Markdown citation" },
+  { command: "↵ (end with /)", purpose: "Insert secondary Markdown citation" },
+];
+
+interface EditorPositionWithAlt extends EditorPosition {
+  alt?: boolean;
+}
 
 export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
   constructor(public plugin: ZoteroPlugin) {
@@ -20,7 +30,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
     if (!this.plugin.settings.suggester.citationEditorSuggester) return null;
     const line = editor.getLine(cursor.line),
       sub = line.substring(0, cursor.ch);
-    const match = sub.match(/\[@([\w\- ]*)$/);
+    const match = sub.match(/\[@([\w\- ]*)\/?$/);
     if (!match) return null;
     const end = { ...cursor };
     // if `]` is next to cursor (auto-complete), include it to replace range as well
@@ -30,18 +40,23 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
       start: {
         ch: match.index as number,
         line: cursor.line,
-      },
+        alt: Boolean(match[0]?.endsWith("/")),
+      } as EditorPositionWithAlt,
       query: match[1],
     };
   }
 
   selectSuggestion(
     suggestion: SearchResult,
-    evt: MouseEvent | KeyboardEvent,
+    // evt: MouseEvent | KeyboardEvent,
   ): void {
     if (!this.context) return;
+    console.log(this.context);
     insertCitation(
-      { item: suggestion.item, alt: isShift(evt) },
+      {
+        item: suggestion.item,
+        alt: (this.context.start as EditorPositionWithAlt).alt ?? false,
+      },
       this.context,
       this.context.editor,
       this.plugin.templateRenderer,
