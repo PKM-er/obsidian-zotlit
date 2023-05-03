@@ -200,7 +200,8 @@ export class AnnotationView extends DerivedFileView {
           plugin.settings.database.zoteroDataDir,
         );
         const url = pathToFileURL(path).href;
-        return url.replace(/^file:\/\//, "app://local/");
+        // url.replace(/^file:\/\//, "app://local");
+        return "app://local" + url.substring(7);
       },
       onShowDetails: async (type, itemId) => {
         const state = store.getState(),
