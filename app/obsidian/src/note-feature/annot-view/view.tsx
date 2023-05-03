@@ -1,3 +1,4 @@
+import { pathToFileURL } from "url";
 import type { AnnotViewContextType, AnnotViewStore } from "@obzt/components";
 import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
@@ -194,10 +195,12 @@ export class AnnotationView extends DerivedFileView {
         await plugin.dbWorker.refresh({ task: "dbConn" });
       },
       getImgSrc: (annotation) => {
-        return `app://local${getCacheImagePath(
+        const path = getCacheImagePath(
           annotation,
           plugin.settings.database.zoteroDataDir,
-        )}`;
+        );
+        const url = pathToFileURL(path).href;
+        return url.replace(/^file:\/\//, "app://local/");
       },
       onShowDetails: async (type, itemId) => {
         const state = store.getState(),

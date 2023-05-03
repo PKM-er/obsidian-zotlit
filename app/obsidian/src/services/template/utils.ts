@@ -1,4 +1,5 @@
 import { join, relative } from "path";
+import { pathToFileURL } from "url";
 import type { AnnotationInfo, AttachmentInfo } from "@obzt/database";
 import { isAnnotationItem } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
@@ -7,7 +8,6 @@ import type { FileSystemAdapter, TFile } from "obsidian";
 import log from "@/log";
 import type ZoteroPlugin from "@/zt-main";
 
-export const toFileUrl = (path: string) => `file://${path}`;
 export const toMdLinkComponent = (url: string): string => {
   return encodeURI(url) === url ? url : `<${url}>`;
 };
@@ -41,7 +41,7 @@ export const fileLink = (
   if (relativePath.startsWith("..")) {
     // file outside of vault
     return `[attachment](${toMdLinkComponent(
-      toFileUrl(filePath + (hash ?? "")),
+      pathToFileURL(filePath).href + (hash ?? ""),
     )})`;
   } else {
     const file = app.metadataCache.getFirstLinkpathDest(relativePath, "");
@@ -83,7 +83,9 @@ export const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
     const linktext = plugin.imgCacheImporter.import(item);
     if (!linktext) {
       const path = plugin.imgCacheImporter.getCachePath(item);
-      return `[Annotation ${item.key}](${toMdLinkComponent(toFileUrl(path))})`;
+      return `[Annotation ${item.key}](${toMdLinkComponent(
+        pathToFileURL(path).href,
+      )})`;
     } else {
       return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
     }

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { pathToFileURL } from "url";
 import { enumerate, getItemKeyGroupID, toPage } from "@obzt/common";
 import type { AnnotationInfo, AttachmentInfo, TagInfo } from "@obzt/database";
 import { getBacklink, getCacheImagePath } from "@obzt/database";
 import { htmlToMarkdown } from "obsidian";
 
-import { fileLink, imgLink, isImageAnnot, toFileUrl } from "../utils.js";
+import { fileLink, imgLink, isImageAnnot } from "../utils.js";
 import type { Context } from "./base.js";
 import { zoteroDataDir } from "./base.js";
 import type { DocItemHelper } from "./item.js";
@@ -60,6 +61,9 @@ export const withAnnotHelper = (
           return htmlToMarkdown(data.comment);
         } else return "";
       },
+      /**
+       * return the absolute path of the image file in file system
+       */
       get imgPath(): string {
         if (isImageAnnot(this)) {
           return getCacheImagePath(this, zoteroDataDir(ctx));
@@ -68,7 +72,7 @@ export const withAnnotHelper = (
       get imgUrl(): string {
         if (isImageAnnot(this)) {
           const path = getCacheImagePath(this, zoteroDataDir(ctx));
-          return toFileUrl(path);
+          return pathToFileURL(path).href;
         } else return "";
       },
       get imgLink(): string {

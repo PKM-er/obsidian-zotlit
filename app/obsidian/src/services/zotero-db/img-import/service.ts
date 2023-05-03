@@ -1,12 +1,11 @@
 import { mkdir, stat, symlink } from "fs/promises";
 import { basename, dirname } from "path";
-import { join } from "path/posix";
 import type { AnnotationInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 import type { FileSystemAdapter } from "obsidian";
-import { Notice, TFile } from "obsidian";
+import { normalizePath, Notice, TFile } from "obsidian";
 import log, { logError } from "@/log";
 import { DatabaseSettings } from "../connector/settings";
 import { ImgImporterSettings } from "./settings";
@@ -31,10 +30,7 @@ export class ImgCacheImporter extends Service {
   getInVaultPath(annot: AnnotationInfo): string | null {
     if (!this.settings.imgExcerptDir || annot.type !== AnnotationType.image)
       return null;
-    const cachePath = getCacheImagePath(
-      annot,
-      this.databaseSettings.zoteroDataDir,
-    );
+    const cachePath = this.getCachePath(annot);
     return getInVaultPath(annot, cachePath, this.settings.imgExcerptDir);
   }
 
@@ -128,7 +124,7 @@ const getInVaultPath = (
   cachePath: string,
   imgExcerptPath: string,
 ): string => {
-  const inVaultName = getInVaultName(cachePath, annot.groupID),
-    inVaultPath = join(imgExcerptPath, inVaultName);
-  return inVaultPath;
+  const inVaultName = getInVaultName(cachePath, annot.groupID);
+
+  return [normalizePath(imgExcerptPath), inVaultName].join("/");
 };
