@@ -207,7 +207,7 @@ export default class DatabaseWorker extends Service {
   }
 
   // #region Initialization, called internally on load
-  private async initialize() {
+  async initialize() {
     if (this.#status !== DatabaseStatus.NotInitialized) {
       throw new Error(
         `Calling init on already initialized db, use refresh instead`,

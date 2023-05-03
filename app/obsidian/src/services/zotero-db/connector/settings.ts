@@ -4,7 +4,7 @@ import assertNever from "assert-never";
 import { getBinaryFullPath } from "@/install-guide/version";
 
 import Settings from "@/settings/base";
-import DatabaseWorker from "./service";
+import DatabaseWorker, { DatabaseStatus } from "./service";
 
 interface SettingOptions {
   zoteroDataDir: string;
@@ -23,7 +23,11 @@ export class DatabaseSettings extends Settings<SettingOptions> {
     const worker = this.use(DatabaseWorker);
     switch (key) {
       case "zoteroDataDir":
-        return await worker.refresh({ task: "full" });
+        if (worker.status === DatabaseStatus.NotInitialized) {
+          return await worker.initialize();
+        } else {
+          return await worker.refresh({ task: "full" });
+        }
       case "citationLibrary":
         return await worker.refresh({
           task: "searchIndex",

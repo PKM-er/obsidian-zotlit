@@ -2,6 +2,7 @@ import { dialog } from "@electron/remote";
 import { cn } from "@obzt/components/utils";
 import { useMemoizedFn } from "ahooks";
 import { assertNever } from "assert-never";
+import { Notice } from "obsidian";
 import type { PropsWithChildren } from "react";
 import { useCallback, useContext, useState } from "react";
 import { useAsyncCallback } from "react-async-hook";
@@ -79,16 +80,23 @@ function useSetDataDir(refresh: () => void) {
     plugin: { settings },
   } = useContext(SettingTabCtx);
   const asyncOnClick = useAsyncCallback(async () => {
-    const {
-      filePaths: [newFolder],
-    } = await dialog.showOpenDialog({
-      defaultPath: settings.database.zoteroDataDir,
-      properties: ["openDirectory"],
-    });
-    if (newFolder && settings.database.zoteroDataDir !== newFolder) {
-      await settings.database.setOption("zoteroDataDir", newFolder).apply();
-      await settings.save();
-      refresh();
+    try {
+      const {
+        filePaths: [newFolder],
+      } = await dialog.showOpenDialog({
+        defaultPath: settings.database.zoteroDataDir,
+        properties: ["openDirectory"],
+      });
+      if (newFolder && settings.database.zoteroDataDir !== newFolder) {
+        await settings.database.setOption("zoteroDataDir", newFolder).apply();
+        await settings.save();
+        refresh();
+      }
+    } catch (err) {
+      // show error in obsidian before react catches it
+      console.error("Failed to set data directory", err);
+      new Notice(`Failed to set data directory: ${err}`);
+      throw err;
     }
   });
   let dataDirState: DatabaseStatus;
