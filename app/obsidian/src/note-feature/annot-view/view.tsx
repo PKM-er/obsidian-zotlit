@@ -4,7 +4,7 @@ import { ObsidianContext, AnnotViewContext, AnnotView } from "@obzt/components";
 import { getCacheImagePath } from "@obzt/database";
 import type { INotifyActiveReader } from "@obzt/protocol";
 import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
-import { Menu } from "obsidian";
+import { Platform, Menu } from "obsidian";
 import ReactDOM from "react-dom";
 import { choosePDFAtch } from "@/components/atch-suggest";
 import { context } from "@/components/basic/context";
@@ -199,9 +199,7 @@ export class AnnotationView extends DerivedFileView {
           annotation,
           plugin.settings.database.zoteroDataDir,
         );
-        const url = pathToFileURL(path).href;
-        // url.replace(/^file:\/\//, "app://local");
-        return "app://local" + url.substring(7);
+        return getFSResourcePath(path);
       },
       onShowDetails: async (type, itemId) => {
         const state = store.getState(),
@@ -321,4 +319,17 @@ export class AnnotationView extends DerivedFileView {
     await sleep(1500);
     element.removeClass("select-flashing");
   }
+}
+
+/**
+ * desktop only, get resource path for filesystem access
+ * @param path absolute path to the file
+ */
+function getFSResourcePath(path: string) {
+  return (
+    (Platform.resourcePathPrefix ?? "app://local/") +
+    // remove leading slash in pathname
+    pathToFileURL(path).pathname.substring(1) +
+    `?${Date.now()}`
+  );
 }

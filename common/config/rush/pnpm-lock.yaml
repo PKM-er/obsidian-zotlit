@@ -77,7 +77,7 @@ importers:
       monkey-around: ^2.3.0
       nanoevents: ~7.0.1
       nanoid: ~4.0.0
-      obsidian: npm:@aidenlx/obsidian@~1.1.13
+      obsidian: ~1.2.8
       pdfjs-dist: ~3.3.122
       postcss: ~8.4.21
       postcss-discard: ~2.0.0
@@ -135,7 +135,7 @@ importers:
       monkey-around: 2.3.0
       nanoevents: 7.0.1
       nanoid: 4.0.1
-      obsidian: /@aidenlx/obsidian/1.1.13_ydzx5qoi6374xmclt4keb2sh6a
+      obsidian: 1.2.8_ydzx5qoi6374xmclt4keb2sh6a
       preact: 10.11.3
       pretty-hrtime: 1.0.3
       pspdfkit: 2023.1.4
@@ -12453,6 +12453,18 @@ packages:
       call-bind: 1.0.2
       define-properties: 1.2.0
       es-abstract: 1.21.2
+    dev: false
+
+  /obsidian/1.2.8_ydzx5qoi6374xmclt4keb2sh6a:
+    resolution: {integrity: sha512-HrC+feA8o0tXspj4lEAqxb1btwLwHD2oHXSwbbN+CdRHURqbCkuIDLld+nkuyJ1w1c9uvVDRVk8BoeOnWheOrQ==}
+    peerDependencies:
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
+    dependencies:
+      '@codemirror/state': 6.2.0
+      '@codemirror/view': 6.9.3
+      '@types/codemirror': 0.0.108
+      moment: 2.29.4
     dev: false
 
   /obuf/1.1.2:
