@@ -101,6 +101,6 @@ Immediately we can see how inserting information works:
 ## Final
 This should be enough to customize some simple templates. If you have any information that would work well here please reach out on the reddit or forum threads linking here, and I will try to incorporate it. 
 
-Additionally please check out AidenLX’s [github](https://github.com/aidenlx/obsidian-zotero) or donate to his[patreon](https://patreon.com/aidenlx). 
+Additionally please check out AidenLX’s [github](https://github.com/aidenlx/obsidian-zotero) or donate to his [patreon](https://patreon.com/aidenlx). 
 
 Also, perhaps check out this [Obsidian forum thread here](https://forum.obsidian.md/t/obsidian-zotero-import-templates/56901/) for more AZP template discussion.
