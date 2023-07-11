@@ -57,14 +57,3 @@ export default class DatabaseWatcher extends Service {
     }
   }
 }
-
-declare module "obsidian" {
-  interface Vault {
-    on(
-      name: "zotero:db-updated",
-      callback: (target: "main" | "bbt") => any,
-      ctx?: any,
-    ): EventRef;
-    trigger(name: "zotero:db-updated", target: "main" | "bbt"): void;
-  }
-}

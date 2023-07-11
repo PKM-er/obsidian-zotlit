@@ -5,12 +5,6 @@ import type { TemplatePreviewStateData } from "./base";
 import { itemDetailsViewType } from "./details";
 import { templatePreviewViewType } from "./preview";
 
-declare module "obsidian" {
-  interface WorkspaceItem {
-    type: string;
-  }
-}
-
 export async function openTemplatePreview(
   type: EjectableTemplate,
   data: TemplatePreviewStateData | null,

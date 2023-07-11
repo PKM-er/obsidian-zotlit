@@ -46,12 +46,6 @@ export function openModal<F>(
   modal.open();
   return promise;
 }
-declare module "obsidian" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface SuggestModal<T> {
-    updateSuggestions(): void;
-  }
-}
 
 export abstract class DebouncedSuggeestModal<T> extends SuggestModal<T> {
   initial = true;

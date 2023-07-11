@@ -292,21 +292,6 @@ export default class DatabaseWorker extends Service {
   // #endregion
 }
 
-declare module "obsidian" {
-  interface Vault {
-    on(name: "zotero:db-ready", callback: () => any, ctx?: any): EventRef;
-    on(name: "zotero:db-refresh", callback: () => any, ctx?: any): EventRef;
-    trigger(name: "zotero:db-ready"): void;
-    trigger(name: "zotero:db-refresh"): void;
-  }
-  interface MetadataCache {
-    on(name: "zotero:search-ready", callback: () => any, ctx?: any): EventRef;
-    on(name: "zotero:search-refresh", callback: () => any, ctx?: any): EventRef;
-    trigger(name: "zotero:search-ready"): void;
-    trigger(name: "zotero:search-refresh"): void;
-  }
-}
-
 interface RefreshDbConnTask {
   task: "dbConn";
 }

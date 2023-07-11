@@ -1,11 +1,5 @@
 import { Notice } from "obsidian";
 
-declare module "obsidian" {
-  interface Notice {
-    noticeEl: HTMLElement;
-  }
-}
-
 export class ClickNotice extends Notice {
   constructor(
     message: string | ((desc: DocumentFragment) => void),

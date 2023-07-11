@@ -22,19 +22,6 @@ interface ClickableToken {
   [key: string]: any;
 }
 
-declare module "obsidian" {
-  interface Editor {
-    cm: EditorView;
-    getClickableTokenAt(pos: EditorPosition): ClickableToken | null;
-  }
-  interface MarkdownView {
-    editMode: MarkdownEditView;
-  }
-  interface MarkdownEditView {
-    triggerClickableToken(token: ClickableToken, newLeaf: boolean): void;
-  }
-}
-
 export class CitekeyClick extends Service {
   plugin = this.use(ZoteroPlugin);
 

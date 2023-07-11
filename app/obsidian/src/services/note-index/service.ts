@@ -19,19 +19,6 @@ import {
   splitMultipleAnnotKey,
 } from "./utils";
 
-declare module "obsidian" {
-  interface MetadataCache {
-    on(
-      name: "zotero:index-update",
-      callback: (file: string) => any,
-      ctx?: any,
-    ): EventRef;
-    on(name: "zotero:index-clear", callback: () => any, ctx?: any): EventRef;
-    trigger(name: "zotero:index-update", file: string): void;
-    trigger(name: "zotero:index-clear"): void;
-  }
-}
-
 interface BlockInfo {
   blocks: Pos[];
   file: string;

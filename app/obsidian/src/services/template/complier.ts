@@ -2,6 +2,7 @@ import { Service } from "@ophidian/core";
 import shimArrayGroup from "array.prototype.group/shim";
 import { Notice, parseYaml } from "obsidian";
 import log, { logError } from "@/log";
+import "@/typings/obsidian-ex";
 import { extractFrontmatter } from "./get-fm";
 import type { AnnotHelper } from "./helper";
 import { TemplateLoader } from "./loader";
@@ -85,16 +86,5 @@ export class TemplateComplier extends Service {
       logError("compling template: " + name, error);
       new Notice(`Error compling template "${name}", ${error}`);
     }
-  }
-}
-
-declare module "obsidian" {
-  interface Vault {
-    on(
-      name: "zotero:template-updated",
-      callback: (template: TemplateType) => any,
-      ctx?: any,
-    ): EventRef;
-    trigger(name: "zotero:template-updated", template: TemplateType): void;
   }
 }

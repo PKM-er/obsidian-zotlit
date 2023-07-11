@@ -8,12 +8,6 @@ import type { GuideMode } from "./atom";
 import { modalAtom } from "./atom";
 import { InstallGuide } from "./content";
 
-declare module "obsidian" {
-  interface App {
-    openWithDefaultApp(path: string): void;
-  }
-}
-
 export class InstallGuideModal extends Modal {
   constructor(
     public manifest: PluginManifest,
