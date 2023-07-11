@@ -7,6 +7,7 @@ import { SettingTabCtx, normalizePath } from "../common";
 import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
+import AutoTrimSetting from "./AutoTrim";
 import { EjectableTemplate } from "./EjectableTemplate";
 import { FmFields } from "./FmFields";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
@@ -35,6 +36,7 @@ export default function Template() {
         If you have issue with native auto pair features, you can disable this
         option and report the bug in GitHub
       </BooleanSetting>
+      <AutoTrimSetting />
       <Setting
         heading
         name="Update Note"

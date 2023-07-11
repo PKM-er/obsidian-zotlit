@@ -36,9 +36,11 @@ export const acceptLineBreak = {
     str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n"),
 };
 
-export const defaultEtaConfig: Partial<Eta["config"]> = {
+export type EtaTrimConfig = "nl" | "slurp" | false;
+
+export const defaultEtaConfig = {
   autoEscape: false,
-  autoTrim: false,
+  autoTrim: [false, false],
   filterFunction: (val: unknown): string => {
     if (typeof val === undefined || val === null) {
       return "";
@@ -46,7 +48,7 @@ export const defaultEtaConfig: Partial<Eta["config"]> = {
     return val as string;
   },
   plugins: [acceptLineBreak],
-};
+} satisfies Partial<Eta["config"]>;
 
 interface SettingOptions {
   ejected: boolean;
@@ -58,6 +60,7 @@ interface SettingOptions {
   updateAnnotBlock: boolean;
   updateOverwrite: boolean;
   autoPairEta: boolean;
+  autoTrim: [EtaTrimConfig, EtaTrimConfig];
 }
 
 type SettingOptionsJSON = Record<
@@ -115,6 +118,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       autoPairEta: false,
       updateAnnotBlock: false,
       updateOverwrite: false,
+      autoTrim: defaultEtaConfig.autoTrim,
     } satisfies SettingOptions;
   }
 
@@ -145,16 +149,23 @@ export class TemplateSettings extends Settings<SettingOptions> {
       case "updateAnnotBlock":
       case "updateOverwrite":
         return;
-      case "autoPairEta": {
+      case "autoPairEta":
         return plugin.templateEditor.setEtaBracketPairing(this.autoPairEta);
-      }
+      case "autoTrim":
+        this.eta.configure({ autoTrim: this.autoTrim });
+        for (const type of templateTypes) {
+          app.vault.trigger("zotero:template-updated", type);
+        }
+        return;
       default:
         assertNever(key);
     }
   }
   async applyAll() {
     const loader = this.use(TemplateLoader);
-    return await loader.loadTemplates("full");
+    await this.apply("autoPairEta");
+    this.eta.configure({ autoTrim: this.autoTrim });
+    await loader.loadTemplates("full");
   }
 
   toJSON(): SettingOptionsJSON {
@@ -170,6 +181,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
       autoPairEta: this.autoPairEta,
       updateAnnotBlock: this.updateAnnotBlock,
       updateOverwrite: this.updateOverwrite,
+      autoTrim: this.autoTrim,
     };
   }
   // fix compatibility with old settings format
@@ -183,6 +195,7 @@ export class TemplateSettings extends Settings<SettingOptions> {
         "fmTagPrefix",
         "updateAnnotBlock",
         "updateOverwrite",
+        "autoTrim",
       ]),
     });
   }

@@ -2,7 +2,6 @@ import { Service } from "@ophidian/core";
 import shimArrayGroup from "array.prototype.group/shim";
 import { Notice, parseYaml } from "obsidian";
 import log, { logError } from "@/log";
-import "@/typings/obsidian-ex";
 import { extractFrontmatter } from "./get-fm";
 import type { AnnotHelper } from "./helper";
 import { TemplateLoader } from "./loader";
