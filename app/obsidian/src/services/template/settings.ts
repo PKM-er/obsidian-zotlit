@@ -18,23 +18,35 @@ export type TemplateType = EjectableTemplate | NonEjectableTemplate;
 /**
  * render undefined/null in interpolate tag as empty string
  */
-const nullishAsEmptyString = {
-  processAST: (buffer: (string | { t: "i" | "e" | "r"; val: string })[]) => {
-    for (const b of buffer) {
-      if (typeof b === "string") continue;
-      if (b.t === "i" && b.val.startsWith("it.")) {
-        // undefined/null is rendered as empty string in favor of 'undefined'
-        b.val += '??""';
-      }
-    }
-    return buffer;
-  },
+// const nullishAsEmptyString = {
+//   processAST: (buffer: (string | { t: "i" | "e" | "r"; val: string })[]) => {
+//     for (const b of buffer) {
+//       if (typeof b === "string") continue;
+//       if (b.t === "i" && b.val.startsWith("it.")) {
+//         // undefined/null is rendered as empty string in favor of 'undefined'
+//         b.val += '??""';
+//       }
+//     }
+//     return buffer;
+//   },
+// };
+
+export const acceptLineBreak = {
+  processTemplate: (str: string) =>
+    str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n"),
 };
 
-export const defaultEtaConfig = {
+export const defaultEtaConfig: Partial<Eta["config"]> = {
   autoEscape: false,
-  plugins: [nullishAsEmptyString],
-} satisfies Partial<Eta["config"]>;
+  autoTrim: false,
+  filterFunction: (val: unknown): string => {
+    if (typeof val === undefined || val === null) {
+      return "";
+    }
+    return val as string;
+  },
+  plugins: [acceptLineBreak],
+};
 
 interface SettingOptions {
   ejected: boolean;
@@ -81,7 +93,15 @@ export const ejectableTemplateTypes = keys(TEMPLATE_FILES),
   );
 
 export class TemplateSettings extends Settings<SettingOptions> {
-  eta = new Eta(defaultEtaConfig);
+  eta = (() => {
+    const eta = new Eta(defaultEtaConfig);
+    // disable file resolution
+    /** @ts-ignore */
+    delete eta.readFile;
+    /** @ts-ignore */
+    delete eta.resolvePath;
+    return eta;
+  })();
   getDefaults() {
     return {
       ejected: false,

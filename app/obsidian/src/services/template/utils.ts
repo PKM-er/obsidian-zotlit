@@ -60,9 +60,6 @@ export const fileLink = (
 export const renderFilename = (name: string): string =>
   filenamify(name, { replacement: "_" });
 
-export const acceptLineBreak = (str: string) =>
-  str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n");
-
 export const isImageAnnot = (item: unknown): item is AnnotationInfo =>
   isAnnotationItem(item) && item.type === AnnotationType.image;
 

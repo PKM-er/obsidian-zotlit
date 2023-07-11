@@ -7,7 +7,7 @@ import type { AnnotHelper } from "./helper";
 import { TemplateLoader } from "./loader";
 import type { TemplateType } from "./settings";
 import { TemplateSettings } from "./settings";
-import { acceptLineBreak, renderFilename } from "./utils";
+import { renderFilename } from "./utils";
 
 // const calloutPattern = /^\s*\[!\w+\]/;
 
@@ -28,9 +28,8 @@ export class TemplateComplier extends Service {
 
   complie(name: TemplateType) {
     const template = this.loader.getTemplate(name);
-    const converted = acceptLineBreak(template);
     try {
-      const compiled = this.eta.compile(converted);
+      const compiled = this.eta.compile(template);
 
       let full = compiled;
       switch (name) {
@@ -81,7 +80,7 @@ export class TemplateComplier extends Service {
             }
           };
       this.eta.templatesSync.define(name, patched);
-      log.trace(`Template "${name}" complie success`, converted);
+      log.trace(`Template "${name}" complie success`, template);
     } catch (error) {
       logError("compling template: " + name, error);
       new Notice(`Error compling template "${name}", ${error}`);
