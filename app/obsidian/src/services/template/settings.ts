@@ -58,8 +58,7 @@ export const DEFAULT_TEMPLATE: Record<TemplateType, string> = {
   note,
   annots,
   annotation,
-  filename:
-    "<%= it.citekey ?? it.DOI ?? it.title ?? it.key ?? it.citekey %>.md",
+  filename: "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md",
   citation: "[@<%= it.citekey %>]",
   altCitation: "@<%= it.citekey %>",
 };
