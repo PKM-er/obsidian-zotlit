@@ -18,7 +18,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@aidenlx/esbuild-plugin-obsidian": "^0.1.4",
     "@release-it/bumper": "^4.0.0",
     "@release-it/conventional-changelog": "^5.1.0",
     "@types/json-schema": "^7.0.9",
