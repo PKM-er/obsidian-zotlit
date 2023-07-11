@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+neverBuiltDependencies:
+  - '@aidenlx/better-sqlite3'
+  - electron
+
 patchedDependencies:
   flexsearch@0.7.31:
     hash: uyw6ivpbfx7v2sahyemwiyw3f4
@@ -121,7 +125,7 @@ importers:
         specifier: ~4.0.0
         version: 4.0.1
       obsidian:
-        specifier: ~1.2.8
+        specifier: 1.2.8
         version: 1.2.8(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
       preact:
         specifier: ~10.11.3
@@ -163,9 +167,6 @@ importers:
       '@aidenlx/esbuild-plugin-inline-worker':
         specifier: workspace:*
         version: link:../../utils/esbuild-inline-worker
-      '@aidenlx/esbuild-plugin-obsidian':
-        specifier: ^0.1.4
-        version: 0.1.8(esbuild@0.17.12)
       '@aidenlx/eslint-config':
         specifier: workspace:*
         version: link:../../common/config/eslint
@@ -577,8 +578,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       obsidian:
-        specifier: npm:@aidenlx/obsidian@~1.1.13
-        version: /@aidenlx/obsidian@1.1.13(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
+        specifier: 1.2.8
+        version: 1.2.8(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
       to-use:
         specifier: ^0.2.1
         version: 0.2.1
@@ -830,7 +831,6 @@ packages:
 
   /@aidenlx/better-sqlite3@8.0.1-mod.1:
     resolution: {integrity: sha512-Cc7JFOCR3eRBkVjNJJ1j0TPWvOH3mhj8aoCOqZGXEGOBzZuR9uHnsdKdcXJoJCqZ3tnVotjgMkUjjeITsYPgTA==}
-    requiresBuild: true
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.1
@@ -846,29 +846,9 @@ packages:
       style-mod: 4.0.2
     dev: true
 
-  /@aidenlx/esbuild-plugin-obsidian@0.1.8(esbuild@0.17.12):
-    resolution: {integrity: sha512-rpX4CdK0OhC/aKUTySpLTAv8QgsnPsLeTt87vN4XfSdZ9HDQlitcPj8/mdmiDn9iHtK0qS5y6ewONQRYBqr/lQ==}
-    peerDependencies:
-      esbuild: ^0.13.0
-    dependencies:
-      esbuild: 0.17.12
-    dev: true
-
   /@aidenlx/iframe-worker@0.2.4-mod.5:
     resolution: {integrity: sha512-joYR8m6T57ZAbOyc89DScH2X4zPdz60HwRg1+uLp6I7rr0GWGSLOLL60uGTAx3yrykwW4IQT9QKBNKoxkTtcBg==}
     engines: {node: '>= 16'}
-    dev: false
-
-  /@aidenlx/obsidian@1.1.13(@codemirror/state@6.2.0)(@codemirror/view@6.9.3):
-    resolution: {integrity: sha512-Nw7Mj5Z5nGfPC9WHHgdEoyV6dbc2nVwWji9Ki9hDlM4ZVU62rd1iaezrJM0Lu1cQvsZDa8jGwr4YCwD4EX0rpA==}
-    peerDependencies:
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
-    dependencies:
-      '@codemirror/state': 6.2.0
-      '@codemirror/view': 6.9.3
-      '@types/codemirror': 0.0.108
-      moment: 2.29.4
     dev: false
 
   /@aidenlx/workerpool@6.2.1-mod.13:
@@ -4744,7 +4724,6 @@ packages:
     resolution: {integrity: sha512-QRUZkGL8O/8CyDmTLSjBeRsZmGTPlPVeWnnpkdNqgHYYaOc/A881FKMiNzvQ9Cj0a+rUavDdwBUfUL82U3Ay7w==}
     engines: {node: '>= 8.6'}
     hasBin: true
-    requiresBuild: true
     dependencies:
       '@electron/get': 1.14.1
       '@types/node': 16.18.19
