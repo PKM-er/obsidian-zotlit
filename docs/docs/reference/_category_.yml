@@ -1,7 +1,0 @@
-position: 2
-label: "Reference"
-collapsible: true
-collapsed: false
-link:
-  type: generated-index
-  slug: reference
