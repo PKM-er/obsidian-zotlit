@@ -8,7 +8,6 @@ import type {
 } from "@obzt/database";
 import { TagType } from "@obzt/zotero-type";
 import { use } from "@ophidian/core";
-import * as Eta from "eta";
 import type { TFile } from "obsidian";
 import { Notice, stringifyYaml } from "obsidian";
 import { logError } from "@/log";
@@ -38,6 +37,8 @@ export interface TemplateDataMap {
 export class TemplateRenderer {
   use = use.this;
 
+  eta = this.use(TemplateSettings).eta;
+
   private mergeAnnotTags(extra: HelperExtra): HelperExtra {
     if (extra.annotations.length === 0) return extra;
     const merged = mergeAnnotsTags(extra.annotations, extra.tags);
@@ -48,7 +49,7 @@ export class TemplateRenderer {
 
   private render<T extends TemplateType>(target: T, obj: TemplateDataMap[T]) {
     try {
-      return Eta.templates.get(target)(obj, Eta.config);
+      return this.eta.render(target, obj);
     } catch (error) {
       console.error(
         "Error while rendering",

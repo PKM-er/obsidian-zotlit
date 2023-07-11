@@ -2,17 +2,16 @@ import { resolve } from "path";
 import { join } from "path/posix";
 import { fileURLToPath } from "url";
 import { D } from "@mobily/ts-belt";
-import { renderFile } from "eta";
+import { Eta } from "eta";
 import type { ContentURIManifest } from "./chrome.js";
 import type { PackageInfo } from "./parse.js";
 
-const installRdfTemplate = resolve(
+const templateDir = resolve(
   fileURLToPath(import.meta.url),
   "..",
   "..",
   "..",
   "public",
-  "install.rdf.ejs",
 );
 
 /**
@@ -74,6 +73,6 @@ export async function genInstallRdf(
         (path) => new URL(path, `chrome://${content.id}/content/`).href,
       ),
   );
-
-  return renderFile(installRdfTemplate, info, { varName: "pkg" });
+  const eta = new Eta({ views: templateDir, varName: "pkg" });
+  return eta.render("./install.rdf.ejs", info);
 }

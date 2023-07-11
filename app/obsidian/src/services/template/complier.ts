@@ -1,13 +1,12 @@
 import { Service } from "@ophidian/core";
 import shimArrayGroup from "array.prototype.group/shim";
-import * as Eta from "eta";
 import { Notice, parseYaml } from "obsidian";
 import log, { logError } from "@/log";
 import { extractFrontmatter } from "./get-fm";
 import type { AnnotHelper } from "./helper";
 import { TemplateLoader } from "./loader";
 import type { TemplateType } from "./settings";
-import { defaultEtaConfig } from "./settings";
+import { TemplateSettings } from "./settings";
 import { acceptLineBreak, renderFilename } from "./utils";
 
 // const calloutPattern = /^\s*\[!\w+\]/;
@@ -15,11 +14,12 @@ import { acceptLineBreak, renderFilename } from "./utils";
 export class TemplateComplier extends Service {
   loader = this.use(TemplateLoader);
 
+  eta = this.use(TemplateSettings).eta;
+
   async onload() {
     this.registerEvent(
       app.vault.on("zotero:template-updated", this.onTemplateUpdated, this),
     );
-    Eta.configure(defaultEtaConfig);
   }
 
   onTemplateUpdated(template: TemplateType) {
@@ -30,15 +30,18 @@ export class TemplateComplier extends Service {
     const template = this.loader.getTemplate(name);
     const converted = acceptLineBreak(template);
     try {
-      const compiled = Eta.compile(converted, { name });
+      const compiled = this.eta.compile(converted);
+
       let full = compiled;
       switch (name) {
         case "filename":
-          full = (data, opts) => renderFilename(compiled(data, opts));
+          full = function (data, opts) {
+            return renderFilename(compiled.call(this, data, opts));
+          };
           break;
         case "annotation":
-          full = (data, opts) => {
-            const result = compiled(data, opts);
+          full = function (data, opts) {
+            const result = compiled.call(this, data, opts);
             let warpCallout = true;
             const { yaml, body } = extractFrontmatter(result);
             if (yaml) {
@@ -67,17 +70,17 @@ export class TemplateComplier extends Service {
       // @ts-expect-error group not yet available
       const patched: typeof full = Array.prototype.group
         ? full
-        : (data, opts) => {
+        : function (data, opts) {
             shimArrayGroup();
             try {
-              const output = full(data, opts);
+              const output = full.call(this, data, opts);
               return output;
             } finally {
               // @ts-expect-error group not yet available
               delete Array.prototype.group;
             }
           };
-      Eta.templates.define(name, patched);
+      this.eta.templatesSync.define(name, patched);
       log.trace(`Template "${name}" complie success`, converted);
     } catch (error) {
       logError("compling template: " + name, error);

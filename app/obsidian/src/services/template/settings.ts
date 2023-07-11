@@ -1,7 +1,7 @@
 import { deleteKeys, keys, selectKeys } from "@mobily/ts-belt/Dict";
 import { enumerate } from "@obzt/common";
 import { assertNever } from "assert-never";
-import type { getConfig } from "eta";
+import { Eta } from "eta";
 import Settings from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
 import annotation from "./defaults/zt-annot.ejs";
@@ -34,7 +34,7 @@ const nullishAsEmptyString = {
 export const defaultEtaConfig = {
   autoEscape: false,
   plugins: [nullishAsEmptyString],
-} satisfies Partial<ReturnType<typeof getConfig>>;
+} satisfies Partial<Eta["config"]>;
 
 interface SettingOptions {
   ejected: boolean;
@@ -81,6 +81,7 @@ export const ejectableTemplateTypes = keys(TEMPLATE_FILES),
   );
 
 export class TemplateSettings extends Settings<SettingOptions> {
+  eta = new Eta(defaultEtaConfig);
   getDefaults() {
     return {
       ejected: false,

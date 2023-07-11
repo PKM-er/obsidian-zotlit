@@ -1,5 +1,4 @@
 import { use } from "@ophidian/core";
-import * as Eta from "eta";
 import type {
   Editor,
   EditorPosition,
@@ -11,6 +10,7 @@ import type {
 import { prepareFuzzySearch, EditorSuggest } from "obsidian";
 import log from "@/log";
 import { isLiteratureNote } from "@/services/note-index";
+import { TemplateSettings } from "@/services/template";
 import ZoteroPlugin from "@/zt-main";
 import { NoteFieldsSettings } from "./settings";
 // >:noteFields
@@ -23,6 +23,8 @@ interface Result extends SearchResult {
 
 export class NoteFieldsSuggest extends EditorSuggest<Result> {
   use = use.this;
+  eta = this.use(TemplateSettings).eta;
+
   settings = this.use(NoteFieldsSettings);
   onTrigger(
     cursor: EditorPosition,
@@ -82,7 +84,7 @@ export class NoteFieldsSuggest extends EditorSuggest<Result> {
       log.error("No template found for field", field);
       return;
     }
-    const toInsert = Eta.render(template, { field }) as string;
+    const toInsert = this.eta.render(template, { field });
     editor.replaceRange(toInsert, start, end);
   }
   renderSuggestion({ query, matches }: Result, el: HTMLElement): void {
