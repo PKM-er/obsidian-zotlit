@@ -9,7 +9,7 @@
     "dev": "tsc -w"
   },
   "devDependencies": {
-    "typescript": "~5.0.2",
+    "typescript": "~5.1.6",
     "eslint": "~8.36.0",
     "@types/eslint": "~8.4.6",
     "@aidenlx/eslint-config": "workspace:*"

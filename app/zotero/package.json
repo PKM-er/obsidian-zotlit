@@ -51,7 +51,7 @@
     "@types/eslint": "~8.4.6",
     "zotero-types": "~1.0.4",
     "eslint": "~8.36.0",
-    "typescript": "~5.0.2"
+    "typescript": "~5.1.6"
   },
   "browserslist": [
     "firefox >= 60"
