@@ -16,8 +16,8 @@ import { DEFAULT_TEMPLATE } from "@/services/template/settings";
 import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
-import { NoteFields } from "./note-fields/service";
-import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
+// import { NoteFields } from "./note-fields/service";
+// import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
 import { ProtocolHandler } from "./protocol/service";
 import { openOrCreateNote } from "./quick-switch";
 import {
@@ -34,7 +34,7 @@ import { getHelperExtraByAtch, updateNote } from "./update-note";
 class NoteFeatures extends Service {
   plugin = this.use(ZoteroPlugin);
 
-  noteFields = this.use(NoteFields);
+  // noteFields = this.use(NoteFields);
   // topicImport = this.use(TopicImport);
   protocol = this.use(ProtocolHandler);
 
@@ -71,10 +71,10 @@ class NoteFeatures extends Service {
         );
       }),
     );
-    plugin.registerView(
-      noteFieldsViewType,
-      (leaf) => new NoteFieldsView(leaf, plugin),
-    );
+    // plugin.registerView(
+    //   noteFieldsViewType,
+    //   (leaf) => new NoteFieldsView(leaf, plugin),
+    // );
     plugin.addCommand({
       id: "zotero-annot-view",
       name: "Open Zotero Annotation View in Side Panel",
@@ -89,20 +89,20 @@ class NoteFeatures extends Service {
         });
       },
     });
-    plugin.addCommand({
-      id: "zotero-note-fields",
-      name: "Open Literature Note Fields in Side Panel",
-      callback: () => {
-        app.workspace.ensureSideLeaf(noteFieldsViewType, "right", {
-          active: true,
-          /**
-           * Workaroud to make sure view shows active file when first open
-           * TODO: bug report? replicate in Backlink, Outline etc...
-           */
-          state: { file: app.workspace.getActiveFile()?.path },
-        });
-      },
-    });
+    // plugin.addCommand({
+    //   id: "zotero-note-fields",
+    //   name: "Open Literature Note Fields in Side Panel",
+    //   callback: () => {
+    //     app.workspace.ensureSideLeaf(noteFieldsViewType, "right", {
+    //       active: true,
+    //       /**
+    //        * Workaroud to make sure view shows active file when first open
+    //        * TODO: bug report? replicate in Backlink, Outline etc...
+    //        */
+    //       state: { file: app.workspace.getActiveFile()?.path },
+    //     });
+    //   },
+    // });
     plugin.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",

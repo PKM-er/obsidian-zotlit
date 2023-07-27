@@ -5,7 +5,7 @@ import { Service } from "@ophidian/core";
 
 import log, { LogSettings } from "@/log";
 import { SuggesterSettings } from "@/note-feature/citation-suggest";
-import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
+// import { NoteFieldsSettings } from "@/note-feature/note-fields/settings.js";
 import { NoteIndexSettings } from "@/services/note-index/settings.js";
 import { ServerSettings } from "@/services/server/settings.js";
 import { TemplateSettings } from "@/services/template/settings.js";
@@ -23,7 +23,7 @@ export interface ZoteroSettings {
   noteIndex: NoteIndexSettings;
   template: TemplateSettings;
   suggester: SuggesterSettings;
-  noteFields: NoteFieldsSettings;
+  // noteFields: NoteFieldsSettings;
   server: ServerSettings;
 }
 const settingNames = enumerate<keyof ZoteroSettings>()(
@@ -34,7 +34,7 @@ const settingNames = enumerate<keyof ZoteroSettings>()(
   "noteIndex",
   "template",
   "suggester",
-  "noteFields",
+  // "noteFields",
   "server",
 );
 
@@ -53,7 +53,7 @@ export class SettingLoader extends Service implements ZoteroSettings {
   log = this.use(LogSettings);
   template = this.use(TemplateSettings);
   suggester = this.use(SuggesterSettings);
-  noteFields = this.use(NoteFieldsSettings);
+  // noteFields = this.use(NoteFieldsSettings);
   server = this.use(ServerSettings);
   // mutoolPath: string | null = null;
   // #endregion
