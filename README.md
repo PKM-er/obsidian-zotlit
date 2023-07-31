@@ -8,8 +8,8 @@ Community plugins for [Obsidian.md](https://obsidian.md) to integrate with [Zote
 
 Disclaimer: The plugins in this project is manitained by third-party developer, who is not affiliated with Obsidian or Zotero. This means that they may be broken at any time due to Zotero and/or Obsidian updates. Although they are not intended to perform any write operations to your Zotero database, there are still risks of data-loss. Therefore, please make proper backup for your data before and when using this plugin, especially when you are using beta version.
 
-- [Overview](https://obzt.aidenlx.top/overview)
-- [Getting Started](https://obzt.aidenlx.top/getting-started)
+- [Overview](https://obzt.aidenlx.top/#overview)
+- [Getting Started](https://obzt.aidenlx.top/#getting-started)
 
 <!-- [![open in obsidian](https://custom-icon-badges.demolab.com/badge/-Open%20In%20Obsidian-d4d4d4?style=for-the-badge&logo=obsidian-full)](https://obsidian.md/plugins?id=obsidian-zotero-plugin "open in obsidian") -->
 
