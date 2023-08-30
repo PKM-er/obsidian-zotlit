@@ -37,6 +37,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
     this.app.log("zotero-obsidian-note Loaded");
 
     this.registerReaderEvent("focus", (itemId, instanceId) => {
+      this.app.log(`reader focus: ${itemId}, ${instanceId}`);
       this.readerFocus.set(instanceId, itemId);
       if (this.settings.notify === false) return;
       this.request.nActiveReader();

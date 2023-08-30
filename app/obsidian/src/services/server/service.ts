@@ -28,6 +28,9 @@ export class Server extends Service implements Events {
   get port() {
     return this.settings.serverPort;
   }
+  get hostname() {
+    return this.settings.serverHostname;
+  }
   onload() {
     if (this.settings.enableServer) {
       this.initServer();
@@ -57,7 +60,9 @@ export class Server extends Service implements Events {
   }
   #startListen() {
     if (this.server?.listening) return;
-    this.server?.listen(this.port, "localhost", () => this.listeningListener());
+    this.server?.listen(this.port, this.hostname, () =>
+      this.listeningListener(),
+    );
   }
   initServer() {
     this.#createServer();

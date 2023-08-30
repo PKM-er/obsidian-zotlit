@@ -5,6 +5,7 @@ import { Server } from "./service";
 interface SettingOptions {
   enableServer: boolean;
   serverPort: number;
+  serverHostname: string;
 }
 
 export class ServerSettings extends Settings<SettingOptions> {
@@ -12,6 +13,7 @@ export class ServerSettings extends Settings<SettingOptions> {
     return {
       enableServer: false,
       serverPort: 9091,
+      serverHostname: "127.0.0.1",
     };
   }
   async apply(key: keyof SettingOptions): Promise<void> {
@@ -25,6 +27,7 @@ export class ServerSettings extends Settings<SettingOptions> {
         }
         return;
       case "serverPort":
+      case "serverHostname":
         server.reloadPort();
         return;
       default:

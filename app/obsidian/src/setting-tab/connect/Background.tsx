@@ -41,7 +41,7 @@ function ServerPort() {
       return false;
     }
     const portReady = await getPort({
-      host: "127.0.0.1",
+      host: server.serverHostname,
       port: [port],
     });
     console.log(portReady, port);

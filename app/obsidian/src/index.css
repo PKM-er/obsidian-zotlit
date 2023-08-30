@@ -32,22 +32,6 @@ button.obzt-btn-reset {
     border-color: theme("borderColor.DEFAULT", currentColor);
   }
 
-  /*
-1. Change the font styles in all browsers.
-2. Remove the margin in Firefox and Safari.
-3. Remove default padding in all browsers.
-*/
-
-  input,
-  optgroup {
-    font-family: inherit; /* 1 */
-    font-size: 100%; /* 1 */
-    font-weight: inherit; /* 1 */
-    line-height: inherit; /* 1 */
-    color: inherit; /* 1 */
-    margin: 0; /* 2 */
-    padding: 0; /* 3 */
-  }
 
   /*
 1. Correct the inability to style clickable types in iOS and Safari.
