@@ -6,7 +6,6 @@ import { SettingTabCtx } from "./common";
 import Connect from "./connect";
 import General from "./general";
 import Misc from "./misc";
-import NoteFields from "./note-fields";
 import PluginSettingTab from "./patch-tab";
 import Suggester from "./suggester";
 import Template from "./template";
@@ -74,12 +73,6 @@ export function MainPage() {
         className="divide-y flex-grow overflow-y-scroll"
       >
         <Template />
-      </TabsContent>
-      <TabsContent
-        value="note-fields"
-        className="divide-y flex-grow overflow-y-scroll"
-      >
-        <NoteFields />
       </TabsContent>
       <TabsContent
         value="misc"
