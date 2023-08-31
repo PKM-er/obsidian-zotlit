@@ -11,8 +11,8 @@ import {
 } from "@/components/atch-suggest";
 import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
+import { Template, fromPath } from "@/services/template/eta/preset";
 import type { Context } from "@/services/template/helper/base.js";
-import { DEFAULT_TEMPLATE } from "@/services/template/settings";
 import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
@@ -59,14 +59,14 @@ class NoteFeatures extends Service {
     );
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
-        const type = plugin.templateLoader.getTemplateTypeOf(file);
-        if (!type) return;
+        const tpl = fromPath(file.path, plugin.settings.template.folder);
+        if (tpl?.type !== "ejectable") return;
         menu.addItem((i) =>
           i
             .setIcon("edit")
             .setTitle("Open Template Preview")
             .onClick(() => {
-              openTemplatePreview(type, null, plugin);
+              openTemplatePreview(tpl.name, null, plugin);
             }),
         );
       }),
@@ -170,19 +170,20 @@ class NoteFeatures extends Service {
     );
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
-        const type = plugin.templateLoader.getTemplateTypeOf(file);
-        if (!type) return;
+        const tpl = fromPath(file.path, plugin.settings.template.folder);
+        if (tpl?.type !== "ejectable") return;
         menu.addItem((i) =>
           i
             .setTitle("Reset to default")
             .setIcon("reset")
             .onClick(async () => {
               // make sure prompt is shown in the active window
-              const win = app.workspace.activeLeaf?.containerEl.win ?? window;
+              const win =
+                plugin.app.workspace.activeLeaf?.containerEl.win ?? window;
               if (!win.confirm("Reset template to default?")) return;
               await plugin.app.vault.modify(
                 file as TFile,
-                DEFAULT_TEMPLATE[type],
+                Template.Ejectable[tpl.name],
               );
             }),
         );
@@ -210,7 +211,10 @@ class NoteFeatures extends Service {
 
   async createNoteForDocItem(
     docItem: RegularItemInfoBase,
-    render: (template: TemplateRenderer, ctx: Context) => string,
+    render: (
+      template: TemplateRenderer,
+      ctx: Context,
+    ) => Promise<string> | string,
   ) {
     const { noteIndex } = this.plugin;
 
@@ -224,7 +228,7 @@ class NoteFeatures extends Service {
       { literatureNoteFolder: folder } = this.plugin.settings.noteIndex,
       template = this.plugin.templateRenderer;
 
-    const filepath = join(folder, template.renderFilename(docItem));
+    const filepath = join(folder, await template.renderFilename(docItem));
     const existingFile = vault.getAbstractFileByPath(filepath);
     if (existingFile) {
       if (getItemKeyOf(existingFile)) {
@@ -237,7 +241,7 @@ class NoteFeatures extends Service {
     const note = await fileManager.createNewMarkdownFile(
       vault.getRoot(),
       filepath,
-      render(template, {
+      await render(template, {
         plugin: this.plugin,
         sourcePath: filepath,
       }),

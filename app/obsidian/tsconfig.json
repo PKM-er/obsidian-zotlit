@@ -4,7 +4,7 @@
     "baseUrl": "src",
     "outDir": "dist",
     "target": "ES2022",
-    "lib": ["dom", "ES2018"],
+    "lib": ["dom", "ES2022"],
     "moduleResolution": "bundler",
     "module": "ESNext",
     "jsx": "react-jsx",

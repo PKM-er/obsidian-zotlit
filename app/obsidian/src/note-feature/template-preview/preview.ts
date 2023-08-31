@@ -1,5 +1,5 @@
 import { loadPrism, Component, TFile, Notice } from "obsidian";
-import type { EjectableTemplate } from "@/services/template/settings";
+import type { TplType } from "@/services/template/eta/preset";
 import { TemplatePreviewBase, asyncDebounce, toCtx } from "./base";
 import { getTemplateEditorInGroup, getTemplateFile } from "./open";
 
@@ -17,7 +17,7 @@ export class TemplatePreview extends TemplatePreviewBase {
     return "Zotero Template Preview: " + type;
   }
 
-  async switchToTemplate(type: EjectableTemplate) {
+  async switchToTemplate(type: TplType.Ejectable) {
     if (!this.leaf.group) return false;
     const templateEditorLeaf = getTemplateEditorInGroup(
       this.leaf.group,
@@ -70,7 +70,7 @@ export class TemplatePreview extends TemplatePreviewBase {
         const currType = this.getTemplateType(this.file);
         if (currType && type === currType) {
           // trigger update on eject state change
-          this.setTemplateType(this.enabled && currType);
+          this.setTemplateType(currType);
           this.requestRender();
         }
       }),
@@ -92,6 +92,7 @@ export class TemplatePreview extends TemplatePreviewBase {
     }
     let markdown = "";
     const ctx = toCtx(this.plugin);
+    const renderer = this.plugin.templateRenderer;
     switch (templateType) {
       case "annotation": {
         const annot = preview.annot ?? preview.annotations[0];
@@ -99,18 +100,14 @@ export class TemplatePreview extends TemplatePreviewBase {
           this.contentEl.setText("No annotation data available");
           return;
         }
-        markdown = this.plugin.templateRenderer.renderAnnot(
-          annot,
-          preview,
-          ctx,
-        );
+        markdown = await renderer.renderAnnot(annot, preview, ctx);
         break;
       }
       case "annots":
-        markdown = this.plugin.templateRenderer.renderAnnots(preview, ctx);
+        markdown = await renderer.renderAnnots(preview, ctx);
         break;
       case "note":
-        markdown = this.plugin.templateRenderer.renderNote(preview, ctx);
+        markdown = await renderer.renderNote(preview, ctx);
         break;
       default:
         this.contentEl.setText("Unexpected template type");

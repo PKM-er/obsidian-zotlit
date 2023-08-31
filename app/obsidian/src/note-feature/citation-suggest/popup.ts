@@ -21,7 +21,7 @@ class CitationPopupSuggest extends ZoteroItemPopupSuggest {
 export async function insertCitationTo(editor: Editor, plugin: ZoteroPlugin) {
   const result = await chooseLiterature(plugin);
   if (!result) return false;
-  insertCitation(
+  await insertCitation(
     { item: result.value.item, alt: isShift(result.evt) },
     undefined,
     editor,

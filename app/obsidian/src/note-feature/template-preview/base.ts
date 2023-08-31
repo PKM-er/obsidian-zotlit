@@ -2,8 +2,9 @@ import { createStore } from "@obzt/components";
 import type { AnnotationInfo, ItemIDLibID } from "@obzt/database";
 import type { TFile, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { FileView } from "obsidian";
+import type { TplType } from "@/services/template/eta/preset";
+import { fromPath } from "@/services/template/eta/preset";
 import type { HelperExtra } from "@/services/template/helper";
-import type { EjectableTemplate } from "@/services/template/settings";
 import { untilZoteroReady } from "@/utils/once";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -20,8 +21,8 @@ export interface TemplatePreviewState {
   preview: TemplatePreviewStateData | null;
 }
 export interface IStore {
-  templateType: EjectableTemplate | null;
-  setTemplateType(type?: EjectableTemplate | false): void;
+  templateType: TplType.Ejectable | null;
+  setTemplateType(type?: TplType.Ejectable | false): void;
   preview: PreviewData | null;
   setPreview(data: PreviewData | null): void;
   setPreviewFromState(
@@ -160,18 +161,18 @@ export abstract class TemplatePreviewBase extends FileView {
   canAcceptExtension(extension: string): boolean {
     return extension === "md";
   }
-  get enabled() {
-    return this.plugin.templateLoader.settings.ejected;
+  getTemplateType(file: TFile | null) {
+    if (!file) return false;
+    const tpl = fromPath(file.path, this.plugin.settings.template.folder);
+    if (tpl?.type !== "ejectable") return false;
+    return tpl.name;
   }
-  getTemplateType(file: TFile) {
-    return this.plugin.templateLoader.getTemplateTypeOf(file);
-  }
-  setTemplateType(type?: EjectableTemplate | false) {
+  setTemplateType(type?: TplType.Ejectable | false) {
     this.store.getState().setTemplateType(type);
   }
   async onLoadFile(file: TFile): Promise<void> {
     await super.onLoadFile(file);
-    this.setTemplateType(this.enabled && this.getTemplateType(file));
+    this.setTemplateType(this.getTemplateType(file));
   }
 
   getState(): TemplatePreviewState {

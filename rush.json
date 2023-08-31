@@ -334,6 +334,10 @@
       "projectFolder": "lib/protocol"
     },
     {
+      "packageName": "eta-prf",
+      "projectFolder": "lib/eta"
+    },
+    {
       "packageName": "@aidenlx/eslint-config",
       "projectFolder": "common/config/eslint"
     }

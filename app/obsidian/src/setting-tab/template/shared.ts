@@ -1,7 +1,7 @@
-import type { TemplateType } from "@/services/template/settings";
+import type { TplType } from "@/services/template/eta/preset";
 
 export const templateDesc: Record<
-  TemplateType,
+  TplType.All,
   { title: string; desc: DocumentFragment | string }
 > = {
   filename: { title: "Note Filename", desc: "" },

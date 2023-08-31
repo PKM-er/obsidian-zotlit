@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
-import type { NonEjectableTemplate } from "@/services/template/settings";
+import type { TplType } from "@/services/template/eta/preset";
 import { SettingTabCtx } from "../common";
 import { TextComfirmSettingBase } from "../components/TextComfirm";
 import { templateDesc } from "./shared";
 
-export function SimpleTemplateEdit({ type }: { type: NonEjectableTemplate }) {
+export function SimpleTemplateEdit({ type }: { type: TplType.Embeded }) {
   const { plugin } = useContext(SettingTabCtx);
   const { template } = plugin.settings;
 

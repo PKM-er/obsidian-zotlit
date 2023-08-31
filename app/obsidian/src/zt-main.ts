@@ -14,12 +14,7 @@ import { CitekeyClick } from "./services/citekey-click/service";
 import NoteIndex from "./services/note-index/service";
 import PDFParser from "./services/pdf-parser/service";
 import { Server } from "./services/server/service";
-import {
-  TemplateComplier,
-  TemplateLoader,
-  TemplateRenderer,
-  TemplateEditorHelper,
-} from "./services/template";
+import { TemplateRenderer, TemplateEditorHelper } from "./services/template";
 import {
   DatabaseWorker,
   ImgCacheImporter,
@@ -62,8 +57,6 @@ export default class ZoteroPlugin extends Plugin {
   database = this.use(ZoteroDatabase);
 
   templateRenderer = this.use(TemplateRenderer);
-  templateComplier = this.use(TemplateComplier);
-  templateLoader = this.use(TemplateLoader);
 
   annotBlockWorker = this.use(AnnotBlock);
   pdfParser = this.use(PDFParser);

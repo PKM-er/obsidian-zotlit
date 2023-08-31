@@ -4,3 +4,6 @@
 [submodule "docs"]
 	path = docs
 	url = https://github.com/aidenlx/obsidian-zotero-docs
+[submodule "lib/eta"]
+	path = lib/eta
+	url = https://github.com/aidenlx/eta

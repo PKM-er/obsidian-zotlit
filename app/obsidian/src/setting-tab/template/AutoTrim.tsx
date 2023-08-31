@@ -1,6 +1,6 @@
 import { useMemoizedFn } from "ahooks";
+import type { trimConfig } from "eta-prf";
 import { useState, useContext } from "react";
-import type { EtaTrimConfig } from "@/services/template/settings";
 import { SettingTabCtx } from "../common";
 import SettingsComponent, { useApplySetting } from "../components/Setting";
 
@@ -9,12 +9,10 @@ type EtaTrimConfigOption = "false" | "nl" | "slurp";
 export default function AutoTrimSetting() {
   const { plugin } = useContext(SettingTabCtx);
   const { template } = plugin.settings;
-  const [leading, setLeading] = useState<EtaTrimConfig>(
+  const [leading, setLeading] = useState<trimConfig>(
     () => template.autoTrim[0],
   );
-  const [ending, setEnding] = useState<EtaTrimConfig>(
-    () => template.autoTrim[1],
-  );
+  const [ending, setEnding] = useState<trimConfig>(() => template.autoTrim[1]);
 
   const applySeting = useApplySetting(template, "autoTrim");
   const onModeChange = useMemoizedFn(async function onChange(

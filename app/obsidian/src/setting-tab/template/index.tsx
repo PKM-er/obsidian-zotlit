@@ -1,8 +1,5 @@
 import { useContext } from "react";
-import {
-  ejectableTemplateTypes,
-  nonEjectableTemplateTypes,
-} from "@/services/template/settings";
+import { TemplateNames } from "@/services/template/eta/preset";
 import { SettingTabCtx, normalizePath } from "../common";
 import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
@@ -11,11 +8,9 @@ import AutoTrimSetting from "./AutoTrim";
 import { EjectableTemplate } from "./EjectableTemplate";
 import { FmFields } from "./FmFields";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
-import { EjectableTemplateHeading, useEjected } from "./useEjected";
 
 export default function Template() {
   const { template } = useContext(SettingTabCtx).plugin.settings;
-  const [ejected, ejectBtnRef] = useEjected();
   return (
     <>
       <TextComfirmSetting
@@ -88,12 +83,16 @@ export default function Template() {
       </BooleanSetting>
       <FmFields />
       <Setting heading name="Simple" />
-      {nonEjectableTemplateTypes.map((type) => (
+      {TemplateNames.Embeded.map((type) => (
         <SimpleTemplateEdit key={type} type={type} />
       ))}
-      <EjectableTemplateHeading ejected={ejected} ref={ejectBtnRef} />
-      {ejectableTemplateTypes.map((type) => (
-        <EjectableTemplate key={type} ejected={ejected} type={type} />
+      <Setting
+        heading
+        name="Ejectable"
+        description="These templates can be customized once saved to the template folder"
+      />
+      {TemplateNames.Ejectable.map((type) => (
+        <EjectableTemplate key={type} type={type} />
       ))}
     </>
   );

@@ -92,7 +92,7 @@ export async function updateNote(
 
     if (overwrite) {
       // TODO: support import from multiple attachments
-      const content = templateRenderer.renderNote(
+      const content = await templateRenderer.renderNote(
         extraByAtch[attachmentIDs[0]],
         ctx,
       );
@@ -119,28 +119,39 @@ export async function updateNote(
         attachmentIDs.map((id) => [extraByAtch[id], []]),
       ),
       toUpdate: { from: number; to: number; insert: string }[] = [];
-    attachmentIDs.forEach((atchID) => {
-      const extra = extraByAtch[atchID];
-      extra.annotations.forEach((annot) => {
-        const blockID = getItemKeyGroupID(annot, true);
-        const ranges = annotSections[blockID];
-        if (ranges) {
-          // only update existing content if explicitly enabled
-          if (!plugin.settings.template.updateAnnotBlock) return;
-          const insert = templateRenderer.renderAnnot(annot, extra, ctx);
-          toUpdate.push(
-            ...ranges.blocks.map((r) => ({
-              from: r.start.offset,
-              to: r.end.offset,
-              insert,
-            })),
-          );
-        } else if (!annotBlocks.has(blockID)) {
-          toAdd.get(extra)!.push(annot);
-        }
-        // blocks that are not section do not support in-place update
-      });
-    });
+
+    await Promise.all(
+      attachmentIDs.map(async (atchID) => {
+        const extra = extraByAtch[atchID];
+        if (!extra.annotations || extra.annotations.length === 0) return;
+        return await Promise.all(
+          extra.annotations.map(async (annot) => {
+            const blockID = getItemKeyGroupID(annot, true);
+            const ranges = annotSections[blockID];
+            if (ranges) {
+              // only update existing content if explicitly enabled
+              if (!plugin.settings.template.updateAnnotBlock) return;
+              const insert = await templateRenderer.renderAnnot(
+                annot,
+                extra,
+                ctx,
+              );
+              toUpdate.push(
+                ...ranges.blocks.map((r) => ({
+                  from: r.start.offset,
+                  to: r.end.offset,
+                  insert,
+                })),
+              );
+            } else if (!annotBlocks.has(blockID)) {
+              toAdd.get(extra)!.push(annot);
+            }
+            // blocks that are not section do not support in-place update
+          }) ?? [],
+        );
+      }),
+    );
+
     if (toUpdate.length > 0) {
       const updatedContent = EditorState.create({
         doc: await app.vault.read(file),

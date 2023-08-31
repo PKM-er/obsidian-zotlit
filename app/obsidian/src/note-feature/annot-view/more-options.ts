@@ -63,7 +63,7 @@ const jumpToAnnotNote =
       if (
         leaf &&
         leaf.view instanceof MarkdownView &&
-        leaf.view.file.path === blockInfo.file
+        leaf.view.file?.path === blockInfo.file
       ) {
         leaf.view.setEphemeralState({ line: endLine });
         hasMarkdownView = !0;

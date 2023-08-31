@@ -53,6 +53,10 @@
       "path": "lib/ophidian-lib-core"
     },
     {
+      "name": "eta",
+      "path": "lib/eta"
+    },
+    {
       "name": "root",
       "path": "."
     }

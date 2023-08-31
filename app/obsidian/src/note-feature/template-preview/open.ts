@@ -1,12 +1,12 @@
 import { MarkdownView, Notice, TFile } from "obsidian";
-import type { EjectableTemplate } from "@/services/template/settings";
+import { fromPath, toPath, type TplType } from "@/services/template/eta/preset";
 import type ZoteroPlugin from "@/zt-main";
 import type { TemplatePreviewStateData } from "./base";
 import { itemDetailsViewType } from "./details";
 import { templatePreviewViewType } from "./preview";
 
 export async function openTemplatePreview(
-  type: EjectableTemplate,
+  type: TplType.Ejectable,
   data: TemplatePreviewStateData | null,
   plugin: ZoteroPlugin,
 ) {
@@ -16,14 +16,14 @@ export async function openTemplatePreview(
     new Notice("Template file not found: " + type);
     return;
   }
-  const { templateLoader } = plugin;
-  const existing = workspace
-    .getLeavesOfType("markdown")
-    .filter(
-      (l) =>
-        templateLoader.getTemplateTypeOf((l.view as MarkdownView)?.file) &&
-        l.getRoot().type === "floating",
+  const existing = workspace.getLeavesOfType("markdown").filter((l) => {
+    const view = l.view as MarkdownView;
+    if (!view.file) return false;
+    return (
+      fromPath(view.file.path, plugin.settings.template.folder)?.type ===
+        "ejectable" && l.getRoot().type === "floating"
     );
+  });
 
   if (existing.length > 0) {
     const markdown = existing[0];
@@ -66,13 +66,11 @@ export async function openTemplatePreview(
   ]);
 }
 
-export function getTemplateFile(type: EjectableTemplate, plugin: ZoteroPlugin) {
-  const filePath = plugin.templateLoader.getTemplateFile(type),
-    file = plugin.app.vault.getAbstractFileByPath(filePath);
-  if (!file || !(file instanceof TFile)) {
-    return null;
-  }
-  return file;
+export function getTemplateFile(type: TplType.Ejectable, plugin: ZoteroPlugin) {
+  const filepath = toPath(type, plugin.settings.template.folder),
+    file = plugin.app.vault.getAbstractFileByPath(filepath);
+  if (file instanceof TFile) return file;
+  return null;
 }
 
 export function getTemplateEditorInGroup(group: string, plugin: ZoteroPlugin) {
@@ -81,7 +79,9 @@ export function getTemplateEditorInGroup(group: string, plugin: ZoteroPlugin) {
     .find(
       (l) =>
         l.view instanceof MarkdownView &&
-        plugin.templateLoader.getTemplateTypeOf(l.view.file),
+        l.view.file &&
+        fromPath(l.view.file.path, plugin.settings.template.folder)?.type ===
+          "ejectable",
     );
   return templateEditorLeaf;
 }
