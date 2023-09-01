@@ -128,8 +128,8 @@ importers:
         specifier: ~4.0.0
         version: 4.0.1
       obsidian:
-        specifier: 1.2.8
-        version: 1.2.8(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
+        specifier: 1.4.4
+        version: 1.4.4(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
       preact:
         specifier: ~10.11.3
         version: 10.11.3
@@ -274,7 +274,7 @@ importers:
         version: 7.3.8
       tailwindcss:
         specifier: ~3.2.4
-        version: 3.2.7(postcss@8.4.21)
+        version: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
       tslib:
         specifier: ^2.3.1
         version: 2.5.0
@@ -472,7 +472,7 @@ importers:
         version: 1.16.0(postcss@8.4.21)
       tailwindcss:
         specifier: ~3.2.4
-        version: 3.2.7(postcss@8.4.21)
+        version: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
       typescript:
         specifier: ~5.1.6
         version: 5.1.6
@@ -665,8 +665,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       obsidian:
-        specifier: 1.2.8
-        version: 1.2.8(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
+        specifier: 1.4.4
+        version: 1.4.4(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
       to-use:
         specifier: ^0.2.1
         version: 0.2.1
@@ -4549,7 +4549,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.2.0'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
   /@tailwindcss/forms@0.5.3(tailwindcss@3.2.7):
@@ -4558,7 +4558,7 @@ packages:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
   /@tailwindcss/line-clamp@0.4.2(tailwindcss@3.2.7):
@@ -4566,7 +4566,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
   /@tailwindcss/typography@0.5.9(tailwindcss@3.2.7):
@@ -4578,7 +4578,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
   /@tootallnate/once@1.1.2:
@@ -4658,8 +4658,8 @@ packages:
       '@types/responselike': 1.0.0
     dev: true
 
-  /@types/codemirror@0.0.108:
-    resolution: {integrity: sha512-3FGFcus0P7C2UOGCNUVENqObEb4SFk+S8Dnxq7K6aIsLVs/vDtlangl3PEO0ykaKXyK56swVF6Nho7VsA44uhw==}
+  /@types/codemirror@5.60.8:
+    resolution: {integrity: sha512-VjFgDF/eB+Aklcy15TtOTLQeMjTo07k7KAjql8OK5Dirr7a6sJY4T1uVBDuTVG9VEmn1uUsohOpYnVfgC6/jyw==}
     dependencies:
       '@types/tern': 0.23.4
     dev: false
@@ -7856,7 +7856,7 @@ packages:
     dependencies:
       fast-glob: 3.2.12
       postcss: 8.4.21
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
   /eslint-scope@5.1.1:
@@ -12050,15 +12050,15 @@ packages:
       es-abstract: 1.21.2
     dev: false
 
-  /obsidian@1.2.8(@codemirror/state@6.2.0)(@codemirror/view@6.9.3):
-    resolution: {integrity: sha512-HrC+feA8o0tXspj4lEAqxb1btwLwHD2oHXSwbbN+CdRHURqbCkuIDLld+nkuyJ1w1c9uvVDRVk8BoeOnWheOrQ==}
+  /obsidian@1.4.4(@codemirror/state@6.2.0)(@codemirror/view@6.9.3):
+    resolution: {integrity: sha512-q2V5GNT/M40uYOENdVw5kovPSoaO6vppiiyBCkIqWgKp4oN654jA/GQ0OaNBA7p5NdfS245QCeRgCFQ42wOZiw==}
     peerDependencies:
       '@codemirror/state': ^6.0.0
       '@codemirror/view': ^6.0.0
     dependencies:
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.9.3
-      '@types/codemirror': 0.0.108
+      '@types/codemirror': 5.60.8
       moment: 2.29.4
     dev: false
 
@@ -12711,7 +12711,7 @@ packages:
     dependencies:
       lilconfig: 2.1.0
       postcss: 8.4.21
-      ts-node: 10.9.1(@types/node@18.15.7)(typescript@5.1.6)
+      ts-node: 10.9.1(@types/node@17.0.45)(typescript@5.1.6)
       yaml: 1.10.2
 
   /postcss-merge-longhand@5.1.7(postcss@8.4.21):
@@ -14683,10 +14683,10 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)
+      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
     dev: false
 
-  /tailwindcss@3.2.7(postcss@8.4.21):
+  /tailwindcss@3.2.7(postcss@8.4.21)(ts-node@10.9.1):
     resolution: {integrity: sha512-B6DLqJzc21x7wntlH/GsZwEXTBttVSl1FtCzC8WP4oBc/NKef7kaax5jeihkkCEWc831/5NDJ9gRNDK6NEioQQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
@@ -14987,7 +14987,6 @@ packages:
       typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    dev: true
 
   /ts-node@10.9.1(@types/node@18.15.7)(typescript@5.1.6):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
@@ -15018,6 +15017,7 @@ packages:
       typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    dev: true
 
   /tsconfck@2.1.1(typescript@5.1.6):
     resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}
