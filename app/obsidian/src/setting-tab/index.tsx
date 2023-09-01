@@ -47,7 +47,6 @@ export function MainPage() {
         <TabsTrigger value="connect">Connect</TabsTrigger>
         <TabsTrigger value="suggester">Suggester</TabsTrigger>
         <TabsTrigger value="template">Template</TabsTrigger>
-        <TabsTrigger value="note-fields">Fields</TabsTrigger>
         <TabsTrigger value="misc">Misc</TabsTrigger>
       </TabsList>
       <TabsContent

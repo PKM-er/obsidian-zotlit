@@ -5,11 +5,12 @@ import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
 import AutoTrimSetting from "./AutoTrim";
-import { EjectableTemplate } from "./EjectableTemplate";
+import { EjectableTemplate, useEjectAll } from "./EjectableTemplate";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
 
 export default function Template() {
   const { template } = useContext(SettingTabCtx).plugin.settings;
+  const [ejected, ejectBtnRef] = useEjectAll();
   return (
     <>
       <TextComfirmSetting
@@ -87,8 +88,11 @@ export default function Template() {
       <Setting
         heading
         name="Ejectable"
+        ref={ejectBtnRef}
         description="These templates can be customized once saved to the template folder"
-      />
+      >
+        {ejected || <div>Eject</div>}
+      </Setting>
       {TemplateNames.Ejectable.map((type) => (
         <EjectableTemplate key={type} type={type} />
       ))}
