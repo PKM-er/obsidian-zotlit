@@ -6,7 +6,6 @@ import Setting from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
 import AutoTrimSetting from "./AutoTrim";
 import { EjectableTemplate } from "./EjectableTemplate";
-import { FmFields } from "./FmFields";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
 
 export default function Template() {
@@ -81,7 +80,6 @@ export default function Template() {
           </div>
         </div>
       </BooleanSetting>
-      <FmFields />
       <Setting heading name="Simple" />
       {TemplateNames.Embeded.map((type) => (
         <SimpleTemplateEdit key={type} type={type} />

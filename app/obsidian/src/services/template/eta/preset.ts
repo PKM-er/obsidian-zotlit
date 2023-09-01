@@ -2,6 +2,7 @@
 import { join } from "path/posix";
 import annotation from "../defaults/zt-annot.ejs";
 import annots from "../defaults/zt-annots.ejs";
+import field from "../defaults/zt-field.ejs";
 import note from "../defaults/zt-note.ejs";
 
 export const Template = {
@@ -9,6 +10,7 @@ export const Template = {
     note,
     annots,
     annotation,
+    field,
   },
   Embeded: {
     filename: "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md",

@@ -1,15 +1,10 @@
 // @ts-ignore
 import { merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
-import type {
-  AnnotationInfo,
-  RegularItemInfoBase,
-  TagInfo,
-} from "@obzt/database";
-import { TagType } from "@obzt/zotero-type";
+import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
 import { Service } from "@ophidian/core";
 import type { TAbstractFile, TFile } from "obsidian";
-import { Notice, TFolder, Vault, stringifyYaml } from "obsidian";
+import { Notice, TFolder, Vault, parseYaml, stringifyYaml } from "obsidian";
 import log, { logError } from "@/log";
 import { isMarkdownFile } from "@/utils";
 import { merge as mergeAnnotsTags } from "@/utils/merge";
@@ -17,12 +12,7 @@ import ZoteroPlugin from "@/zt-main";
 import { ObsidianEta } from "./eta";
 import { patchCompile } from "./eta/patch";
 import { fromPath } from "./eta/preset";
-import type { FmFieldsMapping } from "./frontmatter";
-import {
-  ZOTERO_ATCHS_FIELDNAME,
-  blacklistIgnore,
-  ZOTERO_KEY_FIELDNAME,
-} from "./frontmatter";
+import { ZOTERO_ATCHS_FIELDNAME, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
 import type { HelperExtra } from "./helper/to-helper";
@@ -31,6 +21,7 @@ import { TemplateSettings } from "./settings";
 
 export interface TemplateDataMap {
   note: DocItemHelper;
+  field: DocItemHelper;
   filename: RegularItemInfoBase;
   annotation: AnnotHelper;
   annots: AnnotHelper[];
@@ -121,10 +112,12 @@ export class TemplateRenderer extends Service {
     return extra;
   }
 
-  private render<T extends string>(
+  private render<T extends keyof TemplateDataMap>(
     target: T,
-    obj: T extends keyof TemplateDataMap ? TemplateDataMap[T] : any,
-  ) {
+    obj: TemplateDataMap[T],
+  ): string;
+  private render(target: string, obj: any): string;
+  private render(target: string, obj: any): string {
     try {
       return this.eta.render(target, obj);
     } catch (error) {
@@ -179,42 +172,21 @@ export class TemplateRenderer extends Service {
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
+    const frontmatterString = this.render("field", data);
     const {
-      fmFieldsMode: mode,
-      fmFieldsMapping: mapping,
-      fmTagPrefix: tagPrefix,
-    } = this.use(TemplateSettings);
-    const record: Record<string, any> = {};
-    // Required key for annotation note
-    record[ZOTERO_KEY_FIELDNAME] = getItemKeyGroupID(data, true);
-    if (data.attachment?.itemID) {
-      record[ZOTERO_ATCHS_FIELDNAME] = [data.attachment.itemID];
-    }
-
-    // eslint-disable-next-line prefer-const
-    for (let [key, val] of Object.entries(data as Record<string, any>)) {
-      if (mode === "blacklist" && blacklistIgnore.has(key)) {
-        continue;
-      }
-      if (key === "tags") {
-        val = (val as TagInfo[])
-          // only include manually added tags for now
-          .filter((tag) => tag.type === TagType.manual)
-          .map((v) => (tagPrefix ?? "") + v.name);
-      }
-      const action = mapping[key as keyof FmFieldsMapping];
-      if (typeof action === "string") {
-        record[action] = val;
-      } else if (
-        (mode === "whitelist" && action === undefined) ||
-        (mode === "blacklist" && action === true)
-      ) {
-        continue;
-      } else {
-        record[key] = val;
-      }
-    }
-    return record;
+      [ZOTERO_KEY_FIELDNAME]: _key,
+      [ZOTERO_ATCHS_FIELDNAME]: _atch,
+      ...frontmatter
+    } = parseYaml(frontmatterString);
+    return {
+      // Required keys for zotero literature note
+      [ZOTERO_KEY_FIELDNAME]: getItemKeyGroupID(data, true),
+      [ZOTERO_ATCHS_FIELDNAME]: data.attachment
+        ? // Obsidian field editor don't support array of numbers
+          [data.attachment.itemID.toString()]
+        : undefined,
+      ...frontmatter,
+    };
   }
 
   renderFrontmatter(item: DocItemHelper, extra?: Record<string, any>) {
@@ -225,13 +197,7 @@ export class TemplateRenderer extends Service {
       );
       return str;
     } catch (err) {
-      logError(
-        "Failed to renderYaml",
-        err,
-        item,
-        this.use(TemplateSettings).fmFieldsMode,
-        this.use(TemplateSettings).fmFieldsMapping,
-      );
+      logError("Failed to renderYaml", err, item);
       new Notice("Failed to renderYaml");
     }
   }
@@ -242,13 +208,7 @@ export class TemplateRenderer extends Service {
         Object.assign(fm, record),
       );
     } catch (err) {
-      logError(
-        "Failed to set frontmatter to file " + file.path,
-        err,
-        data,
-        this.use(TemplateSettings).fmFieldsMode,
-        this.use(TemplateSettings).fmFieldsMapping,
-      );
+      logError("Failed to set frontmatter to file " + file.path, err, data);
       new Notice("Failed to set frontmatter to file " + file.path);
     }
   }

@@ -4,15 +4,10 @@ import type { trimConfig } from "eta-prf";
 import Settings from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
 import { Template, TemplateNames, type TplType } from "./eta/preset";
-import type { FmFieldsMapping, FmMode } from "./frontmatter";
-import { DEFAULT_FMFIELD_MAPPING } from "./frontmatter";
 
 interface SettingOptions {
   folder: string;
   templates: Record<TplType.Embeded, string>;
-  fmFieldsMode: FmMode;
-  fmFieldsMapping: FmFieldsMapping;
-  fmTagPrefix: string;
   updateAnnotBlock: boolean;
   updateOverwrite: boolean;
   autoPairEta: boolean;
@@ -31,11 +26,6 @@ export class TemplateSettings extends Settings<SettingOptions> {
     return {
       folder: "ZtTemplates",
       templates: Template.Embeded,
-      fmFieldsMode: "whitelist",
-      fmFieldsMapping: {
-        ...DEFAULT_FMFIELD_MAPPING,
-      },
-      fmTagPrefix: "",
       autoPairEta: false,
       updateAnnotBlock: false,
       updateOverwrite: false,
@@ -58,9 +48,6 @@ export class TemplateSettings extends Settings<SettingOptions> {
     switch (key) {
       case "folder":
       case "templates":
-      case "fmFieldsMode":
-      case "fmFieldsMapping":
-      case "fmTagPrefix":
       case "updateAnnotBlock":
       case "updateOverwrite":
         return;
@@ -86,9 +73,6 @@ export class TemplateSettings extends Settings<SettingOptions> {
         folder: this.folder,
         templates: this.templates,
       },
-      fmFieldsMode: this.fmFieldsMode,
-      fmFieldsMapping: this.fmFieldsMapping,
-      fmTagPrefix: this.fmTagPrefix,
       autoPairEta: this.autoPairEta,
       updateAnnotBlock: this.updateAnnotBlock,
       updateOverwrite: this.updateOverwrite,
@@ -101,9 +85,6 @@ export class TemplateSettings extends Settings<SettingOptions> {
       ...(json.template ?? {}),
       ...selectKeys(json, [
         "autoPairEta",
-        "fmFieldsMode",
-        "fmFieldsMapping",
-        "fmTagPrefix",
         "updateAnnotBlock",
         "updateOverwrite",
         "autoTrim",
