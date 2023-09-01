@@ -7,7 +7,10 @@ export const templateDesc: Record<
   filename: { title: "Note Filename", desc: "" },
   citation: { title: "Markdown primary citation template", desc: "" },
   altCitation: { title: "Markdown secondary citation template", desc: "" },
-  field: { title: "Field", desc: "Note frontmatter fields template" },
+  field: {
+    title: "Note Properties",
+    desc: "Used to render Properties in literature note",
+  },
   note: {
     title: "Note Content",
     desc: "Used to render created literature note",

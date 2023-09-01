@@ -8,9 +8,9 @@ import note from "../defaults/zt-note.ejs";
 export const Template = {
   Ejectable: {
     note,
+    field,
     annots,
     annotation,
-    field,
   },
   Embeded: {
     filename: "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md",

@@ -55,6 +55,13 @@ export class TemplatePreview extends TemplatePreviewBase {
           (await this.switchToTemplate("annotation")) ||
           new Notice("Cannot switch to template"),
       ),
+      field: this.addAction(
+        "info",
+        "Open Template for Note Properties",
+        async () =>
+          (await this.switchToTemplate("field")) ||
+          new Notice("Cannot switch to template"),
+      ),
     };
     Object.values(switchTemplateActions).forEach((a) => a.hide());
     this.register(
