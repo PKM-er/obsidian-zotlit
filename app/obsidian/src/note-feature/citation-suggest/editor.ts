@@ -57,7 +57,6 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
         alt: (this.context.start as EditorPositionWithAlt).alt ?? false,
       },
       this.context,
-      this.context.editor,
       this.plugin.templateRenderer,
     );
   }

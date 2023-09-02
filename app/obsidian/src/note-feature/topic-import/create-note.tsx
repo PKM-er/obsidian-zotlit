@@ -20,19 +20,18 @@ export async function createNote(
 
   for (const [item, index] of items) {
     const attachments = await plugin.databaseAPI.getAttachments(...ids[index]);
-    await plugin.noteFeatures.createNoteForDocItem(item, (template, ctx) =>
-      template.renderNote(
-        {
-          docItem: item,
-          tags,
-          attachment: null,
-          allAttachments: attachments,
-          annotations: [],
-        },
-        ctx,
-        { tags: [currTopic] },
-      ),
-    );
+    const extra = {
+      docItem: item,
+      tags,
+      attachment: null,
+      allAttachments: attachments,
+      annotations: [],
+    };
+    await plugin.noteFeatures.createNoteForDocItem(item, {
+      note: (template, ctx) =>
+        template.renderNote(extra, ctx, { tags: [currTopic] }),
+      filename: (template, ctx) => template.renderFilename(extra, ctx),
+    });
     new Notice(`Created note for ${item.title}`, 1e3);
   }
 }

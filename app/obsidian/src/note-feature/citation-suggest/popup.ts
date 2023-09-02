@@ -1,4 +1,4 @@
-import type { Editor } from "obsidian";
+import type { Editor, TFile } from "obsidian";
 import { openModal } from "@/components/basic/modal";
 import { ZoteroItemPopupSuggest } from "@/components/item-suggest";
 import type ZoteroPlugin from "@/zt-main";
@@ -18,13 +18,22 @@ class CitationPopupSuggest extends ZoteroItemPopupSuggest {
   }
 }
 
-export async function insertCitationTo(editor: Editor, plugin: ZoteroPlugin) {
+export async function insertCitationTo(
+  editor: Editor,
+  file: TFile | null,
+  plugin: ZoteroPlugin,
+) {
   const result = await chooseLiterature(plugin);
   if (!result) return false;
+  const cursor = editor.getCursor();
   await insertCitation(
     { item: result.value.item, alt: isShift(result.evt) },
-    undefined,
-    editor,
+    {
+      start: cursor,
+      end: cursor,
+      editor,
+      file,
+    },
     plugin.templateRenderer,
   );
   return true;

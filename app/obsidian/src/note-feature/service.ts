@@ -106,7 +106,8 @@ class NoteFeatures extends Service {
     plugin.addCommand({
       id: "insert-markdown-citation",
       name: "Insert Markdown citation",
-      editorCallback: (editor) => insertCitationTo(editor, plugin),
+      editorCallback: (editor, ctx) =>
+        insertCitationTo(editor, ctx.file, plugin),
     });
     plugin.registerEditorSuggest(new CitationEditorSuggest(plugin));
 
@@ -211,10 +212,10 @@ class NoteFeatures extends Service {
 
   async createNoteForDocItem(
     docItem: RegularItemInfoBase,
-    render: (
-      template: TemplateRenderer,
-      ctx: Context,
-    ) => Promise<string> | string,
+    render: {
+      note: (template: TemplateRenderer, ctx: Context) => string;
+      filename: (template: TemplateRenderer, ctx: Context) => string;
+    },
   ) {
     const { noteIndex } = this.plugin;
 
@@ -228,7 +229,10 @@ class NoteFeatures extends Service {
       { literatureNoteFolder: folder } = this.plugin.settings.noteIndex,
       template = this.plugin.templateRenderer;
 
-    const filepath = join(folder, await template.renderFilename(docItem));
+    const filepath = join(
+      folder,
+      render.filename(template, { plugin: this.plugin }),
+    );
     const existingFile = vault.getAbstractFileByPath(filepath);
     if (existingFile) {
       if (getItemKeyOf(existingFile)) {
@@ -241,7 +245,7 @@ class NoteFeatures extends Service {
     const note = await fileManager.createNewMarkdownFile(
       vault.getRoot(),
       filepath,
-      await render(template, {
+      render.note(template, {
         plugin: this.plugin,
         sourcePath: filepath,
       }),
@@ -265,9 +269,10 @@ class NoteFeatures extends Service {
       this.plugin,
     );
     const extra = Object.values(extraByAtch)[0];
-    const note = await this.createNoteForDocItem(item, (template, ctx) =>
-      template.renderNote(extra, ctx),
-    );
+    const note = await this.createNoteForDocItem(item, {
+      note: (template, ctx) => template.renderNote(extra, ctx),
+      filename: (template, ctx) => template.renderFilename(extra, ctx),
+    });
     return note.path;
   }
 

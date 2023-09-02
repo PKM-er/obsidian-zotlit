@@ -164,11 +164,13 @@ export class TemplateRenderer extends Service {
     const str = this.render("annots", data.annotations);
     return str;
   }
-  renderCitation(item: RegularItemInfoBase, alt = false): string {
-    return this.render(alt ? "altCitation" : "citation", item);
+  renderCitation(extra: HelperExtra, ctx: Context, alt = false): string {
+    const data = toHelper(extra, ctx);
+    return this.render(alt ? "altCitation" : "citation", data.docItem);
   }
-  renderFilename(item: RegularItemInfoBase): string {
-    return this.render("filename", item);
+  renderFilename(extra: HelperExtra, ctx: Context): string {
+    const data = toHelper(extra, ctx);
+    return this.render("filename", data.docItem);
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
