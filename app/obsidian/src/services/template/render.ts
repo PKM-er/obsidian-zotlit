@@ -1,5 +1,5 @@
 // @ts-ignore
-import { merge } from "@mobily/ts-belt/Dict";
+import { filter, merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
 import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
 import { Service } from "@ophidian/core";
@@ -152,7 +152,7 @@ export class TemplateRenderer extends Service {
       extra = this.mergeAnnotTags(extra);
     }
     const data = toHelper(extra, ctx);
-    const frontmatter = this.renderFrontmatter(data.docItem, fm);
+    const frontmatter = this.#renderFrontmatter(data.docItem, fm);
     const content = this.render("note", data.docItem);
     return ["", frontmatter, content].join("---\n");
   }
@@ -188,11 +188,23 @@ export class TemplateRenderer extends Service {
         ? // Obsidian field editor don't support array of numbers
           [data.attachment.itemID.toString()]
         : undefined,
-      ...frontmatter,
+      ...filter(
+        frontmatter,
+        (v) => !(v === "" || v === null || v === undefined),
+      ),
     };
   }
 
-  renderFrontmatter(item: DocItemHelper, extra?: Record<string, any>) {
+  renderFrontmatter(
+    extra: HelperExtra,
+    ctx: Context,
+    fm?: Record<string, any>,
+  ) {
+    const data = toHelper(extra, ctx);
+    return this.#renderFrontmatter(data.docItem, fm);
+  }
+
+  #renderFrontmatter(item: DocItemHelper, extra?: Record<string, any>) {
     try {
       const record = this.toFrontmatterRecord(item);
       const str = stringifyYaml(
@@ -202,6 +214,7 @@ export class TemplateRenderer extends Service {
     } catch (err) {
       logError("Failed to renderYaml", err, item);
       new Notice("Failed to renderYaml");
+      throw err;
     }
   }
   async setFrontmatterTo(file: TFile, data: DocItemHelper) {
