@@ -172,7 +172,10 @@ export class TemplateRenderer extends Service {
   }
 
   toFrontmatterRecord(data: DocItemHelper) {
-    const frontmatterString = this.render("field", data);
+    // remove leading and trailing ---\n
+    const frontmatterString = this.render("field", data)
+      .trim()
+      .replace(/^---\n+|\n*---$/g, "");
     const {
       [ZOTERO_KEY_FIELDNAME]: _key,
       [ZOTERO_ATCHS_FIELDNAME]: _atch,
