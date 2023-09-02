@@ -14,6 +14,9 @@ export function withTagHelper<T extends TagInfo | null>(
       toString() {
         return data.name;
       },
+      toJSON() {
+        return data.name;
+      },
     },
     {
       get(target, p, receiver) {
@@ -23,7 +26,12 @@ export function withTagHelper<T extends TagInfo | null>(
         );
       },
       ownKeys(target) {
-        return [...Reflect.ownKeys(data), ...Reflect.ownKeys(target)];
+        return [
+          ...Reflect.ownKeys(data),
+          ...Reflect.ownKeys(target).filter(
+            (v) => !(v === "toJSON" || v === "toString"),
+          ),
+        ];
       },
       getOwnPropertyDescriptor(target, prop) {
         if (Object.prototype.hasOwnProperty.call(data, prop)) {

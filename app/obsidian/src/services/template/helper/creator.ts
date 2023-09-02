@@ -17,6 +17,9 @@ export const withCreatorHelper = (data: Creator) => {
     toString() {
       return this.fullname;
     },
+    toJSON() {
+      return this.fullname;
+    },
   };
   return new Proxy(proxy, {
     get(target, p, receiver) {
@@ -24,7 +27,12 @@ export const withCreatorHelper = (data: Creator) => {
       return Reflect.get(target, p, receiver) ?? Reflect.get(data, p, receiver);
     },
     ownKeys(target) {
-      return [...Reflect.ownKeys(data), ...Reflect.ownKeys(target)];
+      return [
+        ...Reflect.ownKeys(data),
+        ...Reflect.ownKeys(target).filter(
+          (v) => !(v === "toJSON" || v === "toString"),
+        ),
+      ];
     },
     getOwnPropertyDescriptor(target, prop) {
       if (Object.prototype.hasOwnProperty.call(data, prop)) {
