@@ -31,9 +31,13 @@ export class ObsidianEta extends EtaCore {
       ...this.config,
       cache: true,
       autoEscape: false,
+      autoFilter: true,
       filterFunction: (val: unknown): string => {
         if (typeof val === undefined || val === null) {
           return "";
+        }
+        if (val instanceof Date) {
+          return val.toISOString();
         }
         return val as string;
       },
