@@ -1,5 +1,4 @@
 import { use } from "@ophidian/core";
-import groupBy from "core-js-pure/full/object/group-by";
 import { EtaCore, EtaError } from "eta-prf";
 import type { TFile } from "obsidian";
 import { isMarkdownFile } from "@/utils";
@@ -10,10 +9,6 @@ import { render, renderAsync, renderString, renderStringAsync } from "./render";
 const acceptLineBreak = {
   processTemplate: (str: string) =>
     str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n"),
-};
-const patchGroupBy = {
-  processFnString: (fnString: string) =>
-    `const groupBy = ${groupBy.toString()};${fnString}`,
 };
 
 export class ObsidianEta extends EtaCore {
@@ -41,7 +36,7 @@ export class ObsidianEta extends EtaCore {
         }
         return val as string;
       },
-      plugins: [acceptLineBreak, patchGroupBy],
+      plugins: [acceptLineBreak],
       get autoTrim() {
         return self.settings.autoTrim;
       },

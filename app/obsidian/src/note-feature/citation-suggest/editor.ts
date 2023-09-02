@@ -51,7 +51,6 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
     // evt: MouseEvent | KeyboardEvent,
   ): void {
     if (!this.context) return;
-    console.log(this.context);
     insertCitation(
       {
         item: suggestion.item,

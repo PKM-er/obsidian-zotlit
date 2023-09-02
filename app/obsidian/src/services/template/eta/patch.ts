@@ -1,3 +1,6 @@
+import mapGroupBy from "core-js-pure/full/map/group-by";
+import objectGroupBy from "core-js-pure/full/object/group-by";
+
 import type { EtaCore } from "eta-prf";
 import { around } from "monkey-around";
 import { parseYaml, Notice } from "obsidian";
@@ -51,7 +54,38 @@ export function patchCompile(eta: ObsidianEta) {
           default:
             break;
         }
-        return postProcessed;
+
+        if (Object.groupBy && Map.groupBy) {
+          return postProcessed;
+        }
+        return (data, opts) => {
+          const revert = patchGroupBy();
+          const result = postProcessed.call(this, data, opts);
+          revert();
+          return result;
+        };
       },
   });
+}
+
+function patchGroupBy() {
+  const revert: (() => void)[] = [];
+  if (!Object.groupBy) {
+    Object.groupBy = objectGroupBy;
+    revert.push(() => delete Object.groupBy);
+  }
+  if (!Map.groupBy) {
+    Map.groupBy = mapGroupBy;
+    revert.push(() => delete Map.groupBy);
+  }
+  return () => revert.forEach((v) => v());
+}
+
+declare global {
+  interface ObjectConstructor {
+    groupBy?: ObjectGroupByFunction;
+  }
+  interface MapConstructor {
+    groupBy?: MapGroupByFunction;
+  }
 }
