@@ -1,3 +1,4 @@
+import { assertNever } from "assert-never";
 import { loadPrism, Component, TFile, Notice } from "obsidian";
 import type { TplType } from "@/services/template/eta/preset";
 import { TemplatePreviewBase, asyncDebounce, toCtx } from "./base";
@@ -107,18 +108,20 @@ export class TemplatePreview extends TemplatePreviewBase {
           this.contentEl.setText("No annotation data available");
           return;
         }
-        markdown = await renderer.renderAnnot(annot, preview, ctx);
+        markdown = renderer.renderAnnot(annot, preview, ctx);
         break;
       }
       case "annots":
-        markdown = await renderer.renderAnnots(preview, ctx);
+        markdown = renderer.renderAnnots(preview, ctx);
         break;
       case "note":
-        markdown = await renderer.renderNote(preview, ctx);
+        markdown = renderer.renderNote(preview, ctx);
+        break;
+      case "field":
+        markdown = renderer.renderFrontmatter(preview, ctx);
         break;
       default:
-        this.contentEl.setText("Unexpected template type");
-        return;
+        assertNever(templateType);
     }
     if (markdown === this.content?.markdown) {
       return;
