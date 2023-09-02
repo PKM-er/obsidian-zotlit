@@ -5,6 +5,9 @@ import { parseSortIndex } from "../../utils/misc.js";
 export const select = `--sql
   items.itemID,
   items.key,
+  items.clientDateModified,
+  items.dateAdded,
+  items.dateModified,
   annots.type,
   annots.authorName,
   annots.text,
@@ -24,6 +27,9 @@ export const from = `--sql
 export type OutputBase = {
   itemID: ItemIDChecked;
   key: DB.Items["key"];
+  clientDateModified: DB.Items["clientDateModified"];
+  dateAdded: DB.Items["dateAdded"];
+  dateModified: DB.Items["dateModified"];
 } & Pick<
   DB.ItemAnnotations,
   | "type"

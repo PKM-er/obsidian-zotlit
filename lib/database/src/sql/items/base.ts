@@ -10,6 +10,9 @@ export const sql = (full: boolean) => `--sql
 SELECT
   items.itemID,
   items.key,
+  items.clientDateModified,
+  items.dateAdded,
+  items.dateModified,
   itemTypesCombined.typeName as itemType
 FROM 
   items
@@ -25,6 +28,9 @@ export const sqlByKey = `--sql
 SELECT
   items.itemID,
   items.key,
+  items.clientDateModified,
+  items.dateAdded,
+  items.dateModified,
   itemTypesCombined.typeName as itemType
 FROM 
   items
@@ -40,4 +46,7 @@ export interface Output {
   itemID: ItemIDChecked;
   key: DB.Items["key"];
   itemType: DB.ItemTypesCombined["typeName"];
+  clientDateModified: DB.Items["clientDateModified"];
+  dateAdded: DB.Items["dateAdded"];
+  dateModified: DB.Items["dateModified"];
 }
