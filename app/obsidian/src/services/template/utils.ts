@@ -19,12 +19,16 @@ export const getAttachmentPath = (
   attachment: AttachmentInfo,
 ): string => {
   if (!attachment.path) return "";
-  return join(
-    dataDir,
-    "storage",
-    attachment.key,
-    attachment.path.replace(/^storage:/, ""),
-  );
+  if (attachment.path.startsWith("storage:")) {
+    return join(
+      dataDir,
+      "storage",
+      attachment.key,
+      attachment.path.replace(/^storage:/, ""),
+    );
+  } else {
+    return attachment.path;
+  }
 };
 
 export const fileLink = (
