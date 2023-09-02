@@ -5,7 +5,7 @@ export class DerivedFileView extends FileView {
     super(leaf);
     this.navigation = false;
     this.allowNoFile = true;
-    this.requestUpdate = debounce(() => this.update(), 0);
+    this.requestUpdate = debounce(() => this.update(), 10);
   }
   load() {
     super.load();
@@ -13,6 +13,17 @@ export class DerivedFileView extends FileView {
       this.app.workspace.on("file-open", this.onFileOpen, this),
     );
   }
+
+  async setState(state, n) {
+    if (!Object.hasOwn(state, "file") && !Object.hasOwn(state, "group")) {
+      const file = this.leaf.workspace.getActiveFile();
+      if (file) {
+        state.file = file?.path;
+      }
+    }
+    await super.setState(state, n);
+  }
+
   onLoadFile(_file) {
     return this.requestUpdate();
   }
@@ -26,7 +37,8 @@ export class DerivedFileView extends FileView {
       this.requestUpdate());
   }
   onGroupChange() {
-    if ((super.onGroupChange(), this.leaf.group))
+    super.onGroupChange();
+    if (this.leaf.group)
       for (
         let i = 0, leaves = this.leaf.workspace.getGroupLeaves(this.leaf.group);
         i < leaves.length;
@@ -50,7 +62,7 @@ export class DerivedFileView extends FileView {
 //       var n = e.call(this, t) || this;
 //       return n.navigation = !1,
 //       n.allowNoFile = !0,
-//       n.requestUpdate = Bb(n.update, 0),
+//       n.requestUpdate = et(n.update, 10),
 //       n
 //   }
 //   return f(t, e),
@@ -60,9 +72,27 @@ export class DerivedFileView extends FileView {
 //       this.registerEvent(t.workspace.on("file-open", this.onFileOpen, this))
 //   }
 //   ,
+//   t.prototype.setState = function(t, n) {
+//       return v(this, void 0, Promise, (function() {
+//           var i;
+//           return y(this, (function(r) {
+//               switch (r.label) {
+//               case 0:
+//                   return t.hasOwnProperty("file") || t.hasOwnProperty("group") || (i = this.leaf.workspace.getActiveFile()) && (t.file = null == i ? void 0 : i.path),
+//                   [4, e.prototype.setState.call(this, t, n)];
+//               case 1:
+//                   return r.sent(),
+//                   [2]
+//               }
+//           }
+//           ))
+//       }
+//       ))
+//   }
+//   ,
 //   t.prototype.onLoadFile = function(e) {
-//       return m(this, void 0, Promise, (function() {
-//           return v(this, (function(e) {
+//       return v(this, void 0, Promise, (function() {
+//           return y(this, (function(e) {
 //               return this.requestUpdate(),
 //               [2]
 //           }
@@ -72,8 +102,8 @@ export class DerivedFileView extends FileView {
 //   }
 //   ,
 //   t.prototype.onUnloadFile = function(e) {
-//       return m(this, void 0, Promise, (function() {
-//           return v(this, (function(e) {
+//       return v(this, void 0, Promise, (function() {
+//           return y(this, (function(e) {
 //               return this.requestUpdate(),
 //               [2]
 //           }
@@ -83,7 +113,7 @@ export class DerivedFileView extends FileView {
 //   }
 //   ,
 //   t.prototype.onFileOpen = function(e) {
-//       this.leaf.group || this.leaf.pinned || (e instanceof CD ? this.loadFile(e) : this.loadFile(null),
+//       this.leaf.group || this.leaf.pinned || (e instanceof vb ? this.loadFile(e) : this.loadFile(null),
 //       this.requestUpdate())
 //   }
 //   ,
@@ -92,7 +122,7 @@ export class DerivedFileView extends FileView {
 //       this.leaf.group)
 //           for (var t = 0, n = this.leaf.workspace.getGroupLeaves(this.leaf.group); t < n.length; t++) {
 //               var i = n[t];
-//               if (i !== this.leaf && i.view instanceof KA) {
+//               if (i !== this.leaf && i.view instanceof HI) {
 //                   var r = i.view.getSyncViewState();
 //                   this.leaf.openFile(i.view.file, r)
 //               }
@@ -104,4 +134,4 @@ export class DerivedFileView extends FileView {
 //   }
 //   ,
 //   t
-// }
+// }(HI)
