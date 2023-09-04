@@ -31,7 +31,7 @@ export default function AutoTrimSetting() {
 
   return (
     <SettingsComponent
-      name="Auto Trim"
+      name="Auto trim"
       description={
         <>
           <p className="text-sm">
@@ -42,7 +42,7 @@ export default function AutoTrimSetting() {
             <div className="grid grid-cols-2 gap-1">
               <div>
                 <dt className="text-xs font-medium text-txt-normal">
-                  Newline Slurp
+                  Newline slurp
                 </dt>
                 <dd className="mt-1">
                   Removes the following newline before and after the tag.
@@ -50,7 +50,7 @@ export default function AutoTrimSetting() {
               </div>
               <div>
                 <dt className="text-xs font-medium text-txt-normal">
-                  Whitespace Slurp:
+                  Whitespace slurp:
                 </dt>
                 <dd className="mt-1">
                   Removes all whitespace before and after the tag.
@@ -76,10 +76,10 @@ export default function AutoTrimSetting() {
                 Disable
               </option>
               <option value={"nl" satisfies EtaTrimConfigOption} key={1}>
-                Newline Slurp
+                Newline slurp (-)
               </option>
               <option value={"slurp" satisfies EtaTrimConfigOption} key={2}>
-                Whitespace Slurp
+                Whitespace slurp (_)
               </option>
             </select>
           </div>

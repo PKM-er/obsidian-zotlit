@@ -9,6 +9,7 @@ import Misc from "./misc";
 import PluginSettingTab from "./patch-tab";
 import Suggester from "./suggester";
 import Template from "./template";
+import Update from "./update";
 
 export default class ZoteroSettingTab extends PluginSettingTab {
   constructor(public plugin: ZoteroPlugin) {
@@ -47,6 +48,7 @@ export function MainPage() {
         <TabsTrigger value="connect">Connect</TabsTrigger>
         <TabsTrigger value="suggester">Suggester</TabsTrigger>
         <TabsTrigger value="template">Template</TabsTrigger>
+        <TabsTrigger value="update">Note update</TabsTrigger>
         <TabsTrigger value="misc">Misc</TabsTrigger>
       </TabsList>
       <TabsContent
@@ -72,6 +74,12 @@ export function MainPage() {
         className="divide-y flex-grow overflow-y-scroll"
       >
         <Template />
+      </TabsContent>
+      <TabsContent
+        value="update"
+        className="divide-y flex-grow overflow-y-scroll"
+      >
+        <Update />
       </TabsContent>
       <TabsContent
         value="misc"

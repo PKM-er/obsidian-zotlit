@@ -4,19 +4,28 @@ export const templateDesc: Record<
   TplType.All,
   { title: string; desc: DocumentFragment | string }
 > = {
-  filename: { title: "Note Filename", desc: "" },
-  citation: { title: "Markdown primary citation template", desc: "" },
-  altCitation: { title: "Markdown secondary citation template", desc: "" },
+  filename: {
+    title: "Note filename",
+    desc: "Used to render filename for each imported literature note",
+  },
+  citation: {
+    title: "Primary Markdown citation",
+    desc: "Used to render citation in literature note",
+  },
+  altCitation: {
+    title: "Secondary Markdown citation",
+    desc: "Used to render alternative citation in literature note",
+  },
   field: {
-    title: "Note Properties",
+    title: "Note properties",
     desc: "Used to render Properties in literature note",
   },
   note: {
-    title: "Note Content",
+    title: "Note content",
     desc: "Used to render created literature note",
   },
   annotation: {
-    title: "Annotaion",
+    title: "Single annotaion",
     desc: "Used to render single annotation",
   },
   annots: {

@@ -8,12 +8,12 @@ export default function Suggester() {
   return (
     <>
       <BooleanSetting
-        name="Citation Editor Suggester"
+        name="Citation editor suggester"
         settings={suggester}
         prop="citationEditorSuggester"
       />
       <BooleanSetting
-        name="Show BibTex Citekey in Suggester"
+        name="Show BibTex citekey in suggester"
         settings={suggester}
         prop="showCitekeyInSuggester"
       />

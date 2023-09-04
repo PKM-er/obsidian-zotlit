@@ -24,7 +24,7 @@ export default function DatabaseSetting() {
 
   return (
     <Setting
-      name="Zotero Data Directory"
+      name="Zotero data directory"
       description={
         <>
           <DatabasePathWithTitle path={mainDbPath} state={mainDbStatus}>

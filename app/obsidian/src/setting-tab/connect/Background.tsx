@@ -13,7 +13,7 @@ export function BackgroundConnectSetting() {
     <>
       <Setting
         heading
-        name="Background Connect"
+        name="Background connect"
         description="Allow Zotero to send status in the background, which is required for some features like focus annotation on selection in Zotero"
       />
       <BooleanSettingBase ref={ref} name="Enable">
@@ -60,7 +60,7 @@ function ServerPort() {
     return result.changed;
   }
   return (
-    <Setting name="Port Number" description={`Default to ${defaultPort}`}>
+    <Setting name="Port number" description={`Default to ${defaultPort}`}>
       <input
         type="number"
         value={port}

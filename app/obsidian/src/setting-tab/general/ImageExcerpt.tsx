@@ -22,7 +22,7 @@ export function ImageExcerptSetting() {
     <>
       <SettingsComponent
         heading
-        name="Image Excerpt"
+        name="Image excerpt"
         description="Controls how to import images in annotaion excerpts."
       />
       <SettingsComponent
@@ -77,7 +77,7 @@ export function ImageExcerptSetting() {
       {importMode !== "false" && (
         <>
           <TextComfirmSetting
-            name="Location"
+            name="Default location"
             settings={imgImporter}
             prop="imgExcerptPath"
             normalize={normalizePath}

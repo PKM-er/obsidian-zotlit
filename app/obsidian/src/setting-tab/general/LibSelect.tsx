@@ -33,7 +33,7 @@ export default function CitationLibrarySelect() {
 
   const [refreshIconRef] = useIconRef<HTMLButtonElement>("switch");
   return (
-    <Setting name="Citation Library">
+    <Setting name="Citation library">
       <select className="dropdown" onChange={onChange} value={value}>
         {libs.map(({ groupID, libraryID, name }) => (
           <option key={libraryID} value={libraryID}>
