@@ -12,13 +12,13 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aidenlx/obsidian-zotero.git"
+    "url": "https://github.com/PKM-er/obsidian-zotlit.git"
   },
   "author": "aidenlx",
   "bugs": {
-    "url": "https://github.com/aidenlx/obsidian-zotero/issues"
+    "url": "https://github.com/PKM-er/obsidian-zotlit/issues"
   },
-  "homepage": "https://github.com/aidenlx/obsidian-zotero",
+  "homepage": "https://github.com/PKM-er/obsidian-zotlit",
   "zotero": {
     "name": "Obsidian Note for Zotero",
     "id": "zotero-obsidian-note@aidenlx.top",
@@ -29,9 +29,9 @@
       "96": "logo.svg"
     },
     "update": {
-      "versions": "https://raw.githubusercontent.com/aidenlx/obsidian-zotero/master/app/zotero/update.json",
-      "download": "https://github.com/aidenlx/obsidian-zotero/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
-      "info": "https://github.com/aidenlx/obsidian-zotero/releases/tag/zt{version}"
+      "versions": "https://raw.githubusercontent.com/PKM-er/obsidian-zotlit/master/app/zotero/update.json",
+      "download": "https://github.com/PKM-er/obsidian-zotlit/releases/download/zt{version}/zotero-obsidian-note-{version}.xpi",
+      "info": "https://github.com/PKM-er/obsidian-zotlit/releases/tag/zt{version}"
     }
   },
   "dependencies": {
