@@ -41,8 +41,8 @@ export class AnnotationView extends DerivedFileView {
     const lib = this.plugin.settings.database.citationLibrary;
     (async () => {
       if (this.file?.extension !== "md") return false;
-      const itemKey = getItemKeyOf(this.file);
-      const attachments = getAtchIDsOf(this.file);
+      const itemKey = getItemKeyOf(this.file, this.app.metadataCache);
+      const attachments = getAtchIDsOf(this.file, this.app.metadataCache);
       if (!itemKey) return false;
       const [item] = await this.plugin.databaseAPI.getItems([[itemKey, lib]]);
       if (!item) return false;
@@ -172,7 +172,7 @@ export class AnnotationView extends DerivedFileView {
     const lib = plugin.settings.database.citationLibrary;
     const attachments = await plugin.databaseAPI.getAttachments(itemID, lib);
 
-    const atch = await choosePDFAtch(attachments);
+    const atch = await choosePDFAtch(attachments, this.app);
     if (!atch) return;
     await this.setStatePrev(({ attachmentId, ...state }) => ({
       ...state,

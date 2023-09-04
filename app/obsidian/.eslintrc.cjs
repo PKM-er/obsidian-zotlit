@@ -34,6 +34,7 @@ module.exports = {
   rules: {
     "react/no-unknown-property": ["error", { ignore: ["aria-label-delay"] }],
     "jsx-a11y/aria-props": "off",
+    "import/no-deprecated": "warn",
   },
   settings: {
     "import/resolver": {

@@ -222,7 +222,7 @@ export class TemplateRenderer extends Service {
   async setFrontmatterTo(file: TFile, data: DocItemHelper) {
     try {
       const record = this.toFrontmatterRecord(data);
-      await app.fileManager.processFrontMatter(file, (fm) =>
+      await this.plugin.app.fileManager.processFrontMatter(file, (fm) =>
         Object.assign(fm, record),
       );
     } catch (err) {

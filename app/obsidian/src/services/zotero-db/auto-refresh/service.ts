@@ -3,18 +3,21 @@ import { watch } from "fs";
 import { map } from "@mobily/ts-belt/Dict";
 import { Service } from "@ophidian/core";
 import log from "@/log";
+import ZoteroPlugin from "@/zt-main";
 import DatabaseWorker from "../connector/service";
 import { DatabaseSettings } from "../connector/settings";
 import { WatcherSettings } from "./settings";
-
-const onDatabaseUpdate = (target: "main" | "bbt") => () =>
-  app.vault.trigger("zotero:db-updated", target);
 
 export default class DatabaseWatcher extends Service {
   databaseSettings = this.use(DatabaseSettings);
   settings = this.use(WatcherSettings);
 
   api = this.use(DatabaseWorker).api;
+  app = this.use(ZoteroPlugin).app;
+
+  onDatabaseUpdate(target: "main" | "bbt") {
+    return () => this.app.vault.trigger("zotero:db-updated", target);
+  }
 
   async onload() {
     await this.setAutoRefresh(this.settings.autoRefresh);
@@ -46,12 +49,12 @@ export default class DatabaseWatcher extends Service {
     if (enable) {
       this.#watcher.main = watch(
         this.databaseSettings.zoteroDbPath,
-        onDatabaseUpdate("main"),
+        this.onDatabaseUpdate("main"),
       );
       if (await this.api.checkDbStatus("bbt")) {
         this.#watcher.bbt = watch(
           this.databaseSettings.betterBibTexDbPath,
-          onDatabaseUpdate("bbt"),
+          this.onDatabaseUpdate("bbt"),
         );
       }
     }

@@ -1,5 +1,4 @@
 import { syntaxTree, tokenClassNodeProp } from "@codemirror/language";
-import type { EditorView } from "@codemirror/view";
 import { Service } from "@ophidian/core";
 import { around } from "monkey-around";
 import type {

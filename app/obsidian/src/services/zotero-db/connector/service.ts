@@ -24,6 +24,7 @@ export const enum DatabaseStatus {
 export default class DatabaseWorker extends Service {
   logSettings = this.use(LogSettings);
   settings = this.use(DatabaseSettings);
+  app = this.use(ZoteroPlugin).app;
   async onload() {
     log.debug("loading DatabaseWorker");
     const onDatabaseUpdate = debounce(
@@ -34,7 +35,7 @@ export default class DatabaseWorker extends Service {
       true,
     );
     this.registerEvent(
-      app.vault.on("zotero:db-updated", () => onDatabaseUpdate()),
+      this.app.vault.on("zotero:db-updated", () => onDatabaseUpdate()),
     );
     const start = process.hrtime();
     await this.initialize();
@@ -214,9 +215,9 @@ export default class DatabaseWorker extends Service {
       );
     }
     await this.#openDbConn();
-    app.vault.trigger("zotero:db-ready");
+    this.app.vault.trigger("zotero:db-ready");
     await this.#initSearch(true);
-    app.metadataCache.trigger("zotero:search-ready");
+    this.app.metadataCache.trigger("zotero:search-ready");
     new Notice("ZoteroDB Initialization complete.");
 
     this.#status = DatabaseStatus.Ready;
@@ -261,11 +262,11 @@ export default class DatabaseWorker extends Service {
   }
   async #refreshDbConn() {
     await this.#openDbConn(true);
-    app.vault.trigger("zotero:db-refresh");
+    this.app.vault.trigger("zotero:db-refresh");
   }
   async #refreshSearchIndex(force = false) {
     if (await this.#initSearch(force)) {
-      app.metadataCache.trigger("zotero:search-refresh");
+      this.app.metadataCache.trigger("zotero:search-refresh");
     }
   }
   async #fullRefresh() {

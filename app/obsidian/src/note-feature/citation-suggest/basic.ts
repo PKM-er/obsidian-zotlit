@@ -29,14 +29,16 @@ export async function insertCitation(
     libId,
   );
 
-  const allSelectedAtchIDs = new Set(getAtchIDsOf(file));
+  const allSelectedAtchIDs = new Set(
+    getAtchIDsOf(file, plugin.app.metadataCache),
+  );
   const allSelectedAtchs = allAttachments.filter((a) =>
     allSelectedAtchIDs.has(a.itemID),
   );
   // if there is no selected attachment in the note, prompt the user to choose one
   let fallbackAtch: AttachmentInfo | undefined | null;
   if (allSelectedAtchs.length === 0) {
-    fallbackAtch = await choosePDFAtch(allAttachments);
+    fallbackAtch = await choosePDFAtch(allAttachments, plugin.app);
     if (fallbackAtch) {
       cacheAttachmentSelect(fallbackAtch, item);
       allSelectedAtchs.push(fallbackAtch);

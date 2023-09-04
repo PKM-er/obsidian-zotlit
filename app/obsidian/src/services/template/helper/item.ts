@@ -51,7 +51,12 @@ export const withDocItemHelper = (
         return getBacklink(data);
       },
       get fileLink(): string {
-        return fileLink(zoteroDataDir(ctx), ctx.sourcePath, extra.attachment);
+        return fileLink(
+          zoteroDataDir(ctx),
+          ctx.plugin.app,
+          ctx.sourcePath,
+          extra.attachment,
+        );
       },
       get authorsShort(): string {
         const authors = this.authors;

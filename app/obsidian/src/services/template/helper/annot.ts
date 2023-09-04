@@ -86,6 +86,7 @@ export const withAnnotHelper = (
       get fileLink(): string {
         return fileLink(
           zoteroDataDir(ctx),
+          ctx.plugin.app,
           ctx.sourcePath,
           extra.attachment,
           toPage(data.position.pageIndex, true),

@@ -23,10 +23,10 @@ export class TemplateEditorHelper extends Service {
       this.#editorExtensions.length = 0;
     }
     if (enable) {
-      this.#editorExtensions.push(bracketExtension);
+      this.#editorExtensions.push(bracketExtension(this.plugin.app.vault));
     }
     if (loadedBefore) {
-      app.workspace.updateOptions();
+      this.plugin.app.workspace.updateOptions();
     }
   }
 

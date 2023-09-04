@@ -5,7 +5,12 @@ import {
   multipleAnnotKeyPagePattern,
 } from "@obzt/common";
 import { TFile } from "obsidian";
-import type { CachedMetadata, TAbstractFile } from "obsidian";
+import type {
+  App,
+  CachedMetadata,
+  MetadataCache,
+  TAbstractFile,
+} from "obsidian";
 import { ZOTERO_KEY_FIELDNAME } from "@/services/template";
 import { getFilePath } from "@/utils";
 import { ZOTERO_ATCHS_FIELDNAME } from "../template/frontmatter";
@@ -20,24 +25,30 @@ export const getItemKeyFromFrontmatter = (
   return null;
 };
 
-export const getItemKeyOf = (file: string | TFile | TAbstractFile | null) => {
+export const getItemKeyOf = (
+  file: string | TFile | TAbstractFile | null,
+  metadataCache: MetadataCache,
+) => {
   if (!file) return null;
   const cache =
     typeof file === "string"
-      ? app.metadataCache.getCache(file)
+      ? metadataCache.getCache(file)
       : file instanceof TFile
-      ? app.metadataCache.getFileCache(file)
+      ? metadataCache.getFileCache(file)
       : null;
   return getItemKeyFromFrontmatter(cache);
 };
 
-export const getAtchIDsOf = (file: string | TFile | TAbstractFile | null) => {
+export const getAtchIDsOf = (
+  file: string | TFile | TAbstractFile | null,
+  metadataCache: MetadataCache,
+) => {
   if (!file) return null;
   const cache =
     typeof file === "string"
-      ? app.metadataCache.getCache(file)
+      ? metadataCache.getCache(file)
       : file instanceof TFile
-      ? app.metadataCache.getFileCache(file)
+      ? metadataCache.getFileCache(file)
       : null;
   const field = cache?.frontmatter?.[ZOTERO_ATCHS_FIELDNAME];
   if (field && Array.isArray(field) && field.length > 0) {
@@ -78,9 +89,12 @@ export const splitMultipleAnnotKey = (key: string): string[] =>
     );
   });
 
-export function isLiteratureNote(file: string): boolean;
-export function isLiteratureNote(file: TAbstractFile): file is TFile;
-export function isLiteratureNote(file: TAbstractFile | string): boolean {
+export function isLiteratureNote(file: string, app: App): boolean;
+export function isLiteratureNote(file: TAbstractFile, app: App): file is TFile;
+export function isLiteratureNote(
+  file: TAbstractFile | string,
+  app: App,
+): boolean {
   const path = getFilePath(file);
-  return !!getItemKeyOf(path);
+  return !!getItemKeyOf(path, app.metadataCache);
 }

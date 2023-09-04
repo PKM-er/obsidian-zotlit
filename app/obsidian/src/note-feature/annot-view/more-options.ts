@@ -14,7 +14,7 @@ export const getMoreOptionsHandler =
         .setIcon("links-going-out")
         .onClick(jumpToAnnotNote(annotation, view)),
     );
-    app.workspace.trigger("zotero:open-annot-menu", annotation, menu);
+    view.app.workspace.trigger("zotero:open-annot-menu", annotation, menu);
     if (evt.nativeEvent instanceof MouseEvent)
       menu.showAtMouseEvent(evt.nativeEvent);
     else {
@@ -48,10 +48,10 @@ const jumpToAnnotNote =
 
     await sleep(10);
     const { leaf } = view,
-      { workspace, vault } = app;
+      { workspace, vault } = view.app;
     // MobileDrawer.collapseFor(n);
     let groupLeaves;
-    if (leaf.group) groupLeaves = app.workspace.getGroupLeaves(leaf.group);
+    if (leaf.group) groupLeaves = workspace.getGroupLeaves(leaf.group);
     else {
       groupLeaves = [];
       const activeFileView = workspace.getActiveFileView();

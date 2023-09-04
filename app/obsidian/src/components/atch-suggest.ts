@@ -1,11 +1,11 @@
 import type { AttachmentInfo, RegularItemInfoBase } from "@obzt/database";
 import { cacheActiveAtch, isFileAttachment } from "@obzt/database";
-import type { FuzzyMatch } from "obsidian";
+import type { App, FuzzyMatch } from "obsidian";
 import { Notice, FuzzySuggestModal } from "obsidian";
 import { openModalFuzzy } from "./basic/modal";
 
 export class AttachmentPopupSuggest extends FuzzySuggestModal<AttachmentInfo> {
-  constructor(public attachments: AttachmentInfo[]) {
+  constructor(public attachments: AttachmentInfo[], app: App) {
     super(app);
   }
   getItems(): AttachmentInfo[] {
@@ -34,19 +34,24 @@ export class AttachmentPopupSuggest extends FuzzySuggestModal<AttachmentInfo> {
   }
 }
 
-export async function chooseAttachment(attachments: AttachmentInfo[]) {
+export async function chooseAttachment(
+  attachments: AttachmentInfo[],
+  app: App,
+) {
   if (attachments.length === 1) return attachments[0];
   if (!attachments.length) {
     new Notice("No attachment found for this item");
     return null;
   }
-  const result = await openModalFuzzy(new AttachmentPopupSuggest(attachments));
+  const result = await openModalFuzzy(
+    new AttachmentPopupSuggest(attachments, app),
+  );
   return result?.value ?? null;
 }
 
-export async function chooseFileAtch(attachments: AttachmentInfo[]) {
+export async function chooseFileAtch(attachments: AttachmentInfo[], app: App) {
   const fileAttachments = attachments.filter(isFileAttachment);
-  return await chooseAttachment(fileAttachments);
+  return await chooseAttachment(fileAttachments, app);
 }
 
 export function cacheAttachmentSelect(
@@ -56,9 +61,9 @@ export function cacheAttachmentSelect(
   cacheActiveAtch(window.localStorage, item, selected.itemID);
 }
 
-export async function choosePDFAtch(attachments: AttachmentInfo[]) {
+export async function choosePDFAtch(attachments: AttachmentInfo[], app: App) {
   const fileAttachments = attachments.filter(
     (i) => isFileAttachment(i) && i.path?.endsWith(".pdf"),
   );
-  return await chooseAttachment(fileAttachments);
+  return await chooseAttachment(fileAttachments, app);
 }

@@ -3,6 +3,7 @@ import workerpool from "@aidenlx/workerpool";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 
+import type { App } from "obsidian";
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
 import workerCode from "worker:@/worker/annot-block/main";
 
@@ -31,7 +32,12 @@ export class AnnotBlock extends Service {
     this.plugin.registerMarkdownCodeBlockProcessor(
       "zotero-annot",
       (source, el, ctx) => {
-        const child = new AnnotBlockRenderChild(el, this.plugin.database, this);
+        const child = new AnnotBlockRenderChild(
+          el,
+          this.plugin.database,
+          this,
+          this.plugin.app,
+        );
         ctx.addChild(child);
         child.load();
         child.render([source, ctx.sourcePath]);
@@ -57,6 +63,7 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     container: HTMLElement,
     private db: ZoteroDatabase,
     private worker: AnnotBlockWorkerAPI,
+    public app: App,
   ) {
     super(container);
   }
@@ -97,7 +104,8 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
       logError("stringify annots", error);
       markdown = source;
     }
-    await MarkdownRenderer.renderMarkdown(
+    await MarkdownRenderer.render(
+      this.app,
       markdown,
       this.containerEl,
       sourcePath,
@@ -108,7 +116,7 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     // safe to load this before first render
     // if db refresh before first render, render will be skipped
     this.registerEvent(
-      app.vault.on("zotero:db-refresh", this.render.bind(this)),
+      this.app.vault.on("zotero:db-refresh", this.render.bind(this)),
     );
   }
 }

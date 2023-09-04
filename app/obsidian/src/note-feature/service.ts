@@ -13,6 +13,7 @@ import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import { Template, fromPath } from "@/services/template/eta/preset";
 import type { Context } from "@/services/template/helper/base.js";
+import { getActiveWin } from "@/utils/active-win";
 import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
@@ -40,6 +41,7 @@ class NoteFeatures extends Service {
 
   onload(): void {
     const { plugin } = this;
+    const { app } = plugin;
     plugin.addCommand({
       id: "note-quick-switcher",
       name: "Open quick switcher for literature notes",
@@ -113,7 +115,7 @@ class NoteFeatures extends Service {
 
     const updateNote = async (file: TFile, overwrite?: boolean) => {
       const lib = plugin.settings.database.citationLibrary;
-      const itemKey = getItemKeyOf(file);
+      const itemKey = getItemKeyOf(file, app.metadataCache);
       if (!itemKey) {
         new Notice("Cannot get zotero item key from file name");
         return false;
@@ -129,7 +131,7 @@ class NoteFeatures extends Service {
       id: "update-literature-note",
       name: "Update Literature Note",
       editorCheckCallback(checking, _editor, ctx) {
-        const shouldContinue = ctx.file && isLiteratureNote(ctx.file);
+        const shouldContinue = ctx.file && isLiteratureNote(ctx.file, app);
         if (checking) {
           return !!shouldContinue;
         } else if (shouldContinue) {
@@ -141,7 +143,7 @@ class NoteFeatures extends Service {
       id: "overwrite-update-literature-note",
       name: "Force Update Literature Note by Overwriting",
       editorCheckCallback(checking, _editor, ctx) {
-        const shouldContinue = ctx.file && isLiteratureNote(ctx.file);
+        const shouldContinue = ctx.file && isLiteratureNote(ctx.file, app);
         if (checking) {
           return !!shouldContinue;
         } else if (shouldContinue) {
@@ -151,7 +153,7 @@ class NoteFeatures extends Service {
     });
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
-        if (!isLiteratureNote(file)) {
+        if (!isLiteratureNote(file, app)) {
           return;
         }
         menu.addItem((i) =>
@@ -179,8 +181,7 @@ class NoteFeatures extends Service {
             .setIcon("reset")
             .onClick(async () => {
               // make sure prompt is shown in the active window
-              const win =
-                plugin.app.workspace.activeLeaf?.containerEl.win ?? window;
+              const win = getActiveWin(app);
               if (!win.confirm("Reset template to default?")) return;
               await plugin.app.vault.modify(
                 file as TFile,
@@ -235,7 +236,7 @@ class NoteFeatures extends Service {
     );
     const existingFile = vault.getAbstractFileByPath(filepath);
     if (existingFile) {
-      if (getItemKeyOf(existingFile)) {
+      if (getItemKeyOf(existingFile, this.plugin.app.metadataCache)) {
         // only throw error if the note is linked to the same zotero item
         throw new NoteExistsError([filepath], docItem.key);
       }
@@ -259,7 +260,7 @@ class NoteFeatures extends Service {
       item.itemID,
       libId,
     );
-    const selected = await choosePDFAtch(allAttachments);
+    const selected = await choosePDFAtch(allAttachments, this.plugin.app);
     if (selected) {
       cacheAttachmentSelect(selected, item);
     }

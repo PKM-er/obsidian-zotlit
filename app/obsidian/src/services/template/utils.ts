@@ -4,7 +4,7 @@ import type { AnnotationInfo, AttachmentInfo } from "@obzt/database";
 import { isAnnotationItem } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import filenamify from "filenamify";
-import type { FileSystemAdapter, TFile } from "obsidian";
+import type { App, FileSystemAdapter, TFile } from "obsidian";
 import log from "@/log";
 import type ZoteroPlugin from "@/zt-main";
 
@@ -33,6 +33,7 @@ export const getAttachmentPath = (
 
 export const fileLink = (
   dataDir: string,
+  app: App,
   sourcePath?: string | null,
   attachment: AttachmentInfo | null = null,
   page: number | null = null,
@@ -88,7 +89,10 @@ export const imgLink = (item: unknown, plugin: ZoteroPlugin) => {
         pathToFileURL(path).href,
       )})`;
     } else {
-      return linktextToLink(linktext, app.vault.getConfig("useMarkdownLinks"));
+      return linktextToLink(
+        linktext,
+        plugin.app.vault.getConfig("useMarkdownLinks"),
+      );
     }
   } else return "";
 };

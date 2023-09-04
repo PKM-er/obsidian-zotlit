@@ -45,14 +45,16 @@ export async function updateNote(
     libId,
   );
 
-  const allSelectedAtchIDs = new Set(notePaths.flatMap(getAtchIDsOf));
+  const allSelectedAtchIDs = new Set(
+    notePaths.flatMap((p) => getAtchIDsOf(p, plugin.app.metadataCache)),
+  );
   const allSelectedAtchs = allAttachments.filter((a) =>
     allSelectedAtchIDs.has(a.itemID),
   );
   // if there is no selected attachment in the note, prompt the user to choose one
   let fallbackAtch: AttachmentInfo | undefined | null;
   if (allSelectedAtchs.length === 0) {
-    fallbackAtch = await choosePDFAtch(allAttachments);
+    fallbackAtch = await choosePDFAtch(allAttachments, plugin.app);
     if (fallbackAtch) {
       cacheAttachmentSelect(fallbackAtch, item);
       allSelectedAtchs.push(fallbackAtch);
@@ -75,10 +77,10 @@ export async function updateNote(
   for (const notePath of notePaths) {
     const meta = app.metadataCache.getCache(notePath);
     if (!meta) continue;
-    let attachmentIDs = getAtchIDsOf(notePath);
+    let attachmentIDs = getAtchIDsOf(notePath, plugin.app.metadataCache);
     if (!attachmentIDs) {
       if (fallbackAtch === undefined) {
-        fallbackAtch = await choosePDFAtch(allSelectedAtchs);
+        fallbackAtch = await choosePDFAtch(allSelectedAtchs, plugin.app);
       }
       if (fallbackAtch) {
         attachmentIDs = [fallbackAtch.itemID];

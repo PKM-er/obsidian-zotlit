@@ -20,25 +20,26 @@ export const getDragStartHandler =
     evt.dataTransfer.dropEffect = "copy";
 
     const window = (evt.target as HTMLElement).win;
+    const { workspace } = plugin.app;
 
     const onEditorDrop = (evt: DragEvent) => {
       // check if drop event is triggered by this drag start event
       if (evt.dataTransfer?.getData(sourceTag) === timeStamp) {
         imgCacheImporter.flush();
       }
-      app.workspace.off("editor-drop", onEditorDrop);
+      workspace.off("editor-drop", onEditorDrop);
       window.removeEventListener("dragend", onDragEnd);
     };
     const onDragEnd = () => {
       imgCacheImporter.cancel();
-      app.workspace.off("editor-drop", onEditorDrop);
+      workspace.off("editor-drop", onEditorDrop);
     };
 
-    const evtRef = app.workspace.on("editor-drop", (evt) => {
+    const evtRef = workspace.on("editor-drop", (evt) => {
       if (evt.dataTransfer?.getData("drag-source") === timeStamp) {
         imgCacheImporter.flush();
       }
-      app.workspace.offref(evtRef);
+      workspace.offref(evtRef);
     });
     window.addEventListener("dragend", onDragEnd, { once: true });
     if (container) {
