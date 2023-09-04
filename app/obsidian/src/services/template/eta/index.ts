@@ -28,7 +28,7 @@ export class ObsidianEta extends EtaCore {
       autoEscape: false,
       autoFilter: true,
       filterFunction: (val: unknown): string => {
-        if (typeof val === undefined || val === null) {
+        if (val === null || val === undefined) {
           return "";
         }
         if (val instanceof Date) {
