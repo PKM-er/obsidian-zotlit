@@ -13,6 +13,7 @@ import { ObsidianEta } from "./eta";
 import { patchCompile } from "./eta/patch";
 import { fromPath } from "./eta/preset";
 import { ZOTERO_ATCHS_FIELDNAME, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
+import { extractFrontmatter } from "./get-fm";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
 import type { HelperExtra } from "./helper/to-helper";
@@ -173,27 +174,51 @@ export class TemplateRenderer extends Service {
     return this.render("filename", data.docItem);
   }
 
-  toFrontmatterRecord(data: DocItemHelper) {
-    // remove leading and trailing ---\n
-    const frontmatterString = this.render("field", data)
-      .trim()
-      .replace(/^---\n+|\n*---$/g, "");
+  toFrontmatterRecord(data: DocItemHelper): {
+    mode: "raw" | "parsed";
+    data: Record<string, any>;
+    yaml: string;
+  } {
+    const frontmatterString = this.render("field", data);
+    let raw = false;
+    const { yaml: header, body } = extractFrontmatter(frontmatterString);
+    console.log(header, body);
+    if (header) {
+      try {
+        if (parseYaml(header).raw === true) raw = true;
+      } catch (error) {
+        new Notice(`Error parsing frontmatter, ${error}`);
+      }
+    }
+    const zoteroKey = getItemKeyGroupID(data, true),
+      zoteroAtchIds = data.attachment
+        ? // Obsidian field editor don't support array of numbers
+          [data.attachment.itemID.toString()]
+        : undefined;
+
     const {
       [ZOTERO_KEY_FIELDNAME]: _key,
       [ZOTERO_ATCHS_FIELDNAME]: _atch,
       ...frontmatter
-    } = parseYaml(frontmatterString);
+    } = parseYaml(body);
+
     return {
-      // Required keys for zotero literature note
-      [ZOTERO_KEY_FIELDNAME]: getItemKeyGroupID(data, true),
-      [ZOTERO_ATCHS_FIELDNAME]: data.attachment
-        ? // Obsidian field editor don't support array of numbers
-          [data.attachment.itemID.toString()]
-        : undefined,
-      ...filter(
-        frontmatter,
-        (v) => !(v === "" || v === null || v === undefined),
-      ),
+      mode: raw ? "raw" : "parsed",
+      yaml: [
+        `${ZOTERO_KEY_FIELDNAME}: ${zoteroKey}`,
+        `${ZOTERO_ATCHS_FIELDNAME}: ${zoteroAtchIds}`,
+        body.trim(),
+        "",
+      ].join("\n"),
+      data: {
+        // Required keys for zotero literature note
+        [ZOTERO_KEY_FIELDNAME]: zoteroKey,
+        [ZOTERO_ATCHS_FIELDNAME]: zoteroAtchIds,
+        ...filter(
+          frontmatter,
+          (v) => !(v === "" || v === null || v === undefined),
+        ),
+      },
     };
   }
 
@@ -208,11 +233,13 @@ export class TemplateRenderer extends Service {
 
   #renderFrontmatter(item: DocItemHelper, extra?: Record<string, any>) {
     try {
-      const record = this.toFrontmatterRecord(item);
-      const str = stringifyYaml(
-        extra !== undefined ? merge(record, extra) : record,
+      const fm = this.toFrontmatterRecord(item);
+      if (fm.mode === "raw") {
+        return fm.yaml;
+      }
+      return stringifyYaml(
+        extra !== undefined ? merge(fm.data, extra) : fm.data,
       );
-      return str;
     } catch (err) {
       logError("Failed to renderYaml", err, item);
       new Notice("Failed to renderYaml");
@@ -221,7 +248,7 @@ export class TemplateRenderer extends Service {
   }
   async setFrontmatterTo(file: TFile, data: DocItemHelper) {
     try {
-      const record = this.toFrontmatterRecord(data);
+      const record = this.toFrontmatterRecord(data).data;
       await this.plugin.app.fileManager.processFrontMatter(file, (fm) =>
         Object.assign(fm, record),
       );
