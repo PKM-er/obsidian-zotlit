@@ -218,7 +218,7 @@ export default class DatabaseWorker extends Service {
     this.app.vault.trigger("zotero:db-ready");
     await this.#initSearch(true);
     this.app.metadataCache.trigger("zotero:search-ready");
-    new Notice("ZoteroDB Initialization complete.");
+    log.info("ZoteroDB Initialization complete.");
 
     this.#status = DatabaseStatus.Ready;
   }
