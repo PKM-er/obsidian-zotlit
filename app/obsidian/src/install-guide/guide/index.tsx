@@ -1,5 +1,5 @@
 import { Provider } from "jotai";
-import type { PluginManifest } from "obsidian";
+import type { App, PluginManifest } from "obsidian";
 import { Modal } from "obsidian";
 import ReactDOM from "react-dom";
 import { createInitialValues } from "@/utils/create-initial";
@@ -14,9 +14,10 @@ export class InstallGuideModal extends Modal {
     public platform: PlatformDetails,
     public binaryVersion: string,
     public mode: GuideMode,
+    public app: App,
   ) {
     super(app);
-    this.titleEl.setText("Setup Obsidian Zotero Plugin");
+    this.titleEl.setText("Setup ZotLit");
     this.modalEl.addClass("mod-zt-install-guide");
   }
 
@@ -36,8 +37,8 @@ export class InstallGuideModal extends Modal {
   }
 
   async reloadPlugin() {
-    await app.plugins.disablePlugin(this.manifest.id);
+    await this.app.plugins.disablePlugin(this.manifest.id);
     this.close();
-    await app.plugins.enablePlugin(this.manifest.id);
+    await this.app.plugins.enablePlugin(this.manifest.id);
   }
 }

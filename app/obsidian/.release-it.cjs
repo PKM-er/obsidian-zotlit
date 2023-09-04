@@ -34,7 +34,7 @@ module.exports = {
       "build/main.js",
       "build/manifest.json",
       "build/styles.css",
-      "build/obsidian-zotero-plugin.zip",
+      "build/zotlit.zip",
     ],
     proxy: process.env.HTTPS_PROXY,
     releaseName: "${version}",

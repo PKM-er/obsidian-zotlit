@@ -34,7 +34,7 @@ export default class ZoteroPlugin extends Plugin {
 
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
-    if (!checkLib(manifest)) {
+    if (!checkLib(manifest, app)) {
       throw new Error("Library check failed");
     }
     // this.noteParser = new NoteParser(this);
@@ -62,7 +62,7 @@ export default class ZoteroPlugin extends Plugin {
   pdfParser = this.use(PDFParser);
 
   async onload() {
-    log.info("loading Obsidian Zotero Plugin");
+    log.info("loading ZotLit");
     this.addSettingTab(new ZoteroSettingTab(this));
     globalThis.zoteroAPI = {
       version: this.manifest.version,
@@ -93,6 +93,6 @@ export default class ZoteroPlugin extends Plugin {
   }
 
   onunload() {
-    log.info("unloading Obsidian Zotero Plugin");
+    log.info("unloading ZotLit");
   }
 }

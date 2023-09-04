@@ -9,6 +9,6 @@ for (const filename of assets) {
 }
 await pipeline(
   zip.generateNodeStream({ type: "nodebuffer", streamFiles: true }),
-  createWriteStream(join("build", "obsidian-zotero-plugin.zip")),
+  createWriteStream(join("build", "zotlit.zip")),
 );
-console.log("obsidian-zotero-plugin.zip written.");
+console.log("zotlit.zip written.");

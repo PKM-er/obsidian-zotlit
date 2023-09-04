@@ -56,7 +56,7 @@ const ManualInstallGuide = () => {
         <SelectButton onClick={onSelectFileClicked} done={fileImported} />
       </li>
       <li>
-        Reload Obsidian Zotero Plugin:
+        Reload ZotLit:
         <ReloadButton
           onClick={() => modal.reloadPlugin()}
           // disabled={!fileImported}

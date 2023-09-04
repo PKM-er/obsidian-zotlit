@@ -10,9 +10,8 @@ const InstallGuideDesc = () => {
     case "install":
       return (
         <>
-          Obsidian Zotero Plugin requires latest version of{" "}
-          <code>better-sqlite3</code> to be installed. Use one of the method
-          below to install or update it.
+          ZotLit requires latest version of <code>better-sqlite3</code> to be
+          installed. Use one of the method below to install or update it.
         </>
       );
     case "reset":

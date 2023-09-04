@@ -1,5 +1,5 @@
 import { statSync } from "fs";
-import type { PluginManifest } from "obsidian";
+import type { App, PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
 import { logError } from "@/log";
 import { InstallGuideModal } from "./guide";
@@ -16,6 +16,7 @@ const showInstallGuide = (
   libPath: string,
   manifest: PluginManifest,
   mode: GuideMode,
+  app: App,
 ) => {
   const platform = getPlatformDetails();
   if (!platform) {
@@ -26,18 +27,18 @@ const showInstallGuide = (
   if (compared < 0) {
     new Notice(
       `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
-        `in current version of obsidian is not supported by obsidian-zotero-plugin,` +
+        `in current version of obsidian is not supported by zotlit,` +
         ` please reinstall using latest obsidian installer from official website`,
     );
   } else if (compared > 0) {
     new Notice(
       `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
-        `in current version of obsidian is newer than the one supported by installed obsidian-zotero-plugin,` +
-        ` please update obsidian-zotero-plugin to the latest version`,
+        `in current version of obsidian is newer than the one supported by installed zotlit,` +
+        ` please update zotlit to the latest version`,
     );
   } else if (!isPlatformSupported(platform)) {
     new Notice(
-      `Your device (${platform.arch}-${platform.platform}) is not supported by obsidian-zotero-plugin`,
+      `Your device (${platform.arch}-${platform.platform}) is not supported by zotlit`,
     );
   } else {
     const binaryVersion = getBinaryVersion(manifest);
@@ -57,13 +58,25 @@ const showInstallGuide = (
         );
       } else if (mode === "reset") {
         // if path occupied by a file, open modal to reset it
-        new InstallGuideModal(manifest, platform, binaryVersion, mode).open();
+        new InstallGuideModal(
+          manifest,
+          platform,
+          binaryVersion,
+          mode,
+          app,
+        ).open();
       }
     } catch (e) {
       const error = e as NodeJS.ErrnoException;
       if (error.code === "ENOENT") {
         // if path not occupied
-        new InstallGuideModal(manifest, platform, binaryVersion, mode).open();
+        new InstallGuideModal(
+          manifest,
+          platform,
+          binaryVersion,
+          mode,
+          app,
+        ).open();
       } else {
         // unexpected error when checking path
         new Notice(
@@ -76,7 +89,7 @@ const showInstallGuide = (
   }
 };
 
-const checkLib = (manifest: PluginManifest): boolean => {
+const checkLib = (manifest: PluginManifest, app: App): boolean => {
   if (!Platform.isDesktopApp) {
     throw new Error("Not in desktop app");
   }
@@ -91,11 +104,11 @@ const checkLib = (manifest: PluginManifest): boolean => {
     return true;
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code === "MODULE_NOT_FOUND") {
-      showInstallGuide(binaryPath, manifest, "install");
+      showInstallGuide(binaryPath, manifest, "install", app);
     } else {
       new Notice(`Failed to load database library: ${err}`);
       logError("Failed to load database library", err);
-      showInstallGuide(binaryPath, manifest, "reset");
+      showInstallGuide(binaryPath, manifest, "reset", app);
     }
     return false;
   }

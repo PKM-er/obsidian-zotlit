@@ -21,7 +21,7 @@ interface OutlineCacheValue {
   created: number;
 }
 
-const dbName = "obsidian-zotero-plugin",
+const dbName = "zotlit",
   pdfOutlineStore = "pdf-outline";
 
 interface ZoteroPluginDB extends DBSchema {
