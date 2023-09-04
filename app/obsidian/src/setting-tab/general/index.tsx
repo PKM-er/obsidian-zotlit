@@ -9,13 +9,13 @@ export default function General() {
   return (
     <>
       <TextComfirmSetting
-        name="Literature Note Folder"
+        name="Default location for new literature notes"
         settings={noteIndex}
         prop="literatureNoteFolder"
         normalize={normalizePath}
       />
-      <ImageExcerptSetting />
       <CitationLibrarySelect />
+      <ImageExcerptSetting />
     </>
   );
 }

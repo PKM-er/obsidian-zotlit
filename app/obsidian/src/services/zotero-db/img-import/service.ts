@@ -1,12 +1,13 @@
-import { mkdir, stat, symlink } from "fs/promises";
-import { basename, dirname } from "path";
+import { copyFile, lstat, rm, stat, symlink } from "fs/promises";
+import { basename } from "path";
+import { dirname as dirnamePosix } from "path/posix";
 import type { AnnotationInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
-import type { FileSystemAdapter } from "obsidian";
-import { normalizePath, Notice, TFile } from "obsidian";
+import { FileSystemAdapter, normalizePath, Notice } from "obsidian";
 import log, { logError } from "@/log";
+import ZoteroPlugin from "@/zt-main";
 import { DatabaseSettings } from "../connector/settings";
 import { ImgImporterSettings } from "./settings";
 
@@ -15,7 +16,11 @@ export class ImgCacheImporter extends Service {
     log.debug("loading ImgCacheImporter");
   }
   async onunload() {
-    await Promise.all(this.flush());
+    await this.flush();
+  }
+
+  get app() {
+    return this.use(ZoteroPlugin).app;
   }
 
   databaseSettings = this.use(DatabaseSettings);
@@ -27,7 +32,7 @@ export class ImgCacheImporter extends Service {
     return getCacheImagePath(annot, this.databaseSettings.zoteroDataDir);
   }
 
-  getInVaultPath(annot: AnnotationInfo): string | null {
+  private getInVaultPath(annot: AnnotationInfo): string | null {
     if (!this.settings.imgExcerptDir || annot.type !== AnnotationType.image)
       return null;
     const cachePath = this.getCachePath(annot);
@@ -53,8 +58,11 @@ export class ImgCacheImporter extends Service {
     // return task;
     return inVaultPath;
   }
-  flush(): Promise<boolean>[] {
-    return [...this.queue.values()].map((task) => task());
+  async flush(): Promise<boolean[]> {
+    const result = await Promise.all(
+      [...this.queue.values()].map((task) => task()),
+    );
+    return result;
   }
   cancel(): void {
     this.queue.clear();
@@ -66,53 +74,117 @@ export class ImgCacheImporter extends Service {
    * @param cachePath path to image excerpt cache
    */
   async linkToVault(inVaultPath: string, cachePath: string): Promise<boolean> {
-    // first check if exist in vault
-    const file = app.vault.getAbstractFileByPath(inVaultPath);
-    if (file) {
-      if (file instanceof TFile) return true;
-      else {
-        logError(
-          "failed to get in-vault image excerpt: given path not file",
-          inVaultPath,
-        );
-        return false;
-      }
-    }
-
-    // if not exist, symlink to vault
     // first check cache exist and is file
-    try {
-      const stats = await stat(cachePath);
-      if (!stats.isFile()) {
-        const msg = `failed to link image excerpt cache to vault: given path not file ${cachePath}`;
-        new Notice(msg);
-        logError(msg, null);
-        return false;
-      }
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-        const msg = `failed to link image excerpt cache to vault: file not found ${cachePath}`;
-        new Notice(msg);
-        logError(msg, error);
-        return false;
-      } else throw error;
-    }
+    const mtimeSrc = await stat(cachePath)
+      .then((stat) => {
+        if (!stat.isFile() && !stat.isSymbolicLink()) {
+          const msg = `failed to link image excerpt cache to vault: given path not file ${cachePath}`;
+          new Notice(msg);
+          logError(msg, null);
+          return -1;
+        }
+        return stat.mtimeMs;
+      })
+      .catch((err) => {
+        if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+          const msg = `failed to link image excerpt cache to vault: file not found ${cachePath}`;
+          new Notice(msg);
+          logError(msg, err);
+          return -1;
+        }
+        throw err;
+      });
+    if (mtimeSrc === -1) return false;
 
-    const symlinkPath = (app.vault.adapter as FileSystemAdapter).getFullPath(
-      inVaultPath,
-    );
+    const importMode = this.settings.mode;
+    if (importMode === false) {
+      log.trace("import mode disabled");
+      return false;
+    }
 
     // create folder if not exist
-    try {
-      await mkdir(dirname(symlinkPath), { recursive: true });
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+    const parentDir = dirnamePosix(inVaultPath);
+    if (parentDir !== "." && parentDir !== "..") {
+      await this.app.vault.createFolder(parentDir).catch(() => void 0);
     }
 
-    // then create symlink
-    await symlink(cachePath, symlinkPath);
-    new Notice(`linked image excerpt cache to vault: ${inVaultPath}`);
-    return true;
+    if (this.app.vault.adapter instanceof FileSystemAdapter) {
+      const targetPath = this.app.vault.adapter.getFullPath(inVaultPath);
+      const stat = await lstat(targetPath).catch((err) => {
+        if (err.code !== "ENOENT") throw err;
+        return null;
+      });
+      if (importMode === "copy") {
+        let mtimeTarget = -1;
+        if (stat) {
+          if (stat.isSymbolicLink()) {
+            log.trace(targetPath + " is symlink, unlinking");
+            await rm(targetPath);
+          } else if (stat.isFile()) {
+            mtimeTarget = stat.mtimeMs;
+          } else {
+            const msg =
+              "Failed to import image excerpt cache: cannot overwrite non-file " +
+              targetPath;
+            new Notice(msg);
+            logError(msg, null);
+            return false;
+          }
+        }
+        if (mtimeTarget < 0 || mtimeSrc > mtimeTarget) {
+          log.trace(
+            targetPath +
+              " is file, " +
+              (mtimeTarget < 0 ? "creating" : "overwritting"),
+          );
+          await copyFile(cachePath, targetPath);
+          new Notice(`Copied image excerpt cache to vault: ${inVaultPath}`);
+          return true;
+        } else {
+          log.trace("mtime check pass, skipping");
+        }
+      } else {
+        if (stat) {
+          if (stat.isSymbolicLink()) {
+            log.trace(targetPath + " is symlink, skipping");
+            return false;
+          } else if (stat.isFile()) {
+            log.trace(targetPath + " is file, remove before symlinking");
+            await rm(targetPath);
+          } else {
+            const msg =
+              "Failed to import image excerpt cache: cannot overwrite non-file " +
+              targetPath;
+            new Notice(msg);
+            logError(msg, null);
+            return false;
+          }
+        }
+        // then create symlink
+        try {
+          await symlink(cachePath, targetPath, "file");
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code === "EPERM") {
+            new Notice(
+              `Failed to symlink image excerpt cache to vault: permission denied ${cachePath}, ` +
+                `check directory permission or change import mode to copy. ` +
+                `If you are using FAT32 drive, symlink is not supported.`,
+            );
+            logError(
+              `Failed to symlink image excerpt cache to vault: permission denied ${cachePath}`,
+              err,
+            );
+            return false;
+          }
+          throw err;
+        }
+        new Notice(`linked image excerpt cache to vault: ${inVaultPath}`);
+        return true;
+      }
+      return false;
+    } else {
+      throw new Error("Mobile not supported");
+    }
   }
 }
 
