@@ -9,6 +9,7 @@ import { fileLink } from "../utils";
 import type { AnnotHelper } from "./annot";
 import type { Context } from "./base";
 import { zoteroDataDir } from "./base";
+import { withCollectionHelper } from "./collection";
 import type { CreatorHelper } from "./creator";
 import { withCreatorHelper } from "./creator";
 
@@ -40,11 +41,16 @@ export type DocItemHelper = Readonly<
 > & { annotations: AnnotHelper[] };
 
 export const withDocItemHelper = (
-  { creators: _creators, ...data }: RegularItemInfoBase,
+  {
+    creators: _creators,
+    collection: _collection,
+    ...data
+  }: RegularItemInfoBase,
   extra: RegularItemInfoExtra,
   ctx: Context,
 ) => {
   const creators = _creators.map((c) => withCreatorHelper(c));
+  const collection = _collection ? withCollectionHelper(_collection) : null;
   return new Proxy(
     {
       get backlink(): string {
@@ -71,6 +77,7 @@ export const withDocItemHelper = (
       },
       annotations: "not-loaded",
       creators,
+      collection,
       get authors() {
         return creators.filter((c) => c.creatorType === "author");
       },

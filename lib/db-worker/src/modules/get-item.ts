@@ -12,6 +12,7 @@ import {
   ItemsByKey,
   Creators,
   ItemFields,
+  Collections,
 } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import type { KeyLibID } from "@obzt/database/dist/utils";
@@ -78,7 +79,8 @@ export function getItemObjects(
   const citekeyMap = readCitekeys(itemIDs);
 
   const itemFields = databases.main.prepare(ItemFields).query(itemIDs),
-    creators = databases.main.prepare(Creators).query(itemIDs);
+    creators = databases.main.prepare(Creators).query(itemIDs),
+    collections = databases.main.prepare(Collections).query(itemIDs);
 
   return itemIDs.reduce((rec, [itemID, libraryID]) => {
     if (!itemID) return rec;
@@ -100,6 +102,7 @@ export function getItemObjects(
       groupID: libInfo[libraryID].groupID,
       itemID,
       creators: creators[itemID],
+      collection: collections.get(itemID) ?? null,
       citekey: citekeyMap[itemID],
       ...fields,
       dateAccessed: isWithAccessDate(fields)
@@ -111,9 +114,8 @@ export function getItemObjects(
   }, {} as Record<number, RegularItemInfo>);
 }
 
-const isItemKeys = (
-  items: IDLibID[] | KeyLibID[],
-): items is KeyLibID[] => typeof items[0][0] === "string";
+const isItemKeys = (items: IDLibID[] | KeyLibID[]): items is KeyLibID[] =>
+  typeof items[0][0] === "string";
 export const getItems: DbWorkerAPI["getItems"] = (items, forceUpdate) => {
   if (items.length === 0) return [];
   if (!forceUpdate) {

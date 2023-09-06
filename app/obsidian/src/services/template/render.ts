@@ -182,7 +182,6 @@ export class TemplateRenderer extends Service {
     const frontmatterString = this.render("field", data);
     let raw = false;
     const { yaml: header, body } = extractFrontmatter(frontmatterString);
-    console.log(header, body);
     if (header) {
       try {
         if (parseYaml(header).raw === true) raw = true;
