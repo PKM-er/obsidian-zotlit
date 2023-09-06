@@ -1,10 +1,10 @@
-import type { ItemIDLibID } from "@obzt/database";
+import type { IDLibID } from "@obzt/database";
 import { Notice } from "obsidian";
 import log from "@/log";
 import type ZoteroPlugin from "@/zt-main";
 
 export async function createNote(
-  ids: ItemIDLibID[],
+  ids: IDLibID[],
   { currTopic, plugin }: { currTopic: string; plugin: ZoteroPlugin },
 ) {
   const items = (await plugin.databaseAPI.getItems(ids, true)).flatMap(

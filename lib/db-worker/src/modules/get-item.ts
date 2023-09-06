@@ -2,7 +2,7 @@ import { getItemKeyGroupID, multipartToSQL } from "@obzt/common";
 
 import type {
   ItemDetails,
-  ItemIDLibID,
+  IDLibID,
   RegularItemInfo,
   RegularItemInfoBase,
 } from "@obzt/database";
@@ -14,7 +14,7 @@ import {
   ItemFields,
 } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
-import type { ItemKeyLibID } from "@obzt/database/dist/utils";
+import type { KeyLibID } from "@obzt/database/dist/utils";
 import { assertNever } from "assert-never";
 import { cache, databases } from "@init";
 import log from "@log";
@@ -36,7 +36,7 @@ const getItemFromCache = (
   return result ?? null;
 };
 
-const readCitekeys = (items: ItemIDLibID[]) => {
+const readCitekeys = (items: IDLibID[]) => {
   log.debug("Reading Better BibTex database");
   if (!databases.bbt.opened) {
     log.info("Better BibTex database not enabled, skipping...");
@@ -70,7 +70,7 @@ function stringToDate(dateString: string): Date | null {
 
 export function getItemObjects(
   itemIDMap: Record<number, ItemDetails>,
-  itemIDs: ItemIDLibID[],
+  itemIDs: IDLibID[],
 ): Record<number, RegularItemInfo> {
   if (!cache.libraries) throw new Error("Library info not loaded");
   const libInfo = cache.libraries;
@@ -112,8 +112,8 @@ export function getItemObjects(
 }
 
 const isItemKeys = (
-  items: ItemIDLibID[] | ItemKeyLibID[],
-): items is ItemKeyLibID[] => typeof items[0][0] === "string";
+  items: IDLibID[] | KeyLibID[],
+): items is KeyLibID[] => typeof items[0][0] === "string";
 export const getItems: DbWorkerAPI["getItems"] = (items, forceUpdate) => {
   if (items.length === 0) return [];
   if (!forceUpdate) {
@@ -121,12 +121,12 @@ export const getItems: DbWorkerAPI["getItems"] = (items, forceUpdate) => {
   }
 
   let itemIDMap: Record<number, ItemDetails>,
-    itemIDs: ItemIDLibID[],
+    itemIDs: IDLibID[],
     itemIDObjectMap: Record<number, RegularItemInfo>;
   if (isItemKeys(items)) {
     const itemKeyMap = databases.main.prepare(ItemsByKey).query(items);
     itemIDs = items.map(
-      ([key, libId]) => [itemKeyMap[key].itemID, libId] as ItemIDLibID,
+      ([key, libId]) => [itemKeyMap[key].itemID, libId] as IDLibID,
     );
     itemIDMap = itemIDs.reduce((rec, [itemID], index) => {
       const [key] = items[index];

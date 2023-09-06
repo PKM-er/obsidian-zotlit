@@ -9,6 +9,8 @@ export { ItemFieldsFull } from "./sql/item-fields/full.js";
 export { ItemFields } from "./sql/item-fields/part.js";
 export { ItemsFull } from "./sql/items/full.js";
 export { Items, ItemsByKey } from "./sql/items/part.js";
+export { CollectionsFull } from "./sql/collections/full.js";
+export { Collections, CollectionsByKey } from "./sql/collections/part.js";
 export { LibrariesFull as AllLibraries } from "./sql/libraries/full.js";
 export { Tags } from "./sql/tags.js";
 
@@ -26,11 +28,7 @@ export {
 } from "./utils/misc.js";
 export { getCacheImagePath } from "./utils/getCacheImagePath.js";
 export * from "./utils/prepared.js";
-export type {
-  ItemIDLibID,
-  ItemKeyLibID,
-  ItemIDChecked,
-} from "./utils/database.js";
+export type { IDLibID, KeyLibID, ItemIDChecked } from "./utils/database.js";
 
 export { getBacklink } from "./utils/zotero-backlink.js";
 export type {
@@ -41,6 +39,7 @@ export type {
   CreatorFullName,
   CreatorNameOnly,
   ItemCreator,
+  Collection,
 } from "./item.js";
 export {
   isCreatorFullName,

@@ -5,7 +5,7 @@ import { pipe } from "@mobily/ts-belt/pipe";
 import type {
   AnnotationInfo,
   AttachmentInfo,
-  ItemIDLibID,
+  IDLibID,
   RegularItemInfoBase,
 } from "@obzt/database";
 import type { TFile } from "obsidian";
@@ -220,7 +220,7 @@ export async function getHelperExtraByAtch(
       tags: {
         ...tagsRecord,
         ...(await plugin.databaseAPI.getTags(
-          annotations.map((i): ItemIDLibID => [i.itemID, libId]),
+          annotations.map((i): IDLibID => [i.itemID, libId]),
         )),
       },
       allAttachments,

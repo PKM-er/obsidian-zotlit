@@ -1,8 +1,8 @@
 import type {
   AnnotationInfo,
   AttachmentInfo,
-  ItemIDLibID,
-  ItemKeyLibID,
+  IDLibID,
+  KeyLibID,
   LibraryInfo,
   RegularItemInfo,
 } from "@obzt/database";
@@ -29,7 +29,7 @@ export interface PluginAPI {
    * @returns  The document items from the given items.
    */
   getDocItems(
-    items: ItemIDLibID[] | ItemKeyLibID[],
+    items: IDLibID[] | KeyLibID[],
   ): Promise<(RegularItemInfo | null)[]>;
 
   /**

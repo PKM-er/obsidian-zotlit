@@ -1,6 +1,6 @@
 import type { DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../../utils/index.js";
-import { whereItemID, checkItemID } from "../../utils/index.js";
+import { whereID, checkID } from "../../utils/index.js";
 
 export const sql = (full: boolean) => `--sql
 SELECT
@@ -17,8 +17,8 @@ FROM
   JOIN creatorTypes USING (creatorTypeID)
 WHERE
   libraryID = $libId
-  ${whereItemID(full || "itemID")}
-  AND ${checkItemID()}
+  ${whereID(full || "itemID")}
+  AND ${checkID()}
 ORDER BY
   itemID,
   orderIndex

@@ -7,7 +7,7 @@ const nonRegularItemTypesSQL = nonRegularItemTypes
 
 export { nonRegularItemTypesSQL as nonRegularItemTypes };
 
-export const checkItemID = (col = "itemID") => `--sql
+export const checkID = (col = "itemID") => `--sql
   ${col} IS NOT NULL
   AND ${col} NOT IN (SELECT itemID FROM deletedItems)
 `;
@@ -15,8 +15,8 @@ export const checkItemID = (col = "itemID") => `--sql
 /** not nullable Items.itemID */
 export type ItemIDChecked = Exclude<DB.Items["itemID"], null>;
 
-export const whereItemID = (col: string | boolean) =>
-  typeof col === "boolean" ? "" : `AND ${col} = $itemId`;
+export const whereID = (col: string | boolean, placeholder = "$itemId") =>
+  typeof col === "boolean" ? "" : `AND ${col} = ${placeholder}`;
 
-export type ItemIDLibID = [id: number, libId: number];
-export type ItemKeyLibID = [key: string, libId: number];
+export type IDLibID = [id: number, libId: number];
+export type KeyLibID = [key: string, libId: number];

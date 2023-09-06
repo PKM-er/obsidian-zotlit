@@ -1,5 +1,5 @@
 import { createStore } from "@obzt/components";
-import type { AnnotationInfo, ItemIDLibID } from "@obzt/database";
+import type { AnnotationInfo, IDLibID } from "@obzt/database";
 import type { TFile, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { FileView } from "obsidian";
 import type { TplType } from "@/services/template/eta/preset";
@@ -100,7 +100,7 @@ export function create() {
 
       const tags = await plugin.databaseAPI.getTags([
         [stateData.docItem, libId],
-        ...annotations.map((i): ItemIDLibID => [i.itemID, libId]),
+        ...annotations.map((i): IDLibID => [i.itemID, libId]),
       ]);
 
       set(() => ({

@@ -1,10 +1,11 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
-import type { ItemIDLibID, ItemKeyLibID } from "../../utils/index.js";
+import type { IDLibID, KeyLibID } from "../../utils/index.js";
 import { PreparedBase } from "../../utils/index.js";
 import type { Output as OutputSql } from "./base.js";
 import { sql } from "./base.js";
 
-const query = sql(false);
+const queryByID = sql("id"),
+  queryByKey = sql("key");
 
 interface Input {
   libId: number;
@@ -14,7 +15,7 @@ interface Input {
 type Output = Record<number, OutputSql>;
 
 export class Items extends PreparedBase<Input, OutputSql, Output> {
-  trxFunc = (itemIDs: ItemIDLibID[]) =>
+  trxFunc = (itemIDs: IDLibID[]) =>
     itemIDs.reduce((rec, [itemId, libId]) => {
       const result = this.statement.get({ itemId, libId });
       if (result) {
@@ -25,10 +26,10 @@ export class Items extends PreparedBase<Input, OutputSql, Output> {
   trx: Transaction = this.database.transaction(this.trxFunc);
 
   sql(): string {
-    return query;
+    return queryByID;
   }
 
-  query(itemIDs: ItemIDLibID[]): Output {
+  query(itemIDs: IDLibID[]): Output {
     return (this.trx as Items["trxFunc"])(itemIDs);
   }
 }
@@ -41,7 +42,7 @@ interface InputByKey {
 type OutputByKey = Record<string, OutputSql>;
 
 export class ItemsByKey extends PreparedBase<InputByKey, OutputSql, Output> {
-  trxFunc = (itemKeys: ItemKeyLibID[]) =>
+  trxFunc = (itemKeys: KeyLibID[]) =>
     itemKeys.reduce((rec, [key, libId]) => {
       const result = this.statement.get({ key, libId });
       if (result) {
@@ -52,10 +53,10 @@ export class ItemsByKey extends PreparedBase<InputByKey, OutputSql, Output> {
   trx: Transaction = this.database.transaction(this.trxFunc);
 
   sql(): string {
-    return query;
+    return queryByKey;
   }
 
-  query(itemKeys: ItemKeyLibID[]): OutputByKey {
+  query(itemKeys: KeyLibID[]): OutputByKey {
     return (this.trx as ItemsByKey["trxFunc"])(itemKeys);
   }
 }

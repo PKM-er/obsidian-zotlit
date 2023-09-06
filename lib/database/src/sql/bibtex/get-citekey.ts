@@ -1,5 +1,5 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
-import type { ItemIDLibID } from "../../utils/index.js";
+import type { IDLibID } from "../../utils/index.js";
 import { PreparedBase } from "../../utils/index.js";
 
 const query = `--sql
@@ -18,7 +18,7 @@ interface InputSql {
 }
 
 interface Input {
-  items: ItemIDLibID[];
+  items: IDLibID[];
 }
 
 interface OutputSql {
@@ -31,7 +31,7 @@ export class BibtexGetCitekey extends PreparedBase<
   OutputSql,
   Output
 > {
-  trxFunc = (items: ItemIDLibID[]) =>
+  trxFunc = (items: IDLibID[]) =>
     items.reduce((rec, [itemID, libId]) => {
       const result = this.get({ itemID, libId });
       if (result) {

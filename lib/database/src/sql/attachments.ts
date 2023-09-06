@@ -1,6 +1,6 @@
 import type { DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../utils/index.js";
-import { Prepared, checkItemID } from "../utils/index.js";
+import { Prepared, checkID } from "../utils/index.js";
 
 const query = `--sql
 SELECT
@@ -15,7 +15,7 @@ FROM
 WHERE
   atchs.parentItemID = $itemId
   AND libraryID = $libId
-  AND ${checkItemID("atchs.itemID")}
+  AND ${checkID("atchs.itemID")}
 GROUP BY atchs.itemID
 `;
 

@@ -4,7 +4,7 @@ import type {
   SimpleDocumentSearchResultSetUnit,
 } from "flexsearch";
 import type { AnnotationInfo, RegularItemInfo } from "./item.js";
-import type { ItemIDLibID, ItemKeyLibID } from "./utils/database.js";
+import type { IDLibID, KeyLibID } from "./utils/database.js";
 import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 
 export type QueryOption = DocumentSearchOptions<false>;
@@ -40,7 +40,7 @@ export interface DbWorkerAPI {
    * @param item item key or item id
    */
   getItems(
-    items: ItemIDLibID[] | ItemKeyLibID[],
+    items: IDLibID[] | KeyLibID[],
     forceUpdate?: boolean,
   ): (RegularItemInfo | null)[];
 
@@ -49,7 +49,7 @@ export interface DbWorkerAPI {
   getLibs(): LibraryInfo[];
   getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];
   getAttachments(docId: number, libraryID: number): AttachmentInfo[];
-  getTags(items: ItemIDLibID[]): Record<number, TagInfo[]>;
+  getTags(items: IDLibID[]): Record<number, TagInfo[]>;
 
   raw<R>(mode: "get", sql: string, args: any[]): R;
   raw<R>(mode: "all", sql: string, args: any[]): R[];

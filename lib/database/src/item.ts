@@ -14,6 +14,13 @@ export type ItemField = {
   fieldName: string;
   value: unknown;
 };
+export type Collection = {
+  id: number;
+  path: string[];
+  key: string;
+  name: string;
+  libraryID: number;
+};
 
 // #region creator
 export interface Creator {

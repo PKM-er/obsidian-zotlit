@@ -1,8 +1,8 @@
 import type { DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../../utils/index.js";
 import {
-  whereItemID,
-  checkItemID,
+  whereID,
+  checkID,
   nonRegularItemTypes,
 } from "../../utils/index.js";
 
@@ -19,9 +19,9 @@ FROM
   JOIN itemTypesCombined USING (itemTypeID)
 WHERE
   libraryID = $libId
-  ${whereItemID(full || "items.itemID")}
+  ${whereID(full || "items.itemID")}
   AND itemTypesCombined.typeName NOT IN (${nonRegularItemTypes})
-  AND ${checkItemID()}
+  AND ${checkID()}
 `;
 
 export interface Output {

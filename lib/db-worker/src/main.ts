@@ -1,6 +1,6 @@
 import { worker } from "@aidenlx/workerpool";
 import { logError } from "@obzt/common";
-import type { ItemIDLibID } from "@obzt/database";
+import type { IDLibID } from "@obzt/database";
 import {
   BibtexGetId,
   AnnotByKeys,
@@ -28,7 +28,7 @@ const methods: DbWorkerAPI = {
     return await cache.search.searchAsync(options);
   },
   getTags: attachLogger(
-    (items: ItemIDLibID[]) => databases.main.prepare(Tags).query(items),
+    (items: IDLibID[]) => databases.main.prepare(Tags).query(items),
     "tags",
   ),
   getItemIDsFromCitekey(citekeys) {

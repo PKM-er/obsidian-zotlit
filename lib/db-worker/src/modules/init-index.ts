@@ -1,5 +1,5 @@
 import { getItemKeyGroupID } from "@obzt/common";
-import type { ItemIDLibID, ItemDetails } from "@obzt/database";
+import type { IDLibID, ItemDetails } from "@obzt/database";
 import { ItemsFull } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/dist/api";
 import { databases, cache } from "@init";
@@ -17,7 +17,7 @@ const initIndex: DbWorkerAPI["initIndex"] = async (libraryID) => {
     {} as Record<number, ItemDetails>,
   );
   const itemIDLibs = Object.keys(itemIDMap).map(
-    (itemID) => [Number(itemID), libraryID] as ItemIDLibID,
+    (itemID) => [Number(itemID), libraryID] as IDLibID,
   );
 
   const items = getItemObjects(itemIDMap, itemIDLibs);

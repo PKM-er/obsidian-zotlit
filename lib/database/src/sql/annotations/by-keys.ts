@@ -1,5 +1,5 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
-import { checkItemID, PreparedBase } from "../../utils/index.js";
+import { checkID, PreparedBase } from "../../utils/index.js";
 import type { OutputBase, Parsed, WithParentItem } from "./base.js";
 import { toParsed, from, select } from "./base.js";
 
@@ -14,7 +14,7 @@ FROM
 WHERE
   items.key = $annotKey
   AND items.libraryID = $libId
-  AND ${checkItemID("items.itemID")}
+  AND ${checkID("items.itemID")}
 `;
 
 type OutputSql = WithParentItem<OutputBase>;

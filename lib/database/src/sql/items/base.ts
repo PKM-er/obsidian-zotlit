@@ -1,12 +1,8 @@
 import type { DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../../utils/index.js";
-import {
-  whereItemID,
-  checkItemID,
-  nonRegularItemTypes,
-} from "../../utils/index.js";
+import { whereID, checkID, nonRegularItemTypes } from "../../utils/index.js";
 
-export const sql = (full: boolean) => `--sql
+const selectFrom = `--sql
 SELECT
   items.itemID,
   items.key,
@@ -17,28 +13,20 @@ SELECT
 FROM 
   items
   JOIN itemTypesCombined USING (itemTypeID)
-WHERE 
-  libraryID = $libId
-  ${whereItemID(full || "items.itemID")}
-  AND ${checkItemID()}
-  AND itemType NOT IN (${nonRegularItemTypes})
 `;
 
-export const sqlByKey = `--sql
-SELECT
-  items.itemID,
-  items.key,
-  items.clientDateModified,
-  items.dateAdded,
-  items.dateModified,
-  itemTypesCombined.typeName as itemType
-FROM 
-  items
-  JOIN itemTypesCombined USING (itemTypeID)
+export const sql = (by: "key" | "id" | "full") => `--sql
+${selectFrom}
 WHERE 
   libraryID = $libId
-  AND items.key = $key
-  AND ${checkItemID()}
+  ${
+    by === "full"
+      ? whereID(false)
+      : by === "id"
+      ? whereID("items.itemID")
+      : whereID("items.key", "$key")
+  }
+  AND ${checkID()}
   AND itemType NOT IN (${nonRegularItemTypes})
 `;
 

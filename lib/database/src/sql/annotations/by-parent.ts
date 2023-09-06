@@ -1,5 +1,5 @@
 import type { Statement } from "@aidenlx/better-sqlite3";
-import { checkItemID, PreparedWithParser } from "../../utils/index.js";
+import { checkID, PreparedWithParser } from "../../utils/index.js";
 import { sortBySortIndex } from "../../utils/misc.js";
 import type { Parsed, OutputBase, WithParentItem } from "./base.js";
 import { toParsed, from, select } from "./base.js";
@@ -12,7 +12,7 @@ FROM
 WHERE
   parentItemID = $attachmentId
   AND items.libraryID = $libId
-  AND ${checkItemID()}
+  AND ${checkID()}
 `;
 
 interface Input {
