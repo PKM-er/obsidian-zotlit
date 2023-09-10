@@ -9,7 +9,11 @@ export { nonRegularItemTypesSQL as nonRegularItemTypes };
 
 export const checkID = (col = "itemID") => `--sql
   ${col} IS NOT NULL
-  AND ${col} NOT IN (SELECT itemID FROM deletedItems)
+  ${
+    col === "itemID"
+      ? `AND ${col} NOT IN (SELECT itemID FROM deletedItems)`
+      : ""
+  }
 `;
 
 /** not nullable Items.itemID */

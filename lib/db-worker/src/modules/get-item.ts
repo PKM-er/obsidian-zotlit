@@ -79,8 +79,18 @@ export function getItemObjects(
   const citekeyMap = readCitekeys(itemIDs);
 
   const itemFields = databases.main.prepare(ItemFields).query(itemIDs),
-    creators = databases.main.prepare(Creators).query(itemIDs),
-    collections = databases.main.prepare(Collections).query(itemIDs);
+    creators = databases.main.prepare(Creators).query(itemIDs);
+  const collectionIDs = uniq(
+    itemIDs.map(([itemID]) => {
+      const collectionID = itemIDMap[itemID]?.collectionID;
+      if (!collectionID) return null;
+      return `${collectionID}-${itemIDMap[itemID].libraryID}`;
+    }),
+  ).filter((v): v is string => v !== null);
+  const collections = databases.main
+    .prepare(Collections)
+    .query(collectionIDs.map((v) => v.split("-").map((v) => +v)) as IDLibID[]);
+  console.log(collections);
 
   return itemIDs.reduce((rec, [itemID, libraryID]) => {
     if (!itemID) return rec;
@@ -96,13 +106,16 @@ export function getItemObjects(
       (fields[field.fieldName] ??= []).push(value);
       return fields;
     }, {} as Record<string, unknown[]>);
+
+    const { collectionID, ...data } = itemIDMap[itemID],
+      collection = collectionID !== null ? collections.get(collectionID) : null;
     const itemObject: RegularItemInfoBase = {
-      ...itemIDMap[itemID],
+      ...data,
       libraryID,
       groupID: libInfo[libraryID].groupID,
       itemID,
       creators: creators[itemID],
-      collection: collections.get(itemID) ?? null,
+      collection: collection ?? null,
       citekey: citekeyMap[itemID],
       ...fields,
       dateAccessed: isWithAccessDate(fields)
@@ -154,4 +167,8 @@ function updateCache(itemIDObjectMap: Record<number, RegularItemInfo>) {
     cacheForLib.byId.set(item.itemID, item);
     cacheForLib.byKey.set(getItemKeyGroupID(item, true), item);
   }
+}
+
+function uniq<T>(arr: T[]) {
+  return [...new Set(arr)];
 }
