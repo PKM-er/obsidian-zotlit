@@ -43,14 +43,13 @@ export type DocItemHelper = Readonly<
 export const withDocItemHelper = (
   {
     creators: _creators,
-    collection: _collection,
+    collections: _collections,
     ...data
   }: RegularItemInfoBase,
   extra: RegularItemInfoExtra,
   ctx: Context,
 ) => {
   const creators = _creators.map((c) => withCreatorHelper(c));
-  const collection = _collection ? withCollectionHelper(_collection) : null;
   return new Proxy(
     {
       get backlink(): string {
@@ -77,7 +76,7 @@ export const withDocItemHelper = (
       },
       annotations: "not-loaded",
       creators,
-      collection,
+      collections: _collections.map((c) => withCollectionHelper(c)),
       get authors() {
         return creators.filter((c) => c.creatorType === "author");
       },

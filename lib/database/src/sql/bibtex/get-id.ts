@@ -36,10 +36,6 @@ export class BibtexGetId extends PreparedBase<InputSql, OutputSql, Output> {
     return query;
   }
 
-  get(input: InputSql): OutputSql | undefined {
-    return this.statement.get(input);
-  }
-
   query(input: Input): Output {
     return (this.trx as BibtexGetId["trxFunc"])(input.citekeys);
   }

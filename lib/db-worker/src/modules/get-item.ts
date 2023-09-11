@@ -5,6 +5,7 @@ import type {
   IDLibID,
   RegularItemInfo,
   RegularItemInfoBase,
+  Collection,
 } from "@obzt/database";
 import {
   BibtexGetCitekey,
@@ -81,16 +82,16 @@ export function getItemObjects(
   const itemFields = databases.main.prepare(ItemFields).query(itemIDs),
     creators = databases.main.prepare(Creators).query(itemIDs);
   const collectionIDs = uniq(
-    itemIDs.map(([itemID]) => {
-      const collectionID = itemIDMap[itemID]?.collectionID;
-      if (!collectionID) return null;
-      return `${collectionID}-${itemIDMap[itemID].libraryID}`;
-    }),
+    itemIDs.flatMap(
+      ([itemID]) =>
+        itemIDMap[itemID]?.collectionIDs?.map(
+          (collectionID) => `${collectionID}-${itemIDMap[itemID].libraryID}`,
+        ) ?? [],
+    ),
   ).filter((v): v is string => v !== null);
-  const collections = databases.main
+  const collectionSet = databases.main
     .prepare(Collections)
     .query(collectionIDs.map((v) => v.split("-").map((v) => +v)) as IDLibID[]);
-  console.log(collections);
 
   return itemIDs.reduce((rec, [itemID, libraryID]) => {
     if (!itemID) return rec;
@@ -107,15 +108,17 @@ export function getItemObjects(
       return fields;
     }, {} as Record<string, unknown[]>);
 
-    const { collectionID, ...data } = itemIDMap[itemID],
-      collection = collectionID !== null ? collections.get(collectionID) : null;
+    const { collectionIDs, ...data } = itemIDMap[itemID],
+      collections = collectionIDs
+        .map((id) => collectionSet.get(id))
+        .filter((v): v is Collection => v !== undefined);
     const itemObject: RegularItemInfoBase = {
       ...data,
       libraryID,
       groupID: libInfo[libraryID].groupID,
       itemID,
       creators: creators[itemID],
-      collection: collection ?? null,
+      collections,
       citekey: citekeyMap[itemID],
       ...fields,
       dateAccessed: isWithAccessDate(fields)

@@ -69,7 +69,7 @@ export type ItemCreator = {
 export type RegularItemInfoBase = Item & {
   creators: Omit<ItemCreator, "itemID">[];
   citekey: string | null;
-  collection: Collection | null;
+  collections: Collection[];
   dateAccessed: Date | null;
 };
 export type RegularItemInfo = RegularItemInfoBase & Record<string, unknown[]>;
@@ -89,6 +89,7 @@ export const requiredKeys = new Set(
     "itemType",
     "key",
     "libraryID",
+    "collections",
   ),
 );
 

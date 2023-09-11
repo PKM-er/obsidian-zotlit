@@ -2,7 +2,7 @@ import type { DB } from "@obzt/zotero-type";
 import type { ItemIDChecked } from "../../utils/index.js";
 import { whereID, checkID, nonRegularItemTypes } from "../../utils/index.js";
 
-const selectFrom = `--sql
+export const sql = (by: "key" | "id" | "full") => `--sql
 SELECT
   items.libraryID,
   items.itemID,
@@ -11,15 +11,11 @@ SELECT
   items.dateAdded,
   items.dateModified,
   itemTypesCombined.typeName as itemType,
-  collectionItems.collectionID
+  json_group_array(collectionID) filter (where collectionID is not null) as collectionIDs
 FROM 
   items
   JOIN itemTypesCombined USING (itemTypeID)
   LEFT JOIN collectionItems USING (itemID)
-`;
-
-export const sql = (by: "key" | "id" | "full") => `--sql
-${selectFrom}
 WHERE 
   libraryID = $libId
   ${
@@ -31,9 +27,10 @@ WHERE
   }
   AND ${checkID()}
   AND itemType NOT IN (${nonRegularItemTypes})
+GROUP BY itemID
 `;
 
-export interface Output {
+export interface OutputSql {
   libraryID: DB.Items["libraryID"];
   itemID: ItemIDChecked;
   key: DB.Items["key"];
@@ -41,5 +38,9 @@ export interface Output {
   clientDateModified: DB.Items["clientDateModified"];
   dateAdded: DB.Items["dateAdded"];
   dateModified: DB.Items["dateModified"];
-  collectionID: DB.CollectionItems["collectionID"] | null;
+  collectionIDs: string;
 }
+
+export type Output = Omit<OutputSql, "collectionIDs"> & {
+  collectionIDs: number[];
+};

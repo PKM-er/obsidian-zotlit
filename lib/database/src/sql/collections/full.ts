@@ -18,7 +18,7 @@ export class CollectionsFull extends PreparedBase<
   }
   query(input: Input) {
     return new Map(
-      this.runAll(input).map((v) => [v.collectionID, toParsed(v)]),
+      this.all(input).map((v) => [v.collectionID, toParsed(v)]),
     );
   }
 }

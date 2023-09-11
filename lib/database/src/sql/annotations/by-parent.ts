@@ -50,7 +50,7 @@ export class AnnotByParent extends PreparedWithParser<
     if (parentItemKey === undefined) {
       throw new Error("Parent item not found");
     }
-    return this.runAll(input)
+    return this.all(input)
       .map((output) => this.parse(output, input, parentItemKey))
       .sort((a, b) => sortBySortIndex(a.sortIndex, b.sortIndex));
   }

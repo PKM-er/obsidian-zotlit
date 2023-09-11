@@ -1,7 +1,7 @@
 import type { Transaction } from "@aidenlx/better-sqlite3";
 import type { IDLibID, KeyLibID } from "../../utils/index.js";
 import { PreparedBase } from "../../utils/index.js";
-import type { Output as OutputSql } from "./base.js";
+import type { Output, OutputSql } from "./base.js";
 import { sql } from "./base.js";
 
 const queryByID = sql("id"),
@@ -12,24 +12,27 @@ interface Input {
   itemId: number;
 }
 
-type Output = Record<number, OutputSql>;
+type IDItemMap = Record<number, Output>;
 
-export class Items extends PreparedBase<Input, OutputSql, Output> {
+export class Items extends PreparedBase<Input, OutputSql, IDItemMap> {
   trxFunc = (itemIDs: IDLibID[]) =>
     itemIDs.reduce((rec, [itemId, libId]) => {
-      const result = this.statement.get({ itemId, libId });
-      if (result) {
-        rec[itemId] = result;
+      const result = this.get({ itemId, libId }) as OutputSql;
+      if (result!) {
+        rec[itemId] = {
+          ...result,
+          collectionIDs: JSON.parse(result.collectionIDs) as number[],
+        };
       }
       return rec;
-    }, {} as Output);
+    }, {} as IDItemMap);
   trx: Transaction = this.database.transaction(this.trxFunc);
 
   sql(): string {
     return queryByID;
   }
 
-  query(itemIDs: IDLibID[]): Output {
+  query(itemIDs: IDLibID[]): IDItemMap {
     return (this.trx as Items["trxFunc"])(itemIDs);
   }
 }
@@ -39,24 +42,27 @@ interface InputByKey {
   key: string;
 }
 
-type OutputByKey = Record<string, OutputSql>;
+type KeyItemMap = Record<string, Output>;
 
-export class ItemsByKey extends PreparedBase<InputByKey, OutputSql, Output> {
+export class ItemsByKey extends PreparedBase<InputByKey, OutputSql, IDItemMap> {
   trxFunc = (itemKeys: KeyLibID[]) =>
     itemKeys.reduce((rec, [key, libId]) => {
-      const result = this.statement.get({ key, libId });
+      const result = this.get({ key, libId });
       if (result) {
-        rec[key] = result;
+        rec[key] = {
+          ...result,
+          collectionIDs: JSON.parse(result.collectionIDs) as number[],
+        };
       }
       return rec;
-    }, {} as OutputByKey);
+    }, {} as KeyItemMap);
   trx: Transaction = this.database.transaction(this.trxFunc);
 
   sql(): string {
     return queryByKey;
   }
 
-  query(itemKeys: KeyLibID[]): OutputByKey {
+  query(itemKeys: KeyLibID[]): KeyItemMap {
     return (this.trx as ItemsByKey["trxFunc"])(itemKeys);
   }
 }

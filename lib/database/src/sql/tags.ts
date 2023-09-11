@@ -35,7 +35,7 @@ type Output = Record<number, OutputSql[]>;
 export class Tags extends PreparedBase<Input, OutputSql, Output> {
   trxFunc = (itemIds: IDLibID[]) =>
     itemIds.map(
-      ([itemId, libId]) => [itemId, this.runAll({ itemId, libId })] as const,
+      ([itemId, libId]) => [itemId, this.all({ itemId, libId })] as const,
     );
   trx: Transaction = this.database.transaction(this.trxFunc);
 

@@ -45,9 +45,6 @@ export class BibtexGetCitekey extends PreparedBase<
     return query;
   }
 
-  get(input: InputSql): OutputSql | undefined {
-    return this.statement.get(input);
-  }
   query(input: Input): Output {
     return (this.trx as BibtexGetCitekey["trxFunc"])(input.items);
   }

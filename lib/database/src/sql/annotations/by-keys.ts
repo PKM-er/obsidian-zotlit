@@ -45,8 +45,8 @@ export class AnnotByKeys extends PreparedBase<InputSql, OutputSql, Output> {
     const { annotKeys, libId } = input;
     const queryFunc = (annotKeys: string[]) =>
       annotKeys.reduce((annotByKey, key) => {
-        const result = this.statement.get({ annotKey: key, libId });
-        if (result) annotByKey[key] = result;
+        const result = this.get({ annotKey: key, libId });
+        if (result) annotByKey[key] = this.parse(result, input);
         return annotByKey;
       }, {} as Output);
     const query = (this.trxCache[libId] ??=

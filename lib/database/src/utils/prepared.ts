@@ -10,11 +10,12 @@ export abstract class PreparedBase<Input, OutputSql, Output = OutputSql[]> {
     return this.statement.database;
   }
 
-  protected runAll(input: Input): OutputSql[] {
-    return this.statement.all(input);
+  protected get(input: Input): OutputSql | null {
+    return this.statement.get(input);
   }
-  protected runAllNoInput(): OutputSql[] {
-    return this.statement.all();
+  protected all(input: Input): OutputSql[] {
+    if (input === undefined) return this.statement.all();
+    return this.statement.all(input);
   }
 
   abstract query(...args: any[]): Output;
@@ -29,7 +30,7 @@ export abstract class Prepared<Output, Input> extends PreparedBase<
   Output
 > {
   query(input: Input): Output[] {
-    return this.runAll(input);
+    return this.all(input);
   }
 }
 
@@ -38,7 +39,7 @@ export abstract class PreparedNoInput<Output> extends PreparedBase<
   Output
 > {
   query(): Output[] {
-    return this.runAllNoInput();
+    return this.all(undefined);
   }
 }
 
@@ -53,6 +54,6 @@ export abstract class PreparedWithParser<
     ...extra: any[]
   ): Output;
   query(input: Input): Output[] {
-    return this.runAll(input).map((output) => this.parse(output, input));
+    return this.all(input).map((output) => this.parse(output, input));
   }
 }

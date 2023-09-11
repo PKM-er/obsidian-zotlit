@@ -22,7 +22,7 @@ export class Collections extends PreparedBase<
 > {
   trxFunc = (ids: IDLibID[]) =>
     ids.reduce((rec, [collectionID, libId]) => {
-      const result = this.statement.get({
+      const result = this.get({
         collectionID,
         libId,
       }) as OutputSql | null;
@@ -56,7 +56,7 @@ export class CollectionsByKey extends PreparedBase<
 > {
   trxFunc = (itemKeys: KeyLibID[]) =>
     itemKeys.reduce((rec, [key, libId]) => {
-      const result = this.statement.get({ key, libId }) as OutputSql | null;
+      const result = this.get({ key, libId });
       if (result) {
         rec.set(key, toParsed(result));
       }
