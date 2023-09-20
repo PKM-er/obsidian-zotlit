@@ -1,5 +1,6 @@
-import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
-import workerpool from "@aidenlx/workerpool";
+import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
+import type { WorkerHandler } from "@aidenlx/workerpool";
+import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 
@@ -17,14 +18,23 @@ import type {
 } from "@/worker/annot-block";
 import ZoteroPlugin from "@/zt-main";
 
+class AnnotBlockWorker extends WebWorkerHandler {
+  initWebWorker(): Worker {
+    return fromScriptText(workerCode, {
+      name: "zotlit annot block worker",
+    });
+  }
+}
+class AnnotBlockWorkerPool extends WorkerPool<AnnotBlockWorkerAPI> {
+  workerCtor(): WorkerHandler {
+    return new AnnotBlockWorker();
+  }
+}
+
 export class AnnotBlock extends Service {
   plugin = this.use(ZoteroPlugin);
 
-  #url = toObjectURL(workerCode);
-  #instance = workerpool.pool(this.#url, {
-    workerType: "web",
-    name: "Zotero Annot Block Worker",
-  });
+  #instance = new AnnotBlockWorkerPool();
 
   api = createWorkerProxy<AnnotBlockWorkerAPI>(this.#instance);
 
@@ -46,7 +56,6 @@ export class AnnotBlock extends Service {
   }
   async onunload(): Promise<void> {
     await this.#instance.terminate();
-    URL.revokeObjectURL(this.#url);
   }
 
   async parse(markdown: string) {

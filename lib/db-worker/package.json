@@ -24,7 +24,7 @@
   "dependencies": {
     "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
     "@obzt/zotero-type": "workspace:*",
-    "@aidenlx/workerpool": ">=6.2.1-mod.13 <6.2.1-mod0",
+    "@aidenlx/workerpool": "workspace:*",
     "@obzt/common": "workspace:*",
     "log4js": "~6.6.1",
     "assert-never": "^1.2.1",

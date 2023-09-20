@@ -338,6 +338,10 @@
       "projectFolder": "lib/eta"
     },
     {
+      "packageName": "@aidenlx/workerpool",
+      "projectFolder": "lib/workerpool"
+    },
+    {
       "packageName": "@aidenlx/eslint-config",
       "projectFolder": "common/config/eslint"
     }

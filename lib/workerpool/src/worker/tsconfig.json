@@ -1,0 +1,8 @@
+{
+  "extends": "../base-tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "WebWorker"]
+  },
+  "include": ["**/*.ts", "../common/interface.ts", "../common/utils/**/*.ts"],
+  "exclude": []
+}

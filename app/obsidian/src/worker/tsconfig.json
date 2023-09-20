@@ -8,11 +8,11 @@
     "lib": ["ES2022", "WebWorker"],
     "declaration": true,
     "emitDeclarationOnly": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "module": "ESNext",
     "noEmit": false,
     "paths": {}
   },
   "include": ["**/*.ts"],
-  "exclude": []
+  "exclude": ["note-parser"]
 }

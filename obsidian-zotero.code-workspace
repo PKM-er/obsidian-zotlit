@@ -45,6 +45,10 @@
       "path": "utils/esbuild-inline-worker"
     },
     {
+      "name": "workerpool",
+      "path": "lib/workerpool"
+    },
+    {
       "name": "zotero-type",
       "path": "lib/zotero-type"
     },

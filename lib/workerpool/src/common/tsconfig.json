@@ -1,0 +1,11 @@
+{
+  "extends": "../base-tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"]
+  },
+  "include": ["./**/*.ts"],
+  "references": [
+    { "path": "../worker/tsconfig.json" },
+    { "path": "../web/tsconfig.json" }
+  ]
+}

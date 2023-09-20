@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
-import workerpool from "@aidenlx/workerpool";
+import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
+import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
 import type { INotifyRegularItem } from "@obzt/protocol";
 import { Service } from "@ophidian/core";
@@ -15,13 +15,26 @@ import ZoteroPlugin from "@/zt-main";
 import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
 
+class DatabaseWorker extends WebWorkerHandler {
+  initWebWorker(): Worker {
+    return fromScriptText(dbWorker, {
+      name: "zotlit database worker",
+    });
+  }
+}
+class DatabaseWorkerPool extends WorkerPool<DbWorkerAPI> {
+  workerCtor() {
+    return new DatabaseWorker();
+  }
+}
+
 export const enum DatabaseStatus {
   NotInitialized,
   Pending,
   Ready,
 }
 
-export default class DatabaseWorker extends Service {
+export default class Database extends Service {
   logSettings = this.use(LogSettings);
   settings = this.use(DatabaseSettings);
   app = this.use(ZoteroPlugin).app;
@@ -139,17 +152,13 @@ export default class DatabaseWorker extends Service {
 
   async onunload(): Promise<void> {
     await this.#instance.terminate();
-    URL.revokeObjectURL(this.#url);
     this.#status = DatabaseStatus.NotInitialized;
     this.#nextRefresh = null;
   }
 
-  #url = toObjectURL(dbWorker);
-  #instance = workerpool.pool(this.#url, {
+  #instance = new DatabaseWorkerPool({
     minWorkers: 1,
     maxWorkers: 1,
-    workerType: "web",
-    name: "Zotero Database Workers",
   });
 
   api = createWorkerProxy<DbWorkerAPI>(this.#instance);
