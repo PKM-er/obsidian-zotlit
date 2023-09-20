@@ -6,11 +6,6 @@ import ZoteroPlugin from "@/zt-main";
 import { resolvePath, readFile, readModTime } from "./file-handling";
 import { render, renderAsync, renderString, renderStringAsync } from "./render";
 
-const acceptLineBreak = {
-  processTemplate: (str: string) =>
-    str.replace(/((?:[^\\]|^)(?:\\{2})*)\\n/g, "$1\n"),
-};
-
 export class ObsidianEta extends EtaCore {
   use = use.this;
   plugin = this.use(ZoteroPlugin);
@@ -36,7 +31,7 @@ export class ObsidianEta extends EtaCore {
         }
         return val as string;
       },
-      plugins: [acceptLineBreak],
+      plugins: [],
       get autoTrim() {
         return self.settings.autoTrim;
       },
