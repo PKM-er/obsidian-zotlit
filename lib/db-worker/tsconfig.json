@@ -5,7 +5,7 @@
     "outDir": "dist",
     "target": "ES2020",
     "lib": ["WebWorker", "es2018"],
-    "moduleResolution": "Node16",
+    "moduleResolution": "Bundler",
     "module": "ESNext",
     "incremental": false,
     "paths": {

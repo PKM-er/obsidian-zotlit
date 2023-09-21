@@ -1,7 +1,7 @@
-export interface AnnotBlockWorkerAPI {
+export type AnnotBlockWorkerAPI = {
   parse(markdown: string): BlockInfo;
   stringify(spec: AnnotDetails[]): string;
-}
+};
 
 export interface AnnotDetails extends AnnotInfo {
   text: string;

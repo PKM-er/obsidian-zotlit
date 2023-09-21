@@ -9,9 +9,10 @@ import log from "@/log";
 import type { PluginAPI } from "./api";
 import checkLib from "./install-guide/index.jsx";
 import NoteFeatures from "./note-feature/service";
-import { AnnotBlock } from "./services/annot-block/service";
+// import { AnnotBlock } from "./services/annot-block/service";
 import { CitekeyClick } from "./services/citekey-click/service";
 import NoteIndex from "./services/note-index/service";
+import { NoteParser } from "./services/note-parser/service";
 import PDFParser from "./services/pdf-parser/service";
 import { Server } from "./services/server/service";
 import { TemplateRenderer, TemplateEditorHelper } from "./services/template";
@@ -37,7 +38,6 @@ export default class ZoteroPlugin extends Plugin {
     if (!checkLib(manifest, app)) {
       throw new Error("Library check failed");
     }
-    // this.noteParser = new NoteParser(this);
   }
 
   settings = this.use(SettingLoader);
@@ -47,6 +47,7 @@ export default class ZoteroPlugin extends Plugin {
   citekeyClick = this.use(CitekeyClick);
   templateEditor = this.use(TemplateEditorHelper);
   noteFeatures = this.use(NoteFeatures);
+  noteParser = this.use(NoteParser);
 
   get databaseAPI() {
     return this.dbWorker.api;
@@ -58,7 +59,7 @@ export default class ZoteroPlugin extends Plugin {
 
   templateRenderer = this.use(TemplateRenderer);
 
-  annotBlockWorker = this.use(AnnotBlock);
+  // annotBlockWorker = this.use(AnnotBlock);
   pdfParser = this.use(PDFParser);
 
   async onload() {

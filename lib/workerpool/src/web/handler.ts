@@ -2,9 +2,8 @@ import {
   DataResponse,
   EVAL_REQ_NAME,
   METHOD_REQ_NAME,
-  ReadySingal,
 } from "../common/interface.js";
-import type { BultiInMethod } from "../common/interface.js";
+import type { BultiInMethod, Response } from "../common/interface.js";
 import { createNanoEvents } from "../common/utils/nanoevent.js";
 import type { InvokeOptions, TaskWithId, WorkerCompat } from "./interface.js";
 
@@ -28,20 +27,20 @@ export default abstract class WorkerHandler {
   worker: WorkerCompat;
   constructor() {
     this.worker = this.setupWorker();
-    this.worker.addEventListener("message", (evt) => this.onMessage(evt.data));
-    this.worker.addEventListener("error", (evt) => this.onError(evt.error));
+    this.worker.onMessage((evt) => this.onMessage(evt.data));
+    this.worker.onError((evt) => this.onError(evt.error));
   }
 
   protected internal = createNanoEvents<{ terminate(): void; ready(): void }>();
   evt = createNanoEvents<Record<string, (payload: any) => void>>();
   private task =
     createNanoEvents<Record<number, (payload: any, error: any) => void>>();
-  private onMessage(data: unknown) {
+  private onMessage(data: Response) {
     if (this.terminateState === "finished") {
       // ignore messages after termination request
       return;
     }
-    if (ReadySingal.allows(data)) {
+    if (data === "ready") {
       this.internal.emit("ready");
       return;
     }

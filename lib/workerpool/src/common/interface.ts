@@ -2,21 +2,20 @@
 import { scope } from "arktype";
 
 export type Request = typeof DataRequest.infer;
-export type Response = typeof DataResponse.infer | typeof ReadySingal.infer;
+export type Response = typeof DataResponse.infer | "ready";
 
-export const { DataRequest, DataResponse, ReadySingal } = scope({
+export const { DataRequest, DataResponse } = scope({
   DataRequest: {
     id: "number",
     method: "string",
-    params: "json[]",
+    params: "any[]",
   },
   DataResponse: {
     id: "number",
     "eventName?": "string",
-    payload: "json",
-    error: "json",
+    payload: "any",
+    error: "any",
   },
-  ReadySingal: `"ready"`,
 }).compile();
 
 export interface Resolver {

@@ -6,17 +6,25 @@ export default abstract class WebWorkerHandler extends WorkerHandler {
   abstract initWebWorker(): Worker;
 
   setupWorker() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     const worker = Object.assign(this.initWebWorker(), {
       readyPromise: new Promise<true>((resolve) =>
         self.internal.once("ready", () => resolve(true)),
       ),
       killed: false,
       send(data: Request, opts?: StructuredSerializeOptions) {
-        postMessage(data, opts);
+        worker.postMessage(data, opts);
+      },
+      onMessage(callback: (evt: MessageEvent) => any) {
+        worker.addEventListener("message", callback);
+        return () => worker.removeEventListener("message", callback);
+      },
+      onError(callback: (evt: ErrorEvent) => any) {
+        worker.addEventListener("error", callback);
+        return () => worker.removeEventListener("error", callback);
       },
     });
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
     around(worker, {
       terminate: (next) =>
         function (this: Worker) {

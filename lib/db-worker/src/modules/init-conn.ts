@@ -1,4 +1,4 @@
-import type { DbWorkerAPI } from "@obzt/database/dist/api";
+import type { DbWorkerAPI } from "@obzt/database/api";
 import { databases } from "@init";
 import log from "@log";
 import { loadLibraryInfo } from "./load-lib.js";

@@ -97,12 +97,17 @@ const opts = {
         ...baseOpts,
         tsconfig: (
           await resolve(
-            path.startsWith("@/worker")
-              ? "src/worker/tsconfig.json"
+            path.startsWith("@/worker-web/")
+              ? "src/worker-web/tsconfig.json"
+              : path.startsWith("@/worker-iframe/")
+              ? "src/worker-iframe/tsconfig.json"
               : `${path}/tsconfig`,
-            { kind: "require-resolve" },
+            { kind: "require-resolve" }
           )
         ).path,
+        target: "es2022",
+        platform: path.startsWith("@/worker-iframe/") ? "browser": "node",
+        format: path.startsWith("@/worker-iframe/") ? "esm" : "cjs",
         sourcemap: !isProd ? "inline" : false,
       }),
       cachedir: "dist",

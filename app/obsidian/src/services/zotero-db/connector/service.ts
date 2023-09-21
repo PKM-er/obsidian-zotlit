@@ -10,7 +10,6 @@ import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";
 import log, { LogSettings } from "@/log";
 import { CancelledError, TimeoutError, untilDbRefreshed } from "@/utils/once";
-import { createWorkerProxy } from "@/utils/worker";
 import ZoteroPlugin from "@/zt-main";
 import type { DbWorkerAPI } from "../api";
 import { DatabaseSettings } from "./settings";
@@ -161,7 +160,9 @@ export default class Database extends Service {
     maxWorkers: 1,
   });
 
-  api = createWorkerProxy<DbWorkerAPI>(this.#instance);
+  get api() {
+    return this.#instance.proxy;
+  }
 
   #status: DatabaseStatus = DatabaseStatus.NotInitialized;
   get status() {

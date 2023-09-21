@@ -5,17 +5,20 @@
     "outDir": "dist",
     "target": "ES2022",
     "lib": ["dom", "ES2022"],
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
     "module": "ESNext",
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./*"],
       "@c/*": ["../../../lib/components/src/components/*"],
       "@log": ["./logger.ts"],
-      "support-platform": ["./platform.json"],
+      "support-platform": ["./platform.json"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/worker/*/api.ts"],
-  "exclude": ["src/worker"],
-  "references": [{ "path": "./src/worker/tsconfig.json" }]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/worker-web/*/api.ts"],
+  "exclude": ["src/worker-web/", "src/worker-iframe/"],
+  "references": [
+    { "path": "./src/worker-web/tsconfig.json" },
+    { "path": "./src/worker-iframe/tsconfig.json" }
+  ]
 }

@@ -1,21 +1,20 @@
 import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
-import type { WorkerHandler } from "@aidenlx/workerpool";
+import type { ProxyMethods, WorkerHandler } from "@aidenlx/workerpool";
 import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 
 import type { App } from "obsidian";
 import { MarkdownRenderChild, MarkdownRenderer } from "obsidian";
-import workerCode from "worker:@/worker/annot-block/main";
+import workerCode from "worker:@/worker-web/annot-block/main";
 
 import log, { logError } from "@/log";
 import type { ZoteroDatabase } from "@/services/zotero-db/database";
-import { createWorkerProxy } from "@/utils/worker";
 import type {
   AnnotBlockWorkerAPI,
   AnnotDetails,
   AnnotInfo,
-} from "@/worker/annot-block";
+} from "@/worker-web/annot-block/api";
 import ZoteroPlugin from "@/zt-main";
 
 class AnnotBlockWorker extends WebWorkerHandler {
@@ -36,7 +35,9 @@ export class AnnotBlock extends Service {
 
   #instance = new AnnotBlockWorkerPool();
 
-  api = createWorkerProxy<AnnotBlockWorkerAPI>(this.#instance);
+  get api() {
+    return this.#instance.proxy;
+  }
 
   onload(): void {
     this.plugin.registerMarkdownCodeBlockProcessor(
@@ -45,7 +46,7 @@ export class AnnotBlock extends Service {
         const child = new AnnotBlockRenderChild(
           el,
           this.plugin.database,
-          this,
+          this.api,
           this.plugin.app,
         );
         ctx.addChild(child);
@@ -71,7 +72,7 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
   constructor(
     container: HTMLElement,
     private db: ZoteroDatabase,
-    private worker: AnnotBlockWorkerAPI,
+    private worker: ProxyMethods<AnnotBlockWorkerAPI>,
     public app: App,
   ) {
     super(container);

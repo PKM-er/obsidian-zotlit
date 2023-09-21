@@ -4,7 +4,7 @@ import { around } from "monkey-around";
 /**
  * Used to emit error to console with proper sourcemap info
  */
-export const logError = <T extends Record<string, any>>(methods: T): never => {
+export const logError = <T extends Record<string, any>>(methods: T): T => {
   const logger =
     (next: any) =>
     async (...args: any[]) => {
@@ -21,5 +21,5 @@ export const logError = <T extends Record<string, any>>(methods: T): never => {
       Object.keys(methods).map((name) => [name, logger]),
     ) as never,
   );
-  return methods as never;
+  return methods;
 };

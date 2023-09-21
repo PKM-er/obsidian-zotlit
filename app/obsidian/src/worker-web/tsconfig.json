@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "src",
+    "outDir": "../../dist/worker",
+    "target": "ES2022",
+    "lib": ["ES2022", "WebWorker"],
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "noEmit": false,
+    "paths": {}
+  },
+  "include": ["**/*.ts"],
+  "exclude": []
+}

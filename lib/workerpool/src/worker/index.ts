@@ -1,9 +1,20 @@
-import type { Response, BultiInMethod } from "../common/interface.js";
+import type { Response, BultiInMethod, Request } from "../common/interface.js";
 import {
   DataRequest,
   EVAL_REQ_NAME,
   METHOD_REQ_NAME,
 } from "../common/interface.js";
+
+const compatPostMessage: typeof postMessage =
+  // @ts-expect-error detect iframe
+  typeof parent !== "undefined" &&
+  // @ts-expect-error detect iframe
+  typeof window !== "undefined" &&
+  // @ts-expect-error detect iframe
+  window !== parent
+    ? // @ts-expect-error detect iframe
+      parent.postMessage
+    : postMessage;
 
 export default class WorkerMain<
   TaskHandler extends Record<string, (...args: any[]) => any>,
@@ -32,10 +43,10 @@ export default class WorkerMain<
   }
 
   send(data: Response, opts?: StructuredSerializeOptions) {
-    postMessage(data, opts);
+    compatPostMessage(data, opts);
   }
 
-  async onMessage(data: unknown) {
+  async onMessage(data: Request) {
     const { data: request, problems } = DataRequest(data);
     if (problems) {
       return this.send({
@@ -57,6 +68,7 @@ export default class WorkerMain<
         error: null,
       });
     } catch (err) {
+      console.error(err);
       this.send({
         id: request.id,
         payload: null,

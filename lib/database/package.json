@@ -11,7 +11,8 @@
   "exports": {
     ".": "./dist/index.js",
     "./api": "./dist/api.js",
-    "./utils/*": "./dist/utils/*.js"
+    "./utils/*": "./dist/utils/*.js",
+    "./utils": "./dist/utils/index.js"
   },
   "devDependencies": {
     "@aidenlx/eslint-config": "workspace:*",

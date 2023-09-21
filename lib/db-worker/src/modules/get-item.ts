@@ -15,8 +15,8 @@ import {
   ItemFields,
   Collections,
 } from "@obzt/database";
-import type { DbWorkerAPI } from "@obzt/database/dist/api";
-import type { KeyLibID } from "@obzt/database/dist/utils";
+import type { DbWorkerAPI } from "@obzt/database/api";
+import type { KeyLibID } from "@obzt/database/utils";
 import { assertNever } from "assert-never";
 import { cache, databases } from "@init";
 import log from "@log";

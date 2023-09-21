@@ -1,32 +1,35 @@
-import { toObjectURL } from "@aidenlx/esbuild-plugin-inline-worker/utils";
-import workerpool from "@aidenlx/workerpool";
+import { IframeWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
 import { Service } from "@ophidian/core";
 
-import workerCode from "worker:@/worker/note-parser/main";
+import workerCode from "worker:@/worker-iframe/note-parser/main";
 
-import { createWorkerProxy } from "@/utils/worker";
-import type { NoteParserWorkerAPI } from "@/worker/note-parser";
+import type { NoteParserWorkerAPI } from "@/worker-iframe/note-parser/api";
 import ZoteroPlugin from "@/zt-main";
+class NoteParserkWorker extends IframeWorkerHandler {
+  get code() {
+    return workerCode;
+  }
+}
+class NoteParserkWorkerPool extends WorkerPool<NoteParserWorkerAPI> {
+  workerCtor() {
+    return new NoteParserkWorker();
+  }
+}
 
 export class NoteParser extends Service {
   plugin = this.use(ZoteroPlugin);
 
-  #url = toObjectURL(workerCode);
-  #instance = workerpool.pool(this.#url, {
-    minWorkers: 1,
-    maxWorkers: 4,
-    workerType: "iframe",
-    // name: "Zotero Note Parser",
-  });
+  instance = new NoteParserkWorkerPool();
 
-  api = createWorkerProxy<NoteParserWorkerAPI>(this.#instance);
+  get api() {
+    return this.instance.proxy;
+  }
 
   onload(): void {
     return;
   }
   async onunload(): Promise<void> {
-    await this.#instance.terminate();
-    URL.revokeObjectURL(this.#url);
+    await this.instance.terminate();
   }
 
   async parse(markdown: string) {

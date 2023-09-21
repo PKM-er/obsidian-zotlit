@@ -1,7 +1,7 @@
 import { getItemKeyGroupID } from "@obzt/common";
 import type { IDLibID, ItemDetails } from "@obzt/database";
 import { ItemsFull } from "@obzt/database";
-import type { DbWorkerAPI } from "@obzt/database/dist/api";
+import type { DbWorkerAPI } from "@obzt/database/api";
 import { databases, cache } from "@init";
 import log from "@log";
 import { getItemObjects } from "./get-item";

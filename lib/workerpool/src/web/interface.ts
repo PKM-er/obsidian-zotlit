@@ -17,26 +17,8 @@ export interface WorkerCompat {
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Worker/terminate)
    */
   terminate(): void;
-  addEventListener<K extends keyof WorkerEventMap>(
-    type: K,
-    listener: (this: Worker, ev: WorkerEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions,
-  ): void;
-  addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions,
-  ): void;
-  removeEventListener<K extends keyof WorkerEventMap>(
-    type: K,
-    listener: (this: Worker, ev: WorkerEventMap[K]) => any,
-    options?: boolean | EventListenerOptions,
-  ): void;
-  removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions,
-  ): void;
+  onMessage(callback: (evt: MessageEvent<any>) => any): () => void;
+  onError(callback: (evt: ErrorEvent) => any): () => void;
 }
 
 export interface Task {
@@ -55,3 +37,10 @@ export interface InvokeOptions {
   transfer: Transferable[];
   timeout: number;
 }
+
+export type ProxyMethods<API extends Record<string, any>> = {
+  [K in keyof API]: API[K] extends (...args: infer P) => infer R
+    ? (...args: P) => Promise<Awaited<R>>
+    : never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+};

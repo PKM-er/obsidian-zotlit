@@ -43,9 +43,16 @@ module.exports = {
   },
   overrides: [
     {
-      files: "src/worker/**/*.ts",
+      files: "src/worker-web/**/*.ts",
+      // excludedFiles: "src/worker/note-parser/**/*.ts",
       parserOptions: {
-        tsconfigRootDir: "src/worker",
+        tsconfigRootDir: "src/worker-web",
+      },
+    },
+    {
+      files: "src/worker-iframe/**/*.ts",
+      parserOptions: {
+        tsconfigRootDir: "src/worker-iframe",
       },
     },
   ],

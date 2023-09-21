@@ -3,7 +3,7 @@ import { type } from "arktype";
 import { METHOD_REQ_NAME, EVAL_REQ_NAME } from "../common/interface.js";
 import { createNanoEvents } from "../common/utils/nanoevent.js";
 import type WorkerHandler from "./handler.js";
-import { type InvokeOptions, type Task } from "./interface.js";
+import type { ProxyMethods, InvokeOptions, Task } from "./interface.js";
 
 /**
  * Configuration options for the Pool class
@@ -13,13 +13,6 @@ interface WorkerPoolOptions {
   maxWorkers?: number;
   minWorkers?: "max" | number;
 }
-
-export type ProxyMethods<API extends Record<string, any>> = {
-  [K in keyof API]: API[K] extends (...args: infer P) => infer R
-    ? (...args: P) => Promise<Awaited<R>>
-    : never;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-};
 
 /**
  * A pool to manage workers

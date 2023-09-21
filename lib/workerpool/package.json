@@ -2,7 +2,7 @@
   "name": "@aidenlx/workerpool",
   "version": "0.0.1",
   "scripts": {
-    "build": " tsc --build src/common/",
+    "build": "tsc --build src/common/",
     "dev": " tsc --build src/common/ --watch"
   },
   "type": "module",

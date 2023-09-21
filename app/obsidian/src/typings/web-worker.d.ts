@@ -1,4 +1,4 @@
 declare module "worker:*" {
-  const dbWorker: string;
+  const worker: string;
   export default string;
 }
