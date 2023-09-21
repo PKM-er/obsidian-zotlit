@@ -20,14 +20,20 @@ import type { HelperExtra } from "./helper/to-helper";
 import { toHelper } from "./helper/to-helper";
 import { TemplateSettings } from "./settings";
 
+interface ColoredText {
+  color: string;
+  content: string;
+  colorName: string;
+}
 export interface TemplateDataMap {
   note: DocItemHelper;
   field: DocItemHelper;
   filename: RegularItemInfoBase;
   annotation: AnnotHelper;
   annots: AnnotHelper[];
-  citation: RegularItemInfoBase;
-  altCitation: RegularItemInfoBase;
+  cite: RegularItemInfoBase[];
+  cite2: RegularItemInfoBase[];
+  colored: ColoredText;
 }
 
 export class TemplateRenderer extends Service {
@@ -165,9 +171,15 @@ export class TemplateRenderer extends Service {
     const str = this.render("annots", data.annotations);
     return str;
   }
-  renderCitation(extra: HelperExtra, ctx: Context, alt = false): string {
-    const data = toHelper(extra, ctx);
-    return this.render(alt ? "altCitation" : "citation", data.docItem);
+  renderCitations(extras: HelperExtra[], ctx: Context, alt = false): string {
+    const data = extras.map((extra) => toHelper(extra, ctx));
+    return this.render(
+      alt ? "cite2" : "cite",
+      data.map((d) => d.docItem),
+    );
+  }
+  renderColored(data: ColoredText) {
+    return this.render("colored", data);
   }
   renderFilename(extra: HelperExtra, ctx: Context): string {
     const data = toHelper(extra, ctx);
@@ -197,7 +209,7 @@ export class TemplateRenderer extends Service {
 
     const {
       [ZOTERO_KEY_FIELDNAME]: _key,
-      [ZOTERO_ATCHS_FIELDNAME]: _atch,
+      [ZOTERO_ATCHS_FIELDNAME]: originalAttachments,
       ...frontmatter
     } = parseYaml(body);
 
@@ -205,7 +217,7 @@ export class TemplateRenderer extends Service {
       mode: raw ? "raw" : "parsed",
       yaml: [
         `${ZOTERO_KEY_FIELDNAME}: ${zoteroKey}`,
-        `${ZOTERO_ATCHS_FIELDNAME}: ${zoteroAtchIds}`,
+        `${ZOTERO_ATCHS_FIELDNAME}: ${originalAttachments ?? zoteroAtchIds}`,
         body.trim(),
         "",
       ].join("\n"),

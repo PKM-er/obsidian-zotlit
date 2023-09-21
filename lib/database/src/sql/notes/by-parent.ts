@@ -28,7 +28,7 @@ export class NoteByParent extends PreparedWithParser<OutputSql, Output, Input> {
   }
 
   getKeyStatement: Statement = this.database.prepare(
-    `SELECT key FROM items WHERE itemID = $attachmentId AND libraryID = $libId`,
+    `SELECT key FROM items WHERE itemID = $itemID AND libraryID = $libId`,
   );
   protected parse(
     output: OutputSql,

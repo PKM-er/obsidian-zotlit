@@ -26,6 +26,9 @@ export async function createNote(
       attachment: null,
       allAttachments: attachments,
       annotations: [],
+      notes: await plugin.databaseAPI
+        .getNotes(item.itemID, item.libraryID)
+        .then((notes) => plugin.noteParser.normalizeNotes(notes)),
     };
     await plugin.noteFeatures.createNoteForDocItem(item, {
       note: (template, ctx) =>

@@ -8,6 +8,7 @@ import { htmlToMarkdown } from "obsidian";
 import { fileLink, imgLink, isImageAnnot } from "../utils.js";
 import type { Context } from "./base.js";
 import { zoteroDataDir } from "./base.js";
+import colors from "./colors.json";
 import type { DocItemHelper } from "./item.js";
 
 export type AnnotHelper = Readonly<
@@ -150,20 +151,4 @@ export const withAnnotHelper = (
 export type AnnotationExtra = {
   attachment: AttachmentInfo | null;
   tags: Record<number, TagInfo[]>;
-};
-
-const colors = {
-  "#FF6666": "red",
-  "#FF8C19": "orange",
-  "#F19837": "orange",
-  "#FFD400": "yellow",
-  "#999999": "gray",
-  "#AAAAAA": "gray",
-  "#5FB236": "green",
-  "#009980": "cyan",
-  "#2EA8E5": "blue",
-  "#576DD9": "navy",
-  "#A28AE5": "purple",
-  "#A6507B": "brown",
-  "#E56EEE": "magenta",
 };

@@ -1,4 +1,5 @@
 import { AnnotationType, TagType } from "@obzt/zotero-type";
+import { colord } from "colord";
 import React from "react";
 import type { ValueRenderer } from "react-json-tree";
 
@@ -7,10 +8,8 @@ const hex = /^#(?:[\dA-F]{3}){1,2}$|^#(?:[\dA-F]{4}){1,2}$/i;
 
 /** @see https://stackoverflow.com/a/41491220 */
 const shouldBlack = (bgHex: string) => {
-  const color = bgHex.charAt(0) === "#" ? bgHex.substring(1, 7) : bgHex;
-  const r = parseInt(color.substring(0, 2), 16); // hexToR
-  const g = parseInt(color.substring(2, 4), 16); // hexToG
-  const b = parseInt(color.substring(4, 6), 16); // hexToB
+  const color = colord(bgHex);
+  const { r, g, b } = color.rgba;
   return r * 0.299 + g * 0.587 + b * 0.114 > 186;
 };
 export const valueRenderer: ValueRenderer = (

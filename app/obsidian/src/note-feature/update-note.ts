@@ -21,6 +21,7 @@ import {
 } from "@/services/note-index/utils";
 import type { HelperExtra } from "@/services/template/helper";
 import { toHelper } from "@/services/template/helper";
+import type { NoteNormailzed } from "@/services/template/helper/item";
 import type ZoteroPlugin from "@/zt-main";
 
 interface UpdateSummary {
@@ -61,9 +62,13 @@ export async function updateNote(
     }
   }
 
+  const notes = await plugin.databaseAPI
+    .getNotes(item.itemID, libId)
+    .then((notes) => plugin.noteParser.normalizeNotes(notes));
+
   const extraByAtch = await getHelperExtraByAtch(
     item,
-    { all: allAttachments, selected: allSelectedAtchs },
+    { all: allAttachments, selected: allSelectedAtchs, notes },
     plugin,
   );
   const mainExtra = Object.values(extraByAtch)[0];
@@ -190,14 +195,17 @@ export async function getHelperExtraByAtch(
   {
     all: allAttachments,
     selected: attachments,
+    notes,
   }: {
     all: AttachmentInfo[];
     selected: AttachmentInfo[];
+    notes: NoteNormailzed[];
   },
   plugin: ZoteroPlugin,
 ): Promise<Record<number, HelperExtra>> {
   const libId = plugin.database.settings.citationLibrary;
   const tagsRecord = await plugin.databaseAPI.getTags([[item.itemID, libId]]);
+
   if (attachments.length === 0) {
     return {
       [-1]: {
@@ -206,6 +214,7 @@ export async function getHelperExtraByAtch(
         tags: tagsRecord,
         allAttachments,
         annotations: [],
+        notes,
       },
     };
   }
@@ -225,6 +234,7 @@ export async function getHelperExtraByAtch(
       },
       allAttachments,
       annotations,
+      notes,
     };
   }
   return extras;

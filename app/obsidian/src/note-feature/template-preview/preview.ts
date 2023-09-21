@@ -120,6 +120,19 @@ export class TemplatePreview extends TemplatePreviewBase {
       case "field":
         markdown = renderer.renderFrontmatter(preview, ctx);
         break;
+      case "cite":
+        markdown = renderer.renderCitations([preview], ctx);
+        break;
+      case "cite2":
+        markdown = renderer.renderCitations([preview], ctx, true);
+        break;
+      case "colored":
+        markdown = renderer.renderColored({
+          content: "I'm Highlight",
+          color: "#FF0000",
+          colorName: "red",
+        });
+        break;
       default:
         assertNever(templateType);
     }

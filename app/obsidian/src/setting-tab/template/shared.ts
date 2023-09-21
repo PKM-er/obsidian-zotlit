@@ -8,11 +8,11 @@ export const templateDesc: Record<
     title: "Note filename",
     desc: "Used to render filename for each imported literature note",
   },
-  citation: {
+  cite: {
     title: "Primary Markdown citation",
     desc: "Used to render citation in literature note",
   },
-  altCitation: {
+  cite2: {
     title: "Secondary Markdown citation",
     desc: "Used to render alternative citation in literature note",
   },
@@ -31,5 +31,9 @@ export const templateDesc: Record<
   annots: {
     title: "Annotations",
     desc: "Used to render annotation list when batch importing",
+  },
+  colored: {
+    title: "Colored text",
+    desc: "Used to render colored text in imported Zotero note",
   },
 };

@@ -76,6 +76,9 @@ importers:
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
+      colord:
+        specifier: ~2.9.3
+        version: 2.9.3
       core-js:
         specifier: ~3.27.2
         version: 3.27.2
@@ -283,7 +286,7 @@ importers:
         version: 7.3.8
       tailwindcss:
         specifier: ~3.2.4
-        version: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+        version: 3.2.7(postcss@8.4.21)
       tslib:
         specifier: ^2.3.1
         version: 2.5.0
@@ -481,7 +484,7 @@ importers:
         version: 1.16.0(postcss@8.4.21)
       tailwindcss:
         specifier: ~3.2.4
-        version: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+        version: 3.2.7(postcss@8.4.21)
       typescript:
         specifier: ~5.1.6
         version: 5.1.6
@@ -4575,7 +4578,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.2.0'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
   /@tailwindcss/forms@0.5.3(tailwindcss@3.2.7):
@@ -4584,7 +4587,7 @@ packages:
       tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
   /@tailwindcss/line-clamp@0.4.2(tailwindcss@3.2.7):
@@ -4592,7 +4595,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
   /@tailwindcss/typography@0.5.9(tailwindcss@3.2.7):
@@ -4604,7 +4607,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
   /@tootallnate/once@1.1.2:
@@ -6391,7 +6394,6 @@ packages:
 
   /colord@2.9.3:
     resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
-    dev: true
 
   /colorette@2.0.16:
     resolution: {integrity: sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==}
@@ -8003,7 +8005,7 @@ packages:
     dependencies:
       fast-glob: 3.2.12
       postcss: 8.4.21
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
   /eslint-scope@5.1.1:
@@ -12898,7 +12900,7 @@ packages:
     dependencies:
       lilconfig: 2.1.0
       postcss: 8.4.21
-      ts-node: 10.9.1(@types/node@17.0.45)(typescript@5.1.6)
+      ts-node: 10.9.1(@types/node@18.15.7)(typescript@5.1.6)
       yaml: 1.10.2
 
   /postcss-merge-longhand@5.1.7(postcss@8.4.21):
@@ -14870,10 +14872,10 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
     dependencies:
-      tailwindcss: 3.2.7(postcss@8.4.21)(ts-node@10.9.1)
+      tailwindcss: 3.2.7(postcss@8.4.21)
     dev: false
 
-  /tailwindcss@3.2.7(postcss@8.4.21)(ts-node@10.9.1):
+  /tailwindcss@3.2.7(postcss@8.4.21):
     resolution: {integrity: sha512-B6DLqJzc21x7wntlH/GsZwEXTBttVSl1FtCzC8WP4oBc/NKef7kaax5jeihkkCEWc831/5NDJ9gRNDK6NEioQQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
@@ -15174,6 +15176,7 @@ packages:
       typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    dev: true
 
   /ts-node@10.9.1(@types/node@18.15.7)(typescript@5.1.6):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
@@ -15204,7 +15207,6 @@ packages:
       typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    dev: true
 
   /tsconfck@2.1.1(typescript@5.1.6):
     resolution: {integrity: sha512-ZPCkJBKASZBmBUNqGHmRhdhM8pJYDdOXp4nRgj/O0JwUwsMq50lCDRQP/M5GBNAA0elPrq4gAeu4dkaVCuKWww==}

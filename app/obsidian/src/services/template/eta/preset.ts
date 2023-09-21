@@ -2,6 +2,9 @@
 import { join } from "path/posix";
 import annotation from "../defaults/zt-annot.ejs";
 import annots from "../defaults/zt-annots.ejs";
+import cite from "../defaults/zt-cite.ejs";
+import cite2 from "../defaults/zt-cite2.ejs";
+import colored from "../defaults/zt-colored.ejs";
 import field from "../defaults/zt-field.ejs";
 import note from "../defaults/zt-note.ejs";
 
@@ -11,11 +14,12 @@ export const Template = {
     field,
     annots,
     annotation,
+    cite,
+    cite2,
+    colored,
   },
   Embeded: {
     filename: "<%= it.citekey ?? it.DOI ?? it.title ?? it.key %>.md",
-    citation: "[@<%= it.citekey %>]",
-    altCitation: "@<%= it.citekey %>",
   },
 } as const;
 

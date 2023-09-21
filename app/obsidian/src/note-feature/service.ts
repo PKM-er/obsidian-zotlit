@@ -264,9 +264,13 @@ class NoteFeatures extends Service {
     if (selected) {
       cacheAttachmentSelect(selected, item);
     }
+    const notes = await this.plugin.databaseAPI
+      .getNotes(item.itemID, libId)
+      .then((notes) => this.plugin.noteParser.normalizeNotes(notes));
+
     const extraByAtch = await getHelperExtraByAtch(
       item,
-      { all: allAttachments, selected: selected ? [selected] : [] },
+      { all: allAttachments, selected: selected ? [selected] : [], notes },
       this.plugin,
     );
     const extra = Object.values(extraByAtch)[0];

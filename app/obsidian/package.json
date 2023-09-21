@@ -114,6 +114,7 @@
     "core-js-pure": "~3.32.1",
     "arktype": "~1.0.21-alpha",
     "linkedom": "~0.15.3",
-    "p-queue": "~7.4.1"
+    "p-queue": "~7.4.1",
+    "colord": "~2.9.3"
   }
 }

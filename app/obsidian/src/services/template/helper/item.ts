@@ -1,6 +1,7 @@
 import { enumerate } from "@obzt/common";
 import type {
   AttachmentInfo,
+  NoteInfo,
   RegularItemInfoBase,
   TagInfo,
 } from "@obzt/database";
@@ -13,18 +14,22 @@ import { withCollectionHelper } from "./collection";
 import type { CreatorHelper } from "./creator";
 import { withCreatorHelper } from "./creator";
 
-export type RegularItemInfoExtra = {
+export interface RegularItemInfoExtra {
   attachment: AttachmentInfo | null;
   // annotations: AnnotationInfo[];
   allAttachments: AttachmentInfo[];
   tags: Record<number, TagInfo[]>;
-};
+  notes: NoteNormailzed[];
+}
+
+export type NoteNormailzed = NoteInfo & { content: string };
 
 const extraKeys = new Set(
   enumerate<keyof RegularItemInfoExtra>()(
     "attachment",
     "allAttachments",
     "tags",
+    "notes",
   ),
 );
 

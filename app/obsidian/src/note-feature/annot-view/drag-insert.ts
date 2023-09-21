@@ -85,6 +85,7 @@ export const getAnnotRenderer = (
           allAttachments,
           annotations,
           docItem: doc.docItem,
+          notes: [],
         },
         {
           plugin,

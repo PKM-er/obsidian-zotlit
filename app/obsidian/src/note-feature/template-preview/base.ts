@@ -102,6 +102,9 @@ export function create() {
         [stateData.docItem, libId],
         ...annotations.map((i): IDLibID => [i.itemID, libId]),
       ]);
+      const notes = await plugin.databaseAPI
+        .getNotes(docItem.itemID, libId)
+        .then((notes) => plugin.noteParser.normalizeNotes(notes));
 
       set(() => ({
         preview: {
@@ -111,6 +114,7 @@ export function create() {
           attachment,
           tags,
           annot: annotations.find((i) => i.itemID === stateData.annot),
+          notes,
         },
       }));
       return true;

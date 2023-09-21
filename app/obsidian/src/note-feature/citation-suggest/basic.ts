@@ -45,14 +45,17 @@ export async function insertCitation(
     }
   }
 
+  const notes = await plugin.databaseAPI
+    .getNotes(item.itemID, libId)
+    .then((notes) => plugin.noteParser.normalizeNotes(notes));
   const extraByAtch = await getHelperExtraByAtch(
     item,
-    { all: allAttachments, selected: allSelectedAtchs },
+    { all: allAttachments, selected: allSelectedAtchs, notes },
     template.plugin,
   );
 
-  const citation = template.renderCitation(
-    Object.values(extraByAtch)[0],
+  const citation = template.renderCitations(
+    Object.values(extraByAtch),
     { plugin: template.plugin },
     alt,
   );
