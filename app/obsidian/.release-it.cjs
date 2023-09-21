@@ -2,7 +2,7 @@ module.exports = {
   hooks: {
     // "before:init": ["npm run eslint"],
     "after:bump": [
-      "node ../../common/scripts/install-run-rush.js rebuild --verbose",
+      "rush rebuild --verbose",
       "node ./scripts/zip.mjs",
       "git add ../../.",
     ],
