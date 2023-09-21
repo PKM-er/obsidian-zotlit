@@ -3,7 +3,7 @@ import type {
   DocumentSearchOptions,
   SimpleDocumentSearchResultSetUnit,
 } from "flexsearch";
-import type { AnnotationInfo, RegularItemInfo } from "./item.js";
+import type { AnnotationInfo, NoteInfo, RegularItemInfo } from "./item.js";
 import type { IDLibID, KeyLibID } from "./utils/database.js";
 import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 
@@ -60,6 +60,9 @@ export interface DbWorkerAPI {
     keys: string[],
     libraryID: number,
   ): Record<string, AnnotationInfo>;
+
+  getNotes(itemID: number, libraryID: number): NoteInfo[];
+  getNoteFromKey(keys: string[], libraryID: number): Record<string, NoteInfo>;
 }
 
 type ToWorkpoolType<API extends DbWorkerAPI> = {

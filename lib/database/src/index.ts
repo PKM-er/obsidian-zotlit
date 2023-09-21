@@ -1,5 +1,7 @@
 export { AnnotByKeys } from "./sql/annotations/by-keys.js";
 export { AnnotByParent } from "./sql/annotations/by-parent.js";
+export { NoteByKeys } from "./sql/notes/by-keys.js";
+export { NoteByParent } from "./sql/notes/by-parent.js";
 export { Attachements } from "./sql/attachments.js";
 export { BibtexGetCitekey } from "./sql/bibtex/get-citekey.js";
 export { BibtexGetId } from "./sql/bibtex/get-id.js";
@@ -40,6 +42,7 @@ export type {
   CreatorNameOnly,
   ItemCreator,
   Collection,
+  NoteInfo,
 } from "./item.js";
 export {
   isCreatorFullName,
@@ -48,4 +51,5 @@ export {
   requiredKeys,
   isAnnotationItem,
   isRegularItemInfo as isGeneralItem,
+  isNoteItem,
 } from "./item.js";

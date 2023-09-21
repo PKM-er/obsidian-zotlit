@@ -1,5 +1,10 @@
 import { enumerate } from "@obzt/common";
-import type { AnnotationPosition, DB, AnnotationItem } from "@obzt/zotero-type";
+import type {
+  AnnotationPosition,
+  DB,
+  AnnotationItem,
+  NoteItem,
+} from "@obzt/zotero-type";
 import { nonRegularItemTypes, CreatorFieldMode } from "@obzt/zotero-type";
 
 export type Item = {
@@ -108,3 +113,13 @@ export const isRegularItemInfo = (item: unknown): item is RegularItemInfo =>
 export const isAnnotationItem = (item: unknown): item is AnnotationInfo =>
   (item as Item).itemType === "annotation" &&
   !!(item as AnnotationInfo).parentItem;
+
+export type NoteInfo = NoteItem<Item> &
+  Required<DB.ItemNotes> & {
+    /** key of parent item (commonly docItem) */
+    parentItem: string;
+    parentItemID: number | null;
+  };
+
+export const isNoteItem = (item: unknown): item is NoteInfo =>
+  (item as NoteInfo).itemType === "note" && !!(item as NoteInfo).parentItem;

@@ -7,6 +7,8 @@ import {
   AnnotByParent,
   Attachements,
   Tags,
+  NoteByParent,
+  NoteByKeys,
 } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/api";
 import localforage from "localforage";
@@ -77,6 +79,26 @@ new Worker(
       (annots, annotKeys) =>
         `annotations with keys: ${annotKeys.join(",")}` +
         (annots ? `, count: ${annots.length}` : ""),
+    ),
+    getNotes: attachLogger(
+      (itemID, libId) =>
+        databases.main.prepare(NoteByParent).query({
+          itemID,
+          libId,
+          groupID: getGroupID(libId),
+        }),
+      (notes, docItemId) =>
+        `notes of literature ${docItemId}` +
+        (notes ? `, count: ${notes.length}` : ""),
+    ),
+    getNoteFromKey: attachLogger(
+      (noteKeys, libId) =>
+        databases.main
+          .prepare(NoteByKeys)
+          .query({ noteKeys, libId, groupID: getGroupID(libId) }),
+      (notes, noteKeys) =>
+        `notes with keys: ${noteKeys.join(",")}` +
+        (notes ? `, count: ${notes.length}` : ""),
     ),
     getItems,
     isUpToDate: () => databases.main.isUpToDate(),
