@@ -33,7 +33,7 @@ export const templateDesc: Record<
     desc: "Used to render annotation list when batch importing",
   },
   colored: {
-    title: "Colored text",
-    desc: "Used to render colored text in imported Zotero note",
+    title: "Colored highlight",
+    desc: "Used to render highlights with color in imported Zotero note",
   },
 };
