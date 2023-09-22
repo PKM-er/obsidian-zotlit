@@ -21,9 +21,11 @@ import { toHelper } from "./helper/to-helper";
 import { TemplateSettings } from "./settings";
 
 interface ColoredText {
-  color: string;
   content: string;
-  colorName: string;
+  color: string | null;
+  colorName: string | null;
+  bgColor: string | null;
+  bgColorName: string | null;
 }
 export interface TemplateDataMap {
   note: DocItemHelper;

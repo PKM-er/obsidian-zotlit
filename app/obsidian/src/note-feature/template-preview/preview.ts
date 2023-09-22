@@ -129,8 +129,10 @@ export class TemplatePreview extends TemplatePreviewBase {
       case "colored":
         markdown = renderer.renderColored({
           content: "I'm Highlight",
-          color: "#FF0000",
+          color: "#FF000080",
           colorName: "red",
+          bgColor: "#FF000080",
+          bgColorName: "red",
         });
         break;
       default:

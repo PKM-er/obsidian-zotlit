@@ -42,6 +42,20 @@ class Note {
   }
 }
 
+function cssColorToHexName(code: string) {
+  if (!code)
+    return {
+      colorName: null,
+      color: null,
+    };
+  const hex = colord(code).toHex().toUpperCase();
+  const name = colors[hex.substring(0, 7) as keyof typeof colors];
+  return {
+    colorName: name ?? hex,
+    color: hex,
+  };
+}
+
 export class NoteParser extends Service {
   plugin = this.use(ZoteroPlugin);
 
@@ -49,20 +63,67 @@ export class NoteParser extends Service {
   tdService = new globalThis.TurndownService()
     .addRule("color", {
       filter: (node, _opts) => {
-        return node.nodeName === "SPAN" && !!node.style.backgroundColor;
+        return node.nodeName === "SPAN" && Boolean(node.style.color);
       },
       replacement: (content, node, _opts) => {
         if (!(node instanceof HTMLElement)) {
           throw new Error("Unexpected node");
         }
-        const colorCode = node.style.backgroundColor;
-        const hex = colord(colorCode).toHex();
+        const { color, colorName } = cssColorToHexName(node.style.color);
+
+        const child = node.firstChild as HTMLSpanElement | null;
+        if (
+          child === node.lastChild &&
+          child?.nodeName === "SPAN" &&
+          Boolean(child.style.backgroundColor)
+        ) {
+          const { color: bgColor, colorName: bgColorName } = cssColorToHexName(
+            child.style.backgroundColor,
+          );
+          return this.plugin.templateRenderer.renderColored({
+            content,
+            color,
+            colorName,
+            bgColor,
+            bgColorName,
+          });
+        } else {
+          return this.plugin.templateRenderer.renderColored({
+            content,
+            color,
+            colorName,
+            bgColor: null,
+            bgColorName: null,
+          });
+        }
+      },
+    })
+    .addRule("bg-color", {
+      filter: (node, _opts) => {
+        return node.nodeName === "SPAN" && Boolean(node.style.backgroundColor);
+      },
+      replacement: (content, node, _opts) => {
+        if (!(node instanceof HTMLElement)) {
+          throw new Error("Unexpected node");
+        }
+        const { color: bgColor, colorName: bgColorName } = cssColorToHexName(
+          node.style.backgroundColor,
+        );
+        const parent = node.parentElement as HTMLSpanElement | null;
+        if (
+          parent?.nodeName === "SPAN" &&
+          Boolean(parent.style.color) &&
+          !node.nextSibling
+        ) {
+          // nested color are handled by color rule
+          return content;
+        }
         return this.plugin.templateRenderer.renderColored({
-          color: hex,
           content,
-          colorName:
-            colors[hex.substring(0, 7).toUpperCase() as keyof typeof colors] ??
-            hex,
+          color: null,
+          colorName: null,
+          bgColor,
+          bgColorName,
         });
       },
     })
