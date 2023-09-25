@@ -111,6 +111,7 @@ export type AnnotationInfo = AnnotationItem<Item> &
       inline: boolean;
       /** the comment from zotero note, null if inline or no text **/
       comment: string | null;
+      commentMd: string;
     };
   };
 

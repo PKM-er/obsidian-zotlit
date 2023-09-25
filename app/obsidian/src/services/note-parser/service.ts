@@ -7,6 +7,7 @@ import type {
 import { Service } from "@ophidian/core";
 
 import { nanoid } from "nanoid";
+import { htmlToMarkdown } from "obsidian";
 import log from "@/log";
 import ZoteroPlugin from "@/zt-main";
 import type { HelperExtra } from "../template/helper";
@@ -279,6 +280,11 @@ export class NoteParser extends Service {
             ...annotation,
             ztnote: {
               comment: annotData.commentHTML,
+              get commentMd(): string {
+                if (annotData.commentHTML) {
+                  return htmlToMarkdown(annotData.commentHTML);
+                } else return "";
+              },
               inline: annotData.inline,
             },
           },
