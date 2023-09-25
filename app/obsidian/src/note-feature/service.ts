@@ -19,6 +19,7 @@ import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
 // import { NoteFields } from "./note-fields/service";
 // import { NoteFieldsView, noteFieldsViewType } from "./note-fields/view";
+import { importNote } from "./note-import";
 import { ProtocolHandler } from "./protocol/service";
 import { openOrCreateNote } from "./quick-switch";
 import {
@@ -79,7 +80,7 @@ class NoteFeatures extends Service {
     // );
     plugin.addCommand({
       id: "zotero-annot-view",
-      name: "Open Zotero Annotation View in Side Panel",
+      name: "Open Zotero annotation view in side panel",
       callback: () => {
         app.workspace.ensureSideLeaf(annotViewType, "right", {
           active: true,
@@ -129,7 +130,7 @@ class NoteFeatures extends Service {
     };
     plugin.addCommand({
       id: "update-literature-note",
-      name: "Update Literature Note",
+      name: "Update literature note",
       editorCheckCallback(checking, _editor, ctx) {
         const shouldContinue = ctx.file && isLiteratureNote(ctx.file, app);
         if (checking) {
@@ -141,7 +142,7 @@ class NoteFeatures extends Service {
     });
     plugin.addCommand({
       id: "overwrite-update-literature-note",
-      name: "Force Update Literature Note by Overwriting",
+      name: "Force update literature note by overwriting",
       editorCheckCallback(checking, _editor, ctx) {
         const shouldContinue = ctx.file && isLiteratureNote(ctx.file, app);
         if (checking) {
@@ -150,6 +151,11 @@ class NoteFeatures extends Service {
           updateNote(ctx.file, true);
         }
       },
+    });
+    plugin.addCommand({
+      id: "import-note",
+      name: "Import note",
+      callback: () => importNote(plugin),
     });
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
@@ -165,7 +171,7 @@ class NoteFeatures extends Service {
         if (!plugin.settings.template.updateOverwrite)
           menu.addItem((i) =>
             i
-              .setTitle("Force Update by Overwriting")
+              .setTitle("Force update by overwriting")
               .setIcon("sync")
               .onClick(() => updateNote(file, true)),
           );
