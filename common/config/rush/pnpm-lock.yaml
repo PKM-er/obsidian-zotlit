@@ -670,6 +670,12 @@ importers:
 
   ../../lib/ophidian-lib-core:
     dependencies:
+      '@preact/signals-core':
+        specifier: ^1.4
+        version: 1.4.0
+      defaults:
+        specifier: ^2.0.1
+        version: 2.0.1
       i18next:
         specifier: ^20.3.2
         version: 20.6.1
@@ -680,12 +686,15 @@ importers:
         specifier: 1.4.4
         version: 1.4.4(@codemirror/state@6.2.0)(@codemirror/view@6.9.3)
       to-use:
-        specifier: ^0.2.1
-        version: 0.2.1
-    devDependencies:
+        specifier: ^0.3.2
+        version: 0.3.2
       typescript:
         specifier: ~5.1.6
         version: 5.1.6
+    devDependencies:
+      '@types/node':
+        specifier: '16'
+        version: 16.18.19
 
   ../../lib/protocol:
     dependencies:
@@ -3820,6 +3829,10 @@ packages:
       preact: '*'
     dependencies:
       preact: 10.11.3
+    dev: false
+
+  /@preact/signals-core@1.4.0:
+    resolution: {integrity: sha512-5iYoZBhELLIhUQceZI7sDTQWPb+xcVSn2qk8T/aNl/VMh+A4AiPX9YRSh4XO7fZ6pncrVxl1Iln82poVqYVbbw==}
     dev: false
 
   /@radix-ui/primitive@1.0.0:
@@ -7215,6 +7228,11 @@ packages:
     dependencies:
       clone: 1.0.4
     dev: true
+
+  /defaults@2.0.1:
+    resolution: {integrity: sha512-1bGZaOcfpx0Iyxc0SqSIJ8O2WZF8xm56p4Yd4be+VxYQlFM5/4Mx3IMZqi96Npl8EsBG2pePlyGVLdqsmtIkag==}
+    engines: {node: '>=16'}
+    dev: false
 
   /defer-to-connect@1.1.3:
     resolution: {integrity: sha512-0ISdNousHvZT2EiFlZeZAHBUvSxmKswVCEf8hW7KWgG4a8MVEu/3Vb6uWYozkjylyCxe0JBIiRB1jV45S70WVQ==}
@@ -15065,8 +15083,8 @@ packages:
     dependencies:
       is-number: 7.0.0
 
-  /to-use@0.2.1:
-    resolution: {integrity: sha512-FwF0QIePeaY/Wk2thTjjV41KltJZsMTidH33R64u76Ai+IDyXI4cLYA5PH2PjQRyxAKVtDgcN1ZPK5JJh102Vw==}
+  /to-use@0.3.2:
+    resolution: {integrity: sha512-BsjW4JlQkMrZ9THFFkC4w5Yv3+dXAnd6Ycrm78heY3rNN6LxkBG0c0BQmn84qlMWxIkny1KmphU5wPMmRwMGhQ==}
     dev: false
 
   /toidentifier@1.0.1:

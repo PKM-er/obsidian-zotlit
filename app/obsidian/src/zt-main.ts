@@ -1,5 +1,6 @@
 import "./main.less";
 import "./index.css";
+import "./dialog.less";
 
 import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";

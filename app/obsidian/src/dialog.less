@@ -1,0 +1,11 @@
+.ophidian-dialog .dialog-text { margin-bottom: 0.75em; }
+
+// Highlight invalid input
+.ophidian-dialog.mod-confirmation input[type="text"] {
+    &:invalid, &[aria-invalid='true'] {
+        &, &:enabled:focus {
+            border-color: var(--text-error);
+            background-color: var(--background-modifier-error);
+        }
+    }
+}
