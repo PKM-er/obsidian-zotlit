@@ -3,6 +3,7 @@ export enum AnnotationType {
   note = 2,
   image = 3,
   ink = 4,
+  underline = 5,
 }
 
 export interface AnnotationPosition {

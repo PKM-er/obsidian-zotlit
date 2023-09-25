@@ -18,6 +18,7 @@ export default memo(function Excerpt({
 }: ExcerptProps) {
   switch (type) {
     case AnnotationType.highlight:
+    case AnnotationType.underline:
       return <p className="select-text">{text}</p>;
     case AnnotationType.image:
       if (!imgSrc) throw new Error("imgSrc is required for image annotation");

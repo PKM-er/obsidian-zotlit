@@ -1,6 +1,7 @@
 import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
 import type { ProxyMethods, WorkerHandler } from "@aidenlx/workerpool";
 import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
+import type { AnnotationInfo } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
 import { Service } from "@ophidian/core";
 
@@ -101,11 +102,12 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
         info.map(({ annotKey }) => annotKey),
         this.db.settings.citationLibrary,
       );
+
       const annotDetails = info.map(({ annotKey, ...props }) => ({
         ...props,
         annotKey,
         text:
-          annotations[annotKey]?.type === AnnotationType.highlight
+          annotations[annotKey] && isTextExcerpt(annotations[annotKey])
             ? annotations[annotKey].text ?? ""
             : "",
       }));
@@ -129,4 +131,11 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
       this.app.vault.on("zotero:db-refresh", this.render.bind(this)),
     );
   }
+}
+
+function isTextExcerpt(annot: AnnotationInfo): boolean {
+  return (
+    annot.type === AnnotationType.highlight ||
+    annot.type === AnnotationType.underline
+  );
 }
