@@ -1,35 +1,35 @@
-// import { IframeWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
-import type { NoteInfo, RegularItemInfo } from "@obzt/database";
+import type {
+  AnnotationInfo,
+  AttachmentInfo,
+  NoteInfo,
+  RegularItemInfo,
+} from "@obzt/database";
 import { Service } from "@ophidian/core";
-import { colord } from "colord";
 
-// import workerCode from "worker:@/worker-iframe/note-parser/main";
-
-// import type { NoteParserWorkerAPI } from "@/worker-iframe/note-parser/api";
 import { nanoid } from "nanoid";
 import log from "@/log";
-import { getHelperExtraByAtch } from "@/note-feature/update-note";
 import ZoteroPlugin from "@/zt-main";
 import type { HelperExtra } from "../template/helper";
-import colors from "../template/helper/colors.json";
 import type { NoteNormailzed } from "../template/helper/item";
-import { DataCitation, citationUri } from "./format";
+import { DataAnnotation, DataCitation, keyFromItemURI } from "./format";
+import { bgColor, color } from "./parse/color";
 
 declare global {
   // eslint-disable-next-line no-var, @typescript-eslint/naming-convention, @typescript-eslint/consistent-type-imports
   var TurndownService: typeof import("turndown");
 }
 
-// class NoteParserkWorker extends IframeWorkerHandler {
-//   get code() {
-//     return workerCode;
-//   }
-// }
-// class NoteParserkWorkerPool extends WorkerPool<NoteParserWorkerAPI> {
-//   workerCtor() {
-//     return new NoteParserkWorker();
-//   }
-// }
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const Placeholder = {
+  cite: {
+    pattern: /%%ZTNOTE\.CITE:([\w-]{10})%%/g,
+    create: (key: string) => `%%ZTNOTE.CITE:${key}%%`,
+  },
+  annot: {
+    pattern: /%%ZTNOTE\.ANNOT:([\w-]{10})%%/g,
+    create: (key: string) => `%%ZTNOTE.ANNOT:${key}%%`,
+  },
+};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Note extends NoteNormailzed {}
@@ -42,89 +42,66 @@ class Note {
   }
 }
 
-function cssColorToHexName(code: string) {
-  if (!code)
-    return {
-      colorName: null,
-      color: null,
-    };
-  const hex = colord(code).toHex().toUpperCase();
-  const name = colors[hex.substring(0, 7) as keyof typeof colors];
-  return {
-    colorName: name ?? hex,
-    color: hex,
-  };
-}
-
 export class NoteParser extends Service {
   plugin = this.use(ZoteroPlugin);
 
   private citations = new Map<string, { text: string; itemKeys: string[] }>();
-  tdService = new globalThis.TurndownService()
-    .addRule("color", {
+  private annotations = new Map<
+    string,
+    {
+      commentHTML: string | null;
+      annotationKey: string;
+      citationKey: string;
+      attachementKey: string;
+      inline: boolean;
+    }
+  >();
+  tdService = new globalThis.TurndownService({ headingStyle: "atx" })
+    .addRule("color", color(this.plugin.templateRenderer))
+    .addRule("bg-color", bgColor(this.plugin.templateRenderer))
+    .addRule("highlight-imported", {
       filter: (node, _opts) => {
-        return node.nodeName === "SPAN" && Boolean(node.style.color);
-      },
-      replacement: (content, node, _opts) => {
-        if (!(node instanceof HTMLElement)) {
-          throw new Error("Unexpected node");
-        }
-        const { color, colorName } = cssColorToHexName(node.style.color);
-
-        const child = node.firstChild as HTMLSpanElement | null;
+        if (node.tagName !== "P") return false;
+        const [first, second, third] = node.childNodes;
         if (
-          child === node.lastChild &&
-          child?.nodeName === "SPAN" &&
-          Boolean(child.style.backgroundColor)
-        ) {
-          const { color: bgColor, colorName: bgColorName } = cssColorToHexName(
-            child.style.backgroundColor,
+          !(
+            first instanceof HTMLElement &&
+            first.classList.contains("highlight")
+          )
+        )
+          return false;
+        if (second instanceof HTMLElement) {
+          return second.classList.contains("citation");
+        }
+        if (second instanceof Text && second.textContent?.trim() === "") {
+          return (
+            third instanceof HTMLElement && third.classList.contains("citation")
           );
-          return this.plugin.templateRenderer.renderColored({
-            content,
-            color,
-            colorName,
-            bgColor,
-            bgColorName,
-          });
-        } else {
-          return this.plugin.templateRenderer.renderColored({
-            content,
-            color,
-            colorName,
-            bgColor: null,
-            bgColorName: null,
-          });
         }
+        return false;
       },
-    })
-    .addRule("bg-color", {
-      filter: (node, _opts) => {
-        return node.nodeName === "SPAN" && Boolean(node.style.backgroundColor);
-      },
-      replacement: (content, node, _opts) => {
-        if (!(node instanceof HTMLElement)) {
-          throw new Error("Unexpected node");
+      replacement: (_content, node, _opts) => {
+        const [highlightEl, citationEl] = node.children;
+        // remove every children of node before citataion element and citation element itself
+        while (node.firstChild !== citationEl) {
+          node.removeChild(node.firstChild!);
         }
-        const { color: bgColor, colorName: bgColorName } = cssColorToHexName(
-          node.style.backgroundColor,
+        node.removeChild(citationEl);
+        const annotation = parseAnnotation(
+          (highlightEl as HTMLElement).dataset.annotation!,
         );
-        const parent = node.parentElement as HTMLSpanElement | null;
-        if (
-          parent?.nodeName === "SPAN" &&
-          Boolean(parent.style.color) &&
-          !node.nextSibling
-        ) {
-          // nested color are handled by color rule
-          return content;
-        }
-        return this.plugin.templateRenderer.renderColored({
-          content,
-          color: null,
-          colorName: null,
-          bgColor,
-          bgColorName,
+        const commentNode = node as HTMLElement;
+        const key = nanoid(10);
+        this.annotations.set(key, {
+          annotationKey: annotation.annotationKey,
+          citationKey: keyFromItemURI(annotation.citationItem.uris[0])!,
+          attachementKey: keyFromItemURI(annotation.attachmentURI)!,
+          commentHTML: commentNode.textContent?.trim()
+            ? commentNode.innerHTML
+            : null,
+          inline: false,
         });
+        return Placeholder.annot.create(key);
       },
     })
     .addRule("citation", {
@@ -135,25 +112,39 @@ export class NoteParser extends Service {
         if (!(node instanceof HTMLElement)) {
           throw new Error("Unexpected node");
         }
-        const _citation = JSON.parse(
-          decodeURIComponent(node.dataset.citation!),
-        );
-        const { data: citation, problems } = DataCitation(_citation);
-        if (problems) {
-          log.error(`Unexpected citation data`, _citation, problems);
-          throw new Error(`Unexpected citation data: ` + problems.summary);
-        }
+        const citation = parseCitation(node.dataset.citation!);
         const key = nanoid(10);
         this.citations.set(key, {
           text: content,
           itemKeys: citation.citationItems.map(
-            ({ uris: [idUri] }) => idUri.match(citationUri)![1],
+            ({ uris: [idUri] }) => keyFromItemURI(idUri)!,
           ),
         });
-        return `%%ZTNOTE.CITE:${key}%%`;
+        return Placeholder.cite.create(key);
+      },
+    })
+    .addRule("highlight", {
+      filter: (node, _opts) => {
+        return (
+          node.classList.contains("highlight") && !!node.dataset.annotation
+        );
+      },
+      replacement: (content, node, _opts) => {
+        if (!(node instanceof HTMLElement)) {
+          throw new Error("Unexpected node");
+        }
+        const annotation = parseAnnotation(node.dataset.annotation!);
+        const key = nanoid(10);
+        this.annotations.set(key, {
+          annotationKey: annotation.annotationKey,
+          citationKey: keyFromItemURI(annotation.citationItem.uris[0])!,
+          attachementKey: keyFromItemURI(annotation.attachmentURI)!,
+          commentHTML: null,
+          inline: true,
+        });
+        return Placeholder.annot.create(key);
       },
     });
-  domParser = new DOMParser();
 
   onload(): void {
     return;
@@ -175,56 +166,165 @@ export class NoteParser extends Service {
 
   async turndown(html: string): Promise<string> {
     this.citations.clear();
+    this.annotations.clear();
     const markdown = this.tdService.turndown(html);
-    const literatureKeys = [
-      ...new Set([...this.citations.values()].flatMap((c) => c.itemKeys)),
-    ];
-    const items = await this.plugin.databaseAPI.getItems(
-      literatureKeys.map((key) => [
-        key,
-        this.plugin.settings.database.citationLibrary,
-      ]),
+    const keyFrom = {
+      citations: [...this.citations.values()].flatMap((c) => c.itemKeys),
+      annotations: [...this.annotations.values()].map((a) => a.citationKey),
+    };
+    const attachmentWithAnnotation = new Set(
+      [...this.annotations.values()].map((v) => v.attachementKey),
     );
-    const itemByKey = new Map(
-      (await this.toHelpers(items)).map((item, i) => [literatureKeys[i], item]),
+    const libId = this.plugin.settings.database.citationLibrary;
+
+    const literatureKeys = uniq([...keyFrom.citations, ...keyFrom.annotations]);
+    const docItems = await this.plugin.databaseAPI
+      .getItems(literatureKeys.map((key) => [key, libId]))
+      .then(async (itemList) => {
+        const items = new Map<
+          string,
+          {
+            item: RegularItemInfo;
+            attachments: AttachmentInfo[];
+            annotations: Map<string, AnnotationInfo>;
+          } | null
+        >();
+        for (let i = 0; i < literatureKeys.length; i++) {
+          const key = literatureKeys[i];
+          const docItem = itemList[i];
+          if (docItem === null) {
+            items.set(key, null);
+            continue;
+          }
+          const attachments = await this.plugin.databaseAPI.getAttachments(
+            docItem.itemID,
+            libId,
+          );
+          const annotations = new Map<string, AnnotationInfo>();
+          for (const attachment of attachments) {
+            if (!attachmentWithAnnotation.has(attachment.key)) continue;
+            const annots = await this.plugin.databaseAPI.getAnnotations(
+              attachment.itemID,
+              libId,
+            );
+            for (const annot of annots) {
+              annotations.set(annot.key, annot);
+            }
+          }
+          items.set(key, {
+            item: docItem,
+            attachments,
+            annotations,
+          });
+        }
+        return items;
+      });
+    const tags = await this.plugin.databaseAPI.getTags(
+      [...docItems.values()]
+        .flatMap((v) =>
+          v
+            ? [
+                v.item.itemID,
+                ...[...v.annotations.values()].map((a) => a.itemID),
+              ]
+            : [],
+        )
+        .map((id) => [id, libId]),
     );
-    const withCitations = markdown.replaceAll(
-      /%%ZTNOTE\.CITE:([\w-]{10})%%/g,
-      (_, key) => {
-        const { itemKeys } = this.citations.get(key)!;
-        const items = itemKeys
-          .map((key) => itemByKey.get(key))
-          .filter((v): v is HelperExtra => !!v);
+
+    const parsed = markdown
+      .replaceAll(Placeholder.cite.pattern, (_, key) => {
+        const citeData = this.citations.get(key)!;
+        const items = citeData.itemKeys.map((key) => {
+          const item = docItems.get(key);
+          if (!item) {
+            log.error(`citation not found, key: `, key, citeData);
+            throw new Error(`citation not found: key ${key}`);
+          }
+          return {
+            allAttachments: item.attachments,
+            annotations: [],
+            docItem: item.item,
+            attachment: null,
+            tags,
+            notes: [],
+          } as HelperExtra;
+        });
+
         const citation = this.plugin.templateRenderer.renderCitations(items, {
           plugin: this.plugin,
         });
         return citation;
-      },
-    );
+      })
+      .replaceAll(Placeholder.annot.pattern, (_, key) => {
+        const annotData = this.annotations.get(key)!;
+        const docItem = docItems.get(annotData.citationKey);
+        if (!docItem) {
+          log.error(`citation not found, key:`, key, annotData);
+          throw new Error(`citation key not found: ${key}`);
+        }
+        const annotation = docItem.annotations.get(annotData.annotationKey);
+        if (!annotation) {
+          log.error(
+            `annotation not found, key: `,
+            annotData.annotationKey,
+            annotData,
+          );
+          throw new Error(
+            `annotation key not found: ${annotData.annotationKey}`,
+          );
+        }
+        const markdown = this.plugin.templateRenderer.renderAnnot(
+          {
+            ...annotation,
+            ztnote: {
+              comment: annotData.commentHTML,
+              inline: annotData.inline,
+            },
+          },
+          {
+            allAttachments: docItem.attachments,
+            annotations: [...docItem.annotations.values()],
+            attachment: docItem.attachments.find(
+              (atch) => atch.itemID === annotation.parentItemID,
+            )!,
+            docItem: docItem.item,
+            notes: [],
+            tags,
+          },
+          { plugin: this.plugin },
+        );
+        if (!annotData.inline) {
+          return "\n" + markdown + "\n";
+        }
+        return markdown;
+      })
+      .replace(/\n{3,}/g, "\n\n");
     this.citations.clear();
-    return withCitations;
+    this.annotations.clear();
+    return parsed;
   }
+}
 
-  async toHelpers(items: (RegularItemInfo | null)[]) {
-    const helpers: (HelperExtra | null)[] = [];
-    const libId = this.plugin.database.settings.citationLibrary;
-
-    for (const item of items) {
-      if (item === null) {
-        helpers.push(null);
-        continue;
-      }
-      const helpersByAtch = await getHelperExtraByAtch(
-        item,
-        {
-          all: await this.plugin.databaseAPI.getAttachments(item.itemID, libId),
-          selected: [],
-          notes: [],
-        },
-        this.plugin,
-      );
-      helpers.push(helpersByAtch[-1]);
-    }
-    return helpers;
+function parseCitation(uriEncodedJson: string) {
+  const parsed = JSON.parse(decodeURIComponent(uriEncodedJson));
+  const { data, problems } = DataCitation(parsed);
+  if (problems) {
+    log.error(`Unexpected citation data`, parsed, problems);
+    throw new Error(`Unexpected citation data: ` + problems.summary);
   }
+  return data;
+}
+function parseAnnotation(uriEncodedJson: string) {
+  const parsed = JSON.parse(decodeURIComponent(uriEncodedJson));
+  const { data, problems } = DataAnnotation(parsed);
+  if (problems) {
+    log.error(`Unexpected annotation data`, parsed, problems);
+    throw new Error(`Unexpected annotation data: ` + problems.summary);
+  }
+  return data;
+}
+
+function uniq<T>(arr: T[]) {
+  return [...new Set(arr)];
 }

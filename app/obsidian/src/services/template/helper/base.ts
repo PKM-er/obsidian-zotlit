@@ -3,6 +3,7 @@ import type ZoteroPlugin from "@/zt-main";
 export interface Context {
   sourcePath?: string | null;
   plugin: ZoteroPlugin;
+  /** enable merging cross-page annotation */
   merge?: boolean;
 }
 

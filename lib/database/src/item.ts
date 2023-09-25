@@ -105,6 +105,13 @@ export type AnnotationInfo = AnnotationItem<Item> &
     /** key of parent item (commonly attachment) */
     parentItem: string;
     parentItemID: number;
+  } & {
+    ztnote?: {
+      /** embed in zotero note or an direct output from 'Add note from Annotation' */
+      inline: boolean;
+      /** the comment from zotero note, null if inline or no text **/
+      comment: string | null;
+    };
   };
 
 export const isRegularItemInfo = (item: unknown): item is RegularItemInfo =>

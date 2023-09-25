@@ -2,13 +2,25 @@
 import { scope } from "arktype";
 
 // uri like http://zotero.org/users/6775115/items/C689D5Q2
-export const citationUri = /^https?:\/\/zotero\.org\/.*\/items\/([A-Z\d]+)$/;
-export const { DataCitation } = scope({
+const itemURI = /^https?:\/\/zotero\.org\/.*\/items\/([A-Z\d]+)$/;
+export function keyFromItemURI(uri: string) {
+  const match = uri.match(itemURI);
+  if (!match) return null;
+  return match[1];
+}
+
+export const { DataCitation, DataAnnotation } = scope({
   CitationItem: {
-    uris: [citationUri],
+    uris: [itemURI],
   },
   DataCitation: {
     citationItems: "CitationItem[]",
-    properties: "any",
+    "properties?": "any",
+    "locator?": "string",
+  },
+  DataAnnotation: {
+    attachmentURI: itemURI,
+    annotationKey: "string",
+    citationItem: "CitationItem",
   },
 }).compile();
