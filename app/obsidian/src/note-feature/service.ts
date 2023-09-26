@@ -67,7 +67,7 @@ class NoteFeatures extends Service {
         menu.addItem((i) =>
           i
             .setIcon("edit")
-            .setTitle("Open Template Preview")
+            .setTitle("Open template preview")
             .onClick(() => {
               openTemplatePreview(tpl.name, null, plugin);
             }),
@@ -164,7 +164,7 @@ class NoteFeatures extends Service {
         }
         menu.addItem((i) =>
           i
-            .setTitle("Update Literature Note")
+            .setTitle("Update literature note")
             .setIcon("sync")
             .onClick(() => updateNote(file)),
         );

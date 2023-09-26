@@ -51,7 +51,7 @@ export function EjectableTemplate({ type }: { type: TplType.Ejectable }) {
       >
         <code>{filepath}</code>
         <button
-          aria-label="Open Template File"
+          aria-label="Open template file"
           ref={openIconRef}
           onClick={async () => {
             await openTemplatePreview(type, null, plugin);
@@ -85,7 +85,7 @@ export function EjectableTemplate({ type }: { type: TplType.Ejectable }) {
           {Template.Ejectable[type]}
         </pre>
         <button
-          aria-label="Save to Template Folder"
+          aria-label="Save to template folder"
           ref={ejectIconRef}
           onClick={async () => {
             const ejected = await eject(type, {

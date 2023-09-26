@@ -11,10 +11,10 @@ export default function FollowButton(props: FollowButtonProps) {
   const mode = useStore(store, (s) => s.follow);
   const description =
     mode === null
-      ? "Not Following"
+      ? "not following"
       : mode === "ob-note"
-      ? "Active Literature Note"
-      : "Active Literature in Zotero Reader";
+      ? "active literature note"
+      : "active literature in Zotero reader";
 
   const icon = mode === null ? "unlink" : "link";
   return (
@@ -24,7 +24,7 @@ export default function FollowButton(props: FollowButtonProps) {
         onClick={onSetFollow}
         icon={icon}
         aria-label={
-          "Choose Follow Mode" +
+          "Choose follow mode" +
           (mode === null ? ` (Currently linked with literature)` : "")
         }
         aria-label-delay="50"

@@ -10,7 +10,7 @@ export const getMoreOptionsHandler =
     const menu = new Menu();
     menu.addItem((i) =>
       i
-        .setTitle("Jump to Note")
+        .setTitle("Jump to note")
         .setIcon("links-going-out")
         .onClick(jumpToAnnotNote(annotation, view)),
     );

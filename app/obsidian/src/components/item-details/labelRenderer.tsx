@@ -14,14 +14,14 @@ export const labelRenderer: LabelRenderer = (
   const path = getKeyName(keyPath);
   const handler = (evt: MouseEvent<HTMLSpanElement>) => {
     const menu = new Menu().addItem((i) =>
-      i.setTitle("Copy Template").onClick(() => {
+      i.setTitle("Copy template").onClick(() => {
         navigator.clipboard.writeText(`<%= ${path} %>`);
       }),
     );
 
     if (expandable && nodeType !== "Array") {
       menu.addItem((i) =>
-        i.setTitle("Copy Template (using with)").onClick(() => {
+        i.setTitle("Copy template (using with)").onClick(() => {
           const [toPick, ...rest] = keyPath;
           const destruct =
             typeof toPick === "string" && identifiers.test(toPick)
@@ -37,33 +37,33 @@ export const labelRenderer: LabelRenderer = (
     if (nodeType === "Array") {
       menu
         .addItem((i) =>
-          i.setTitle("Copy Template (using for-of loop)").onClick(() => {
+          i.setTitle("Copy template (using for-of loop)").onClick(() => {
             navigator.clipboard.writeText(
               `<% for (const $it of ${path}) { %>\n  <%= $it %>\n<% } %>`,
             );
           }),
         )
         .addItem((i) =>
-          i.setTitle("Copy Template (using forEach)").onClick(() => {
+          i.setTitle("Copy template (using forEach)").onClick(() => {
             navigator.clipboard.writeText(
               `<% ${path}.forEach(($it, i) => { %>\n  <%= $it %>\n<% }) %>`,
             );
           }),
         )
         .addItem((i) =>
-          i.setTitle("Copy Template (pick first element)").onClick(() => {
+          i.setTitle("Copy template (pick first element)").onClick(() => {
             navigator.clipboard.writeText(`<%= ${path}.first() %>`);
           }),
         )
         .addItem((i) =>
-          i.setTitle("Copy Template (pick last element)").onClick(() => {
+          i.setTitle("Copy template (pick last element)").onClick(() => {
             navigator.clipboard.writeText(`<%= ${path}.last() %>`);
           }),
         );
     }
     if (!requiredKeys.has(keyPath[0] as never)) {
       menu.addItem((i) =>
-        i.setTitle("Copy Template (render when present)").onClick(() => {
+        i.setTitle("Copy template (render when present)").onClick(() => {
           navigator.clipboard.writeText(
             `<% if (${path}) { %>\n  <%= ${path} %>\n<% } %>`,
           );

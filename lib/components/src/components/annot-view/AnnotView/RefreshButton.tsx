@@ -8,7 +8,7 @@ export default function RefreshButton(props: RefreshButtonProps) {
     <IconToggle
       {...props}
       icon="refresh-ccw"
-      aria-label="Refresh Annotation List"
+      aria-label="Refresh annotation list"
       aria-label-delay="50"
     />
   );

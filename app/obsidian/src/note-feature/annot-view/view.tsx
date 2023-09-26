@@ -232,7 +232,7 @@ export class AnnotationView extends DerivedFileView {
           menu.addItem((i) =>
             i
               .setIcon("book")
-              .setTitle("Follow Active Literature in Zotero Reader")
+              .setTitle("Follow active literature in Zotero reader")
               .onClick(self.onSetFollowZt),
           );
         }
@@ -240,14 +240,14 @@ export class AnnotationView extends DerivedFileView {
           menu.addItem((i) =>
             i
               .setIcon("file-edit")
-              .setTitle("Follow Active Literature Note")
+              .setTitle("Follow active literature note")
               .onClick(self.onSetFollowOb),
           );
         }
         menu.addItem((i) =>
           i
             .setIcon("file-lock-2")
-            .setTitle("Link with Selected Literature")
+            .setTitle("Link with selected literature")
             .onClick(async () => {
               // prevent focus from transfering back from modal,
               // triggering another keyup event

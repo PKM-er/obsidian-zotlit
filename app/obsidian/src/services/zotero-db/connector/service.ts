@@ -59,14 +59,14 @@ export default class Database extends Service {
     const plugin = this.use(ZoteroPlugin);
     plugin.addCommand({
       id: "refresh-zotero-data",
-      name: "Refresh Zotero Data",
+      name: "Refresh Zotero data",
       callback: async () => {
         await this.refresh({ task: "full" });
       },
     });
     plugin.addCommand({
       id: "refresh-zotero-search-index",
-      name: "Refresh Zotero Search Index",
+      name: "Refresh Zotero search index",
       callback: async () => {
         await this.refresh({ task: "searchIndex" });
       },

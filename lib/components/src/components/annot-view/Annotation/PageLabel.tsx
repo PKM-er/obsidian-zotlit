@@ -25,7 +25,7 @@ export default memo(function PageLabel({
           className,
         )}
         href={backlink}
-        aria-label={`Open Annotation In Zotero at Page ${pageLabel}`}
+        aria-label={`Open annotation in Zotero at page ${pageLabel}`}
         aria-label-delay="500"
         {...props}
       >

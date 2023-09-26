@@ -231,7 +231,7 @@ export default class NoteIndex extends Service {
       this.onMetaBuilt();
       this.plugin.addCommand({
         id: "refresh-note-index",
-        name: "Refresh Literature Notes Index",
+        name: "Refresh literature notes index",
         callback: () => {
           this.reload();
           new Notice("Literature notes re-indexed");

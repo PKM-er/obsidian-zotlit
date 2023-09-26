@@ -37,7 +37,7 @@ export const getItemString: GetItemString = (
         tabIndex={0}
         onClick={copy}
         onKeyDown={copy}
-        aria-label="Copy Item Details in JSON"
+        aria-label="Copy item details in JSON"
       >
         {itemString} <CopyJSONIcon />
       </span>
