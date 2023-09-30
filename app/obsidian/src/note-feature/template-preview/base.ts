@@ -102,9 +102,16 @@ export function create() {
         [stateData.docItem, libId],
         ...annotations.map((i): IDLibID => [i.itemID, libId]),
       ]);
-      const notes = await plugin.databaseAPI
-        .getNotes(docItem.itemID, libId)
-        .then((notes) => plugin.noteParser.normalizeNotes(notes));
+
+      let notes: HelperExtra["notes"];
+      try {
+        notes = await plugin.databaseAPI
+          .getNotes(docItem.itemID, libId)
+          .then((notes) => plugin.noteParser.normalizeNotes(notes));
+      } catch (error) {
+        console.error(error);
+        notes = [];
+      }
 
       set(() => ({
         preview: {

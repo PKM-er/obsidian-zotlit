@@ -101,65 +101,76 @@ export class TemplatePreview extends TemplatePreviewBase {
     let markdown = "";
     const ctx = toCtx(this.plugin);
     const renderer = this.plugin.templateRenderer;
-    switch (templateType) {
-      case "annotation": {
-        const annot = preview.annot ?? preview.annotations[0];
-        if (!annot) {
-          this.contentEl.setText("No annotation data available");
-          return;
+    try {
+      switch (templateType) {
+        case "annotation": {
+          const annot = preview.annot ?? preview.annotations[0];
+          if (!annot) {
+            this.contentEl.setText("No annotation data available");
+            return;
+          }
+          markdown = renderer.renderAnnot(annot, preview, ctx);
+          break;
         }
-        markdown = renderer.renderAnnot(annot, preview, ctx);
-        break;
+        case "annots":
+          markdown = renderer.renderAnnots(preview, ctx);
+          break;
+        case "note":
+          markdown = renderer.renderNote(preview, ctx);
+          break;
+        case "field":
+          markdown = renderer.renderFrontmatter(preview, ctx);
+          break;
+        case "cite":
+          markdown = renderer.renderCitations([preview], ctx);
+          break;
+        case "cite2":
+          markdown = renderer.renderCitations([preview], ctx, true);
+          break;
+        case "colored":
+          markdown = renderer.renderColored({
+            content: "I'm Highlight",
+            color: "#FF000080",
+            colorName: "red",
+            bgColor: "#FF000080",
+            bgColorName: "red",
+          });
+          break;
+        default:
+          assertNever(templateType);
       }
-      case "annots":
-        markdown = renderer.renderAnnots(preview, ctx);
-        break;
-      case "note":
-        markdown = renderer.renderNote(preview, ctx);
-        break;
-      case "field":
-        markdown = renderer.renderFrontmatter(preview, ctx);
-        break;
-      case "cite":
-        markdown = renderer.renderCitations([preview], ctx);
-        break;
-      case "cite2":
-        markdown = renderer.renderCitations([preview], ctx, true);
-        break;
-      case "colored":
-        markdown = renderer.renderColored({
-          content: "I'm Highlight",
-          color: "#FF000080",
-          colorName: "red",
-          bgColor: "#FF000080",
-          bgColorName: "red",
-        });
-        break;
-      default:
-        assertNever(templateType);
-    }
-    if (markdown === this.content?.markdown) {
-      return;
-    }
-    this.content?.unload();
-    this.contentEl.empty();
-    const prism = await loadPrism();
-    const html = prism.highlight(
-      markdown,
-      prism.languages.markdown,
-      "markdown",
-    );
+      if (markdown === this.content?.markdown) return;
+      this.content?.unload();
+      this.contentEl.empty();
+      const prism = await loadPrism();
+      const html = prism.highlight(
+        markdown,
+        prism.languages.markdown,
+        "markdown",
+      );
 
-    this.content = new PreviewContent(markdown);
-    this.contentEl
-      .createEl("pre")
-      .createEl("code", { cls: "language-markdown" }).innerHTML = html;
-    // await MarkdownRenderer.renderMarkdown(
-    //   markdown,
-    //   this.contentEl,
-    //   ctx.sourcePath,
-    //   this.content
-    // );
+      this.content = new PreviewContent(markdown);
+      this.contentEl
+        .createEl("pre")
+        .createEl("code", { cls: "language-markdown" }).innerHTML = html;
+      // await MarkdownRenderer.renderMarkdown(
+      //   markdown,
+      //   this.contentEl,
+      //   ctx.sourcePath,
+      //   this.content
+      // );
+    } catch (error) {
+      this.content?.unload();
+      this.contentEl.empty();
+      const msg = error instanceof Error ? error.message : String(error);
+      this.contentEl.createEl("h1", {
+        text: `Error while rendering ${templateType}`,
+        cls: ["mod-error", "message"],
+      });
+      this.contentEl.createEl("pre", {
+        text: msg,
+      });
+    }
   }
   requestRender = asyncDebounce(() => this.render(), 200);
 
