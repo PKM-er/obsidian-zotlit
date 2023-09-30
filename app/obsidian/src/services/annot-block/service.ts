@@ -100,7 +100,7 @@ class AnnotBlockRenderChild extends MarkdownRenderChild {
     try {
       const annotations = await this.db.api.getAnnotFromKey(
         info.map(({ annotKey }) => annotKey),
-        this.db.settings.citationLibrary,
+        this.db.settings.libId,
       );
 
       const annotDetails = info.map(({ annotKey, ...props }) => ({

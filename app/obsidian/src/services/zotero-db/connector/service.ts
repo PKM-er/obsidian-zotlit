@@ -3,16 +3,17 @@ import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
 import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
 import type { DbConnParams } from "@obzt/database/api";
 import type { INotifyRegularItem } from "@obzt/protocol";
-import { Service } from "@ophidian/core";
+import { Service, calc } from "@ophidian/core";
 import { assertNever } from "assert-never";
-import { debounce, Notice } from "obsidian";
+import { App, debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
 import dbWorker from "worker:@obzt/db-worker";
-import log, { LogSettings } from "@/log";
+import log, { LogService } from "@/log";
+import { Server } from "@/services/server/service";
+import { SettingsService, effect } from "@/settings/base";
 import { CancelledError, TimeoutError, untilDbRefreshed } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
 import type { DbWorkerAPI } from "../api";
-import { DatabaseSettings } from "./settings";
 
 class DatabaseWorker extends WebWorkerHandler {
   initWebWorker(): Worker {
@@ -34,49 +35,77 @@ export const enum DatabaseStatus {
 }
 
 export default class Database extends Service {
-  logSettings = this.use(LogSettings);
-  settings = this.use(DatabaseSettings);
-  app = this.use(ZoteroPlugin).app;
-  async onload() {
-    log.debug("loading DatabaseWorker");
-    const onDatabaseUpdate = debounce(
-      () => {
-        this.refresh({ task: "dbConn" });
-      },
-      500,
-      true,
-    );
-    this.registerEvent(
-      this.app.vault.on("zotero:db-updated", () => onDatabaseUpdate()),
-    );
-    const start = process.hrtime();
-    await this.initialize();
-    log.debug(
-      `ZoteroDB Initialization complete. Took ${prettyHrtime(
-        process.hrtime(start),
-      )}`,
-    );
-    const plugin = this.use(ZoteroPlugin);
-    plugin.addCommand({
-      id: "refresh-zotero-data",
-      name: "Refresh Zotero data",
-      callback: async () => {
-        await this.refresh({ task: "full" });
-      },
-    });
-    plugin.addCommand({
-      id: "refresh-zotero-search-index",
-      name: "Refresh Zotero search index",
-      callback: async () => {
-        await this.refresh({ task: "searchIndex" });
-      },
-    });
+  logSettings = this.use(LogService);
+  settings = this.use(SettingsService);
+  app = this.use(App);
+  plugin = this.use(ZoteroPlugin);
+  server = this.use(Server);
 
-    const requestRefresh = this.genAutoRefresh(plugin);
-    this.registerEvent(
-      plugin.server.on("bg:notify", async (_, data) => {
-        if (data.event !== "regular-item/update") return;
-        requestRefresh(data);
+  @calc get zoteroDataDir(): string {
+    return this.settings.current?.zoteroDataDir;
+  }
+
+  onload() {
+    log.debug("loading DatabaseWorker");
+    this.settings.once(async () => {
+      const onDatabaseUpdate = debounce(
+        () => this.refresh({ task: "dbConn" }),
+        500,
+        true,
+      );
+      this.registerEvent(
+        this.app.vault.on("zotero:db-updated", () => onDatabaseUpdate()),
+      );
+      const start = process.hrtime();
+      await this.initialize();
+      log.debug(
+        `ZoteroDB Initialization complete. Took ${prettyHrtime(
+          process.hrtime(start),
+        )}`,
+      );
+
+      const requestRefresh = this.genAutoRefresh(this.plugin);
+      this.registerEvent(
+        this.server.on("bg:notify", async (_, data) => {
+          if (data.event !== "regular-item/update") return;
+          requestRefresh(data);
+        }),
+      );
+      this.plugin.addCommand({
+        id: "refresh-zotero-data",
+        name: "Refresh Zotero data",
+        callback: async () => {
+          await this.refresh({ task: "full" });
+        },
+      });
+      this.plugin.addCommand({
+        id: "refresh-zotero-search-index",
+        name: "Refresh Zotero search index",
+        callback: async () => {
+          await this.refresh({ task: "searchIndex" });
+        },
+      });
+    });
+    this.register(
+      effect(async (initial) => {
+        this.zoteroDataDir;
+        if (initial) return;
+        if (this.status === DatabaseStatus.NotInitialized) {
+          await this.initialize();
+        } else {
+          await this.refresh({ task: "full" });
+        }
+      }),
+    );
+    this.register(
+      effect(async (initial) => {
+        this.settings.libId;
+        if (initial) return;
+        await this.refresh({
+          task: "searchIndex",
+          force: true,
+        });
+        new Notice("Zotero search index updated.");
       }),
     );
   }
@@ -176,7 +205,7 @@ export default class Database extends Service {
   }
 
   async #initSearch(force: boolean) {
-    const libToIndex = this.settings.citationLibrary;
+    const libToIndex = this.settings.libId;
     if (!force && this.#indexedLibrary === libToIndex) {
       log.debug(
         `Skipping search index init, lib ${libToIndex} already indexed`,

@@ -73,7 +73,7 @@ export function renderSuggestion(
   } */ else {
     titleEl.setText(title);
   }
-  if (this.plugin.settings.suggester.showCitekeyInSuggester && item.citekey) {
+  if (this.plugin.settings.current?.showCitekeyInSuggester && item.citekey) {
     contentEl.createDiv({ cls: "citekey", text: item.citekey });
   }
   if (isJournalArticleItem(item)) {

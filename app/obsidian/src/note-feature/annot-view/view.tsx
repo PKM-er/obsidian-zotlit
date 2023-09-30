@@ -38,7 +38,7 @@ export class AnnotationView extends DerivedFileView {
   }
   update() {
     if (this.follow !== "ob-note") return;
-    const lib = this.plugin.settings.database.citationLibrary;
+    const lib = this.plugin.settings.libId;
     (async () => {
       if (this.file?.extension !== "md") return false;
       const itemKey = getItemKeyOf(this.file, this.app.metadataCache);
@@ -120,7 +120,7 @@ export class AnnotationView extends DerivedFileView {
   }
 
   get lib() {
-    return this.plugin.settings.database.citationLibrary;
+    return this.plugin.settings.libId;
   }
   store: StoreAPI;
   get follow() {
@@ -169,7 +169,7 @@ export class AnnotationView extends DerivedFileView {
     if (!literature) return;
     const { itemID } = literature.value.item;
 
-    const lib = plugin.settings.database.citationLibrary;
+    const lib = plugin.settings.libId;
     const attachments = await plugin.databaseAPI.getAttachments(itemID, lib);
 
     const atch = await choosePDFAtch(attachments, this.app);
@@ -197,7 +197,7 @@ export class AnnotationView extends DerivedFileView {
       getImgSrc: (annotation) => {
         const path = getCacheImagePath(
           annotation,
-          plugin.settings.database.zoteroDataDir,
+          plugin.settings.current?.zoteroDataDir,
         );
         return getFSResourcePath(path);
       },

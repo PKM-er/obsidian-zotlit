@@ -1,22 +1,16 @@
-import { useMemoizedFn } from "ahooks";
-import { useContext, useState } from "react";
-import { SettingTabCtx, normalizePath } from "../common";
-import SettingsComponent, { useApplySetting } from "../components/Setting";
+import { normalizePath } from "../common";
+import SettingsComponent, { useSetting } from "../components/Setting";
 import TextComfirmSetting from "../components/TextComfirm";
 
 type ImportModeSelect = "false" | "copy" | "symlink";
 export function ImageExcerptSetting() {
-  const { imgImporter } = useContext(SettingTabCtx).plugin.settings;
-  const [importMode, setImportMode] = useState<ImportModeSelect>(() =>
-    imgImporter.mode === false ? "false" : imgImporter.mode,
+  const [importMode, setImportMode] = useSetting(
+    (s) => (s.imgExcerptImport === false ? "false" : s.imgExcerptImport),
+    (v, prev) => {
+      const mode = v === "false" ? false : v;
+      return { ...prev, imgExcerptImport: mode };
+    },
   );
-  const applySeting = useApplySetting(imgImporter, "imgExcerptImport");
-  const onModeChange = useMemoizedFn(async function onChange(
-    option: ImportModeSelect,
-  ) {
-    setImportMode(option);
-    await applySeting(option === "false" ? false : option);
-  });
 
   return (
     <>
@@ -60,7 +54,9 @@ export function ImageExcerptSetting() {
       >
         <select
           className="dropdown"
-          onChange={(evt) => onModeChange(evt.target.value as ImportModeSelect)}
+          onChange={(evt) =>
+            setImportMode(evt.target.value as ImportModeSelect)
+          }
           value={importMode}
         >
           <option value={"false" satisfies ImportModeSelect} key={0}>
@@ -78,8 +74,8 @@ export function ImageExcerptSetting() {
         <>
           <TextComfirmSetting
             name="Default location"
-            settings={imgImporter}
-            prop="imgExcerptPath"
+            get={(s) => s.imgExcerptPath}
+            set={(v, prev) => ({ ...prev, imgExcerptPath: v })}
             normalize={normalizePath}
           >
             The folder to store image excerpts.

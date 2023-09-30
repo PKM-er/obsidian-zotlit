@@ -1,5 +1,6 @@
 import type { Extension } from "@codemirror/state";
-import { Service } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
+import { SettingsService } from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
 import { bracketExtension } from "./bracket";
 import { EtaSuggest } from "./suggester";
@@ -10,11 +11,17 @@ export class TemplateEditorHelper extends Service {
 
   plugin = this.use(ZoteroPlugin);
 
+  settings = this.use(SettingsService);
+
   #registerEtaEditorHelper() {
     this.plugin.registerEditorSuggest(new EtaSuggest(this.plugin.app));
   }
 
-  setEtaBracketPairing(enable: boolean) {
+  @calc
+  get etaBracketPairing() {
+    return this.settings.current?.autoPairEta;
+  }
+  #setEtaBracketPairing(enable: boolean) {
     const loadedBefore = this.#editorExtensions !== null;
     if (this.#editorExtensions === null) {
       this.#editorExtensions = [];
@@ -32,5 +39,8 @@ export class TemplateEditorHelper extends Service {
 
   onload(): void {
     this.#registerEtaEditorHelper();
+    this.register(
+      effect(() => this.#setEtaBracketPairing(this.etaBracketPairing)),
+    );
   }
 }

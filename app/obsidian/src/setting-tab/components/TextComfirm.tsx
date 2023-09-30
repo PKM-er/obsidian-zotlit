@@ -1,27 +1,24 @@
 import { TextareaAutosize as Textarea } from "@obzt/components";
 import type { PropsWithChildren, ReactNode } from "react";
 import { useState } from "react";
-import type { Settings } from "@/settings/base";
+import type { Settings } from "@/settings/service";
 import { useIconRef } from "@/utils/icon";
-import SettingsComponent, { useApplySetting } from "./Setting";
+import SettingsComponent, { useSetting } from "./Setting";
 
-export default function TextComfirmSetting<Opts extends Record<string, any>>({
+export default function TextComfirmSetting({
   name,
   children,
   normalize,
-  settings,
-  prop,
+  get,
+  set,
 }: PropsWithChildren<{
   name: ReactNode;
-  settings: Settings<Opts> & Readonly<Opts>;
-  prop: PickStringKeys<Opts>;
+  get: (settings: Settings) => string;
+  set: (val: string, settings: Settings) => Settings;
   normalize?: (val: string) => string;
 }>) {
-  const [value, setValue] = useState<string>(settings[prop]);
-  const applySetting = useApplySetting(settings, prop) as (
-    val: string,
-  ) => Promise<boolean>;
-
+  const [defaultValue, applyValue] = useSetting(get, set);
+  const [value, setValue] = useState(defaultValue);
   return (
     <TextComfirmSettingBase
       name={name}
@@ -32,17 +29,13 @@ export default function TextComfirmSetting<Opts extends Record<string, any>>({
         if (normalized !== value) {
           setValue(normalized);
         }
-        applySetting(normalized);
+        applyValue(normalized);
       }}
     >
       {children}
     </TextComfirmSettingBase>
   );
 }
-
-type PickStringKeys<T> = {
-  [K in keyof T]: T[K] extends string ? K : never;
-}[keyof T];
 
 export function TextComfirmSettingBase({
   name,

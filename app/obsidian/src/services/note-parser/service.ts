@@ -176,7 +176,7 @@ export class NoteParser extends Service {
     const attachmentWithAnnotation = new Set(
       [...this.annotations.values()].map((v) => v.attachementKey),
     );
-    const libId = this.plugin.settings.database.citationLibrary;
+    const libId = this.plugin.settings.libId;
 
     const literatureKeys = uniq([...keyFrom.citations, ...keyFrom.annotations]);
     const docItems = await this.plugin.databaseAPI

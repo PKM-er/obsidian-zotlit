@@ -1,11 +1,11 @@
 import { useMemoizedFn } from "ahooks";
 import { ToggleComponent } from "obsidian";
 import type { PropsWithChildren, ReactNode, RefCallback } from "react";
-import { forwardRef, useState, useCallback, useEffect, useRef } from "react";
-import type { Settings } from "@/settings/base";
-import SettingsComponent, { useApplySetting } from "./Setting";
+import { forwardRef, useCallback, useEffect, useRef } from "react";
+import type { Settings } from "@/settings/service";
+import SettingsComponent, { useSetting } from "./Setting";
 
-function useSwitch(value: boolean, onChange: (value: boolean) => void) {
+export function useSwitch(value: boolean, onChange: (value: boolean) => void) {
   const onChangeImmu = useMemoizedFn(onChange);
   const compRef = useRef<ToggleComponent | null>(null);
   useEffect(() => {
@@ -28,17 +28,17 @@ function useSwitch(value: boolean, onChange: (value: boolean) => void) {
   );
 }
 
-export default function BooleanSetting<Opts extends Record<string, any>>({
+export default function BooleanSetting({
   name,
   children: description,
-  settings,
-  prop,
+  get,
+  set,
 }: PropsWithChildren<{
   name: ReactNode;
-  settings: Settings<Opts> & Readonly<Opts>;
-  prop: PickBooleanKeys<Opts>;
+  get: (settings: Settings) => boolean;
+  set: (val: boolean, settings: Settings) => Settings;
 }>) {
-  const [, ref] = useBoolean(settings, prop);
+  const ref = useSwitch(...useSetting(get, set));
   return (
     <BooleanSettingBase ref={ref} name={name}>
       {description}
@@ -59,22 +59,3 @@ export const BooleanSettingBase = forwardRef<
     />
   );
 });
-
-type PickBooleanKeys<T> = {
-  [K in keyof T]: T[K] extends boolean ? K : never;
-}[keyof T];
-
-export function useBoolean<Opts extends Record<string, any>>(
-  settings: Settings<Opts> & Readonly<Opts>,
-  key: PickBooleanKeys<Opts>,
-) {
-  const [value, setValue] = useState<boolean>(settings[key]);
-  const applySeting = useApplySetting(settings, key) as (
-    val: boolean,
-  ) => Promise<boolean>;
-  const onChange = useMemoizedFn(async function onChange(val: boolean) {
-    setValue(val);
-    await applySeting(val);
-  });
-  return [value, useSwitch(value, onChange)] as const;
-}

@@ -1,31 +1,17 @@
-import { useMemoizedFn } from "ahooks";
-import { Notice } from "obsidian";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useIconRef } from "@/utils/icon";
 import { SettingTabCtx, useRefreshAsync } from "../common";
-import Setting, { useApplySetting } from "../components/Setting";
+import Setting, { useSetting } from "../components/Setting";
 
 export default function CitationLibrarySelect() {
-  const { plugin } = useContext(SettingTabCtx);
-  const { database } = plugin.settings;
+  const { database } = useContext(SettingTabCtx);
 
-  const [data, refresh] = useRefreshAsync(
-    () => plugin.databaseAPI.getLibs(),
-    [],
+  const [value, setValue] = useSetting(
+    (s) => s.citationLibrary,
+    (v, prev) => ({ ...prev, citationLibrary: v }),
   );
-  const [value, setValue] = useState(() => database.citationLibrary);
-  const applySeting = useApplySetting(database, "citationLibrary");
 
-  const onChange = useMemoizedFn(async function onChange(
-    evt: React.ChangeEvent<HTMLSelectElement>,
-  ) {
-    const val = Number.parseInt(evt.target.value, 10);
-    if (Number.isNaN(val)) return;
-    setValue(val);
-    if (await applySeting(val)) {
-      new Notice("Zotero search index updated.");
-    }
-  });
+  const [data, refresh] = useRefreshAsync(() => database.api.getLibs(), []);
 
   const libs = data.result ?? [
     { groupID: null, libraryID: 1, name: "My Library" },
@@ -34,7 +20,11 @@ export default function CitationLibrarySelect() {
   const [refreshIconRef] = useIconRef<HTMLButtonElement>("switch");
   return (
     <Setting name="Citation library">
-      <select className="dropdown" onChange={onChange} value={value}>
+      <select
+        className="dropdown"
+        onChange={(evt) => setValue(Number.parseInt(evt.target.value, 10))}
+        value={value}
+      >
         {libs.map(({ groupID, libraryID, name }) => (
           <option key={libraryID} value={libraryID}>
             {name
@@ -49,7 +39,7 @@ export default function CitationLibrarySelect() {
         aria-label="Refresh"
         ref={refreshIconRef}
         onClick={async () => {
-          await plugin.dbWorker.refresh({ task: "full" });
+          await database.refresh({ task: "full" });
           refresh();
         }}
       />

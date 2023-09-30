@@ -32,9 +32,9 @@ interface Options {
 }
 
 export function readFile(this: ObsidianEta, filepath: string): string {
-  const builtIn = fromPath(filepath, this.settings.folder);
+  const builtIn = fromPath(filepath, this.settings.templateDir);
   if (builtIn?.type === "embeded") {
-    return this.settings.templates[builtIn.name];
+    return this.settings.simpleTemplates[builtIn.name];
   }
   const file = this.getFile(filepath);
   if (typeof file === "string") {
@@ -55,7 +55,7 @@ export function readModTime(
   this: ObsidianEta,
   filepath: string,
 ): number | undefined {
-  const builtIn = fromPath(filepath, this.settings.folder);
+  const builtIn = fromPath(filepath, this.settings.templateDir);
   if (builtIn?.type === "embeded") {
     return -1;
   }

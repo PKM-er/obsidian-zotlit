@@ -22,7 +22,7 @@ export async function insertCitation(
   template: TemplateRenderer,
 ) {
   const { plugin } = template;
-  const libId = plugin.database.settings.citationLibrary;
+  const libId = plugin.settings.libId;
 
   const allAttachments = await plugin.databaseAPI.getAttachments(
     item.itemID,

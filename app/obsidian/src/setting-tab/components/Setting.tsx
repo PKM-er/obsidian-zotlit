@@ -1,8 +1,10 @@
 import { cn } from "@obzt/components/utils";
+// import { computed, effect } from "@ophidian/core";
+import { computed } from "@preact/signals-core";
 import { useMemoizedFn } from "ahooks";
 import type { PropsWithChildren, ReactNode } from "react";
-import { useContext, forwardRef } from "react";
-import type { Settings } from "@/settings/base";
+import { forwardRef, useContext, useMemo, useRef } from "react";
+import type { Settings } from "@/settings/service";
 import { SettingTabCtx } from "../common";
 
 export default forwardRef<
@@ -35,17 +37,20 @@ export default forwardRef<
   );
 });
 
-export function useApplySetting<
-  Opts extends Record<string, any>,
-  K extends keyof Opts,
->(settings: Settings<Opts> & Readonly<Opts>, key: K) {
-  const {
-    plugin: { settings: settingsLoader },
-  } = useContext(SettingTabCtx);
-  return useMemoizedFn(async function onChange(val: Opts[K]) {
-    const updated = await settings.setOption(key, val as any).apply();
-    if (updated === false) return false;
-    await settingsLoader.save();
-    return true;
+export function useComputed<T>(compute: () => T) {
+  const $compute = useRef(compute);
+  $compute.current = compute;
+  return useMemo(() => computed<T>(() => $compute.current()), []);
+}
+
+export function useSetting<T>(
+  get: (settings: Settings) => T,
+  set: (val: T, settings: Settings) => Settings,
+) {
+  const service = useContext(SettingTabCtx).settings;
+  const value = useComputed(() => get(service.current)).value;
+  const onChange = useMemoizedFn(function onChange(val: T) {
+    service.update((prev) => set(val, prev));
   });
+  return [value, onChange] as const;
 }

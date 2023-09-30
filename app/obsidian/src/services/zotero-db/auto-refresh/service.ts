@@ -1,26 +1,33 @@
 import type { FSWatcher } from "fs";
 import { watch } from "fs";
 import { map } from "@mobily/ts-belt/Dict";
-import { Service } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
+import { App } from "obsidian";
 import log from "@/log";
-import ZoteroPlugin from "@/zt-main";
+import { SettingsService } from "@/settings/base";
 import DatabaseWorker from "../connector/service";
-import { DatabaseSettings } from "../connector/settings";
-import { WatcherSettings } from "./settings";
 
 export default class DatabaseWatcher extends Service {
-  databaseSettings = this.use(DatabaseSettings);
-  settings = this.use(WatcherSettings);
+  settings = this.use(SettingsService);
 
   api = this.use(DatabaseWorker).api;
-  app = this.use(ZoteroPlugin).app;
+  app = this.use(App);
+
+  @calc
+  get autoRefresh() {
+    return this.settings.current?.autoRefresh;
+  }
 
   onDatabaseUpdate(target: "main" | "bbt") {
     return () => this.app.vault.trigger("zotero:db-updated", target);
   }
 
-  async onload() {
-    await this.setAutoRefresh(this.settings.autoRefresh);
+  onload() {
+    this.register(
+      effect(async () => {
+        await this.setAutoRefresh(this.autoRefresh);
+      }),
+    );
     log.debug("loading DatabaseWatcher");
   }
   onunload(): void {
@@ -48,12 +55,12 @@ export default class DatabaseWatcher extends Service {
     this.#unloadWatchers();
     if (enable) {
       this.#watcher.main = watch(
-        this.databaseSettings.zoteroDbPath,
+        this.settings.zoteroDbPath,
         this.onDatabaseUpdate("main"),
       );
       if (await this.api.checkDbStatus("bbt")) {
         this.#watcher.bbt = watch(
-          this.databaseSettings.betterBibTexDbPath,
+          this.settings.betterBibTexDbPath,
           this.onDatabaseUpdate("bbt"),
         );
       }

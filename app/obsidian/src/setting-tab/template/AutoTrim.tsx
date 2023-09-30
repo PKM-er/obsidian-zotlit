@@ -1,20 +1,23 @@
 import { useMemoizedFn } from "ahooks";
 import type { trimConfig } from "eta-prf";
-import { useState, useContext } from "react";
-import { SettingTabCtx } from "../common";
-import SettingsComponent, { useApplySetting } from "../components/Setting";
+import { useState } from "react";
+import SettingsComponent, { useSetting } from "../components/Setting";
 
 type EtaTrimConfigOption = "false" | "nl" | "slurp";
 
 export default function AutoTrimSetting() {
-  const { plugin } = useContext(SettingTabCtx);
-  const { template } = plugin.settings;
-  const [leading, setLeading] = useState<trimConfig>(
-    () => template.autoTrim[0],
+  const [defaultLeading, applyLeading] = useSetting(
+    (s) => s.autoTrim[0],
+    (s, prev) => ({ ...prev, autoTrim: [s, prev.autoTrim[1]] }),
   );
-  const [ending, setEnding] = useState<trimConfig>(() => template.autoTrim[1]);
+  const [defaultEnding, applyEnding] = useSetting(
+    (s) => s.autoTrim[1],
+    (s, prev) => ({ ...prev, autoTrim: [prev.autoTrim[0], s] }),
+  );
 
-  const applySeting = useApplySetting(template, "autoTrim");
+  const [leading, setLeading] = useState<trimConfig>(defaultLeading);
+  const [ending, setEnding] = useState<trimConfig>(defaultEnding);
+
   const onModeChange = useMemoizedFn(async function onChange(
     option: EtaTrimConfigOption,
     index: 0 | 1,
@@ -22,10 +25,10 @@ export default function AutoTrimSetting() {
     const value = option === "false" ? false : option;
     if (index === 0) {
       setLeading(value);
-      await applySeting([value, ending]);
+      applyLeading(value);
     } else {
       setEnding(value);
-      await applySeting([leading, value]);
+      applyEnding(value);
     }
   });
 

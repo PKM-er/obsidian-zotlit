@@ -1,25 +1,14 @@
 import { logLevels } from "@obzt/common";
 import type { LogLevel } from "@obzt/common";
-import { useMemoizedFn } from "ahooks";
-import { useContext, useState } from "react";
 
 import { promptOpenLog } from "@/utils";
-import { SettingTabCtx } from "../common";
-import Setting, { useApplySetting } from "../components/Setting";
+import Setting, { useSetting } from "../components/Setting";
 
 export default function LogLevel() {
-  const { log } = useContext(SettingTabCtx).plugin.settings;
-
-  const [value, setValue] = useState(() => log.level);
-  const applySeting = useApplySetting(log, "level");
-
-  const onChange = useMemoizedFn(async function onChange(
-    evt: React.ChangeEvent<HTMLSelectElement>,
-  ) {
-    const val = evt.target.value as LogLevel;
-    setValue(val);
-    await applySeting(val);
-  });
+  const [value, handleChange] = useSetting(
+    (s) => s.logLevel,
+    (v, prev) => ({ ...prev, logLevel: v }),
+  );
 
   return (
     <>
@@ -36,7 +25,14 @@ export default function LogLevel() {
           </>
         }
       >
-        <select className="dropdown" onChange={onChange} value={value}>
+        <select
+          className="dropdown"
+          onChange={(evt) => {
+            const val = evt.target.value as LogLevel;
+            handleChange(val);
+          }}
+          value={value}
+        >
           {Object.entries(logLevels).map(([label, value]) => (
             <option key={value} value={value}>
               {label}

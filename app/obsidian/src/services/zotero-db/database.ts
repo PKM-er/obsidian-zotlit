@@ -2,9 +2,9 @@ import type { RegularItemInfo } from "@obzt/database";
 import type { SimpleDocumentSearchResultSetUnit } from "@obzt/database/api";
 import { Service } from "@ophidian/core";
 import log from "@/log";
+import { SettingsService } from "@/settings/base";
 import DatabaseWatcher from "./auto-refresh/service";
 import DatabaseWorker, { DatabaseStatus } from "./connector/service";
-import { DatabaseSettings } from "./connector/settings";
 
 export class ZoteroDatabase extends Service {
   // async onload() {}
@@ -14,10 +14,10 @@ export class ZoteroDatabase extends Service {
   }
 
   get defaultLibId() {
-    return this.settings.citationLibrary;
+    return this.settings.libId;
   }
 
-  settings = this.use(DatabaseSettings);
+  settings = this.use(SettingsService);
   #worker = this.use(DatabaseWorker);
 
   watcher = this.use(DatabaseWatcher);

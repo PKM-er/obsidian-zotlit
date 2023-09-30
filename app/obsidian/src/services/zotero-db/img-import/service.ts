@@ -4,12 +4,11 @@ import { dirname as dirnamePosix } from "path/posix";
 import type { AnnotationInfo } from "@obzt/database";
 import { getCacheImagePath } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
-import { Service } from "@ophidian/core";
+import { Service, calc } from "@ophidian/core";
 import { FileSystemAdapter, normalizePath, Notice } from "obsidian";
 import log, { logError } from "@/log";
+import { SettingsService } from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
-import { DatabaseSettings } from "../connector/settings";
-import { ImgImporterSettings } from "./settings";
 
 export class ImgCacheImporter extends Service {
   onload() {
@@ -23,20 +22,31 @@ export class ImgCacheImporter extends Service {
     return this.use(ZoteroPlugin).app;
   }
 
-  databaseSettings = this.use(DatabaseSettings);
-  settings = this.use(ImgImporterSettings);
+  settings = this.use(SettingsService);
 
   private queue = new Map<string, () => Promise<boolean>>();
 
   getCachePath(annot: AnnotationInfo) {
-    return getCacheImagePath(annot, this.databaseSettings.zoteroDataDir);
+    return getCacheImagePath(annot, this.settings.current?.zoteroDataDir);
+  }
+
+  @calc
+  get mode() {
+    return this.settings.current?.imgExcerptImport;
+  }
+  @calc
+  get path() {
+    return this.settings.current?.imgExcerptPath;
+  }
+  @calc
+  get imgExcerptDir(): string | null {
+    return this.mode ? this.path : null;
   }
 
   private getInVaultPath(annot: AnnotationInfo): string | null {
-    if (!this.settings.imgExcerptDir || annot.type !== AnnotationType.image)
-      return null;
+    if (!this.imgExcerptDir || annot.type !== AnnotationType.image) return null;
     const cachePath = this.getCachePath(annot);
-    return getInVaultPath(annot, cachePath, this.settings.imgExcerptDir);
+    return getInVaultPath(annot, cachePath, this.imgExcerptDir);
   }
 
   import(annot: AnnotationInfo): string | null {
@@ -96,7 +106,7 @@ export class ImgCacheImporter extends Service {
       });
     if (mtimeSrc === -1) return false;
 
-    const importMode = this.settings.mode;
+    const importMode = this.mode;
     if (importMode === false) {
       log.trace("import mode disabled");
       return false;

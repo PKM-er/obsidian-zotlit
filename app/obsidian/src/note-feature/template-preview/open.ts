@@ -1,5 +1,7 @@
+import type { App } from "obsidian";
 import { MarkdownView, Notice, TFile } from "obsidian";
 import { fromPath, toPath, type TplType } from "@/services/template/eta/preset";
+import type { SettingsService } from "@/settings/base";
 import type ZoteroPlugin from "@/zt-main";
 import type { TemplatePreviewStateData } from "./base";
 import { itemDetailsViewType } from "./details";
@@ -8,10 +10,10 @@ import { templatePreviewViewType } from "./preview";
 export async function openTemplatePreview(
   type: TplType.Ejectable,
   data: TemplatePreviewStateData | null,
-  plugin: ZoteroPlugin,
+  { app, settings }: { app: App; settings: SettingsService },
 ) {
-  const { workspace } = plugin.app;
-  const file = getTemplateFile(type, plugin);
+  const { workspace } = app;
+  const file = getTemplateFile(type, settings.templateDir, app);
   if (!file || !(file instanceof TFile)) {
     new Notice("Template file not found: " + type);
     return;
@@ -20,8 +22,8 @@ export async function openTemplatePreview(
     const view = l.view as MarkdownView;
     if (!view.file) return false;
     return (
-      fromPath(view.file.path, plugin.settings.template.folder)?.type ===
-        "ejectable" && l.getRoot().type === "floating"
+      fromPath(view.file.path, settings.templateDir)?.type === "ejectable" &&
+      l.getRoot().type === "floating"
     );
   });
 
@@ -66,9 +68,13 @@ export async function openTemplatePreview(
   ]);
 }
 
-export function getTemplateFile(type: TplType.Ejectable, plugin: ZoteroPlugin) {
-  const filepath = toPath(type, plugin.settings.template.folder),
-    file = plugin.app.vault.getAbstractFileByPath(filepath);
+export function getTemplateFile(
+  type: TplType.Ejectable,
+  templateDir: string,
+  app: App,
+) {
+  const filepath = toPath(type, templateDir),
+    file = app.vault.getAbstractFileByPath(filepath);
   if (file instanceof TFile) return file;
   return null;
 }
@@ -80,7 +86,7 @@ export function getTemplateEditorInGroup(group: string, plugin: ZoteroPlugin) {
       (l) =>
         l.view instanceof MarkdownView &&
         l.view.file &&
-        fromPath(l.view.file.path, plugin.settings.template.folder)?.type ===
+        fromPath(l.view.file.path, plugin.settings.templateDir)?.type ===
           "ejectable",
     );
   return templateEditorLeaf;

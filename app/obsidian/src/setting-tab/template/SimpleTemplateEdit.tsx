@@ -1,19 +1,21 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import type { TplType } from "@/services/template/eta/preset";
-import { SettingTabCtx } from "../common";
+import { useSetting } from "../components/Setting";
 import { TextComfirmSettingBase } from "../components/TextComfirm";
 import { templateDesc } from "./shared";
 
 export function SimpleTemplateEdit({ type }: { type: TplType.Embeded }) {
-  const { plugin } = useContext(SettingTabCtx);
-  const { template } = plugin.settings;
-
-  const [value, setValue] = useState<string>(template.templates[type]);
-  const applySetting = async (val: string) => {
-    const updated = await template.setTemplate(type, val);
-    if (updated === false) return false;
-    await plugin.settings.save();
-  };
+  const [defaultValue, applyTemplate] = useSetting(
+    (s) => s.template.templates[type],
+    (v, prev) => ({
+      ...prev,
+      template: {
+        ...prev.template,
+        templates: { ...prev.template.templates, [type]: v },
+      },
+    }),
+  );
+  const [value, setValue] = useState<string>(defaultValue);
 
   return (
     <TextComfirmSettingBase
@@ -21,8 +23,7 @@ export function SimpleTemplateEdit({ type }: { type: TplType.Embeded }) {
       value={value}
       onChange={(evt) => setValue(evt.target.value)}
       onSubmit={() => {
-        setValue(value);
-        applySetting(value);
+        applyTemplate(value);
       }}
     >
       {templateDesc[type].desc}

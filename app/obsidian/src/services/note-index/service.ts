@@ -4,15 +4,15 @@ import { groupBy } from "@mobily/ts-belt/Array";
 import { mapWithKey, values } from "@mobily/ts-belt/Dict";
 import type { ItemKeyGroup } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
-import { Service } from "@ophidian/core";
+import { Service, calc } from "@ophidian/core";
 import type { CachedMetadata, Pos, TAbstractFile, TFile } from "obsidian";
-import { Notice } from "obsidian";
+import { App, Notice } from "obsidian";
 
 import log from "@/log";
+import { SettingsService, effect } from "@/settings/base";
 import { isMarkdownFile } from "@/utils";
 import { untilMetaReady } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
-import { NoteIndexSettings } from "./settings";
 import {
   getItemKeyFromFrontmatter,
   isAnnotBlock,
@@ -27,16 +27,22 @@ interface BlockInfo {
 
 export default class NoteIndex extends Service {
   plugin = this.use(ZoteroPlugin);
-  settings = this.use(NoteIndexSettings);
+  settings = this.use(SettingsService);
+  app = this.use(App);
 
   get meta() {
-    return this.plugin.app.metadataCache;
+    return this.app.metadataCache;
   }
   get vault() {
-    return this.plugin.app.vault;
+    return this.app.vault;
   }
-  get template() {
-    return this.plugin.settings.template;
+
+  @calc
+  get literatureNoteFolder() {
+    return this.settings.current?.literatureNoteFolder;
+  }
+  get joinPath() {
+    return getFolderJoinPath(this.literatureNoteFolder);
   }
 
   /** key -> file[] */
@@ -217,27 +223,36 @@ export default class NoteIndex extends Service {
   }
 
   onload(): void {
-    // plugin.register(() => this.buildFilemapWorker.terminate());
-    [
-      this.meta.on("changed", this.onMetaChanged, this),
-      // this.vault.on("create") // also fired on meta.changed
-      this.vault.on("rename", this.onFileRenamed, this),
-      this.vault.on("delete", this.onFileRemoved, this),
-    ].forEach(this.registerEvent.bind(this));
+    this.settings.once(() => {
+      // plugin.register(() => this.buildFilemapWorker.terminate());
+      [
+        this.meta.on("changed", this.onMetaChanged, this),
+        // this.vault.on("create") // also fired on meta.changed
+        this.vault.on("rename", this.onFileRenamed, this),
+        this.vault.on("delete", this.onFileRemoved, this),
+      ].forEach(this.registerEvent.bind(this));
 
-    const [task, cancel] = untilMetaReady(this.plugin.app, {});
-    cancel && this.register(cancel);
-    task.then(() => {
-      this.onMetaBuilt();
-      this.plugin.addCommand({
-        id: "refresh-note-index",
-        name: "Refresh literature notes index",
-        callback: () => {
-          this.reload();
-          new Notice("Literature notes re-indexed");
-        },
+      const [task, cancel] = untilMetaReady(this.plugin.app, {});
+      cancel && this.register(cancel);
+      task.then(() => {
+        this.onMetaBuilt();
+        this.plugin.addCommand({
+          id: "refresh-note-index",
+          name: "Refresh literature notes index",
+          callback: () => {
+            this.reload();
+            new Notice("Literature notes re-indexed");
+          },
+        });
       });
     });
+    this.register(
+      effect((initial) => {
+        this.literatureNoteFolder;
+        if (initial) return;
+        this.reload();
+      }),
+    );
   }
 
   onMetaBuilt() {
@@ -266,3 +281,6 @@ export default class NoteIndex extends Service {
     log.info("Note Index: Reloaded");
   }
 }
+
+const getFolderJoinPath = (folder: string): string =>
+  folder === "/" ? "" : folder + "/";

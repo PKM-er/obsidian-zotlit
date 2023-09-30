@@ -72,7 +72,7 @@ export class CitekeyClick extends Service {
                   return;
                 }
                 const [item] = await database.api.getItems([
-                  [itemID, settings.database.citationLibrary],
+                  [itemID, settings.libId],
                 ]);
                 if (!item) {
                   new Notice(`Item not found for citekey ${citekey}`);

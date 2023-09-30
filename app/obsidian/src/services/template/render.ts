@@ -2,23 +2,30 @@
 import { filter, merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
 import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
-import { Service } from "@ophidian/core";
+import { Service, calc } from "@ophidian/core";
 import type { TAbstractFile, TFile } from "obsidian";
-import { Notice, TFolder, Vault, parseYaml, stringifyYaml } from "obsidian";
+import {
+  Notice,
+  App,
+  TFolder,
+  Vault,
+  parseYaml,
+  stringifyYaml,
+} from "obsidian";
 import log, { logError } from "@/log";
+import { SettingsService, effect } from "@/settings/base";
 import { isMarkdownFile } from "@/utils";
 import { merge as mergeAnnotsTags } from "@/utils/merge";
 import ZoteroPlugin from "@/zt-main";
 import { ObsidianEta } from "./eta";
 import { patchCompile } from "./eta/patch";
-import { fromPath } from "./eta/preset";
+import { TemplateNames, fromPath } from "./eta/preset";
 import { ZOTERO_ATCHS_FIELDNAME, ZOTERO_KEY_FIELDNAME } from "./frontmatter";
 import { extractFrontmatter } from "./get-fm";
 import type { AnnotHelper, DocItemHelper } from "./helper";
 import type { Context } from "./helper/base";
 import type { HelperExtra } from "./helper/to-helper";
 import { toHelper } from "./helper/to-helper";
-import { TemplateSettings } from "./settings";
 
 interface ColoredText {
   content: string;
@@ -38,14 +45,28 @@ export interface TemplateDataMap {
   colored: ColoredText;
 }
 
-export class TemplateRenderer extends Service {
+export class Template extends Service {
   eta = this.use(ObsidianEta);
   plugin = this.use(ZoteroPlugin);
+  settings = this.use(SettingsService);
+  app = this.use(App);
   get vault() {
-    return this.plugin.app.vault;
+    return this.app.vault;
   }
+
+  @calc
   get folder() {
-    return this.use(TemplateSettings).folder;
+    return this.settings.templateDir;
+  }
+
+  @calc
+  get filenameTemplate() {
+    return this.settings.simpleTemplates?.filename;
+  }
+
+  @calc
+  get autoTrim() {
+    return this.settings.current?.autoTrim;
   }
 
   async loadTemplates() {
@@ -66,9 +87,28 @@ export class TemplateRenderer extends Service {
       ),
     );
   }
-  async onload() {
+  onload() {
     patchCompile(this.eta);
-    await this.loadTemplates();
+    this.settings.once(async () => {
+      await this.loadTemplates();
+    });
+    this.register(
+      effect((initial) => {
+        this.filenameTemplate;
+        if (initial) return;
+        this.plugin.app.vault.trigger("zotero:template-updated", "filename");
+      }),
+    );
+    this.register(
+      effect((initial) => {
+        // trigger update on autoTrim change
+        this.autoTrim;
+        if (initial) return;
+        for (const type of TemplateNames.All) {
+          this.plugin.app.vault.trigger("zotero:template-updated", type);
+        }
+      }),
+    );
     this.registerEvent(this.vault.on("create", this.onFileChange, this));
     this.registerEvent(this.vault.on("modify", this.onFileChange, this));
     this.registerEvent(

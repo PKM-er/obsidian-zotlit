@@ -5,18 +5,13 @@ import { BackgroundConnectSetting } from "./Background";
 import DatabaseSetting from "./Database";
 
 export default function Connect() {
-  const {
-    plugin: {
-      settings: { watcher },
-    },
-  } = useContext(SettingTabCtx);
   return (
     <>
       <DatabaseSetting />
       <BooleanSetting
         name="Refresh automatically when Zotero updates database"
-        settings={watcher}
-        prop="autoRefresh"
+        get={(s) => s.autoRefresh}
+        set={(v, s) => ({ ...s, autoRefresh: v })}
       />
       <BackgroundConnectSetting />
     </>

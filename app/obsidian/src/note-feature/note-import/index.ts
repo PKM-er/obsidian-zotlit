@@ -27,7 +27,7 @@ export async function importNote(plugin: ZoteroPlugin): Promise<boolean> {
   } = result;
   const notes = await plugin.databaseAPI.getNotes(
     item.itemID,
-    plugin.settings.database.citationLibrary,
+    plugin.settings.libId,
   );
   if (notes.length === 0) {
     new Notice("No note found for selected literature");
@@ -45,7 +45,7 @@ export async function importNote(plugin: ZoteroPlugin): Promise<boolean> {
   }
   const noteMarkdown = await plugin.noteParser.turndown(noteItem.note);
 
-  const folder = plugin.settings.noteIndex.literatureNoteFolder;
+  const folder = plugin.settings.current?.literatureNoteFolder;
 
   const filepath = join(
     folder,

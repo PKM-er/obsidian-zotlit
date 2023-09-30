@@ -8,6 +8,7 @@
     "moduleResolution": "Bundler",
     "module": "ESNext",
     "jsx": "react-jsx",
+    "experimentalDecorators": true,
     "paths": {
       "@/*": ["./*"],
       "@c/*": ["../../../lib/components/src/components/*"],

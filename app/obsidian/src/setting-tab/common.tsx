@@ -1,11 +1,15 @@
+import type { App } from "obsidian";
 import { createContext, useCallback, useState } from "react";
 import type { UseAsyncOptions, UseAsyncReturn } from "react-async-hook";
 import { useAsync } from "react-async-hook";
+import type { DatabaseWorker } from "@/services/zotero-db";
+import type { SettingsService } from "@/settings/base";
 import { InVaultPath } from "@/settings/invault-path";
-import type ZoteroPlugin from "../zt-main";
 
 export const SettingTabCtx = createContext<{
-  plugin: ZoteroPlugin;
+  settings: SettingsService;
+  app: App;
+  database: DatabaseWorker;
   closeTab: () => void;
 }>({} as any);
 

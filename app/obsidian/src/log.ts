@@ -1,9 +1,9 @@
 import { initLogger } from "@obzt/common";
 import type { LogLevel } from "@obzt/common";
-import { assertNever } from "assert-never";
+import { Service, calc, effect } from "@ophidian/core";
 import log4js, { levels } from "log4js";
 import DatabaseWorker from "./services/zotero-db/connector/service";
-import Settings from "./settings/base";
+import { SettingsService } from "./settings/base";
 
 const DEFAULT_LOGLEVEL: LogLevel = "INFO";
 export const storageKey = "log4js_loglevel";
@@ -36,28 +36,28 @@ export const logError = (message: string, error: unknown, ...args: any[]) => {
   console.error(error);
 };
 
-interface SettingOptions {
-  level: LogLevel;
+export interface SettingsLog {
+  logLevel: LogLevel;
 }
 
-export class LogSettings extends Settings<SettingOptions> {
-  getDefaults(): SettingOptions {
-    return { level: DEFAULT_LOGLEVEL };
+export const defaultSettingsLog: SettingsLog = {
+  logLevel: DEFAULT_LOGLEVEL,
+};
+
+export class LogService extends Service {
+  settings = this.use(SettingsService);
+
+  @calc
+  get level() {
+    return this.settings.current?.logLevel;
   }
 
-  async applyLevel() {
-    log.level = this.level;
+  async applyLogLevel() {
     localStorage.setItem(storageKey, this.level);
     await this.use(DatabaseWorker).api.setLoglevel(this.level);
   }
 
-  async apply(key: keyof SettingOptions): Promise<void> {
-    switch (key) {
-      case "level":
-        await this.applyLevel();
-        return;
-      default:
-        assertNever(key);
-    }
+  onload(): void {
+    this.register(effect(() => this.applyLogLevel()));
   }
 }

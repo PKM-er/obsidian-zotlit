@@ -25,7 +25,11 @@ export class TemplatePreview extends TemplatePreviewBase {
       this.plugin,
     );
     if (!templateEditorLeaf) return false;
-    const file = getTemplateFile(type, this.plugin);
+    const file = getTemplateFile(
+      type,
+      this.plugin.settings.templateDir,
+      this.app,
+    );
     if (!file || !(file instanceof TFile)) {
       new Notice("Template file not found: " + type);
       return;

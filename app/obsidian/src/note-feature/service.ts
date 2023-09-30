@@ -62,7 +62,7 @@ class NoteFeatures extends Service {
     );
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
-        const tpl = fromPath(file.path, plugin.settings.template.folder);
+        const tpl = fromPath(file.path, plugin.settings.templateDir);
         if (tpl?.type !== "ejectable") return;
         menu.addItem((i) =>
           i
@@ -115,7 +115,7 @@ class NoteFeatures extends Service {
     plugin.registerEditorSuggest(new CitationEditorSuggest(plugin));
 
     const updateNote = async (file: TFile, overwrite?: boolean) => {
-      const lib = plugin.settings.database.citationLibrary;
+      const lib = plugin.settings.libId;
       const itemKey = getItemKeyOf(file, app.metadataCache);
       if (!itemKey) {
         new Notice("Cannot get zotero item key from file name");
@@ -168,7 +168,7 @@ class NoteFeatures extends Service {
             .setIcon("sync")
             .onClick(() => updateNote(file)),
         );
-        if (!plugin.settings.template.updateOverwrite)
+        if (!plugin.settings.current?.updateOverwrite)
           menu.addItem((i) =>
             i
               .setTitle("Force update by overwriting")
@@ -179,7 +179,7 @@ class NoteFeatures extends Service {
     );
     plugin.registerEvent(
       plugin.app.workspace.on("file-menu", (menu, file) => {
-        const tpl = fromPath(file.path, plugin.settings.template.folder);
+        const tpl = fromPath(file.path, plugin.settings.templateDir);
         if (tpl?.type !== "ejectable") return;
         menu.addItem((i) =>
           i
@@ -233,7 +233,7 @@ class NoteFeatures extends Service {
     }
 
     const { vault, fileManager } = this.plugin.app,
-      { literatureNoteFolder: folder } = this.plugin.settings.noteIndex,
+      { literatureNoteFolder: folder } = this.plugin.settings.current,
       template = this.plugin.templateRenderer;
 
     const filepath = join(
@@ -261,7 +261,7 @@ class NoteFeatures extends Service {
   }
 
   async createNoteForDocItemFull(item: RegularItemInfoBase): Promise<string> {
-    const libId = this.plugin.database.settings.citationLibrary;
+    const libId = this.plugin.settings.libId;
     const allAttachments = await this.plugin.databaseAPI.getAttachments(
       item.itemID,
       libId,

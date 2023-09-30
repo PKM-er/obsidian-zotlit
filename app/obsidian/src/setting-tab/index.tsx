@@ -21,7 +21,9 @@ export default class ZoteroSettingTab extends PluginSettingTab {
     ReactDOM.render(
       <SettingTabCtx.Provider
         value={{
-          plugin: this.plugin,
+          settings: this.plugin.settings,
+          app: this.app,
+          database: this.plugin.dbWorker,
           closeTab: () => (this as any).setting.close(),
         }}
       >

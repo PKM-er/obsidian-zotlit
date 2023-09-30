@@ -1,14 +1,16 @@
 import getPort from "get-port";
 import { Notice } from "obsidian";
-import { useContext, useMemo, useState } from "react";
+import { useState } from "react";
 import { useIconRef } from "@/utils/icon";
-import { SettingTabCtx } from "../common";
-import { BooleanSettingBase, useBoolean } from "../components/Boolean";
-import Setting from "../components/Setting";
+import { BooleanSettingBase, useSwitch } from "../components/Boolean";
+import Setting, { useSetting } from "../components/Setting";
 
 export function BackgroundConnectSetting() {
-  const { server } = useContext(SettingTabCtx).plugin.settings;
-  const [value, ref] = useBoolean(server, "enableServer");
+  const [value, setValue] = useSetting(
+    (s) => s.enableServer,
+    (v, s) => ({ ...s, enableServer: v }),
+  );
+  const ref = useSwitch(value, setValue);
   return (
     <>
       <Setting
@@ -25,26 +27,30 @@ export function BackgroundConnectSetting() {
 }
 
 function ServerPort() {
-  const { server } = useContext(SettingTabCtx).plugin.settings;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const defaultPort = useMemo(() => server.getDefaults().serverPort, []);
+  const [defaultPort, applyPort] = useSetting(
+    (s) => s.serverPort,
+    (v, prev) => ({ ...prev, serverPort: v }),
+  );
+  const [hostname] = useSetting(
+    (s) => s.serverHostname,
+    (v, prev) => ({ ...prev, serverHostname: v }),
+  );
   const [port, setPort] = useState<number>(defaultPort);
   const [checkIconRef] = useIconRef<HTMLButtonElement>("check");
   async function apply() {
     if (isNaN(port) || port < 0 || port > 65535) {
       new Notice("Invalid port number: " + port);
-      setPort(server.serverPort);
+      setPort(defaultPort);
       return false;
     }
-    if (port === server.serverPort) {
+    if (port === defaultPort) {
       // no need to save if port is not changed
       return false;
     }
     const portReady = await getPort({
-      host: server.serverHostname,
+      host: hostname,
       port: [port],
     });
-    console.log(portReady, port);
     if (portReady !== port) {
       new Notice(
         `Port is currently occupied, a different port is provided: ${portReady}, confirm again to apply the change.`,
@@ -52,12 +58,8 @@ function ServerPort() {
       setPort(portReady);
       return false;
     }
-    const result = server.setOption("serverPort", portReady);
-    await result.apply();
-    if (result.changed) {
-      new Notice("Server port is saved and applied.");
-    }
-    return result.changed;
+    applyPort(portReady);
+    return true;
   }
   return (
     <Setting name="Port number" description={`Default to ${defaultPort}`}>

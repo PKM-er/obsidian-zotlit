@@ -6,7 +6,7 @@ import { use } from "@ophidian/core";
 import type { App, PluginManifest } from "obsidian";
 import { Plugin } from "obsidian";
 
-import log from "@/log";
+import log, { LogService } from "@/log";
 import type { PluginAPI } from "./api";
 import checkLib from "./install-guide/index.jsx";
 import NoteFeatures from "./note-feature/service";
@@ -24,7 +24,7 @@ import {
   ZoteroDatabase,
 } from "./services/zotero-db";
 import ZoteroSettingTab from "./setting-tab";
-import { SettingLoader } from "./settings/service";
+import { useSettings } from "./settings/base";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -41,7 +41,12 @@ export default class ZoteroPlugin extends Plugin {
     }
   }
 
-  settings = this.use(SettingLoader);
+  settings = useSettings(this);
+
+  services = {
+    /** dummy used to init log settings */
+    _log: this.use(LogService),
+  };
 
   noteIndex = this.use(NoteIndex);
   server = this.use(Server);
@@ -63,7 +68,7 @@ export default class ZoteroPlugin extends Plugin {
   // annotBlockWorker = this.use(AnnotBlock);
   pdfParser = this.use(PDFParser);
 
-  async onload() {
+  onload() {
     log.info("loading ZotLit");
     this.addSettingTab(new ZoteroSettingTab(this));
     globalThis.zoteroAPI = {

@@ -33,14 +33,14 @@ interface UpdateSummary {
 export async function updateNote(
   item: RegularItemInfoBase,
   plugin: ZoteroPlugin,
-  overwrite = plugin.settings.template.updateOverwrite,
+  overwrite = plugin.settings.current?.updateOverwrite,
 ): Promise<UpdateSummary | null> {
   const { app, noteIndex, templateRenderer } = plugin;
 
   const notePaths = noteIndex.getNotesFor(item);
   if (notePaths.length === 0) return null;
 
-  const libId = plugin.database.settings.citationLibrary;
+  const libId = plugin.settings.libId;
   const allAttachments = await plugin.databaseAPI.getAttachments(
     item.itemID,
     libId,
@@ -137,7 +137,7 @@ export async function updateNote(
             const ranges = annotSections[blockID];
             if (ranges) {
               // only update existing content if explicitly enabled
-              if (!plugin.settings.template.updateAnnotBlock) return;
+              if (!plugin.settings.current?.updateAnnotBlock) return;
               const insert = await templateRenderer.renderAnnot(
                 annot,
                 extra,
@@ -203,7 +203,7 @@ export async function getHelperExtraByAtch(
   },
   plugin: ZoteroPlugin,
 ): Promise<Record<number, HelperExtra>> {
-  const libId = plugin.database.settings.citationLibrary;
+  const libId = plugin.settings.libId;
   const tagsRecord = await plugin.databaseAPI.getTags([[item.itemID, libId]]);
 
   if (attachments.length === 0) {

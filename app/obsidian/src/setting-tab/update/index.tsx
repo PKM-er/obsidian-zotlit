@@ -1,10 +1,7 @@
-import { useContext } from "react";
-import { SettingTabCtx } from "../common";
 import BooleanSetting from "../components/Boolean";
 import Setting from "../components/Setting";
 
 export default function Update() {
-  const { template } = useContext(SettingTabCtx).plugin.settings;
   return (
     <>
       <Setting
@@ -21,8 +18,8 @@ export default function Update() {
       />
       <BooleanSetting
         name="Overwrite existing note"
-        settings={template}
-        prop="updateOverwrite"
+        get={(s) => s.updateOverwrite}
+        set={(v, s) => ({ ...s, updateOverwrite: v })}
       >
         <div className="space-y-2">
           <div className="text-txt-error">
@@ -34,8 +31,8 @@ export default function Update() {
       </BooleanSetting>
       <BooleanSetting
         name="In-place update of existing annotations"
-        settings={template}
-        prop="updateAnnotBlock"
+        get={(s) => s.updateAnnotBlock}
+        set={(v, s) => ({ ...s, updateAnnotBlock: v })}
       >
         <div className="space-y-2">
           <div>(Experimental)</div>

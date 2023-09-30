@@ -18,7 +18,7 @@ export function patchCompile(eta: ObsidianEta) {
         const compiled = next.call(this, template, options);
         if (!options?.filepath) return compiled;
         const filepath = options.filepath;
-        const builtIn = fromPath(filepath, self.settings.folder);
+        const builtIn = fromPath(filepath, self.settings.templateDir);
         if (!builtIn) return compiled;
         let postProcessed = compiled;
         switch (builtIn.name) {

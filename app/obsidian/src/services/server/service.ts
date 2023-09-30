@@ -6,12 +6,12 @@ import type {
 import { createServer } from "http";
 import { queryActions } from "@obzt/protocol";
 import type { INotify } from "@obzt/protocol/dist/bg";
-import { Service } from "@ophidian/core";
+import { Service, calc } from "@ophidian/core";
 import type { EventRef, ObsidianProtocolData } from "obsidian";
-import { Events } from "obsidian";
+import { Events, Notice } from "obsidian";
 import log from "@/log";
+import { SettingsService, effect } from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
-import { ServerSettings } from "./settings";
 
 /** background actions */
 const bgActions = new Set<string>(["notify"]);
@@ -21,20 +21,42 @@ const obActions = new Set<string>([...queryActions.map((v) => `zotero/${v}`)]);
 export class Server extends Service implements Events {
   #events = new Events();
 
-  settings = this.use(ServerSettings);
+  settings = this.use(SettingsService);
   plugin = this.use(ZoteroPlugin);
   server: HTTPServer | null = null;
 
+  @calc
   get port() {
-    return this.settings.serverPort;
+    return this.settings.current?.serverPort;
   }
+
+  @calc
   get hostname() {
-    return this.settings.serverHostname;
+    return this.settings.current?.serverHostname;
+  }
+  @calc
+  get enableServer() {
+    return this.settings.current?.enableServer;
   }
   onload() {
-    if (this.settings.enableServer) {
-      this.initServer();
-    }
+    this.register(
+      effect(() => {
+        if (this.enableServer) {
+          this.initServer();
+        } else {
+          this.closeServer();
+        }
+      }),
+    );
+    this.register(
+      effect((initial) => {
+        // trigger reloadPort only when port or hostname is changed
+        this.port, this.hostname;
+        if (initial) return;
+        this.reloadPort();
+        new Notice("Server port is saved and applied.");
+      }),
+    );
     this.registerObsidianProtocolHandler();
   }
   onunload(): void {
@@ -72,7 +94,7 @@ export class Server extends Service implements Events {
     this.server?.close();
   }
   reloadPort() {
-    if (!this.settings.enableServer) return;
+    if (!this.enableServer) return;
     this.closeServer();
     this.#createServer();
     this.#startListen();

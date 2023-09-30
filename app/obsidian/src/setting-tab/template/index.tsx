@@ -9,22 +9,24 @@ import { EjectableTemplate, useEjectAll } from "./EjectableTemplate";
 import { SimpleTemplateEdit } from "./SimpleTemplateEdit";
 
 export default function Template() {
-  const { template } = useContext(SettingTabCtx).plugin.settings;
   const [ejected, ejectBtnRef] = useEjectAll();
   return (
     <>
       <TextComfirmSetting
         name="Template location"
-        settings={template}
-        prop="folder"
+        get={(s) => s.template.folder}
+        set={(v, prev) => ({
+          ...prev,
+          template: { ...prev.template, folder: v },
+        })}
         normalize={normalizePath}
       >
         The folder which templates are ejected into and stored
       </TextComfirmSetting>
       <BooleanSetting
         name="Auto pair for Eta"
-        settings={template}
-        prop="autoPairEta"
+        get={(s) => s.autoPairEta}
+        set={(v, s) => ({ ...s, autoPairEta: v })}
       >
         {"Pair `<` and `%` automatically in eta templates."}
         <br />

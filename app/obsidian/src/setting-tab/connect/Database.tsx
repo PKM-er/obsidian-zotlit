@@ -1,26 +1,24 @@
 import { dialog } from "@electron/remote";
-import { cn } from "@obzt/components/utils";
-import { useMemoizedFn } from "ahooks";
-import { assertNever } from "assert-never";
 import { Notice } from "obsidian";
-import type { PropsWithChildren } from "react";
-import { useCallback, useContext, useState } from "react";
+import { useContext } from "react";
 import { useAsyncCallback } from "react-async-hook";
-import { SettingTabCtx, useRefreshAsync } from "../common";
-import Setting from "../components/Setting";
+import { SettingTabCtx } from "../common";
+import Setting, { useSetting } from "../components/Setting";
+import { DatabasePathWithTitle, DatabasePath } from "./DatabasePath";
+import type { DatabaseStatus } from "./useDatabaseStatus";
+import { useDatabaseStatus } from "./useDatabaseStatus";
 
 export default function DatabaseSetting() {
-  const [mainDbPath, mainDbStatus, refreshMainDb] = useDatabaseInfo("main");
-  const [bbtDbPath, bbtDbStatus, refreshBbtDb] = useDatabaseInfo("bbt");
-  const [dataDir, refreshDataDir] = useDatabasePath("data");
+  const mainDbPath = useDatabasePath("main");
+  const bbtDbPath = useDatabasePath("bbt");
 
-  const [dataDirState, setDataDir] = useSetDataDir(
-    useMemoizedFn(() => {
-      refreshDataDir();
-      refreshMainDb();
-      refreshBbtDb();
-    }),
-  );
+  const [mainDbStatus, refreshMainDb] = useDatabaseStatus("main");
+  const [bbtDbStatus, refreshBbtDb] = useDatabaseStatus("bbt");
+
+  const [dataDir, dataDirState, setDataDir] = useApplyDataDir(() => {
+    refreshMainDb();
+    refreshBbtDb();
+  });
 
   return (
     <Setting
@@ -42,55 +40,34 @@ export default function DatabaseSetting() {
   );
 }
 
-function useDatabaseStatus(target: "main" | "bbt") {
-  const { plugin } = useContext(SettingTabCtx);
-  const [promise, refresh] = useRefreshAsync(
-    () => plugin.databaseAPI.checkDbStatus(target),
-    [target],
+function useApplyDataDir(updateStatus: () => void) {
+  const [datadir, setDataDir] = useSetting(
+    (s) => s.zoteroDataDir,
+    (v, prev) => ({ ...prev, zoteroDataDir: v }),
   );
-
-  let state: DatabaseStatus;
-  if (promise.loading) {
-    state = "disabled";
-  } else if (promise.error) {
-    state = "failed";
-  } else {
-    state = promise.result ? "success" : "failed";
-  }
-  return [state, refresh] as const;
-}
-
-type DatabaseStatus = "success" | "failed" | "disabled";
-
-function useDatabaseInfo(target: "main" | "bbt") {
-  const [path, refreshPath] = useDatabasePath(target);
-  const [status, refreshStatus] = useDatabaseStatus(target);
-  return [
-    path,
-    status,
-    useCallback(() => {
-      refreshPath();
-      refreshStatus();
-    }, [refreshPath, refreshStatus]),
-  ] as const;
-}
-
-function useSetDataDir(refresh: () => void) {
-  const {
-    plugin: { settings },
-  } = useContext(SettingTabCtx);
+  const { app } = useContext(SettingTabCtx);
   const asyncOnClick = useAsyncCallback(async () => {
     try {
       const {
         filePaths: [newFolder],
       } = await dialog.showOpenDialog({
-        defaultPath: settings.database.zoteroDataDir,
+        defaultPath: datadir,
         properties: ["openDirectory"],
       });
-      if (newFolder && settings.database.zoteroDataDir !== newFolder) {
-        await settings.database.setOption("zoteroDataDir", newFolder).apply();
-        await settings.save();
-        refresh();
+      if (newFolder && datadir !== newFolder) {
+        setDataDir(newFolder);
+        await new Promise<void>((resolve, reject) => {
+          function callback() {
+            resolve();
+            app.vault.off("zotero:db-refresh", callback);
+          }
+          app.vault.on("zotero:db-refresh", callback);
+          setTimeout(() => {
+            reject(new DOMException("Timeout after 5s", "TimeoutError"));
+            app.vault.off("zotero:db-refresh", callback);
+          }, 5e3);
+        });
+        updateStatus();
       }
     } catch (err) {
       // show error in obsidian before react catches it
@@ -107,68 +84,12 @@ function useSetDataDir(refresh: () => void) {
   } else {
     dataDirState = "success";
   }
-  return [dataDirState, asyncOnClick.execute] as const;
+  return [datadir, dataDirState, asyncOnClick.execute] as const;
 }
 
-function useDatabasePath(target: "main" | "bbt" | "data") {
-  const {
-    plugin: {
-      settings: { database },
-    },
-  } = useContext(SettingTabCtx);
-  const getDatabasePath = useCallback(() => {
-    switch (target) {
-      case "main":
-        return database.zoteroDbPath;
-      case "bbt":
-        return database.betterBibTexDbPath;
-      case "data":
-        return database.zoteroDataDir;
-      default:
-        assertNever(target);
-    }
-  }, [target, database]);
-  const [value, setValue] = useState(getDatabasePath);
-
-  return [
-    value,
-    useCallback(() => setValue(getDatabasePath), [getDatabasePath]),
-  ] as const;
-}
-
-function DatabasePathWithTitle({
-  children: name,
-  path,
-  state,
-}: PropsWithChildren<{
-  path: string;
-  state: DatabaseStatus;
-}>) {
-  return (
-    <div>
-      {name}: {state === "failed" && "(Failed to load)"}
-      <DatabasePath path={path} state={state} />
-    </div>
-  );
-}
-
-function DatabasePath({
-  path,
-  state,
-}: {
-  path: string;
-  state: DatabaseStatus;
-}) {
-  return (
-    <code
-      data-state={state}
-      className={cn(
-        "data-[state=success]:text-txt-success",
-        "data-[state=failed]:text-txt-error",
-        "data-[state=disabled]:text-txt-muted",
-      )}
-    >
-      {path}
-    </code>
-  );
+function useDatabasePath(target: "main" | "bbt") {
+  const service = useContext(SettingTabCtx).settings;
+  const value =
+    target === "main" ? service.zoteroDbPath : service.betterBibTexDbPath;
+  return value;
 }

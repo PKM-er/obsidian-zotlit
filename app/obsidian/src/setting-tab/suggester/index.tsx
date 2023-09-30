@@ -1,21 +1,17 @@
-import { useContext } from "react";
-import { SettingTabCtx } from "../common";
 import BooleanSetting from "../components/Boolean";
 
 export default function Suggester() {
-  const { suggester } = useContext(SettingTabCtx).plugin.settings;
-
   return (
     <>
       <BooleanSetting
         name="Citation editor suggester"
-        settings={suggester}
-        prop="citationEditorSuggester"
+        get={(s) => s.citationEditorSuggester}
+        set={(v, s) => ({ ...s, citationEditorSuggester: v })}
       />
       <BooleanSetting
         name="Show BibTex citekey in suggester"
-        settings={suggester}
-        prop="showCitekeyInSuggester"
+        get={(s) => s.showCitekeyInSuggester}
+        set={(v, s) => ({ ...s, showCitekeyInSuggester: v })}
       />
     </>
   );

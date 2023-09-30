@@ -58,7 +58,7 @@ export function create() {
       ) {
         return false;
       }
-      const libId = plugin.database.settings.citationLibrary;
+      const libId = plugin.database.settings.libId;
       if (!stateData.docItem) {
         console.error("TemplatePreview: no docItem provided");
         return false;
@@ -174,7 +174,7 @@ export abstract class TemplatePreviewBase extends FileView {
   }
   getTemplateType(file: TFile | null) {
     if (!file) return false;
-    const tpl = fromPath(file.path, this.plugin.settings.template.folder);
+    const tpl = fromPath(file.path, this.plugin.settings.templateDir);
     if (tpl?.type !== "ejectable") return false;
     return tpl.name;
   }

@@ -8,7 +8,7 @@ export interface Context {
 }
 
 export const zoteroDataDir = (ctx: Context) =>
-  ctx.plugin.settings.database.zoteroDataDir;
+  ctx.plugin.settings.current?.zoteroDataDir;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Proxied = Symbol("proxied");
