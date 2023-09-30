@@ -128,7 +128,9 @@ export class TemplateRenderer extends Service {
   private render(target: string, obj: any): string;
   private render(target: string, obj: any): string {
     try {
-      return this.eta.render(target, obj);
+      const markdown = this.eta.render(target, obj);
+      this.plugin.imgCacheImporter.flush();
+      return markdown;
     } catch (error) {
       console.error(
         "Error while rendering",
