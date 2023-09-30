@@ -2,35 +2,42 @@ import { Platform } from "obsidian";
 import Settings from "@/settings/base";
 
 interface SettingOptions {
-  mode: false | "symlink" | "copy";
+  imgExcerptImport: false | "symlink" | "copy";
   imgExcerptPath: string;
 }
 
 type SettingOptionsJSON = Omit<SettingOptions, "importImg"> & {
   symlinkImgExcerpt?: boolean;
-} & Partial<Pick<SettingOptions, "mode">>;
+} & Partial<Pick<SettingOptions, "imgExcerptImport">>;
 
 export class ImgImporterSettings extends Settings<SettingOptions> {
+  get mode() {
+    return this.imgExcerptImport;
+  }
   getDefaults() {
     return {
-      mode: Platform.isWin ? "copy" : "symlink",
+      imgExcerptImport: Platform.isWin ? "copy" : "symlink",
       imgExcerptPath: "ZtImgExcerpt",
     } satisfies SettingOptions;
   }
   get imgExcerptDir(): string | null {
     return this.mode ? this.imgExcerptPath : null;
   }
-  fromJSON({ mode, symlinkImgExcerpt, ...json }: SettingOptionsJSON): void {
+  fromJSON({
+    imgExcerptImport,
+    symlinkImgExcerpt,
+    ...json
+  }: SettingOptionsJSON): void {
     super.fromJSON({
       ...json,
-      mode:
-        mode ??
+      imgExcerptImport:
+        imgExcerptImport ??
         (symlinkImgExcerpt !== undefined
           ? symlinkImgExcerpt === true
             ? "symlink"
             : false
           : undefined) ??
-        this.getDefaults().mode,
+        this.getDefaults().imgExcerptImport,
     });
   }
 }

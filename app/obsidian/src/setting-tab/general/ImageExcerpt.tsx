@@ -10,7 +10,7 @@ export function ImageExcerptSetting() {
   const [importMode, setImportMode] = useState<ImportModeSelect>(() =>
     imgImporter.mode === false ? "false" : imgImporter.mode,
   );
-  const applySeting = useApplySetting(imgImporter, "mode");
+  const applySeting = useApplySetting(imgImporter, "imgExcerptImport");
   const onModeChange = useMemoizedFn(async function onChange(
     option: ImportModeSelect,
   ) {
