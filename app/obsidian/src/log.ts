@@ -3,7 +3,7 @@ import type { LogLevel } from "@obzt/common";
 import { Service, calc, effect } from "@ophidian/core";
 import log4js, { levels } from "log4js";
 import DatabaseWorker from "./services/zotero-db/connector/service";
-import { SettingsService } from "./settings/base";
+import { SettingsService, skip } from "./settings/base";
 
 const DEFAULT_LOGLEVEL: LogLevel = "INFO";
 export const storageKey = "log4js_loglevel";
@@ -58,6 +58,13 @@ export class LogService extends Service {
   }
 
   onload(): void {
-    this.register(effect(() => this.applyLogLevel()));
+    this.register(
+      effect(
+        skip(
+          () => this.applyLogLevel(),
+          () => this.level,
+        ),
+      ),
+    );
   }
 }

@@ -7,9 +7,10 @@
     "lib": ["es2018"],
     "declaration": true,
     "moduleResolution": "Node16",
-    "module": "ESNext",
+    "module": "Node16",
     "incremental": false,
     "noEmit": false,
+    "declarationMap": true
   },
   "include": ["src/**/*.ts"]
 }

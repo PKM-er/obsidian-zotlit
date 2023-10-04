@@ -2,7 +2,7 @@
 import { filter, merge } from "@mobily/ts-belt/Dict";
 import { getItemKeyGroupID } from "@obzt/common";
 import type { AnnotationInfo, RegularItemInfoBase } from "@obzt/database";
-import { Service, calc } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
 import type { TAbstractFile, TFile } from "obsidian";
 import {
   Notice,
@@ -13,7 +13,7 @@ import {
   stringifyYaml,
 } from "obsidian";
 import log, { logError } from "@/log";
-import { SettingsService, effect } from "@/settings/base";
+import { SettingsService, skip } from "@/settings/base";
 import { isMarkdownFile } from "@/utils";
 import { merge as mergeAnnotsTags } from "@/utils/merge";
 import ZoteroPlugin from "@/zt-main";
@@ -93,21 +93,29 @@ export class Template extends Service {
       await this.loadTemplates();
     });
     this.register(
-      effect((initial) => {
-        this.filenameTemplate;
-        if (initial) return;
-        this.plugin.app.vault.trigger("zotero:template-updated", "filename");
-      }),
+      effect(
+        skip(
+          () =>
+            this.plugin.app.vault.trigger(
+              "zotero:template-updated",
+              "filename",
+            ),
+          () => this.filenameTemplate,
+          true,
+        ),
+      ),
     );
     this.register(
-      effect((initial) => {
-        // trigger update on autoTrim change
-        this.autoTrim;
-        if (initial) return;
-        for (const type of TemplateNames.All) {
-          this.plugin.app.vault.trigger("zotero:template-updated", type);
-        }
-      }),
+      effect(
+        skip(
+          async () =>
+            TemplateNames.All.forEach((type) =>
+              this.plugin.app.vault.trigger("zotero:template-updated", type),
+            ),
+          () => this.autoTrim,
+          true,
+        ),
+      ),
     );
     this.registerEvent(this.vault.on("create", this.onFileChange, this));
     this.registerEvent(this.vault.on("modify", this.onFileChange, this));

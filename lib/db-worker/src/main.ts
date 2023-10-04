@@ -12,60 +12,53 @@ import {
 } from "@obzt/database";
 import type { DbWorkerAPI } from "@obzt/database/api";
 import localforage from "localforage";
-import { cache, databases, getGroupID, getLibInfo } from "./init.js";
+// import { use } from "to-use";
+import { conn, index, itemFetcher } from "./globals";
 import logger, { storageKey } from "./logger.js";
-import { getItems } from "./modules/get-item.js";
-import { openDb } from "./modules/init-conn.js";
-import initIndex from "./modules/init-index.js";
-import { attachLogger } from "./utils.js";
+import { attachLogger } from "./utils/log.js";
 
-new Worker(
-  logError({
-    getLibs: () => Object.values(getLibInfo()),
-    initIndex,
-    openDb,
+class Main {
+  #conn = conn;
+  #index = index;
+  #fetcher = itemFetcher;
+
+  api: DbWorkerAPI = {
+    getLibs: () => this.#conn.libraries,
+    initIndex: async (libId) => {
+      await this.#index.load(libId);
+    },
+    openDb: (...args) => {
+      return this.#conn.load(...args);
+    },
     search: async (libraryID, options) => {
-      if (!cache.items.has(libraryID)) {
-        throw new Error("Query before index ready");
-      }
-      return await cache.search.searchAsync(options);
+      return await this.#index.searchItems(libraryID, options);
+    },
+    getItems: async (items, forceUpdate) => {
+      return await this.#fetcher.get(items, forceUpdate);
     },
     getTags: attachLogger(
-      (items: IDLibID[]) => databases.main.prepare(Tags).query(items),
+      (items: IDLibID[]) => this.#conn.zotero.prepare(Tags).query(items),
       "tags",
     ),
-    getItemIDsFromCitekey(citekeys) {
-      const result = databases.bbt.prepare(BibtexGetId).query({ citekeys });
-      return result;
+    getItemIDsFromCitekey: (citekeys) => {
+      return this.#conn.bbt.prepare(BibtexGetId).query({ citekeys });
     },
     getItemsFromCache: (limit, lib) => {
-      const itemsCache = cache.items.get(lib);
-      if (!itemsCache) {
-        throw new Error("get items before cache ready");
-      }
-      const items = [...itemsCache.byId.values()].sort((a, b) =>
-        b.dateAccessed && a.dateAccessed
-          ? b.dateAccessed.getTime() - a.dateAccessed.getTime()
-          : 0,
-      );
-      if (limit <= 0) {
-        return items;
-      }
-      return items.slice(0, limit);
+      return this.#index.getCachedItems(limit, lib);
     },
     getAttachments: attachLogger(
       (docId: number, libId: number) =>
-        databases.main.prepare(Attachements).query({ itemId: docId, libId }),
+        this.#conn.zotero.prepare(Attachements).query({ itemId: docId, libId }),
       (attachments, docId) =>
         `attachments of item ${docId}` +
         (attachments ? `, count: ${attachments.length}` : ""),
     ),
     getAnnotations: attachLogger(
       (attachmentId, libId) =>
-        databases.main.prepare(AnnotByParent).query({
+        this.#conn.zotero.prepare(AnnotByParent).query({
           attachmentId,
           libId,
-          groupID: getGroupID(libId),
+          groupID: this.#conn.groupOf(libId),
         }),
       (annots, attachmentId) =>
         `annotations of attachment ${attachmentId}` +
@@ -73,19 +66,19 @@ new Worker(
     ),
     getAnnotFromKey: attachLogger(
       (annotKeys, libId) =>
-        databases.main
+        this.#conn.zotero
           .prepare(AnnotByKeys)
-          .query({ annotKeys, libId, groupID: getGroupID(libId) }),
+          .query({ annotKeys, libId, groupID: this.#conn.groupOf(libId) }),
       (annots, annotKeys) =>
         `annotations with keys: ${annotKeys.join(",")}` +
         (annots ? `, count: ${annots.length}` : ""),
     ),
     getNotes: attachLogger(
       (itemID, libId) =>
-        databases.main.prepare(NoteByParent).query({
+        this.#conn.zotero.prepare(NoteByParent).query({
           itemID,
           libId,
-          groupID: getGroupID(libId),
+          groupID: this.#conn.groupOf(libId),
         }),
       (notes, docItemId) =>
         `notes of literature ${docItemId}` +
@@ -93,29 +86,37 @@ new Worker(
     ),
     getNoteFromKey: attachLogger(
       (noteKeys, libId) =>
-        databases.main
+        this.#conn.zotero
           .prepare(NoteByKeys)
-          .query({ noteKeys, libId, groupID: getGroupID(libId) }),
+          .query({ noteKeys, libId, groupID: this.#conn.groupOf(libId) }),
       (notes, noteKeys) =>
         `notes with keys: ${noteKeys.join(",")}` +
         (notes ? `, count: ${notes.length}` : ""),
     ),
-    getItems,
-    isUpToDate: () => databases.main.isUpToDate(),
-    checkDbStatus: (name) => databases[name].opened,
+    isUpToDate: () => this.#conn.zotero.isUpToDate(),
+    checkDbStatus: (name) => this.#conn.checkDbStatus(name),
     /**
      * raw query on zotero database
      */
-    raw<R>(mode: "get" | "all", sql: string, args: any[]): R | R[] {
-      const { instance: db } = databases.main;
-      if (!db) {
+    raw: <R>(mode: "get" | "all", sql: string, args: any[]): R | R[] => {
+      const {
+        zotero: { instance },
+      } = this.#conn;
+      if (!instance) {
         throw new Error("failed to query raw: no main database opened");
       }
-      return db.prepare(sql)[mode](...args);
+      return instance.prepare(sql)[mode](...args);
     },
     setLoglevel: (level) => {
       logger.level = level;
       localforage.setItem(storageKey, level);
     },
-  } satisfies DbWorkerAPI),
-);
+  };
+
+  toAPI(): DbWorkerAPI {
+    return logError(this.api);
+  }
+}
+
+const main = new Main();
+new Worker(main.toAPI() as any);

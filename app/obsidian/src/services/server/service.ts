@@ -6,11 +6,11 @@ import type {
 import { createServer } from "http";
 import { queryActions } from "@obzt/protocol";
 import type { INotify } from "@obzt/protocol/dist/bg";
-import { Service, calc } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
 import type { EventRef, ObsidianProtocolData } from "obsidian";
 import { Events, Notice } from "obsidian";
 import log from "@/log";
-import { SettingsService, effect } from "@/settings/base";
+import { SettingsService, skip } from "@/settings/base";
 import ZoteroPlugin from "@/zt-main";
 
 /** background actions */
@@ -40,22 +40,30 @@ export class Server extends Service implements Events {
   }
   onload() {
     this.register(
-      effect(() => {
-        if (this.enableServer) {
-          this.initServer();
-        } else {
-          this.closeServer();
-        }
-      }),
+      effect(
+        skip(
+          () => {
+            if (this.enableServer) {
+              this.initServer();
+            } else {
+              this.closeServer();
+            }
+          },
+          () => this.enableServer,
+        ),
+      ),
     );
     this.register(
-      effect((initial) => {
-        // trigger reloadPort only when port or hostname is changed
-        this.port, this.hostname;
-        if (initial) return;
-        this.reloadPort();
-        new Notice("Server port is saved and applied.");
-      }),
+      effect(
+        skip(
+          () => {
+            this.reloadPort();
+            new Notice("Server port is saved and applied.");
+          },
+          () => (this.port, this.hostname),
+          true,
+        ),
+      ),
     );
     this.registerObsidianProtocolHandler();
   }

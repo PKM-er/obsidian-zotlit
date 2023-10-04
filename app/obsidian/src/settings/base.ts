@@ -1,32 +1,29 @@
 import { join } from "path";
+import type { DatabaseOptions, DatabasePaths } from "@obzt/database/api";
 import type { Useful } from "@ophidian/core";
 import {
   calc,
   SettingsService as _SettingsService,
-  effect as _effect,
   getContext,
-  defer,
 } from "@ophidian/core";
 import type { Component } from "obsidian";
 import { getBinaryFullPath } from "@/install-guide/version";
 import ZoteroPlugin from "@/zt-main";
 import { getDefaultSettings, type Settings } from "./service";
 
-export function effect(
-  compute: (initial: boolean) => unknown | (() => unknown),
-  ctx?: any,
-): () => void {
-  let initial = true;
-  const callback = () => {
-    const result = compute(initial);
-    if (initial === true) {
-      initial = false;
+export function skip<T extends (...args: any[]) => any>(
+  compute: T,
+  deps: () => any,
+  skipInitial = false,
+) {
+  let count = 0;
+  return (...args: Parameters<T>): ReturnType<T> | undefined => {
+    deps();
+    if (count > (skipInitial ? 1 : 0)) {
+      count++;
+      return compute(...args);
     }
-    return result;
   };
-  return _effect(() => {
-    defer(callback.bind(ctx));
-  });
 }
 
 export class SettingsService extends _SettingsService<Settings> {
@@ -66,12 +63,11 @@ export class SettingsService extends _SettingsService<Settings> {
     return join(this.current?.zoteroDataDir, "cache");
   }
 
-  @calc get dbConnParams() {
-    return {
-      nativeBinding: this.nativeBinding,
-      mainDbPath: this.zoteroDbPath,
-      bbtDbPath: this.betterBibTexDbPath,
-    };
+  @calc get dbConnParams(): [paths: DatabasePaths, opts: DatabaseOptions] {
+    return [
+      { zotero: this.zoteroDbPath, bbt: this.betterBibTexDbPath },
+      { nativeBinding: this.nativeBinding },
+    ];
   }
 }
 

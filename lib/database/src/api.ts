@@ -10,10 +10,13 @@ import type { LibraryInfo, AttachmentInfo, TagInfo } from "./index.js";
 export type QueryOption = DocumentSearchOptions<false>;
 export type { SimpleDocumentSearchResultSetUnit } from "flexsearch";
 
-export interface DbConnParams {
+export interface DatabaseOptions {
   nativeBinding: string;
-  mainDbPath: string;
-  bbtDbPath: string;
+}
+
+export interface DatabasePaths {
+  zotero: string;
+  bbt: string;
 }
 
 export interface DbWorkerAPI {
@@ -23,11 +26,12 @@ export interface DbWorkerAPI {
    * @returns return true if successful
    */
   openDb(
-    params?: Partial<DbConnParams>,
+    paths: DatabasePaths,
+    opts: DatabaseOptions,
   ): [mainDbResult: boolean, bbtDbResult: boolean];
 
   isUpToDate(): boolean | null;
-  checkDbStatus(name: "main" | "bbt"): boolean;
+  checkDbStatus(name: "zotero" | "bbt"): boolean;
 
   /* start index for library, need to be called before query and after openDb */
   initIndex(libraryID: number): void;
@@ -42,9 +46,9 @@ export interface DbWorkerAPI {
   getItems(
     items: IDLibID[] | KeyLibID[],
     forceUpdate?: boolean,
-  ): (RegularItemInfo | null)[];
+  ): Promise<(RegularItemInfo | null)[]>;
 
-  getItemsFromCache(limit: number, lib: number): RegularItemInfo[];
+  getItemsFromCache(limit: number, lib: number): Promise<RegularItemInfo[]>;
 
   getLibs(): LibraryInfo[];
   getAnnotations(attachmentId: number, libraryID: number): AnnotationInfo[];

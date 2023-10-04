@@ -1,32 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { fromScriptText } from "@aidenlx/esbuild-plugin-inline-worker/utils";
-import { WebWorkerHandler, WorkerPool } from "@aidenlx/workerpool";
-import type { DbConnParams } from "@obzt/database/api";
 import type { INotifyRegularItem } from "@obzt/protocol";
-import { Service, calc } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
 import { assertNever } from "assert-never";
 import { App, debounce, Notice } from "obsidian";
 import prettyHrtime from "pretty-hrtime";
-import dbWorker from "worker:@obzt/db-worker";
-import log, { LogService } from "@/log";
+import log from "@/log";
 import { Server } from "@/services/server/service";
-import { SettingsService, effect } from "@/settings/base";
+import { SettingsService, skip } from "@/settings/base";
 import { CancelledError, TimeoutError, untilDbRefreshed } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
-import type { DbWorkerAPI } from "../api";
-
-class DatabaseWorker extends WebWorkerHandler {
-  initWebWorker(): Worker {
-    return fromScriptText(dbWorker, {
-      name: "zotlit database worker",
-    });
-  }
-}
-class DatabaseWorkerPool extends WorkerPool<DbWorkerAPI> {
-  workerCtor() {
-    return new DatabaseWorker();
-  }
-}
+import { DatabaseWorkerPool } from "./worker";
 
 export const enum DatabaseStatus {
   NotInitialized,
@@ -35,7 +18,6 @@ export const enum DatabaseStatus {
 }
 
 export default class Database extends Service {
-  logSettings = this.use(LogService);
   settings = this.use(SettingsService);
   app = this.use(App);
   plugin = this.use(ZoteroPlugin);
@@ -87,26 +69,33 @@ export default class Database extends Service {
       });
     });
     this.register(
-      effect(async (initial) => {
-        this.zoteroDataDir;
-        if (initial) return;
-        if (this.status === DatabaseStatus.NotInitialized) {
-          await this.initialize();
-        } else {
-          await this.refresh({ task: "full" });
-        }
-      }),
+      effect(
+        skip(
+          async () => {
+            if (this.status === DatabaseStatus.NotInitialized) {
+              await this.initialize();
+            } else {
+              await this.refresh({ task: "full" });
+            }
+          },
+          () => this.zoteroDataDir,
+        ),
+      ),
     );
     this.register(
-      effect(async (initial) => {
-        this.settings.libId;
-        if (initial) return;
-        await this.refresh({
-          task: "searchIndex",
-          force: true,
-        });
-        new Notice("Zotero search index updated.");
-      }),
+      effect(
+        skip(
+          async () => {
+            await this.refresh({
+              task: "searchIndex",
+              force: true,
+            });
+            new Notice("Zotero search index updated.");
+          },
+          () => this.settings.libId,
+          true,
+        ),
+      ),
     );
   }
   private genAutoRefresh(plugin: ZoteroPlugin) {
@@ -199,10 +188,6 @@ export default class Database extends Service {
   }
 
   #indexedLibrary: number | null = null;
-  #connectedDbId: string | null = null;
-  toConnectedDbId(params: Pick<DbConnParams, "bbtDbPath" | "mainDbPath">) {
-    return [params.mainDbPath, params.bbtDbPath].join();
-  }
 
   async #initSearch(force: boolean) {
     const libToIndex = this.settings.libId;
@@ -218,26 +203,10 @@ export default class Database extends Service {
     return true;
   }
 
-  async #openDbConn(refresh = false) {
-    const params = this.settings.dbConnParams,
-      newDbId = this.toConnectedDbId(params);
+  async #openDbConn() {
+    const [paths, opts] = this.settings.dbConnParams;
 
-    let result;
-    if (!refresh) {
-      // init database
-      result = await this.api.openDb(params);
-      this.#connectedDbId = newDbId;
-    } else if (newDbId !== this.#connectedDbId) {
-      // open conn to new database
-      delete (params as Partial<DbConnParams>).nativeBinding;
-      result = await this.api.openDb(params);
-      this.#connectedDbId = newDbId;
-    } else {
-      // refresh existing database conn
-      result = await this.api.openDb();
-    }
-
-    const [mainOpened, bbtOpened] = result;
+    const [mainOpened, bbtOpened] = await this.api.openDb(paths, opts);
     if (!bbtOpened) {
       log.debug("Failed to open Better BibTeX database, skipping...");
     }
@@ -300,7 +269,7 @@ export default class Database extends Service {
     }
   }
   async #refreshDbConn() {
-    await this.#openDbConn(true);
+    await this.#openDbConn();
     this.app.vault.trigger("zotero:db-refresh");
   }
   async #refreshSearchIndex(force = false) {

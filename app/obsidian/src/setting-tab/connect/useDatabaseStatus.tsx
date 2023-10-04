@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { SettingTabCtx, useRefreshAsync } from "../common";
 
-export function useDatabaseStatus(target: "main" | "bbt") {
+export function useDatabaseStatus(target: "zotero" | "bbt") {
   const { database } = useContext(SettingTabCtx);
   const [promise, refresh] = useRefreshAsync(
     () => database.api.checkDbStatus(target),

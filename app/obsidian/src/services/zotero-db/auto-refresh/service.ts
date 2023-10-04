@@ -4,7 +4,7 @@ import { map } from "@mobily/ts-belt/Dict";
 import { Service, calc, effect } from "@ophidian/core";
 import { App } from "obsidian";
 import log from "@/log";
-import { SettingsService } from "@/settings/base";
+import { SettingsService, skip } from "@/settings/base";
 import DatabaseWorker from "../connector/service";
 
 export default class DatabaseWatcher extends Service {
@@ -24,9 +24,12 @@ export default class DatabaseWatcher extends Service {
 
   onload() {
     this.register(
-      effect(async () => {
-        await this.setAutoRefresh(this.autoRefresh);
-      }),
+      effect(
+        skip(
+          () => this.setAutoRefresh(this.autoRefresh),
+          () => this.autoRefresh,
+        ),
+      ),
     );
     log.debug("loading DatabaseWatcher");
   }

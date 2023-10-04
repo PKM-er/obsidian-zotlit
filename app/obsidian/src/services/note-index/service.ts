@@ -4,12 +4,12 @@ import { groupBy } from "@mobily/ts-belt/Array";
 import { mapWithKey, values } from "@mobily/ts-belt/Dict";
 import type { ItemKeyGroup } from "@obzt/common";
 import { getItemKeyGroupID } from "@obzt/common";
-import { Service, calc } from "@ophidian/core";
+import { Service, calc, effect } from "@ophidian/core";
 import type { CachedMetadata, Pos, TAbstractFile, TFile } from "obsidian";
 import { App, Notice } from "obsidian";
 
 import log from "@/log";
-import { SettingsService, effect } from "@/settings/base";
+import { SettingsService, skip } from "@/settings/base";
 import { isMarkdownFile } from "@/utils";
 import { untilMetaReady } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
@@ -247,11 +247,13 @@ export default class NoteIndex extends Service {
       });
     });
     this.register(
-      effect((initial) => {
-        this.literatureNoteFolder;
-        if (initial) return;
-        this.reload();
-      }),
+      effect(
+        skip(
+          () => this.reload(),
+          () => this.literatureNoteFolder,
+          true,
+        ),
+      ),
     );
   }
 

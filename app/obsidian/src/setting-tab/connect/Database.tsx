@@ -12,7 +12,7 @@ export default function DatabaseSetting() {
   const mainDbPath = useDatabasePath("main");
   const bbtDbPath = useDatabasePath("bbt");
 
-  const [mainDbStatus, refreshMainDb] = useDatabaseStatus("main");
+  const [mainDbStatus, refreshMainDb] = useDatabaseStatus("zotero");
   const [bbtDbStatus, refreshBbtDb] = useDatabaseStatus("bbt");
 
   const [dataDir, dataDirState, setDataDir] = useApplyDataDir(() => {
