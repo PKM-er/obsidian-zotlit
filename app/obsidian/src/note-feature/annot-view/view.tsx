@@ -173,12 +173,11 @@ export class AnnotationView extends DerivedFileView {
     const attachments = await plugin.databaseAPI.getAttachments(itemID, lib);
 
     const atch = await choosePDFAtch(attachments, this.app);
-    if (!atch) return;
     await this.setStatePrev(({ attachmentId, ...state }) => ({
       ...state,
       follow: null,
       itemId: itemID,
-      attachmentId: atch.itemID,
+      attachmentId: atch?.itemID,
     }));
   };
   getContext(): AnnotViewContextType<AnnotRendererProps> {
