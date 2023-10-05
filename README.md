@@ -9,7 +9,7 @@ ZotLit is a third-party project that aims to facilitate the integration between 
 - [Full Documentation](https://obzt.aidenlx.top/)
 - [中文文档](https://obzt.aidenlx.top/zh-CN/)
 
-<!-- [![open in obsidian](https://custom-icon-badges.demolab.com/badge/-Open%20In%20Obsidian-d4d4d4?style=for-the-badge&logo=obsidian-full)](https://obsidian.md/plugins?id=zotlit "open in obsidian") -->
+[![open in obsidian](https://custom-icon-badges.demolab.com/badge/-Open%20In%20Obsidian-d4d4d4?style=for-the-badge&logo=obsidian-full)](https://obsidian.md/plugins?id=zotlit "open in obsidian")
 
 Disclaimer: The plugins in this project is manitained by third-party developer, who is not affiliated with Obsidian or Zotero. This means that they may be broken at any time due to Zotero and/or Obsidian updates. Although they are not intended to perform any write operations to your Zotero database, there are still risks of data-loss. Therefore, please make proper backup for your data before and when using this plugin, especially when you are using beta version.
 
