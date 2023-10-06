@@ -4,7 +4,7 @@ import type { AttachmentInfo } from "@obzt/database";
 import {
   cacheActiveAtch,
   getCachedActiveAtch,
-  isFileAttachment,
+  isAnnotatableAttachment,
 } from "@obzt/database";
 import { mergeAnnots, mergeTags, mergedToAnnots } from "@/utils/merge";
 import type ZoteroPlugin from "@/zt-main";
@@ -63,7 +63,7 @@ export const createStore = (p: ZoteroPlugin) =>
      */
     const loadAtchs = async (itemID: number, lib: number) => {
         const attachments = (await api(p).getAttachments(itemID, lib)).filter(
-          (f) => isFileAttachment(f) && f.path?.endsWith(".pdf"),
+          isAnnotatableAttachment,
         );
         set((state) => ({
           ...state,

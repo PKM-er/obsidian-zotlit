@@ -6,7 +6,7 @@ import type { INotifyActiveReader } from "@obzt/protocol";
 import type { ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Platform, Menu } from "obsidian";
 import ReactDOM from "react-dom";
-import { choosePDFAtch } from "@/components/atch-suggest";
+import { chooseAnnotAtch } from "@/components/atch-suggest";
 import { context } from "@/components/basic/context";
 import { DerivedFileView } from "@/components/derived-file-view";
 import { getItemKeyOf } from "@/services/note-index";
@@ -172,7 +172,7 @@ export class AnnotationView extends DerivedFileView {
     const lib = plugin.settings.libId;
     const attachments = await plugin.databaseAPI.getAttachments(itemID, lib);
 
-    const atch = await choosePDFAtch(attachments, this.app);
+    const atch = await chooseAnnotAtch(attachments, this.app);
     await this.setStatePrev(({ attachmentId, ...state }) => ({
       ...state,
       follow: null,

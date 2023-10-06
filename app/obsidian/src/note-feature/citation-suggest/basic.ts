@@ -3,7 +3,7 @@ import type { EditorSuggestContext, TFile } from "obsidian";
 import { Keymap } from "obsidian";
 import {
   cacheAttachmentSelect,
-  choosePDFAtch,
+  chooseAnnotAtch,
 } from "@/components/atch-suggest";
 import { getAtchIDsOf } from "@/services/note-index/utils";
 import type { TemplateRenderer } from "@/services/template";
@@ -38,7 +38,7 @@ export async function insertCitation(
   // if there is no selected attachment in the note, prompt the user to choose one
   let fallbackAtch: AttachmentInfo | undefined | null;
   if (allSelectedAtchs.length === 0) {
-    fallbackAtch = await choosePDFAtch(allAttachments, plugin.app);
+    fallbackAtch = await chooseAnnotAtch(allAttachments, plugin.app);
     if (fallbackAtch) {
       cacheAttachmentSelect(fallbackAtch, item);
       allSelectedAtchs.push(fallbackAtch);

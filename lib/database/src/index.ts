@@ -24,6 +24,7 @@ export type { Output as ItemDetails } from "./sql/items/base.js";
 export {
   sortBySortIndex,
   isFileAttachment,
+  isAnnotatableAttachment,
   parseSortIndex,
   cacheActiveAtch,
   getCachedActiveAtch,

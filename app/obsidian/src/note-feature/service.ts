@@ -7,7 +7,7 @@ import type { TFile } from "obsidian";
 import { Notice } from "obsidian";
 import {
   cacheAttachmentSelect,
-  choosePDFAtch,
+  chooseAnnotAtch,
 } from "@/components/atch-suggest";
 import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
@@ -266,7 +266,7 @@ class NoteFeatures extends Service {
       item.itemID,
       libId,
     );
-    const selected = await choosePDFAtch(allAttachments, this.plugin.app);
+    const selected = await chooseAnnotAtch(allAttachments, this.plugin.app);
     if (selected) {
       cacheAttachmentSelect(selected, item);
     }

@@ -1,4 +1,4 @@
-import { AnnotationType, TagType } from "@obzt/zotero-type";
+import { AnnotationType, AttachmentType, TagType } from "@obzt/zotero-type";
 import { colord } from "colord";
 import React from "react";
 import type { ValueRenderer } from "react-json-tree";
@@ -30,25 +30,28 @@ export const valueRenderer: ValueRenderer = (
       </span>
     );
   }
+  let label: string | undefined;
+  if (keyPath[0] === "linkMode" && typeof value === "number") {
+    label = AttachmentType[value];
+  }
   if (keyPath[0] === "type" && typeof value === "number") {
-    let type = "";
     if (keyPath.length === 2 && AnnotationType[value]) {
-      type = AnnotationType[value];
+      label = AnnotationType[value];
     } else if (
       keyPath.length === 4 &&
       typeof keyPath[1] === "number" &&
       keyPath[2] === "tags" &&
       TagType[value]
     ) {
-      type = TagType[value];
+      label = TagType[value];
     }
-    if (type) {
-      return (
-        <>
-          {valueAsString} <span>({type})</span>
-        </>
-      );
-    }
+  }
+  if (label) {
+    return (
+      <>
+        {valueAsString} <span>({label})</span>
+      </>
+    );
   }
   return valueAsString;
 };

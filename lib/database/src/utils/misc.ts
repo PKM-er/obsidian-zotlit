@@ -13,7 +13,15 @@ export const sortBySortIndex = (aIdx: number[], bIdx: number[]) => {
   return 0;
 };
 
+const annotatable = new Set([
+  "application/pdf",
+  "text/html",
+  "application/epub+zip",
+]);
+
 export const isFileAttachment = (i: AttachmentInfo): boolean => Boolean(i.path);
+export const isAnnotatableAttachment = (i: AttachmentInfo): boolean =>
+  isFileAttachment(i) && !!i.contentType && annotatable.has(i.contentType);
 
 interface Storage {
   getItem(key: string): string | null;
