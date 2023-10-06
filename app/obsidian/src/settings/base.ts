@@ -19,8 +19,7 @@ export function skip<T extends (...args: any[]) => any>(
   let count = 0;
   return (...args: Parameters<T>): ReturnType<T> | undefined => {
     deps();
-    if (count > (skipInitial ? 1 : 0)) {
-      count++;
+    if (count++ > (skipInitial ? 1 : 0)) {
       return compute(...args);
     }
   };
