@@ -13,7 +13,6 @@ import { getItemKeyOf, isLiteratureNote } from "@/services/note-index";
 import type { TemplateRenderer } from "@/services/template";
 import { Template, fromPath } from "@/services/template/eta/preset";
 import type { Context } from "@/services/template/helper/base.js";
-import { getActiveWin } from "@/utils/active-win";
 import ZoteroPlugin from "@/zt-main";
 import { AnnotationView, annotViewType } from "./annot-view/view";
 import { CitationEditorSuggest, insertCitationTo } from "./citation-suggest/";
@@ -187,8 +186,7 @@ class NoteFeatures extends Service {
             .setIcon("reset")
             .onClick(async () => {
               // make sure prompt is shown in the active window
-              const win = getActiveWin(app);
-              if (!win.confirm("Reset template to default?")) return;
+              if (!activeWindow.confirm("Reset template to default?")) return;
               await plugin.app.vault.modify(
                 file as TFile,
                 Template.Ejectable[tpl.name],

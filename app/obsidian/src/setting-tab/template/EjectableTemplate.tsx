@@ -9,7 +9,6 @@ import {
   toPath,
   type TplType,
 } from "@/services/template/eta/preset";
-import { getActiveWin } from "@/utils/active-win";
 import { useIconRef } from "@/utils/icon";
 import { SettingTabCtx } from "../common";
 import Setting from "../components/Setting";
@@ -61,8 +60,7 @@ export function EjectableTemplate({ type }: { type: TplType.Ejectable }) {
           ref={resetIconRef}
           onClick={async () => {
             // make sure prompt is shown in the active window
-            const win = getActiveWin(app);
-            if (!win.confirm("Reset template to default?")) return;
+            if (!activeWindow.confirm("Reset template to default?")) return;
             const file = app.vault.getAbstractFileByPath(filepath);
             if (file instanceof TFile) {
               await app.vault.modify(file, Template.Ejectable[type]);
