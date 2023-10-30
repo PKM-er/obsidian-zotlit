@@ -54,8 +54,12 @@ export class SettingsService extends _SettingsService<Settings> {
     return join(this.current?.zoteroDataDir, "zotero.sqlite");
   }
 
-  @calc get betterBibTexDbPath(): string {
+  @calc get bbtSearchDbPath(): string {
     return join(this.current?.zoteroDataDir, "better-bibtex-search.sqlite");
+  }
+
+  @calc get bbtMainDbPath(): string {
+    return join(this.current?.zoteroDataDir, "better-bibtex.sqlite");
   }
 
   @calc get zoteroCacheDirPath(): string {
@@ -64,7 +68,11 @@ export class SettingsService extends _SettingsService<Settings> {
 
   @calc get dbConnParams(): [paths: DatabasePaths, opts: DatabaseOptions] {
     return [
-      { zotero: this.zoteroDbPath, bbt: this.betterBibTexDbPath },
+      {
+        zotero: this.zoteroDbPath,
+        bbtSearch: this.bbtSearchDbPath,
+        bbtMain: this.bbtMainDbPath,
+      },
       { nativeBinding: this.nativeBinding },
     ];
   }

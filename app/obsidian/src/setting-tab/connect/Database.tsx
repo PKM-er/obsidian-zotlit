@@ -90,6 +90,6 @@ function useApplyDataDir(updateStatus: () => void) {
 function useDatabasePath(target: "main" | "bbt") {
   const service = useContext(SettingTabCtx).settings;
   const value =
-    target === "main" ? service.zoteroDbPath : service.betterBibTexDbPath;
+    target === "main" ? service.zoteroDbPath : service.bbtMainDbPath;
   return value;
 }

@@ -2,7 +2,6 @@ import Worker from "@aidenlx/workerpool/worker";
 import { logError } from "@obzt/common";
 import type { IDLibID } from "@obzt/database";
 import {
-  BibtexGetId,
   AnnotByKeys,
   AnnotByParent,
   Attachements,
@@ -41,7 +40,7 @@ class Main {
       "tags",
     ),
     getItemIDsFromCitekey: (citekeys) => {
-      return this.#conn.bbt.prepare(BibtexGetId).query({ citekeys });
+      return this.#conn.getItemIDsFromCitekey(citekeys);
     },
     getItemsFromCache: (limit, lib) => {
       return this.#index.getCachedItems(limit, lib);
@@ -94,7 +93,14 @@ class Main {
         (notes ? `, count: ${notes.length}` : ""),
     ),
     isUpToDate: () => this.#conn.zotero.isUpToDate(),
-    checkDbStatus: (name) => this.#conn.checkDbStatus(name),
+    getLoadStatus: () => {
+      const status = this.#conn.loadStatus;
+      return {
+        main: status.main,
+        bbt: this.#conn.bbtLoadStatus,
+        bbtVersion: status.bbtSearch === null ? "v1" : "v0",
+      };
+    },
     /**
      * raw query on zotero database
      */

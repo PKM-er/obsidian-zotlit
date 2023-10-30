@@ -4,7 +4,10 @@ import { SettingTabCtx, useRefreshAsync } from "../common";
 export function useDatabaseStatus(target: "zotero" | "bbt") {
   const { database } = useContext(SettingTabCtx);
   const [promise, refresh] = useRefreshAsync(
-    () => database.api.checkDbStatus(target),
+    () =>
+      database.api
+        .getLoadStatus()
+        .then((s) => (target === "zotero" ? s.main : s.bbt)),
     [target],
   );
 

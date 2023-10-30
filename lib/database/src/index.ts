@@ -3,8 +3,12 @@ export { AnnotByParent } from "./sql/annotations/by-parent.js";
 export { NoteByKeys } from "./sql/notes/by-keys.js";
 export { NoteByParent } from "./sql/notes/by-parent.js";
 export { Attachements } from "./sql/attachments.js";
-export { BibtexGetCitekey } from "./sql/bibtex/get-citekey.js";
-export { BibtexGetId } from "./sql/bibtex/get-id.js";
+export {
+  BibtexGetCitekeyV0,
+  BibtexGetCitekeyV1,
+} from "./sql/bibtex/get-citekey.js";
+export { BibtexGetIdV0, BibtexGetIdV1 } from "./sql/bibtex/get-id.js";
+export { BBT_MAIN_DB_NAME, BBT_SEARCH_DB_NAME } from "./sql/bibtex/base.js";
 export { CreatorsFull } from "./sql/creator/full.js";
 export { Creators } from "./sql/creator/part.js";
 export { ItemFieldsFull } from "./sql/item-fields/full.js";

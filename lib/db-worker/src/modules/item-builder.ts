@@ -7,12 +7,7 @@ import type {
   RegularItemInfoBase,
   Collection,
 } from "@obzt/database";
-import {
-  BibtexGetCitekey,
-  Creators,
-  ItemFields,
-  Collections,
-} from "@obzt/database";
+import { Creators, ItemFields, Collections } from "@obzt/database";
 // import { use } from "to-use";
 import log from "@log";
 import { conn } from "../globals";
@@ -23,11 +18,11 @@ export default class ItemBuilder {
 
   readCitekeys(items: IDLibID[]) {
     log.debug("Reading Better BibTex database");
-    if (!this.#conn.bbt.opened) {
+    if (!this.#conn.bbtLoadStatus) {
       log.info("Better BibTex database not enabled, skipping...");
       return [];
     }
-    const result = this.#conn.bbt.prepare(BibtexGetCitekey).query({ items });
+    const result = this.#conn.getCitekeys(items);
     log.info("Finished reading Better BibTex");
     return result;
   }

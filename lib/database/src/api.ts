@@ -11,27 +11,37 @@ export type QueryOption = DocumentSearchOptions<false>;
 export type { SimpleDocumentSearchResultSetUnit } from "flexsearch";
 
 export interface DatabaseOptions {
+  /** The path to the SQLite nodejs native binding binary. */
   nativeBinding: string;
 }
 
 export interface DatabasePaths {
   zotero: string;
-  bbt: string;
+  /** better-bibtex-search.sqlite */
+  bbtSearch: string;
+  /** better-bibtex.sqlite */
+  bbtMain: string;
+}
+export interface LoadStatus extends BBTLoadStatus {
+  /** zotero.sqlite load status */
+  main: boolean;
+}
+export interface BBTLoadStatus {
+  /** better-bibtex.sqlite load status */
+  bbtMain: boolean;
+  /**
+   * better-bibtex-search.sqlite load status
+   * null => version after migration, no need to load
+   */
+  bbtSearch: boolean | null;
 }
 
 export interface DbWorkerAPI {
   setLoglevel(level: LogLevel): void;
-  /**
-   * open new database connection or refresh existing if no param passed in
-   * @returns return true if successful
-   */
-  openDb(
-    paths: DatabasePaths,
-    opts: DatabaseOptions,
-  ): [mainDbResult: boolean, bbtDbResult: boolean];
+  openDb(paths: DatabasePaths, opts: DatabaseOptions): LoadStatus;
 
   isUpToDate(): boolean | null;
-  checkDbStatus(name: "zotero" | "bbt"): boolean;
+  getLoadStatus(): { main: boolean; bbt: boolean; bbtVersion: "v0" | "v1" };
 
   /* start index for library, need to be called before query and after openDb */
   initIndex(libraryID: number): void;
