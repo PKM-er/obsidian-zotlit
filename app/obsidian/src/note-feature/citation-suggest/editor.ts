@@ -30,11 +30,11 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
     if (!this.plugin.settings.current?.citationEditorSuggester) return null;
     const line = editor.getLine(cursor.line),
       sub = line.substring(0, cursor.ch);
-    const match = sub.match(/\[@([\w\- ]*)\/?$/);
+    const match = sub.match(/[[【]@([^\]】]*)$/);
     if (!match) return null;
     const end = { ...cursor };
     // if `]` is next to cursor (auto-complete), include it to replace range as well
-    if (line[cursor.ch] === "]") end.ch += 1;
+    if (line[cursor.ch] === "]" || line[cursor.ch] === "】") end.ch += 1;
     return {
       end,
       start: {
@@ -42,7 +42,7 @@ export class CitationEditorSuggest extends ZoteroItemEditorSuggest {
         line: cursor.line,
         alt: Boolean(match[0]?.endsWith("/")),
       } as EditorPositionWithAlt,
-      query: match[1],
+      query: match[1].replaceAll(/\/$/g, ""),
     };
   }
 
