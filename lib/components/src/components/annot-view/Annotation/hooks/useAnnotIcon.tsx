@@ -1,5 +1,4 @@
 import { AnnotationType } from "@obzt/zotero-type";
-import { assertNever } from "assert-never";
 
 export const useAnnotIcon = (type: AnnotationType) => {
   switch (type) {
@@ -9,10 +8,11 @@ export const useAnnotIcon = (type: AnnotationType) => {
       return "underline";
     case AnnotationType.image:
       return "frame";
+    case AnnotationType.text:
+      return "text-select";
     case AnnotationType.note:
     case AnnotationType.ink:
-      return "file-question";
     default:
-      assertNever(type);
+      return "file-question";
   }
 };

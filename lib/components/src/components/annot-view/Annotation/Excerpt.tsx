@@ -1,6 +1,6 @@
 import type { AnnotationInfo } from "@obzt/database";
 import { AnnotationType } from "@obzt/zotero-type";
-import { assertNever } from "assert-never";
+// import { assertNever } from "assert-never";
 import { memo } from "react";
 import ImgExcerpt from "./ImgExcerpt";
 
@@ -19,6 +19,7 @@ export default memo(function Excerpt({
   switch (type) {
     case AnnotationType.highlight:
     case AnnotationType.underline:
+    case AnnotationType.text:
       return <p className="select-text">{text}</p>;
     case AnnotationType.image:
       if (!imgSrc) throw new Error("imgSrc is required for image annotation");
@@ -30,10 +31,9 @@ export default memo(function Excerpt({
           text={text}
         />
       );
-    case AnnotationType.note:
-    case AnnotationType.ink:
-      return <>Unsupported Type: {AnnotationType[type]}</>;
+    // case AnnotationType.note:
+    // case AnnotationType.ink:
     default:
-      assertNever(type);
+      return <>Unsupported Type: {AnnotationType[type] ?? type}</>;
   }
 });
