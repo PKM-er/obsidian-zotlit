@@ -39,7 +39,7 @@ export const uploadModule = async () => {
 };
 
 export const checkModuleStatus = async (url: string): Promise<number> => {
-  const response = await fetch(url, { method: "HEAD" });
+  const response = await requestUrl({ url, method: "HEAD" });
   return response.status;
 };
 
