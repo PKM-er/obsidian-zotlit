@@ -74,13 +74,13 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "eslint.format.enable": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+      "source.fixAll.eslint": "explicit"
     },
     "[mdx]": {
       "editor.formatOnSave": false,
       "editor.defaultFormatter": "dbaeumer.vscode-eslint",
       "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": false
+        "source.fixAll.eslint": "never"
       }
     },
 
