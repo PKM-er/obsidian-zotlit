@@ -526,6 +526,9 @@ importers:
       '@types/flexsearch':
         specifier: ~0.7.3
         version: 0.7.3
+      '@types/node':
+        specifier: ^17.0.10
+        version: 17.0.45
       eslint:
         specifier: ~8.36.0
         version: 8.36.0

@@ -4,7 +4,7 @@
     "baseUrl": "src",
     "outDir": "dist",
     "target": "ESNext",
-    "lib": ["es2018"],
+    "lib": ["es2018", "DOM"],
     "declaration": true,
     "moduleResolution": "Node16",
     "module": "Node16",
