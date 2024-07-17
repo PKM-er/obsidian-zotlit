@@ -151,7 +151,7 @@
    *
    * PNPM documentation: https://pnpm.io/package_json#pnpmneverbuiltdependencies
    */
-  "globalNeverBuiltDependencies": ["electron", "@aidenlx/better-sqlite3"],
+  "globalNeverBuiltDependencies": ["electron", "@aidenlx/better-sqlite3", "better-sqlite3"],
 
   /**
    * The `globalAllowedDeprecatedVersions` setting suppresses installation warnings for package

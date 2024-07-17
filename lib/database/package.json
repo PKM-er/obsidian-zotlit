@@ -28,6 +28,6 @@
     "@mobily/ts-belt": "^4.0.0-rc.5"
   },
   "peerDependencies": {
-    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2"
+    "@aidenlx/better-sqlite3": "11.1.2"
   }
 }

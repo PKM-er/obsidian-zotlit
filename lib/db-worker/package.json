@@ -22,7 +22,7 @@
     "@types/flexsearch": "~0.7.3"
   },
   "dependencies": {
-    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
+    "@aidenlx/better-sqlite3": "11.1.2",
     "@obzt/zotero-type": "workspace:*",
     "@aidenlx/workerpool": "workspace:*",
     "@obzt/common": "workspace:*",
@@ -31,7 +31,7 @@
     "@mobily/ts-belt": "^4.0.0-rc.5",
     "localforage": "~1.10.0",
     "@obzt/database": "workspace:*",
-    "flexsearch": "~0.7.31",
+    "flexsearch": "0.7.31",
     "nanoevents": "~7.0.1"
   }
 }

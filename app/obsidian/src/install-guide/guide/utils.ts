@@ -1,25 +1,42 @@
 import { createWriteStream } from "fs";
-import { rm } from "fs/promises";
+import { rm, writeFile } from "fs/promises";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import { createGunzip } from "zlib";
 import { app as electronApp } from "@electron/remote";
 import { fileDialog } from "file-select-dialog";
 import { requestUrl } from "obsidian";
+import { list } from "tar";
 
 export const importModule = async (
   ab: ArrayBuffer,
   writeTo: string,
-  decompressed: boolean,
+  decompressed: boolean
 ): Promise<void> => {
-  const source = Readable.from(Buffer.from(ab)),
-    target = createWriteStream(writeTo);
+  if (decompressed) {
+    await writeFile(writeTo, Buffer.from(ab));
+    return;
+  }
+  const target = createWriteStream(writeTo);
   try {
-    if (decompressed) {
-      await pipeline(source, target);
-    } else {
-      await pipeline(source, createGunzip(), target);
-    }
+    const sourceFile = "build/Release/better_sqlite3.node";
+    let tasks: Promise<any>[] = [];
+    tasks.push(
+      pipeline(
+        Readable.from(Buffer.from(ab)),
+        list(
+          {
+            gzip: true,
+            onReadEntry: (e) => {
+              if (e.path !== sourceFile) return;
+              tasks.push(pipeline(e, target));
+            },
+          },
+          [sourceFile]
+        )
+      )
+    );
+    await Promise.all(tasks);
   } catch (error) {
     target.destroy();
     await rm(writeTo, { force: true });
@@ -30,7 +47,7 @@ export const importModule = async (
 export const uploadModule = async () => {
   const file = await fileDialog({
     multiple: false,
-    accept: [".gz", ".node"],
+    accept: [".tar.gz", ".node"],
     strict: true,
   });
   if (!file) return null;

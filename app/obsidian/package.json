@@ -35,7 +35,7 @@
     "eslint": "~8.36.0",
     "@aidenlx/eslint-config": "workspace:*",
     "electron": "18.0.3",
-    "@aidenlx/better-sqlite3": ">=8.0.1-mod.1 <8.0.1-mod.2",
+    "@aidenlx/better-sqlite3": "11.1.2",
     "@types/react-dom": "~17.0.11",
     "@types/dompurify": "~2.3.4",
     "@types/react": "~17.0.8",
@@ -115,6 +115,7 @@
     "arktype": "~1.0.21-alpha",
     "linkedom": "~0.15.3",
     "p-queue": "~7.4.1",
-    "colord": "~2.9.3"
+    "colord": "~2.9.3",
+    "tar": "~7.4.0"
   }
 }
