@@ -4,9 +4,9 @@ import type {
   Statement,
 } from "@aidenlx/better-sqlite3";
 import DatabaseConstructor from "@aidenlx/better-sqlite3";
+import log from "@log";
 import type { PreparedBase, PreparedBaseCtor } from "@obzt/database";
 import type { DatabaseOptions } from "@obzt/database/api";
-import log from "@log";
 
 export class DatabaseNotSetError extends Error {
   constructor() {
@@ -14,7 +14,14 @@ export class DatabaseNotSetError extends Error {
   }
 }
 
-const getMtime = (dbPath: string) => statSync(dbPath).mtimeMs;
+const getMtime = (dbPath: string) => {
+  try {
+    return statSync(dbPath).mtimeMs;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return -1;
+    throw err;
+  }
+};
 
 interface DatabaseListItem {
   seq: number;
@@ -73,7 +80,9 @@ export default class Database {
    */
   isUpToDate(): boolean | null {
     if (!this.database) return null;
-    return this.database.mtime === getMtime(this.database.file);
+    const latestMtime = getMtime(this.database.file);
+    if (latestMtime === -1) return null;
+    return this.database.mtime === latestMtime;
   }
 
   opened = false;
@@ -92,8 +101,14 @@ export default class Database {
         );
         this.close();
       }
+      const mtime = getMtime(file);
+      // file not exists
+      if (mtime === -1) {
+        this.opened = false;
+        return false;
+      }
       this.database = {
-        mtime: getMtime(file),
+        mtime,
         instance: initDatabase(file, opts),
         file,
         existStatements: {},
@@ -103,12 +118,8 @@ export default class Database {
       this.opened = true;
       return true;
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        console.error("Failed to open database", file);
-        throw error;
-      }
-      this.opened = false;
-      return false;
+      log.error("Failed to open database", file);
+      throw error;
     }
   }
 

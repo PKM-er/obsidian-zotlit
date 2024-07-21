@@ -1,7 +1,11 @@
 import type { Database, Statement } from "@aidenlx/better-sqlite3";
 
-export abstract class PreparedBase<Input, OutputSql, Output = OutputSql[]> {
-  protected statement: Statement;
+export abstract class PreparedBase<
+  Input extends {} | unknown[],
+  OutputSql,
+  Output = OutputSql[]
+> {
+  protected statement: Statement<Input, OutputSql>;
   abstract sql(): string;
   constructor(database: Database) {
     this.statement = database.prepare(this.sql());
@@ -10,11 +14,10 @@ export abstract class PreparedBase<Input, OutputSql, Output = OutputSql[]> {
     return this.statement.database;
   }
 
-  protected get(input: Input): OutputSql | null {
+  protected get(input: Input): OutputSql | undefined {
     return this.statement.get(input);
   }
   protected all(input: Input): OutputSql[] {
-    if (input === undefined) return this.statement.all();
     return this.statement.all(input);
   }
 
@@ -25,28 +28,25 @@ export interface PreparedBaseCtor {
   new (database: Database): PreparedBase<any, any, any>;
 }
 
-export abstract class Prepared<Output, Input> extends PreparedBase<
-  Input,
-  Output
-> {
+export abstract class Prepared<
+  Output,
+  Input extends {} | unknown[]
+> extends PreparedBase<Input, Output> {
   query(input: Input): Output[] {
     return this.all(input);
   }
 }
 
-export abstract class PreparedNoInput<Output> extends PreparedBase<
-  undefined,
-  Output
-> {
+export abstract class PreparedNoInput<Output> extends PreparedBase<[], Output> {
   query(): Output[] {
-    return this.all(undefined);
+    return this.all([]);
   }
 }
 
 export abstract class PreparedWithParser<
   OutputSql,
   Output,
-  Input = undefined,
+  Input extends {} | unknown[] = []
 > extends PreparedBase<Input, OutputSql, Output[]> {
   protected abstract parse(
     output: OutputSql,

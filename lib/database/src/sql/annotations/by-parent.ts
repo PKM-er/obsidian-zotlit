@@ -32,13 +32,14 @@ export class AnnotByParent extends PreparedWithParser<
     return query;
   }
 
-  getKeyStatement: Statement = this.database.prepare(
-    `SELECT key FROM items WHERE itemID = $attachmentId AND libraryID = $libId`,
-  );
+  getKeyStatement: Statement<Input, Pick<OutputSql, "key">> =
+    this.database.prepare(
+      `SELECT key FROM items WHERE itemID = $attachmentId AND libraryID = $libId`
+    );
   protected parse(
     output: OutputSql,
     input: Input,
-    parentItemKey: string,
+    parentItemKey: string
   ): Output {
     return Object.assign(toParsed(output, input.libId, input.groupID), {
       parentItem: parentItemKey,

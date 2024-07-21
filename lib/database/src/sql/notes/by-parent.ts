@@ -27,13 +27,14 @@ export class NoteByParent extends PreparedWithParser<OutputSql, Output, Input> {
     return query;
   }
 
-  getKeyStatement: Statement = this.database.prepare(
-    `SELECT key FROM items WHERE itemID = $itemID AND libraryID = $libId`,
-  );
+  getKeyStatement: Statement<Input, Pick<OutputSql, "key">> =
+    this.database.prepare(
+      `SELECT key FROM items WHERE itemID = $itemID AND libraryID = $libId`
+    );
   protected parse(
     output: OutputSql,
     input: Input,
-    parentItemKey: string,
+    parentItemKey: string
   ): Output {
     return Object.assign(toParsed(output, input.libId, input.groupID), {
       parentItem: parentItemKey,
@@ -46,7 +47,7 @@ export class NoteByParent extends PreparedWithParser<OutputSql, Output, Input> {
       throw new Error("Parent item not found");
     }
     return this.all(input).map((output) =>
-      this.parse(output, input, parentItemKey),
+      this.parse(output, input, parentItemKey)
     );
   }
 }

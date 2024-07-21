@@ -520,6 +520,9 @@ importers:
       '@aidenlx/eslint-config':
         specifier: workspace:*
         version: link:../../common/config/eslint
+      '@types/better-sqlite3':
+        specifier: ~7.6.11
+        version: 7.6.11
       '@types/eslint':
         specifier: ~8.4.6
         version: 8.4.10
@@ -575,6 +578,9 @@ importers:
       '@aidenlx/eslint-config':
         specifier: workspace:*
         version: link:../../common/config/eslint
+      '@types/better-sqlite3':
+        specifier: ~7.6.11
+        version: 7.6.11
       '@types/eslint':
         specifier: ~8.4.6
         version: 8.4.10
@@ -2780,6 +2786,9 @@ packages:
 
   '@types/base16@1.0.2':
     resolution: {integrity: sha512-oYO/U4VD1DavwrKuCSQWdLG+5K22SLPem2OQaHmFcQuwHoVeGC+JGVRji2MUqZUAIQZHEonOeVfAX09hYiLsdg==}
+
+  '@types/better-sqlite3@7.6.11':
+    resolution: {integrity: sha512-i8KcD3PgGtGBLl3+mMYA8PdKkButvPyARxA7IQAd6qeslht13qxb1zzO8dRCtE7U3IoJS782zDBAeoKiM695kg==}
 
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
@@ -11362,6 +11371,10 @@ snapshots:
       '@babel/types': 7.21.3
 
   '@types/base16@1.0.2': {}
+
+  '@types/better-sqlite3@7.6.11':
+    dependencies:
+      '@types/node': 17.0.45
 
   '@types/cacheable-request@6.0.3':
     dependencies:
