@@ -1,7 +1,6 @@
 import { statSync } from "fs";
 import type { App, PluginManifest } from "obsidian";
 import { Platform, Notice } from "obsidian";
-import { logError } from "@/log";
 import { InstallGuideModal } from "./guide";
 import type { GuideMode } from "./guide/atom";
 import {
@@ -11,6 +10,7 @@ import {
   compareElectronVer,
   isPlatformSupported,
 } from "./version";
+import { logError } from "@/log";
 
 const showInstallGuide = (
   libPath: string,
@@ -28,7 +28,7 @@ const showInstallGuide = (
     new Notice(
       `The electron (electron: ${platform.electron}, module version: ${platform.modules}) ` +
         `in current version of obsidian is not supported by zotlit,` +
-        ` please reinstall using latest obsidian installer from official website`,
+        ` please reinstall using latest obsidian installer (.exe/.dmg/...) from obsidian.md`,
     );
   } else if (compared > 0) {
     new Notice(

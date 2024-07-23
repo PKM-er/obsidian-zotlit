@@ -31,3 +31,4 @@ export class LibrariesFull extends PreparedNoInput<Output> {
     return query;
   }
 }
+
