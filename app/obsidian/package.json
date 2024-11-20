@@ -1,6 +1,6 @@
 {
   "name": "zotlit",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
   "scripts": {
     "dev": "cross-env BUILD=development node esbuild.config.mjs",
