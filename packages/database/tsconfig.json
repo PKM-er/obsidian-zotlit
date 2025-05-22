@@ -4,6 +4,7 @@
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
+    "emitDeclarationOnly": true,
     "lib": [
       "es2024",
       "ESNext.Disposable",
@@ -11,12 +12,16 @@
       "DOM.Iterable",
       "WebWorker"
     ],
-    "module": "NodeNext",
-    "moduleDetection": "auto",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "target": "ESNext",
     "outDir": "dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@zt/*": ["./drizzle/zotero/*"],
+      "@bbt/*": ["./drizzle/bbt/*"],
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
     "./src/**/*.ts",

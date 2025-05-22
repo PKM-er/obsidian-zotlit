@@ -16,6 +16,4 @@ pnpm drizzle-kit pull --dialect sqlite --out $DRIZZLE_DIR/bbt \
 
 rm -r $DRIZZLE_DIR/*/meta $DRIZZLE_DIR/*/*.sql
 
-sed -i '' 's/from "\.\/schema"/from "\.\/schema\.js"/g' $DRIZZLE_DIR/*/relations.ts
-
 pnpm biome check --write $DRIZZLE_DIR/*/*.ts

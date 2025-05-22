@@ -53,7 +53,7 @@ import {
   syncedSettings,
   tags,
   users,
-} from "./schema.js";
+} from "./schema";
 
 export const fileTypeMimeTypesRelations = relations(
   fileTypeMimeTypes,

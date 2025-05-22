@@ -1,1 +1,1 @@
-import {} from "./schema.js";
+import {} from "./schema";

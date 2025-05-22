@@ -3,24 +3,36 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "concurrently \"pnpm run dev:tsc\" \"pnpm run dev:esbuild\"",
+    "dev:tsc": "tsc --watch",
+    "dev:esbuild": "node esbuild.config.js --watch",
+    "build:tsc": "tsc",
+    "build:esbuild": "node esbuild.config.js",
+    "build": "concurrently \"pnpm run build:tsc\" \"pnpm run build:esbuild\"",
     "typecheck": "tsc --noEmit",
     "gen-schema": "bash test/gen.sh"
   },
   "exports": {
-    ".": "./dist/src/index.js"
+    ".": "./dist/src/index.js",
+    "./worker": "./dist/src/main.js"
   },
   "files": [
     "dist"
   ],
   "peerDependencies": {
+    "better-sqlite3": "workspace:*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "drizzle-kit": "^0.31.1"
+    "better-sqlite3": "workspace:*",
+    "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.31.1",
+    "esbuild": "^0.25.4"
   },
   "dependencies": {
-    "drizzle-orm": "^0.43.1"
+    "@std/collections": "npm:@jsr/std__collections@^1.1.0",
+    "drizzle-orm": "^0.43.1",
+    "valibot": "^1.1.0",
+    "worker-fn": "^3.2.1"
   }
 }

@@ -57,16 +57,34 @@ importers:
 
   packages/database:
     dependencies:
+      '@std/collections':
+        specifier: npm:@jsr/std__collections@^1.1.0
+        version: '@jsr/std__collections@1.1.0'
       drizzle-orm:
         specifier: ^0.43.1
-        version: 0.43.1(@types/better-sqlite3@7.6.13)(sqlite3@5.1.7)
+        version: 0.43.1(@types/better-sqlite3@7.6.13)(better-sqlite3@packages+better-sqlite3)(sqlite3@5.1.7)
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.8.3)
+      worker-fn:
+        specifier: ^3.2.1
+        version: 3.2.1
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
+      better-sqlite3:
+        specifier: workspace:*
+        version: link:../better-sqlite3
+      concurrently:
+        specifier: ^9.1.2
+        version: 9.1.2
       drizzle-kit:
         specifier: ^0.31.1
         version: 0.31.1
+      esbuild:
+        specifier: ^0.25.4
+        version: 0.25.4
 
 packages:
 
@@ -423,6 +441,12 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
+  '@jsr/std__collections@1.1.0':
+    resolution: {integrity: sha512-7ZWtcEp91LeR0AOcaO5jibuVmCVbK7U3+uc7cxXaiwG/LAZM86+DlA/iZK4gGgVCv2mplIctwMntiC8nngOXJQ==, tarball: https://npm.jsr.io/~/11/@jsr/std__collections/1.1.0.tgz}
+
+  '@mys-x/m-rpc@0.12.2':
+    resolution: {integrity: sha512-f2K6zx58zJXb+SAPWVouflVxJJGozQI9uFEnP2RBIAKoWY8KPDQ+qUCl2+Q3z8/azmivyj25746nKLn7UIDdVg==}
+
   '@npmcli/agent@2.2.2':
     resolution: {integrity: sha512-OrcNPXdpSl9UX7qPVRWbmWMCSXrcDa2M9DvrbOTj7ao1S4PlqVFYv9/yLKMkrJKZ/V5A/kDBC690or307i26Og==}
     engines: {node: ^16.14.0 || >=18.0.0}
@@ -700,6 +724,11 @@ packages:
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+
+  concurrently@9.1.2:
+    resolution: {integrity: sha512-H9MWcoPsYddwbOGM6difjVwVZHl63nwMEwDJG/L7VGtuaJhb12h2caPG2tVPWs7emuYix252iGfqOyrz1GczTQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   console-control-strings@1.1.0:
     resolution: {integrity: sha512-ty/fTekppD2fIwRvnZAVdeOiGd1c7YXEixbgJTNzqcxJWKQnjJ/V1bNEEE6hygpM3WjwHFUVK6HTjWSzV4a8sQ==}
@@ -1332,6 +1361,9 @@ packages:
   lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
 
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
@@ -1725,6 +1757,9 @@ packages:
   run-waterfall@1.1.7:
     resolution: {integrity: sha512-iFPgh7SatHXOG1ClcpdwHI63geV3Hc/iL6crGSyBlH2PY7Rm/za+zoKz6FfY/Qlw5K7JwSol8pseO8fN6CMhhQ==}
 
+  rxjs@7.8.2:
+    resolution: {integrity: sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==}
+
   safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
 
@@ -1760,6 +1795,10 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  shell-quote@1.8.2:
+    resolution: {integrity: sha512-AzqKpGKjrj7EM6rKVQEPpB288oCfnrEIuyoT9cyF4nmGa7V8Zk6f7RRqYisX8X9m+Q7bd632aZW4ky7EhbQztA==}
+    engines: {node: '>= 0.4'}
 
   sherif-darwin-arm64@1.5.0:
     resolution: {integrity: sha512-4BYYCEXVJ8+xqfnntxnyGcwgByjrHSeKOitPYdBPMB3aauptC4GUMeVqXRXf5JNbx3lRKg8bZdoq0QPnbsr6BQ==}
@@ -1945,6 +1984,13 @@ packages:
     resolution: {integrity: sha512-nlLsUzgm1kfLXSXfRZMc1KLAugd4hqJHDTvc2hDIwS3mZAfMEuMbc03SujMF+GEcpaX/qboeycw6iO8JwVv2+g==}
     engines: {node: '>=0.8'}
 
+  tree-kill@1.2.2:
+    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
+
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
@@ -2038,6 +2084,14 @@ packages:
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
 
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   verror@1.10.0:
     resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
@@ -2058,6 +2112,9 @@ packages:
 
   wide-align@1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
+
+  worker-fn@3.2.1:
+    resolution: {integrity: sha512-WcWqV6yFnmNAmX+jEIQxslRJ7aJUuYInmZ2f0zTVN9y85pOEg64NOK7e4RqmLAwhlu+xmB6LfD8BRcv1OFkMGg==}
 
   workerpool@6.5.1:
     resolution: {integrity: sha512-Fs4dNYcsdpYSAfVxhnl1L5zTksjvOJxtC5hzMNl+1t9B8hTJTdKDyZ5ju7ztgPy+ft9tBFXoOlDNiOT9WUXZlA==}
@@ -2309,6 +2366,10 @@ snapshots:
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
+
+  '@jsr/std__collections@1.1.0': {}
+
+  '@mys-x/m-rpc@0.12.2': {}
 
   '@npmcli/agent@2.2.2':
     dependencies:
@@ -2647,6 +2708,16 @@ snapshots:
 
   concat-map@0.0.1: {}
 
+  concurrently@9.1.2:
+    dependencies:
+      chalk: 4.1.2
+      lodash: 4.17.21
+      rxjs: 7.8.2
+      shell-quote: 1.8.2
+      supports-color: 8.1.1
+      tree-kill: 1.2.2
+      yargs: 17.7.2
+
   console-control-strings@1.1.0: {}
 
   core-util-is@1.0.2: {}
@@ -2707,9 +2778,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.43.1(@types/better-sqlite3@7.6.13)(sqlite3@5.1.7):
+  drizzle-orm@0.43.1(@types/better-sqlite3@7.6.13)(better-sqlite3@packages+better-sqlite3)(sqlite3@5.1.7):
     optionalDependencies:
       '@types/better-sqlite3': 7.6.13
+      better-sqlite3: link:packages/better-sqlite3
       sqlite3: 5.1.7
 
   dunder-proto@1.0.1:
@@ -3269,6 +3341,8 @@ snapshots:
 
   lodash.uniq@4.5.0: {}
 
+  lodash@4.17.21: {}
+
   log-symbols@4.1.0:
     dependencies:
       chalk: 4.1.2
@@ -3800,6 +3874,10 @@ snapshots:
 
   run-waterfall@1.1.7: {}
 
+  rxjs@7.8.2:
+    dependencies:
+      tslib: 2.8.1
+
   safe-buffer@5.1.2: {}
 
   safe-buffer@5.2.1: {}
@@ -3823,6 +3901,8 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  shell-quote@1.8.2: {}
 
   sherif-darwin-arm64@1.5.0:
     optional: true
@@ -4051,6 +4131,10 @@ snapshots:
       psl: 1.15.0
       punycode: 2.3.1
 
+  tree-kill@1.2.2: {}
+
+  tslib@2.8.1: {}
+
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
@@ -4126,6 +4210,10 @@ snapshots:
 
   uuid@3.4.0: {}
 
+  valibot@1.1.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
+
   verror@1.10.0:
     dependencies:
       assert-plus: 1.0.0
@@ -4147,6 +4235,10 @@ snapshots:
   wide-align@1.1.5:
     dependencies:
       string-width: 4.2.3
+
+  worker-fn@3.2.1:
+    dependencies:
+      '@mys-x/m-rpc': 0.12.2
 
   workerpool@6.5.1: {}
 
