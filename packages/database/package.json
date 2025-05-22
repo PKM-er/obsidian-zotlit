@@ -15,11 +15,9 @@
     "dist"
   ],
   "peerDependencies": {
-    "better-sqlite3": "workspace:*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "workspace:*",
     "drizzle-kit": "^0.31.1"
   },
   "dependencies": {

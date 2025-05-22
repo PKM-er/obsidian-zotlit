@@ -59,14 +59,11 @@ importers:
     dependencies:
       drizzle-orm:
         specifier: ^0.43.1
-        version: 0.43.1(@types/better-sqlite3@7.6.13)(better-sqlite3@packages+better-sqlite3)(sqlite3@5.1.7)
+        version: 0.43.1(@types/better-sqlite3@7.6.13)(sqlite3@5.1.7)
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
-      better-sqlite3:
-        specifier: workspace:*
-        version: link:../better-sqlite3
       drizzle-kit:
         specifier: ^0.31.1
         version: 0.31.1
@@ -2710,10 +2707,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.43.1(@types/better-sqlite3@7.6.13)(better-sqlite3@packages+better-sqlite3)(sqlite3@5.1.7):
+  drizzle-orm@0.43.1(@types/better-sqlite3@7.6.13)(sqlite3@5.1.7):
     optionalDependencies:
       '@types/better-sqlite3': 7.6.13
-      better-sqlite3: link:packages/better-sqlite3
       sqlite3: 5.1.7
 
   dunder-proto@1.0.1:

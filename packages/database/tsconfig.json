@@ -8,7 +8,8 @@
       "es2024",
       "ESNext.Disposable",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "WebWorker"
     ],
     "module": "NodeNext",
     "moduleDetection": "auto",
