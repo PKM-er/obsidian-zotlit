@@ -1,0 +1,28 @@
+{
+  "name": "@zotlit/database",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "gen-schema": "bash test/gen.sh"
+  },
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "better-sqlite3": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "workspace:*",
+    "drizzle-kit": "^0.31.1"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.43.1"
+  }
+}

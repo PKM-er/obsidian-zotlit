@@ -1,0 +1,35 @@
+{
+  "name": "zotlit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write",
+    "pkg-lint": "sherif --fix"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "sherif": "^1.4.0",
+    "turbo": "^2.4.4",
+    "typescript": "~5.8.2"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "better-sqlite3",
+      "core-js",
+      "esbuild",
+      "sharp"
+    ]
+  }
+}
