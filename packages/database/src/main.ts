@@ -1,15 +1,13 @@
 import { defineWorkerFns } from "worker-fn";
 import { init } from "./db";
-import {
-  getAnnotationsByParentItem,
-  getAnnotationsByKey,
-} from "./query/annotation";
-import { getBibtexCitekeys, getBibtexIds } from "./query/bibtex";
+
+import * as annotationQuery from "./query/annotation";
+import * as bibtexQuery from "./query/bibtex";
+import * as collectionQuery from "./query/collection";
 
 defineWorkerFns({
   init,
-  getAnnotationsByParentItem,
-  getAnnotationsByKey,
-  getBibtexCitekeys,
-  getBibtexIds,
+  ...annotationQuery,
+  ...bibtexQuery,
+  ...collectionQuery,
 });

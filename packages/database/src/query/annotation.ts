@@ -50,16 +50,16 @@ const baseQuery = db("zt")
  */
 const sortIndexOrder = asc(annotations.sortIndex);
 
-export async function getAnnotationsByKey(
-  items: { key: string }[],
-  libraryId: number,
-) {
+export async function getAnnotationsByKey({
+  items: inputs,
+  libraryId,
+}: { items: { key: string }[]; libraryId: number }) {
   const result = await baseQuery
     .where(
       and(
         inArray(
           libraryItems.key,
-          items.map((v) => v.key),
+          inputs.map((v) => v.key),
         ),
         eq(libraryItems.libraryId, libraryId),
         itemExists(libraryItems.itemId),

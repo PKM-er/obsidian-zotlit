@@ -9,7 +9,7 @@ import { citationkey as citationTable } from "@bbt/schema";
  * @returns A record of item IDs to citekeys.
  */
 export async function getBibtexCitekeys({
-  items,
+  items: inputs,
   libraryId,
 }: { items: { itemId: string }[]; libraryId: string }): Promise<
   Record<string, string>
@@ -24,7 +24,7 @@ export async function getBibtexCitekeys({
       and(
         inArray(
           citationTable.itemId,
-          items.map((item) => item.itemId),
+          inputs.map((item) => item.itemId),
         ),
         or(
           eq(citationTable.libraryId, libraryId),
