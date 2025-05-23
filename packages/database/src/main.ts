@@ -4,10 +4,12 @@ import { init } from "./db";
 import * as annotationQuery from "./query/annotation";
 import * as bibtexQuery from "./query/bibtex";
 import * as collectionQuery from "./query/collection";
+import * as libraryQuery from "./query/library";
 
 defineWorkerFns({
   init,
   ...annotationQuery,
   ...bibtexQuery,
   ...collectionQuery,
+  ...libraryQuery,
 });
