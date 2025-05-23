@@ -222,9 +222,9 @@ export const items = sqliteTable(
   {
     itemId: integer().primaryKey(),
     itemTypeId: integer().notNull(),
-    dateAdded: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    dateModified: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    clientDateModified: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    dateAdded: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    dateModified: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    clientDateModified: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     libraryId: integer()
       .notNull()
       .references(() => libraries.libraryId, { onDelete: "cascade" }),
@@ -415,7 +415,7 @@ export const collections = sqliteTable(
     collectionId: integer().primaryKey(),
     collectionName: text().notNull(),
     parentCollectionId: integer().default(sql`(NULL)`),
-    clientDateModified: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    clientDateModified: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     libraryId: integer()
       .notNull()
       .references(() => libraries.libraryId, { onDelete: "cascade" }),
@@ -504,7 +504,7 @@ export const savedSearches = sqliteTable(
   {
     savedSearchId: integer().primaryKey(),
     savedSearchName: text().notNull(),
-    clientDateModified: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    clientDateModified: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
     libraryId: integer()
       .notNull()
       .references(() => libraries.libraryId, { onDelete: "cascade" }),
@@ -541,7 +541,7 @@ export const deletedCollections = sqliteTable(
     collectionId: integer()
       .primaryKey()
       .references(() => collections.collectionId, { onDelete: "cascade" }),
-    dateDeleted: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    dateDeleted: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
   },
   (table) => [index("deletedCollections_dateDeleted").on(table.dateDeleted)],
 );
@@ -552,7 +552,7 @@ export const deletedItems = sqliteTable(
     itemId: integer()
       .primaryKey()
       .references(() => items.itemId, { onDelete: "cascade" }),
-    dateDeleted: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    dateDeleted: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
   },
   (table) => [
     index("deletedSearches_dateDeleted").on(table.dateDeleted),
@@ -564,7 +564,7 @@ export const deletedSearches = sqliteTable("deletedSearches", {
   savedSearchId: integer()
     .primaryKey()
     .references(() => savedSearches.savedSearchId, { onDelete: "cascade" }),
-  dateDeleted: numeric().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+  dateDeleted: text().default(sql`(CURRENT_TIMESTAMP)`).notNull(),
 });
 
 export const libraries = sqliteTable("libraries", {
