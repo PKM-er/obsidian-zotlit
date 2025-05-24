@@ -35,11 +35,11 @@
     "dist"
   ],
   "peerDependencies": {
-    "better-sqlite3": "workspace:*"
+    "better-sqlite3": "workspace:@aidenlx/better-sqlite3@11.10.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "workspace:*",
+    "better-sqlite3": "workspace:@aidenlx/better-sqlite3@11.10.0",
     "concurrently": "^9.1.2",
     "drizzle-kit": "^0.31.1",
     "esbuild": "^0.25.4",
