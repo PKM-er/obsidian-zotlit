@@ -1,7 +1,7 @@
 {
-  "name": "zotlit",
-  "version": "2.0.0-beta.0",
-  "description": "Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
+	"name": "zotlit",
+	"version": "2.0.0-beta.0",
+	"description": "Obsidian.md plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -10,18 +10,18 @@
 		"build": "tsc && NODE_ENV=production node esbuild.config.js"
 	},
 	"keywords": [],
-  "author": {
-    "name": "AidenLx",
-    "email": "aiden.lx@outlook.com",
-    "url": "https://github.com/aidenlx"
-  },
-  "license": "MIT",
+	"author": {
+		"name": "AidenLx",
+		"email": "aiden.lx@outlook.com",
+		"url": "https://github.com/aidenlx"
+	},
+	"license": "MIT",
 	"devDependencies": {
 		"@electron/remote": "^2.1.2",
 		"@types/node": "^22.10.0",
 		"builtin-modules": "3.3.0",
 		"electron": "^32.1.2",
-    "esbuild": "^0.25.4",
+		"esbuild": "^0.25.4",
 		"globby": "^14.1.0",
 		"jszip": "^3.10.1",
 		"obsidian": "1.8.7",
@@ -29,6 +29,10 @@
 		"typescript": "~5.8.2"
 	},
 	"dependencies": {
-		"@zotlit/database": "workspace:*"
+		"@zotlit/database": "workspace:*",
+		"core-js": "^3.42.0",
+		"jotai": "^2.12.4",
+		"valibot": "^1.1.0",
+		"worker-fn": "^3.2.1"
 	}
 }

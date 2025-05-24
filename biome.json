@@ -34,7 +34,7 @@
       },
       "correctness": {
         "useHookAtTopLevel": "error",
-        "noUnusedImports": "warn"
+        "noUnusedImports": "off"
       }
     }
   },

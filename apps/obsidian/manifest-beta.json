@@ -4,7 +4,7 @@
   "version": "2.0.0-beta.0",
   "minAppVersion": "1.8.10",
   "versions": {
-    "better-sqlite3": "v11.9.4"
+    "better-sqlite3": "v11.9.1"
   },
   "description": "Plugin to integrate with Zotero, create literature notes and insert citations from a Zotero library.",
   "author": "AidenLx",
