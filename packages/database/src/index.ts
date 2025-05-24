@@ -3,4 +3,9 @@ export type * from "./query/bibtex";
 export type * from "./query/collection";
 export type * from "./query/library";
 
-export type { initZotero, initBetterBibtex } from "./main";
+export type {
+  initZotero,
+  initBetterBibtex,
+  init,
+  DatabaseConfig,
+} from "./main";

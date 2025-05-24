@@ -1,7 +1,19 @@
 import { defineWorkerFns } from "worker-fn";
 
+export interface DatabaseConfig {
+  dbPaths: {
+    zotero: string;
+    betterBibtex: string;
+  };
+  nativeBinding: string;
+}
+
 declare global {
-  var DB_CONFIG: { zotero_db: string; bbt_db: string } | undefined;
+  var DB_CONFIG: DatabaseConfig | undefined;
+}
+
+export function init(config: DatabaseConfig) {
+  self.DB_CONFIG = config;
 }
 
 export async function initZotero() {
@@ -21,6 +33,7 @@ export async function initBetterBibtex() {
 }
 
 defineWorkerFns({
+  init,
   initZotero,
   initBetterBibtex,
 });

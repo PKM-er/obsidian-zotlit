@@ -6,16 +6,16 @@ const schema = { ...ZoteroSchema, ...ZoteroRelations };
 
 const databaseManager = new DatabaseManager<typeof schema>();
 
-const filepath = DB_CONFIG?.zotero_db;
-if (!filepath) {
+if (!DB_CONFIG || !DB_CONFIG.dbPaths.zotero) {
   throw new Error("database filepath for zotero is not set");
 }
 
 databaseManager.init(schema, {
-  filepath,
+  filepath: DB_CONFIG.dbPaths.zotero,
   force: true,
+  nativeBinding: DB_CONFIG.nativeBinding,
 });
 
-console.log("zotero db initialized:", filepath);
+console.log("zotero db initialized:", DB_CONFIG.dbPaths.zotero);
 
 export const db = databaseManager.get();

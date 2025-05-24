@@ -3,16 +3,16 @@ import DatabaseManager from "@/lib/db-manager";
 
 const databaseManager = new DatabaseManager<typeof schema>();
 
-const filepath = DB_CONFIG?.bbt_db;
-if (!filepath) {
+if (!DB_CONFIG || !DB_CONFIG.dbPaths.betterBibtex) {
   throw new Error("database filepath for bbt is not set");
 }
 
 databaseManager.init(schema, {
-  filepath,
+  filepath: DB_CONFIG.dbPaths.betterBibtex,
   force: true,
+  nativeBinding: DB_CONFIG.nativeBinding,
 });
 
-console.log("bbt db initialized:", filepath);
+console.log("bbt db initialized:", DB_CONFIG.dbPaths.betterBibtex);
 
 export const db = databaseManager.get();

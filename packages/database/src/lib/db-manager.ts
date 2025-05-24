@@ -20,6 +20,7 @@ type DrizzleDatabase<TSchema extends Record<string, unknown>> =
 interface InitializationConfig {
   force?: boolean;
   filepath: string;
+  nativeBinding: string | undefined;
 }
 
 export default class DatabaseManager<
@@ -79,6 +80,7 @@ export default class DatabaseManager<
         immutable: true,
         readonly: true,
         fileMustExist: true,
+        nativeBinding: config.nativeBinding,
       }),
       schema,
     });
