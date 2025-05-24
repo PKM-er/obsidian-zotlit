@@ -30,6 +30,7 @@ const baseConfig = {
   },
   target: "es2022",
   metafile: true,
+  conditions: isProd ? ["production"] : ["development"],
 };
 
 const context = await esbuild.context({

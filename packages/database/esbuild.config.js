@@ -2,26 +2,41 @@ import { build, context } from "esbuild";
 
 async function buildPackage(watch = false) {
   /** @type {import("esbuild").BuildOptions} */
-  const options = {
+  const baseOptions = {
     entryPoints: ["./src/main.ts"],
     outdir: "dist/src",
     bundle: true,
     platform: "node",
     target: ["es2022"],
     format: "esm",
+  };
+
+  /** @type {import("esbuild").BuildOptions} */
+  const devOptions = {
+    ...baseOptions,
+    outExtension: { ".js": ".dev.js" },
+    sourcemap: "inline",
+    minify: false,
+  };
+
+  /** @type {import("esbuild").BuildOptions} */
+  const prodOptions = {
+    ...baseOptions,
+    outExtension: { ".js": ".prod.js" },
     sourcemap: "external",
     minify: true,
   };
 
   if (watch) {
-    // Create a context for watch mode
-    const ctx = await context(options);
-    await ctx.watch();
-    console.log("Watching for changes...");
+    // Create contexts for watch mode
+    const devCtx = await context(devOptions);
+    const prodCtx = await context(prodOptions);
+    await Promise.all([devCtx.watch(), prodCtx.watch()]);
+    console.log("Watching for changes (dev and prod builds)...");
   } else {
     // Regular build
-    await build(options);
-    console.log("Build complete");
+    await Promise.all([build(devOptions), build(prodOptions)]);
+    console.log("Build complete (dev and prod builds)");
   }
 }
 

@@ -17,8 +17,18 @@
       "types": "./dist/src/index.d.ts"
     },
     "./worker": {
-      "import": "./dist/src/main.js",
-      "types": "./dist/src/main.d.ts"
+      "development": {
+        "import": "./dist/src/main.dev.js",
+        "types": "./dist/src/main.d.ts"
+      },
+      "production": {
+        "import": "./dist/src/main.prod.js",
+        "types": "./dist/src/main.d.ts"
+      },
+      "default": {
+        "import": "./dist/src/main.prod.js",
+        "types": "./dist/src/main.d.ts"
+      }
     }
   },
   "files": [
