@@ -32,7 +32,8 @@
     "better-sqlite3": "workspace:*",
     "concurrently": "^9.1.2",
     "drizzle-kit": "^0.31.1",
-    "esbuild": "^0.25.4"
+    "esbuild": "^0.25.4",
+		"typescript": "~5.8.2"
   },
   "dependencies": {
     "@std/collections": "npm:@jsr/std__collections@^1.1.0",

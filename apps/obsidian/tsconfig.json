@@ -1,0 +1,33 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "noEmit": true,
+    "incremental": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "declaration": false,
+    "declarationMap": false,
+    "lib": [
+      "es2022",
+      "ESNext.Disposable",
+      "DOM",
+      "DOM.Iterable",
+      "ES2024.Collection",
+      "ESNext.Collection"
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "moduleDetection": "force",
+    "target": "es2022",
+    "jsx": "react-jsx",
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+}

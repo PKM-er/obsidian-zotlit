@@ -1,0 +1,8 @@
+test/zt-vault/.obsidian/workspace.json
+
+dist
+
+tsconfig.tsbuildinfo
+
+test/zt-vault/.obsidian/plugins/zotlit/*
+!test/zt-vault/.obsidian/plugins/zotlit/data.json

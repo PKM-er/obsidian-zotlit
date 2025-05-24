@@ -29,6 +29,9 @@
       "core-js",
       "esbuild",
       "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "electron"
     ]
   }
 }
