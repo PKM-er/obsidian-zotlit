@@ -1,15 +1,26 @@
 import { defineWorkerFns } from "worker-fn";
-import { init } from "./db";
 
-import * as annotationQuery from "./query/annotation";
-import * as bibtexQuery from "./query/bibtex";
-import * as collectionQuery from "./query/collection";
-import * as libraryQuery from "./query/library";
+declare global {
+  var DB_CONFIG: { zotero_db: string; bbt_db: string } | undefined;
+}
+
+export async function initZotero() {
+  void (await import("@/db/zotero"));
+  defineWorkerFns({
+    ...(await import("@/query/annotation")),
+    ...(await import("@/query/collection")),
+    ...(await import("@/query/library")),
+  });
+}
+
+export async function initBetterBibtex() {
+  void (await import("@/db/bbt"));
+  defineWorkerFns({
+    ...(await import("@/query/bibtex")),
+  });
+}
 
 defineWorkerFns({
-  init,
-  ...annotationQuery,
-  ...bibtexQuery,
-  ...collectionQuery,
-  ...libraryQuery,
+  initZotero,
+  initBetterBibtex,
 });

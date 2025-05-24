@@ -1,6 +1,6 @@
-import { and, isNotNull, notInArray, type SQL } from "drizzle-orm";
+import { and, isNotNull, notInArray } from "drizzle-orm";
 import { deletedItems } from "@zt/schema";
-import { db } from "@/db";
+import { db } from "@/db/zotero";
 import type { SQLiteColumn } from "drizzle-orm/sqlite-core";
 
 /**
@@ -23,7 +23,7 @@ export function itemExists(idCol: SQLiteColumn) {
     isNotNull(idCol),
     notInArray(
       idCol,
-      db("zt")
+      db
         .select({
           itemId: deletedItems.itemId,
         })

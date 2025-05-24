@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db } from "@/db/zotero";
 import {
   groups,
   itemAnnotations as annotations,
@@ -10,7 +10,7 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { parseSortIndex } from "@/lib/sort-index";
 import { parseAnnotationPosition } from "@/lib/position";
 import { pick } from "@std/collections";
-import { itemExists } from "./_where";
+import { itemExists } from "../_where";
 
 const annotationColumns = pick(annotations, [
   "itemId",
@@ -32,7 +32,7 @@ const itemColumns = pick(libraryItems, [
   "libraryId",
 ]);
 
-const baseQuery = db("zt")
+const baseQuery = db
   .select({
     ...annotationColumns,
     ...itemColumns,

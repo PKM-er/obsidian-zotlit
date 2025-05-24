@@ -13,8 +13,13 @@
     "gen-schema": "bash test/gen.sh"
   },
   "exports": {
-    ".": "./dist/src/index.js",
-    "./worker": "./dist/src/main.js"
+    ".": {
+      "types": "./dist/src/index.d.ts"
+    },
+    "./worker": {
+      "import": "./dist/src/main.js",
+      "types": "./dist/src/main.d.ts"
+    }
   },
   "files": [
     "dist"
