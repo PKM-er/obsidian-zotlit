@@ -18,6 +18,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@electron/remote": "^2.1.2",
+		"@mys-x/m-rpc": "^0.12.2",
 		"@types/node": "^22.10.0",
 		"builtin-modules": "3.3.0",
 		"electron": "^32.1.2",
@@ -32,6 +33,8 @@
 		"@zotlit/database": "workspace:*",
 		"core-js": "^3.42.0",
 		"jotai": "^2.12.4",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
 		"valibot": "^1.1.0",
 		"worker-fn": "^3.2.1"
 	}
