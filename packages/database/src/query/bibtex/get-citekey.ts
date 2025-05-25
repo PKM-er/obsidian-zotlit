@@ -32,7 +32,7 @@ const statement = db
 export function getBibtexCitekeys({
   items: inputs,
   libraryId,
-}: { items: { itemId: string }[]; libraryId: string }): Record<string, string> {
+}: { items: { itemId: string }[]; libraryId: string }): Map<number, string> {
   const citekeys = inputs
     .map((i) =>
       statement.get({
@@ -41,7 +41,5 @@ export function getBibtexCitekeys({
       } satisfies Params),
     )
     .filter((v) => !!v);
-  return Object.fromEntries(
-    citekeys.map((citekey) => [citekey.itemId, citekey.citekey]),
-  );
+  return new Map(citekeys.map((citekey) => [citekey.itemId, citekey.citekey]));
 }

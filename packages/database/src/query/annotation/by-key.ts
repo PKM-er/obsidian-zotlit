@@ -43,7 +43,7 @@ export function getAnnotationsByKey({
   keys,
   libraryId,
 }: { keys: string[]; libraryId: number }) {
-  return Object.fromEntries(
+  return new Map(
     keys
       .map((key) => statement.get({ key, libraryId } satisfies Params))
       .filter((v) => !!v)

@@ -38,7 +38,7 @@ const statement = db
   );
 
 export function getAnnotationsById({ items }: { items: { itemId: number }[] }) {
-  return Object.fromEntries(
+  return new Map(
     items
       .map(({ itemId }) => statement.get({ itemId } satisfies Params))
       .filter((v) => !!v)

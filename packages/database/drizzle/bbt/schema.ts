@@ -4,9 +4,9 @@ import { check, index, numeric, sqliteTable } from "drizzle-orm/sqlite-core";
 export const citationkey = sqliteTable(
   "citationkey",
   {
-    itemId: numeric().primaryKey().notNull(),
+    itemId: numeric({ mode: "number" }).primaryKey().notNull(),
     itemKey: numeric().notNull(),
-    libraryId: numeric().notNull(),
+    libraryId: numeric({ mode: "number" }).notNull(),
     citationKey: numeric().notNull(),
     pinned: numeric(),
   },
