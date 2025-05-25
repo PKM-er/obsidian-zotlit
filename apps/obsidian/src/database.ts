@@ -4,6 +4,7 @@ import type {
   initBetterBibtex,
   init,
   getAllLibraries,
+  getItemsById,
 } from "@zotlit/database";
 import { useWorkerFns } from "worker-fn";
 import type { RemoteFns } from "@mys-x/m-rpc";
@@ -13,6 +14,7 @@ type DatabaseFns = RemoteFns<{
   initZotero: typeof initZotero;
   initBetterBibtex: typeof initBetterBibtex;
   getAllLibraries: typeof getAllLibraries;
+  getItemsById: typeof getItemsById;
 }>;
 
 import { join } from "node:path";

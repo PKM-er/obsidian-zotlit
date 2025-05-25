@@ -22,6 +22,7 @@ export async function initZotero() {
     ...(await import("@/query/annotation")),
     ...(await import("@/query/collection")),
     ...(await import("@/query/library")),
+    ...(await import("@/query/item")),
   });
 }
 
