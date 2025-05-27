@@ -31,7 +31,8 @@
       "sharp"
     ],
     "ignoredBuiltDependencies": [
-      "electron"
+      "electron",
+      "husky"
     ]
   }
 }

@@ -1,3 +1,6 @@
 [submodule "packages/better-sqlite3"]
 	path = packages/better-sqlite3
 	url = https://github.com/aidenlx/better-sqlite3.git
+[submodule "packages/eta"]
+	path = packages/eta
+	url = https://github.com/aidenlx/eta.git
