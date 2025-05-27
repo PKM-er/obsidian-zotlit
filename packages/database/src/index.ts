@@ -4,6 +4,7 @@ export type * from "./query/collection";
 export type * from "./query/library";
 export type * from "./query/item";
 export type * from "./query/tag";
+export type * from "./query/note";
 
 export {
   AttachmentLinkMode,
