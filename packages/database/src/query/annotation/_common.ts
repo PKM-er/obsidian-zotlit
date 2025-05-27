@@ -35,13 +35,7 @@ export const annotationColumns = pick(annotations, [
   "position",
   "isExternal",
 ]);
-export const itemColumns = pick(libraryItems, [
-  "key",
-  "clientDateModified",
-  "dateAdded",
-  "dateModified",
-  "libraryId",
-]);
+export const itemColumns = pick(libraryItems, ["key", "libraryId"]);
 
 /**
  * Zotero only use sortIndex as a string to sort items... wtf
