@@ -14,6 +14,38 @@ export interface ItemQueryCreator {
   type: string | null;
 }
 
+/**
+ * Zotero.Attachments.linkModeToName
+ */
+export const AttachmentLinkMode = {
+  importedFile: 0,
+  importedUrl: 1,
+  linkedFile: 2,
+  linkedUrl: 3,
+  embeddedImage: 4,
+} as const;
+
+import * as v from "valibot";
+
+// could be one of 0, 1, 2, 3, 4, or other new types, invalid value fallback to null
+const attachmentLinkModeSchema = v.fallback(
+  v.union([v.pipe(v.number(), v.integer(), v.minValue(0)), v.null()]),
+  null,
+);
+
+export type AttachmentLinkModeValue = v.InferOutput<
+  typeof attachmentLinkModeSchema
+>;
+
+export interface ItemQueryAttachment {
+  itemId: number;
+  key: string;
+  contentType: string | null;
+  linkMode: AttachmentLinkModeValue;
+  path: string | null;
+  charset: string | null;
+}
+
 export interface ItemQueryResult {
   collections: ItemQueryCollection[];
   creators: ItemQueryCreator[];
@@ -26,6 +58,7 @@ export interface ItemQueryResult {
   dateAdded: Date | null;
   dateModified: Date | null;
   dateAccessed: Date | null;
+  attachments: ItemQueryAttachment[];
 }
 
 type ItemQueryField = {
@@ -48,6 +81,7 @@ export function parseItem(
   if (!input) return null;
   const {
     collectionItems,
+    itemAttachments_parentItemId: attachments,
     itemCreators,
     clientDateModified,
     dateAdded,
@@ -60,6 +94,14 @@ export function parseItem(
 
   return {
     ...item,
+    attachments: attachments.map((f) => ({
+      charset: f.charset?.charset ?? null,
+      contentType: f.contentType,
+      key: f.item_itemId.key,
+      linkMode: v.parse(attachmentLinkModeSchema, f.linkMode),
+      path: f.path,
+      itemId: f.itemId,
+    })),
     collections: collectionItems.map(({ orderIndex, collection }) => ({
       orderIndex,
       ...collection,

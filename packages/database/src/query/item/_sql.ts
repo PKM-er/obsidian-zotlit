@@ -17,6 +17,22 @@ export function prepareItemQuery({
       },
       where: whereClause,
       with: {
+        itemAttachments_parentItemId: {
+          columns: {
+            itemId: true,
+            contentType: true,
+            linkMode: true,
+            path: true,
+          },
+          with: {
+            charset: {
+              columns: { charset: true },
+            },
+            item_itemId: {
+              columns: { key: true },
+            },
+          },
+        },
         collectionItems: {
           columns: { orderIndex: true },
           with: {

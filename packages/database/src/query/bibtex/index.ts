@@ -1,2 +1,3 @@
-export { getBibtexCitekeys } from "./get-citekey";
-export { getItemsFromBibtexCitekey } from "./get-item";
+export { getBibtexCitekeys } from "./from-item-id";
+export { getItemsFromBibtexCitekey } from "./from-citekey";
+export { getItemsByCitekey } from "./item-by-citekey";
