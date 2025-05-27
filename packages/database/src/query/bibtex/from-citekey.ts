@@ -3,7 +3,7 @@ import { db } from "@/db/bbt";
 import { citationkey as citationTable } from "@bbt/schema";
 import * as v from "valibot";
 
-const paramSchema = v.object({
+const ParamSchema = v.object({
   citekey: v.pipe(v.string(), v.trim(), v.toLowerCase()),
 });
 
@@ -40,9 +40,9 @@ export function getItemsFromBibtexCitekey({
 }: {
   citekeys: string[];
 }): Map<string, { itemId: number; libraryId: number; citekey: string }> {
-  const params = citekeys.map((citekey) => v.parse(paramSchema, { citekey }));
+  const params = citekeys.map((citekey) => v.parse(ParamSchema, { citekey }));
   const items = citekeys
-    .map((citekey) => statement.get(v.parse(paramSchema, { citekey })))
+    .map((citekey) => statement.get(v.parse(ParamSchema, { citekey })))
     .filter((v) => !!v);
 
   console.log(params, items);

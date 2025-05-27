@@ -1,7 +1,9 @@
 import { groups, libraries } from "@zt/schema";
 import { db } from "@/db/zotero";
 import { eq } from "drizzle-orm";
-import { resolveName } from "./_common";
+
+import * as v from "valibot";
+import { LibrarySchema } from "./_common";
 
 const statement = db
   .select({
@@ -15,5 +17,5 @@ const statement = db
   .prepare();
 
 export function getAllLibraries() {
-  return statement.all().map(resolveName);
+  return statement.all().map((o) => v.parse(LibrarySchema, o));
 }

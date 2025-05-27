@@ -9,6 +9,7 @@ export {
   CreatorFieldMode,
   AnnotationType,
 } from "./lib/const";
+export type { LibraryType, Library } from "./query/library/_common";
 
 export type {
   AttachmentLinkModeValue,

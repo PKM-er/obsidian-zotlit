@@ -1,11 +1,13 @@
 import { groups, libraries } from "@zt/schema";
 import { db } from "@/db/zotero";
 import { eq, sql } from "drizzle-orm";
-import { resolveName } from "./_common";
 
-export type Params = {
-  libraryId: number;
-};
+import * as v from "valibot";
+import { LibrarySchema } from "./_common";
+
+const ParamsSchema = v.object({
+  libraryId: v.number(),
+});
 
 const statement = db
   .select({
@@ -19,8 +21,8 @@ const statement = db
   .where(eq(libraries.libraryId, sql.placeholder("libraryId")))
   .prepare();
 
-export function getLibraryById({ libraryId }: Params) {
-  const result = statement.get({ libraryId } satisfies Params);
+export function getLibraryById({ libraryId }: { libraryId: number }) {
+  const result = statement.get(v.parse(ParamsSchema, { libraryId }));
   if (!result) return null;
-  return resolveName(result);
+  return v.parse(LibrarySchema, result);
 }
