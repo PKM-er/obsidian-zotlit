@@ -1,4 +1,4 @@
-import queryCollectionPath from "../collection-with-path";
+import queryCollectionPath from "./with-path";
 import { collections } from "@zt/schema";
 
 export function resolveCollectionPath<T extends { id: number }>(rows: T[]) {
