@@ -1,4 +1,5 @@
 import type { ItemQueryRawResult, ItemQueryRawField } from "./_sql";
+import { ZoteroEnumSchema } from "@/lib/zt-enum";
 import * as v from "valibot";
 
 export interface ItemQueryCollection {
@@ -16,12 +17,7 @@ export interface ItemQueryCreator {
   type: string | null;
 }
 
-const CreatorFieldModeSchema = v.fallback(
-  v.union([v.pipe(v.number(), v.integer(), v.minValue(0)), v.null()]),
-  null,
-);
-
-type CreatorFieldModeValue = v.InferOutput<typeof CreatorFieldModeSchema>;
+type CreatorFieldModeValue = v.InferOutput<typeof ZoteroEnumSchema>;
 
 // could be included in enum or not, invalid value fallback to null
 const AttachmentLinkModeSchema = v.fallback(
@@ -111,7 +107,7 @@ export function parseItem(
           creatorType,
         }) => ({
           ...creator,
-          fieldMode: v.parse(CreatorFieldModeSchema, fieldMode),
+          fieldMode: v.parse(ZoteroEnumSchema, fieldMode),
           orderIndex,
           creatorId,
           type: creatorType.creatorType,

@@ -7,7 +7,9 @@ export type * from "./query/item";
 export {
   AttachmentLinkMode,
   CreatorFieldMode,
-} from "./query/item/_const";
+  AnnotationType,
+} from "./lib/const";
+
 export type {
   AttachmentLinkModeValue,
   ItemQueryAttachment,

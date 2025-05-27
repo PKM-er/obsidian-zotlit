@@ -1,22 +1,27 @@
 import { parseAnnotationPosition } from "@/lib/position";
 import { parseSortIndex } from "@/lib/sort-index";
-
-export function parseAnnotation<
-  T extends Record<"sortIndex" | "position", string>,
->({ position, sortIndex, ...rest }: T) {
-  return {
-    ...rest,
-    sortIndex: parseSortIndex(sortIndex, () => rest),
-    position: parseAnnotationPosition(position, () => rest),
-  };
-}
-
 import {
   itemAnnotations as annotations,
   items as libraryItems,
 } from "@zt/schema";
 import { asc } from "drizzle-orm";
 import { pick } from "@std/collections";
+import { ZoteroEnumSchema } from "@/lib/zt-enum";
+
+import * as v from "valibot";
+
+export function parseAnnotation<
+  T extends Record<"sortIndex" | "position", string> & {
+    type: number;
+  },
+>({ position, sortIndex, type, ...rest }: T) {
+  return {
+    ...rest,
+    type: v.parse(ZoteroEnumSchema, type),
+    sortIndex: parseSortIndex(sortIndex, () => rest),
+    position: parseAnnotationPosition(position, () => rest),
+  };
+}
 
 export const annotationColumns = pick(annotations, [
   "itemId",

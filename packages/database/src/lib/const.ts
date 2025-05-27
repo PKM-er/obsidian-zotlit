@@ -3,6 +3,7 @@ export const CreatorFieldMode = {
   /** store in last name */
   nameOnly: 1,
 } as const;
+
 /**
  * Zotero.Attachments.linkModeToName
  */
@@ -13,4 +14,13 @@ export const AttachmentLinkMode = {
   linkedFile: 2,
   linkedUrl: 3,
   embeddedImage: 4,
+} as const;
+
+export const AnnotationType = {
+  highlight: 1,
+  note: 2,
+  image: 3,
+  ink: 4,
+  underline: 5,
+  text: 6,
 } as const;
