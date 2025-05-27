@@ -1,29 +1,24 @@
-import { db } from "@/db/zotero";
-import { itemNotes as notes, items } from "@zt/schema";
+import { items } from "@zt/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { itemExists } from "../_where";
-import { itemColumns, noteColumns } from "./_common";
+import { buildNoteQuery } from "./_sql";
 import * as v from "valibot";
+import { parseNote } from "./_parse";
 
 const ParamsSchema = v.object({
   key: v.string(),
   libraryId: v.number(),
 });
 
-const statement = db
-  .select({
-    ...noteColumns,
-    ...itemColumns,
-  })
-  .from(notes)
-  .innerJoin(items, eq(notes.itemId, items.itemId))
+const statement = buildNoteQuery()
   .where(
     and(
       eq(items.key, sql.placeholder("key")),
       eq(items.libraryId, sql.placeholder("libraryId")),
       itemExists(items.itemId),
     ),
-  );
+  )
+  .prepare();
 
 export function getNotesByKey({
   keys,
@@ -33,6 +28,6 @@ export function getNotesByKey({
     keys
       .map((key) => statement.get(v.parse(ParamsSchema, { key, libraryId })))
       .filter((v) => !!v)
-      .map((v) => [v.key, v]),
+      .map((v) => [v.key, parseNote(v)]),
   );
 }

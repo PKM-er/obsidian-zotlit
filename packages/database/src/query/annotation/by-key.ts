@@ -1,34 +1,25 @@
-import { db } from "@/db/zotero";
-import { itemAnnotations as annotations, items } from "@zt/schema";
+import { items } from "@zt/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { itemExists } from "../_where";
-import {
-  itemColumns,
-  annotationColumns,
-  parseAnnotation,
-  sortByIndex,
-} from "./_common";
+import { sortByIndex } from "./_sort";
 import * as v from "valibot";
+import { buildAnnotationQuery } from "./_sql";
+import { parseAnnotation } from "./_parse";
 
 const ParamsSchema = v.object({
   key: v.string(),
   libraryId: v.number(),
 });
 
-const statement = db
-  .select({
-    ...annotationColumns,
-    ...itemColumns,
-  })
-  .from(annotations)
-  .innerJoin(items, eq(annotations.itemId, items.itemId))
+const statement = buildAnnotationQuery()
   .where(
     and(
       eq(items.key, sql.placeholder("key")),
       eq(items.libraryId, sql.placeholder("libraryId")),
       itemExists(items.itemId),
     ),
-  );
+  )
+  .prepare();
 
 export function getAnnotationsByKey({
   keys,
