@@ -1,4 +1,4 @@
-import { itemAnnotations as annotations, items } from "@zt/schema";
+import { itemAnnotations as annotations, groups, items } from "@zt/schema";
 import { eq } from "drizzle-orm";
 import { pick } from "@std/collections";
 import { alias } from "drizzle-orm/sqlite-core";
@@ -30,9 +30,11 @@ export function buildAnnotationQuery() {
       ...annotationColumns,
       ...itemColumns,
       ...parentItemColumns,
+      groupId: groups.groupId,
     })
     .from(annotations)
     .innerJoin(items, eq(annotations.itemId, items.itemId))
+    .leftJoin(groups, eq(items.libraryId, groups.libraryId))
     .leftJoin(parentItems, eq(annotations.parentItemId, parentItems.itemId));
 }
 

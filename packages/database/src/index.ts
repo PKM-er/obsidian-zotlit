@@ -12,6 +12,14 @@ export {
   AnnotationType,
   TagType,
 } from "./lib/const";
+export { isAnnotatableAttachment, isFileAttachment } from "./lib/atch-assert";
+export { getCacheImagePath } from "./lib/cached-img-path";
+export {
+  getAnnotationBacklink,
+  getRegularItemBacklink,
+} from "./lib/zotero-backlink";
+
+export type { AnnotationPosition } from "./lib/position";
 export type { LibraryType, Library } from "./query/library/_common";
 
 export type {

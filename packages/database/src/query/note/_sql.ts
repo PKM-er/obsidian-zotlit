@@ -1,4 +1,4 @@
-import { itemNotes as notes, items } from "@zt/schema";
+import { itemNotes as notes, items, groups } from "@zt/schema";
 import { eq } from "drizzle-orm";
 import { pick } from "@std/collections";
 import { alias } from "drizzle-orm/sqlite-core";
@@ -19,9 +19,11 @@ export function buildNoteQuery() {
       ...noteColumns,
       ...itemColumns,
       ...parentItemColumns,
+      groupId: groups.groupId,
     })
     .from(notes)
     .innerJoin(items, eq(notes.itemId, items.itemId))
+    .leftJoin(groups, eq(items.libraryId, groups.libraryId))
     .leftJoin(parentItems, eq(notes.parentItemId, parentItems.itemId));
 }
 

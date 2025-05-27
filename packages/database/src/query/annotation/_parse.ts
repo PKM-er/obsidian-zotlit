@@ -24,6 +24,7 @@ export type AnnotationQueryResult = {
   sortIndex: SortIndex | null;
   position: AnnotationPosition | null;
   type: AnnotationTypeValue;
+  groupId: number | null;
 };
 
 export function parseAnnotation({

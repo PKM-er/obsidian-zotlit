@@ -6,6 +6,7 @@ export type NoteQueryResult = {
   parentItemKey: string | null;
   note: string | null;
   title: string | null;
+  groupId: number | null;
 };
 
 export function parseNote(result: NoteQueryRawResult): NoteQueryResult {
