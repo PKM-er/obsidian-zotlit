@@ -4,6 +4,18 @@ export type * from "./query/collection";
 export type * from "./query/library";
 export type * from "./query/item";
 
+export {
+  AttachmentLinkMode,
+  CreatorFieldMode,
+} from "./query/item/_const";
+export type {
+  AttachmentLinkModeValue,
+  ItemQueryAttachment,
+  ItemQueryCollection,
+  ItemQueryCreator,
+  ItemQueryResult,
+} from "./query/item/_parse";
+
 export type {
   initZotero,
   initBetterBibtex,

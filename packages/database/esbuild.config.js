@@ -3,9 +3,10 @@ import { build, context } from "esbuild";
 async function buildPackage(watch = false) {
   /** @type {import("esbuild").BuildOptions} */
   const baseOptions = {
-    entryPoints: ["./src/main.ts"],
+    entryPoints: ["./src/main.ts", "./src/index.ts"],
     outdir: "dist/src",
     bundle: true,
+    treeShaking: true,
     platform: "node",
     target: ["es2022"],
     format: "esm",

@@ -1,4 +1,5 @@
 import type { ItemQueryRawResult, ItemQueryRawField } from "./_sql";
+import * as v from "valibot";
 
 export interface ItemQueryCollection {
   key: string;
@@ -6,35 +7,30 @@ export interface ItemQueryCollection {
   collectionName: string;
   orderIndex: number;
 }
+
 export interface ItemQueryCreator {
   creatorId: number;
   firstName: string | null;
   lastName: string | null;
-  fieldMode: number | null;
+  fieldMode: CreatorFieldModeValue;
   type: string | null;
 }
 
-/**
- * Zotero.Attachments.linkModeToName
- */
-export const AttachmentLinkMode = {
-  importedFile: 0,
-  importedUrl: 1,
-  linkedFile: 2,
-  linkedUrl: 3,
-  embeddedImage: 4,
-} as const;
+const CreatorFieldModeSchema = v.fallback(
+  v.union([v.pipe(v.number(), v.integer(), v.minValue(0)), v.null()]),
+  null,
+);
 
-import * as v from "valibot";
+type CreatorFieldModeValue = v.InferOutput<typeof CreatorFieldModeSchema>;
 
-// could be one of 0, 1, 2, 3, 4, or other new types, invalid value fallback to null
-const attachmentLinkModeSchema = v.fallback(
+// could be included in enum or not, invalid value fallback to null
+const AttachmentLinkModeSchema = v.fallback(
   v.union([v.pipe(v.number(), v.integer(), v.minValue(0)), v.null()]),
   null,
 );
 
 export type AttachmentLinkModeValue = v.InferOutput<
-  typeof attachmentLinkModeSchema
+  typeof AttachmentLinkModeSchema
 >;
 
 export interface ItemQueryAttachment {
@@ -98,7 +94,7 @@ export function parseItem(
       charset: f.charset?.charset ?? null,
       contentType: f.contentType,
       key: f.item_itemId.key,
-      linkMode: v.parse(attachmentLinkModeSchema, f.linkMode),
+      linkMode: v.parse(AttachmentLinkModeSchema, f.linkMode),
       path: f.path,
       itemId: f.itemId,
     })),
@@ -107,12 +103,20 @@ export function parseItem(
       ...collection,
     })),
     creators: itemCreators
-      .map(({ orderIndex, creatorId, creator, creatorType }) => ({
-        ...creator,
-        orderIndex,
-        creatorId,
-        type: creatorType.creatorType,
-      }))
+      .map(
+        ({
+          orderIndex,
+          creatorId,
+          creator: { fieldMode, ...creator },
+          creatorType,
+        }) => ({
+          ...creator,
+          fieldMode: v.parse(CreatorFieldModeSchema, fieldMode),
+          orderIndex,
+          creatorId,
+          type: creatorType.creatorType,
+        }),
+      )
       .sort((a, b) => a.orderIndex - b.orderIndex),
     fields,
     clientDateModified: parseDateString(clientDateModified),

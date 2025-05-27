@@ -14,7 +14,18 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts"
+      "development": {
+        "import": "./dist/src/index.dev.js",
+        "types": "./dist/src/index.d.ts"
+      },
+      "production": {
+        "import": "./dist/src/index.prod.js",
+        "types": "./dist/src/index.d.ts"
+      },
+      "default": {
+        "import": "./dist/src/index.prod.js",
+        "types": "./dist/src/index.d.ts"
+      }
     },
     "./worker": {
       "development": {
