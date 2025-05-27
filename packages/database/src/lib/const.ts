@@ -24,3 +24,14 @@ export const AnnotationType = {
   underline: 5,
   text: 6,
 } as const;
+
+export const TagType = {
+  /**
+   * 0 or missing indicates a manually added tag
+   */
+  manual: 0,
+  /**
+   * 1 indicates an automatically fetched tag
+   */
+  auto: 1,
+} as const;

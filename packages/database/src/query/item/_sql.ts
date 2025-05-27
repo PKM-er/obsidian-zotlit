@@ -17,6 +17,10 @@ export function prepareItemQuery({
       },
       where: whereClause,
       with: {
+        itemTags: {
+          columns: { type: true },
+          with: { tag: { columns: { name: true, tagId: true } } },
+        },
         itemAttachments_parentItemId: {
           columns: {
             itemId: true,

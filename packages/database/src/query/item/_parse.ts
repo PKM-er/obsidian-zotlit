@@ -17,17 +17,15 @@ export interface ItemQueryCreator {
   type: string | null;
 }
 
+export interface ItemQueryTag {
+  tagId: number;
+  name: string;
+  type: TagTypeValue;
+}
+
 type CreatorFieldModeValue = v.InferOutput<typeof ZoteroEnumSchema>;
-
-// could be included in enum or not, invalid value fallback to null
-const AttachmentLinkModeSchema = v.fallback(
-  v.union([v.pipe(v.number(), v.integer(), v.minValue(0)), v.null()]),
-  null,
-);
-
-export type AttachmentLinkModeValue = v.InferOutput<
-  typeof AttachmentLinkModeSchema
->;
+type AttachmentLinkModeValue = v.InferOutput<typeof ZoteroEnumSchema>;
+type TagTypeValue = v.InferOutput<typeof ZoteroEnumSchema>;
 
 export interface ItemQueryAttachment {
   itemId: number;
@@ -39,6 +37,7 @@ export interface ItemQueryAttachment {
 }
 
 export interface ItemQueryResult {
+  tags: ItemQueryTag[];
   collections: ItemQueryCollection[];
   creators: ItemQueryCreator[];
   fields: ItemQueryField[];
@@ -74,6 +73,7 @@ export function parseItem(
   const {
     collectionItems,
     itemAttachments_parentItemId: attachments,
+    itemTags,
     itemCreators,
     clientDateModified,
     dateAdded,
@@ -86,11 +86,16 @@ export function parseItem(
 
   return {
     ...item,
+    tags: itemTags.map((f) => ({
+      tagId: f.tag.tagId,
+      name: f.tag.name,
+      type: v.parse(ZoteroEnumSchema, f.type),
+    })),
     attachments: attachments.map((f) => ({
       charset: f.charset?.charset ?? null,
       contentType: f.contentType,
       key: f.item_itemId.key,
-      linkMode: v.parse(AttachmentLinkModeSchema, f.linkMode),
+      linkMode: v.parse(ZoteroEnumSchema, f.linkMode),
       path: f.path,
       itemId: f.itemId,
     })),
