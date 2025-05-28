@@ -1,0 +1,9 @@
+{
+  "conventionalCommits.scopes": [
+    "app/obsidian",
+    "app/template",
+    "db",
+    "lib/better-sqlite3",
+    "lib/eta"
+  ]
+}
