@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"pnpm run dev:tsc\" \"pnpm run dev:esbuild\"",
-    "dev:tsc": "tsc --watch",
+    "dev:tsc": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "dev:esbuild": "node esbuild.config.js --watch",
-    "build:tsc": "tsc",
+    "build:tsc": "tsc && tsc-alias",
     "build:esbuild": "node esbuild.config.js",
     "build": "concurrently \"pnpm run build:tsc\" \"pnpm run build:esbuild\"",
     "typecheck": "tsc --noEmit",
@@ -27,18 +27,35 @@
         "types": "./dist/src/index.d.ts"
       }
     },
-    "./worker": {
+    "./obsidian": {
       "development": {
-        "import": "./dist/src/main.dev.js",
-        "types": "./dist/src/main.d.ts"
+        "browser": "./dist/src/obsidian.dev.js",
+        "import": "./dist/src/obsidian.dev.js",
+        "types": "./dist/src/obsidian.d.ts"
       },
       "production": {
-        "import": "./dist/src/main.prod.js",
-        "types": "./dist/src/main.d.ts"
+        "browser": "./dist/src/obsidian.prod.js",
+        "import": "./dist/src/obsidian.prod.js",
+        "types": "./dist/src/obsidian.d.ts"
       },
       "default": {
-        "import": "./dist/src/main.prod.js",
-        "types": "./dist/src/main.d.ts"
+        "browser": "./dist/src/obsidian.prod.js",
+        "import": "./dist/src/obsidian.prod.js",
+        "types": "./dist/src/obsidian.d.ts"
+      }
+    },
+    "./browser": {
+      "development": {
+        "import": "./dist/src/browser.dev.js",
+        "types": "./dist/src/browser.d.ts"
+      },
+      "production": {
+        "import": "./dist/src/browser.prod.js",
+        "types": "./dist/src/browser.d.ts"
+      },
+      "default": {
+        "import": "./dist/src/browser.prod.js",
+        "types": "./dist/src/browser.d.ts"
       }
     }
   },
@@ -54,11 +71,13 @@
     "concurrently": "^9.1.2",
     "drizzle-kit": "^0.31.1",
     "esbuild": "^0.25.4",
-		"typescript": "~5.8.2"
+    "tsc-alias": "^1.8.16",
+    "typescript": "~5.8.2"
   },
   "dependencies": {
     "@std/collections": "npm:@jsr/std__collections@^1.1.0",
     "drizzle-orm": "^0.43.1",
+    "sqlocal": "^0.14.1",
     "valibot": "^1.1.0",
     "worker-fn": "^3.2.1"
   }

@@ -8,10 +8,10 @@ import { getItemsById } from "../item/by-id";
  * @remarks The returned map's keys are the citation keys from the database,
  * which may not exactly match the input array's citekeys. This is because internally it performs a case-insensitive query.
  */
-export function getItemsByCitekey(citekeys: string[]) {
-  const itemIdsByCitekey = getItemsFromBibtexCitekey({ citekeys });
+export async function getItemsByCitekey(citekeys: string[]) {
+  const itemIdsByCitekey = await getItemsFromBibtexCitekey({ citekeys });
   const itemIds = [...itemIdsByCitekey.values()];
-  const itemsById = getItemsById({ items: itemIds });
+  const itemsById = await getItemsById({ items: itemIds });
   return new Map(
     itemIds.map(({ itemId, citekey }) => [citekey, itemsById.get(itemId)]),
   );

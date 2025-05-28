@@ -2,7 +2,7 @@ import { itemAnnotations as annotations, groups, items } from "@zt/schema";
 import { eq } from "drizzle-orm";
 import { pick } from "@std/collections";
 import { alias } from "drizzle-orm/sqlite-core";
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 
 const parentItems = alias(items, "parentItems");
 const parentItemColumns = {
@@ -39,5 +39,5 @@ export function buildAnnotationQuery() {
 }
 
 export type AnnotationQueryRawResult = NonNullable<
-  ReturnType<ReturnType<typeof buildAnnotationQuery>["get"]>
+  Awaited<ReturnType<ReturnType<typeof buildAnnotationQuery>["get"]>>
 >;

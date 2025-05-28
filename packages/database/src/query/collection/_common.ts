@@ -1,8 +1,10 @@
 import queryCollectionPath from "./with-path";
 import { collections } from "@zt/schema";
 
-export function resolveCollectionPath<T extends { id: number }>(rows: T[]) {
-  const pathResult = queryCollectionPath(rows);
+export async function resolveCollectionPath<T extends { id: number }>(
+  rows: T[],
+) {
+  const pathResult = await queryCollectionPath(rows);
   return rows.map((row) => ({
     path: pathResult.get(row.id) ?? [],
     ...row,

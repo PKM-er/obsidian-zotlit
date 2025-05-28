@@ -19,11 +19,10 @@ const statement = buildAnnotationQuery()
   )
   .prepare();
 
-export function getAnnotationsByParentItem({
+export async function getAnnotationsByParentItem({
   parentItemId,
 }: { parentItemId: number }) {
-  return statement
-    .all(v.parse(ParamsSchema, { parentItemId }))
+  return (await statement.all(v.parse(ParamsSchema, { parentItemId })))
     .sort(sortByIndex)
     .map(parseAnnotation);
 }

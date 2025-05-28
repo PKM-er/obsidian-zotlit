@@ -34,5 +34,4 @@ export type {
   initZotero,
   initBetterBibtex,
   init,
-  DatabaseConfig,
-} from "./main";
+} from "./obsidian";

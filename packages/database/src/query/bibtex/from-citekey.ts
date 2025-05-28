@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { db } from "@/db/bbt";
+import { db } from "@db/bbt";
 import { citationkey as citationTable } from "@bbt/schema";
 import * as v from "valibot";
 
@@ -35,21 +35,20 @@ const statement = db
  *          Citekeys from the input array that are not found in the database will not
  *          be included in the returned map.
  */
-export function getItemsFromBibtexCitekey({
+export async function getItemsFromBibtexCitekey({
   citekeys,
 }: {
   citekeys: string[];
-}): Map<string, { itemId: number; libraryId: number; citekey: string }> {
-  const params = citekeys.map((citekey) => v.parse(ParamSchema, { citekey }));
-  const items = citekeys
-    .map((citekey) => statement.get(v.parse(ParamSchema, { citekey })))
-    .filter((v) => !!v);
-
-  console.log(params, items);
+}) {
   return new Map(
-    items.map(({ citekey, itemId, libraryId }) => [
-      citekey,
-      { itemId, libraryId, citekey },
-    ]),
+    (
+      await Promise.all(
+        citekeys.map((citekey) =>
+          statement.get(v.parse(ParamSchema, { citekey })),
+        ),
+      )
+    )
+      .filter((v) => !!v)
+      .map((v) => [v.citekey, v]),
   );
 }

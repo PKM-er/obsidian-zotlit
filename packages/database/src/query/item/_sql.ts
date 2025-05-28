@@ -1,4 +1,4 @@
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import type { SQL } from "drizzle-orm";
 
 export function prepareItemQuery({
@@ -88,8 +88,8 @@ export function prepareItemQuery({
     })
     .prepare();
 }
-export type ItemQueryRawResult = ReturnType<
-  ReturnType<typeof prepareItemQuery>["all"]
+export type ItemQueryRawResult = Awaited<
+  ReturnType<ReturnType<typeof prepareItemQuery>["all"]>
 >[number];
 export type ItemQueryRawField = {
   itemId: number | null;

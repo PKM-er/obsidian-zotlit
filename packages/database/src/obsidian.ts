@@ -1,23 +1,13 @@
 import { defineWorkerFns } from "worker-fn";
-
-export interface DatabaseConfig {
-  dbPaths: {
-    zotero: string;
-    betterBibtex: string;
-  };
-  nativeBinding: string;
-}
-
-declare global {
-  var DB_CONFIG: DatabaseConfig | undefined;
-}
+import type { DatabaseConfig } from "../types/globals";
 
 export function init(config: DatabaseConfig) {
-  self.DB_CONFIG = config;
+  globalThis.DB_CONFIG = config;
+  globalThis.DB_ENV = "node";
 }
 
 export async function initZotero() {
-  void (await import("@/db/zotero"));
+  void (await import("@/db/zotero.node"));
   defineWorkerFns({
     ...(await import("@/query/annotation")),
     ...(await import("@/query/collection")),
@@ -29,7 +19,7 @@ export async function initZotero() {
 }
 
 export async function initBetterBibtex() {
-  void (await import("@/db/bbt"));
+  void (await import("@/db/bbt.node"));
   defineWorkerFns({
     ...(await import("@/query/bibtex")),
   });

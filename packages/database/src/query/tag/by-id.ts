@@ -13,13 +13,17 @@ const statement = prepareTagQuery({
   where: eq(tags.tagId, sql.placeholder("tagId")),
 });
 
-export function getTagsById({ tags }: { tags: { tagId: number }[] }) {
+export async function getTagsById({ tags }: { tags: { tagId: number }[] }) {
   return new Map(
-    tags
-      .map((tag) =>
-        statement.all(v.parse(ParamsSchema, { tagId: tag.tagId })).at(0),
+    (
+      await Promise.all(
+        tags.map(async (tag) => {
+          const [value] = await statement.get(
+            v.parse(ParamsSchema, { tagId: tag.tagId }),
+          );
+          return value ? ([tag.tagId, parseTag(value)] as const) : null;
+        }),
       )
-      .filter((v) => !!v)
-      .map((v) => [v.tagId, parseTag(v)]),
+    ).filter((v) => !!v),
   );
 }

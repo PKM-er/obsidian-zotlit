@@ -1,4 +1,4 @@
-import workerCode from "inline:@zotlit/database/worker";
+import workerCode from "inline:@zotlit/database/obsidian";
 import type {
   initZotero,
   initBetterBibtex,

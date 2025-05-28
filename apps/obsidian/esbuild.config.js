@@ -23,6 +23,7 @@ await mkdir(distDir);
 
 /** @type {import("esbuild").BuildOptions} */
 const baseConfig = {
+  platform: "node",
   define: {
     "process.env.NODE_ENV": JSON.stringify(
       process.env.NODE_ENV || "development",

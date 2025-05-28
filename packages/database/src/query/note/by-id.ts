@@ -15,10 +15,15 @@ const statement = buildNoteQuery()
   )
   .prepare();
 
-export function getNotesById({ items }: { items: { itemId: number }[] }) {
+export async function getNotesById({ items }: { items: { itemId: number }[] }) {
   return new Map(
-    items
-      .map(({ itemId }) => statement.get(v.parse(ParamsSchema, { itemId })))
+    (
+      await Promise.all(
+        items.map(({ itemId }) =>
+          statement.get(v.parse(ParamsSchema, { itemId })),
+        ),
+      )
+    )
       .filter((v) => !!v)
       .map((v) => [v.itemId, parseNote(v)]),
   );

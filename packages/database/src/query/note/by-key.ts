@@ -20,13 +20,18 @@ const statement = buildNoteQuery()
   )
   .prepare();
 
-export function getNotesByKey({
+export async function getNotesByKey({
   keys,
   libraryId,
 }: { keys: string[]; libraryId: number }) {
   return new Map(
-    keys
-      .map((key) => statement.get(v.parse(ParamsSchema, { key, libraryId })))
+    (
+      await Promise.all(
+        keys.map((key) =>
+          statement.get(v.parse(ParamsSchema, { key, libraryId })),
+        ),
+      )
+    )
       .filter((v) => !!v)
       .map((v) => [v.key, parseNote(v)]),
   );

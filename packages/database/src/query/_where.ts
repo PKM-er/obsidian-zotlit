@@ -1,6 +1,6 @@
 import { and, isNotNull, notInArray } from "drizzle-orm";
 import { deletedItems } from "@zt/schema";
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import type { SQLiteColumn } from "drizzle-orm/sqlite-core";
 
 /**

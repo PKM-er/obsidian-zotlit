@@ -1,11 +1,12 @@
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import { collections } from "@zt/schema";
 import { eq, sql } from "drizzle-orm";
 import { collectionColumns, resolveCollectionPath } from "./_common";
+import * as v from "valibot";
 
-type Params = {
-  key: string;
-};
+const ParamsSchema = v.object({
+  key: v.string(),
+});
 
 const statement = db
   .select(collectionColumns)
@@ -13,9 +14,9 @@ const statement = db
   .where(eq(collections.key, sql.placeholder("key")))
   .prepare();
 
-export function getCollectionByKey({ key }: { key: string }) {
-  const result = statement.get({ key } satisfies Params);
+export async function getCollectionByKey({ key }: { key: string }) {
+  const result = await statement.get(v.parse(ParamsSchema, { key }));
   if (!result) return null;
-  const parsed = resolveCollectionPath([result]);
+  const parsed = await resolveCollectionPath([result]);
   return parsed.at(0) ?? null;
 }

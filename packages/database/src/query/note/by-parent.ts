@@ -18,8 +18,10 @@ const statement = buildNoteQuery()
   )
   .prepare();
 
-export function getNotesByParentItem({
+export async function getNotesByParentItem({
   parentItemId,
 }: { parentItemId: number }) {
-  return statement.all(v.parse(ParamsSchema, { parentItemId })).map(parseNote);
+  return (await statement.all(v.parse(ParamsSchema, { parentItemId }))).map(
+    parseNote,
+  );
 }

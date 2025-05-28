@@ -14,15 +14,17 @@ const statement = prepareTagQuery({
   where: eq(sql`lower(${tags.name})`, sql.placeholder("name")),
 });
 
-export function getTagsByName({ tags }: { tags: { name: string }[] }) {
+export async function getTagsByName({ tags }: { tags: { name: string }[] }) {
   const tagNamesLower = distinct(tags.map((t) => t.name.toLowerCase()));
   return new Map(
-    tagNamesLower
-      .map((name) => {
-        const result = statement.all(v.parse(ParamsSchema, { name }));
-        if (result.length === 0) return null;
-        return [name, result.map(parseTag)] as const;
-      })
-      .filter((v) => !!v),
+    (
+      await Promise.all(
+        tagNamesLower.map(async (name) => {
+          const result = await statement.all(v.parse(ParamsSchema, { name }));
+          if (result.length === 0) return null;
+          return [name, result.map(parseTag)] as const;
+        }),
+      )
+    ).filter((v) => !!v),
   );
 }

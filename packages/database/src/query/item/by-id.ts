@@ -3,8 +3,8 @@ import { items } from "@zt/schema";
 import { parseItem } from "./_parse";
 import { prepareItemQuery } from "./_sql";
 import { getItemType } from "./_item-type";
-import { db } from "@/db/zotero";
 import { itemExists } from "../_where";
+import * as v from "valibot";
 
 const statement = prepareItemQuery({
   where: and(
@@ -13,21 +13,20 @@ const statement = prepareItemQuery({
   ),
 });
 
-type Params = {
-  itemId: number;
-};
+const ParamsSchema = v.object({
+  itemId: v.number(),
+});
 
-export function getItemsById({ items }: { items: { itemId: number }[] }) {
-  const result = db.transaction(() =>
-    items
-      .map(({ itemId }) =>
-        parseItem(statement.all({ itemId } satisfies Params).at(0)),
-      )
-      .filter((v) => !!v)
-      .map(({ itemTypeId, ...item }) => ({
-        ...item,
-        type: getItemType(itemTypeId),
-      })),
+export async function getItemsById({ items }: { items: { itemId: number }[] }) {
+  const values = await Promise.all(
+    items.map(async ({ itemId }) => {
+      const item = parseItem(
+        (await statement.all(v.parse(ParamsSchema, { itemId }))).at(0),
+      );
+      if (!item) return null;
+      const { itemTypeId, ...rest } = item;
+      return { ...rest, type: await getItemType({ itemTypeId }) };
+    }),
   );
-  return new Map(result.map((v) => [v.itemId, v]));
+  return new Map(values.filter((v) => !!v).map((v) => [v.itemId, v]));
 }

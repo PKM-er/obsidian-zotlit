@@ -21,11 +21,12 @@
       "@zt/*": ["./drizzle/zotero/*"],
       "@bbt/*": ["./drizzle/bbt/*"],
       "@/*": ["./src/*"]
-    }
+    },
   },
   "include": [
     "./src/**/*.ts",
-    "./drizzle/**/*.ts"
+    "./drizzle/**/*.ts",
+    "./types/**/*.d.ts"
   ],
   "exclude": [
     "./node_modules",

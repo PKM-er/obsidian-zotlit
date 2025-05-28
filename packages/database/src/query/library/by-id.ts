@@ -1,5 +1,5 @@
 import { groups, libraries } from "@zt/schema";
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import { eq, sql } from "drizzle-orm";
 
 import * as v from "valibot";
@@ -21,8 +21,8 @@ const statement = db
   .where(eq(libraries.libraryId, sql.placeholder("libraryId")))
   .prepare();
 
-export function getLibraryById({ libraryId }: { libraryId: number }) {
-  const result = statement.get(v.parse(ParamsSchema, { libraryId }));
+export async function getLibraryById({ libraryId }: { libraryId: number }) {
+  const result = await statement.get(v.parse(ParamsSchema, { libraryId }));
   if (!result) return null;
   return v.parse(LibrarySchema, result);
 }

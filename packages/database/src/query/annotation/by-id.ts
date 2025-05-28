@@ -16,10 +16,17 @@ const statement = buildAnnotationQuery()
   )
   .prepare();
 
-export function getAnnotationsById({ items }: { items: { itemId: number }[] }) {
+export async function getAnnotationsById({
+  items,
+}: { items: { itemId: number }[] }) {
   return new Map(
-    items
-      .map(({ itemId }) => statement.get(v.parse(ParamsSchema, { itemId })))
+    (
+      await Promise.all(
+        items.map(({ itemId }) =>
+          statement.get(v.parse(ParamsSchema, { itemId })),
+        ),
+      )
+    )
       .filter((v) => !!v)
       .sort(sortByIndex)
       .map((v) => [v.itemId, parseAnnotation(v)]),

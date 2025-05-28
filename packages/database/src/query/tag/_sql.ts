@@ -1,4 +1,4 @@
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import type { SQL } from "drizzle-orm";
 
 export function prepareTagQuery({
@@ -18,6 +18,6 @@ export function prepareTagQuery({
     .prepare();
 }
 
-export type TagQueryRawResult = ReturnType<
-  ReturnType<typeof prepareTagQuery>["all"]
+export type TagQueryRawResult = Awaited<
+  ReturnType<ReturnType<typeof prepareTagQuery>["all"]>
 >[number];

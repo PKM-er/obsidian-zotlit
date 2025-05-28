@@ -1,5 +1,6 @@
 import { collections } from "@zt/schema";
 import { eq, sql } from "drizzle-orm";
+import * as v from "valibot";
 
 // use drizzle native method when https://github.com/drizzle-team/drizzle-orm/issues/209 lands
 const collectionsWithPathTable = sql.raw('"collectionsWithPath"');
@@ -8,9 +9,10 @@ export type Result = {
   id: number;
   path: string;
 };
-export type Params = {
-  id: number;
-};
+export const ParamsSchema = v.object({
+  id: v.number(),
+});
+export type Params = v.InferOutput<typeof ParamsSchema>;
 
 export { pathQuerySql as sql };
 

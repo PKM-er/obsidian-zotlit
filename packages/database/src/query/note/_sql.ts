@@ -2,7 +2,7 @@ import { itemNotes as notes, items, groups } from "@zt/schema";
 import { eq } from "drizzle-orm";
 import { pick } from "@std/collections";
 import { alias } from "drizzle-orm/sqlite-core";
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 
 const parentItems = alias(items, "parentItems");
 const parentItemColumns = {
@@ -28,5 +28,5 @@ export function buildNoteQuery() {
 }
 
 export type NoteQueryRawResult = NonNullable<
-  ReturnType<ReturnType<typeof buildNoteQuery>["get"]>
+  Awaited<ReturnType<ReturnType<typeof buildNoteQuery>["get"]>>
 >;

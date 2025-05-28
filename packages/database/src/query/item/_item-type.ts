@@ -1,5 +1,6 @@
-import { db } from "@/db/zotero";
+import { db } from "@db/zotero";
 import { sql } from "drizzle-orm";
+import * as v from "valibot";
 
 const statement = db.query.itemTypesCombined
   .findFirst({
@@ -14,10 +15,10 @@ const statement = db.query.itemTypesCombined
   })
   .prepare();
 
-type Params = {
-  itemTypeId: number;
-};
+const ParamsSchema = v.object({
+  itemTypeId: v.number(),
+});
 
-export function getItemType(itemTypeId: number) {
-  return statement.get({ itemTypeId } satisfies Params);
+export async function getItemType({ itemTypeId }: { itemTypeId: number }) {
+  return await statement.get(v.parse(ParamsSchema, { itemTypeId }));
 }
