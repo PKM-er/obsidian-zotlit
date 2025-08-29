@@ -1,12 +1,12 @@
-import type { IDLibID, LibraryInfo } from "@obzt/database";
+import type { IDLibID, LibraryInfo, RelationInfo } from "@obzt/database";
 import {
   AllLibraries,
   BBT_MAIN_DB_NAME,
-  BBT_SEARCH_DB_NAME,
-  BibtexGetCitekeyV0,
   BibtexGetCitekeyV1,
-  BibtexGetIdV0,
   BibtexGetIdV1,
+  Relations,
+  ItemsByKey,
+  extractZoteroKey,
 } from "@obzt/database";
 import type {
   BBTLoadStatus,
@@ -18,14 +18,9 @@ import type {
 import log from "@log";
 import Database, { DatabaseNotSetError } from "./database";
 
-function isBBTAfterMigration(db: Database) {
-  return db.tableExists("citationkey", BBT_MAIN_DB_NAME);
-}
-
 export default class Connections {
   #instance: {
     zotero: Database;
-    bbtAfterMigration: boolean;
     libraries: Record<number, LibraryInfo>;
   } | null = null;
 
@@ -48,31 +43,15 @@ export default class Connections {
       return {
         main: false,
         bbtMain: false,
-        bbtSearch: null,
+        bbtSearch: null, // Legacy field, always null in Zotero 6+
       };
     }
     const loadedDb = this.#instance.zotero.databaseList;
     const isMainLoaded = loadedDb.some((v) => v.name === BBT_MAIN_DB_NAME);
-    if (!isMainLoaded)
-      return {
-        main: true,
-        bbtMain: false,
-        bbtSearch: null,
-      };
-
-    // In v6.7.128+, citekeys are stored in main db
-    if (this.#instance.bbtAfterMigration)
-      return {
-        main: true,
-        bbtMain: true,
-        bbtSearch: null,
-      };
-    // Before v6.7.128, the citekeys is stored in dedicated database
-    const isSearchLoaded = loadedDb.some((v) => v.name === BBT_SEARCH_DB_NAME);
     return {
       main: true,
-      bbtMain: true,
-      bbtSearch: isSearchLoaded,
+      bbtMain: isMainLoaded,
+      bbtSearch: null, // Legacy field, always null in Zotero 6+
     };
   }
   get bbtLoadStatus(): boolean {
@@ -84,19 +63,68 @@ export default class Connections {
 
   getItemIDsFromCitekey(citekeys: string[]) {
     if (!this.#instance) throw new DatabaseNotSetError();
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const BibtexGetId = this.#instance.bbtAfterMigration
-      ? BibtexGetIdV1
-      : BibtexGetIdV0;
-    return this.#instance.zotero.prepare(BibtexGetId).query({ citekeys });
+    // Only use V1 query for Zotero 6+ / BBT 6.0+
+    return this.#instance.zotero.prepare(BibtexGetIdV1).query({ citekeys });
   }
   getCitekeys(items: IDLibID[]) {
     if (!this.#instance) throw new DatabaseNotSetError();
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const BibtexGetCitekey = this.#instance.bbtAfterMigration
-      ? BibtexGetCitekeyV1
-      : BibtexGetCitekeyV0;
-    return this.#instance.zotero.prepare(BibtexGetCitekey).query({ items });
+    // Only use V1 query for Zotero 6+ / BBT 6.0+
+    return this.#instance.zotero.prepare(BibtexGetCitekeyV1).query({ items });
+  }
+
+  getRelations(items: IDLibID[]) {
+    if (!this.#instance) throw new DatabaseNotSetError();
+
+    // Get simplified relations first
+    const rawRelations = this.#instance.zotero.prepare(Relations).query(items);
+
+    // Process relations to extract keys and resolve related items
+    const processedRelations: Record<number, RelationInfo[]> = {};
+
+    Object.entries(rawRelations).forEach(([itemIdStr, relationList]) => {
+      const itemId = parseInt(itemIdStr);
+      processedRelations[itemId] = [];
+
+      relationList.forEach(relation => {
+        // Extract the Zotero key from URI or use as-is
+        const extractedKey = extractZoteroKey(relation.relatedItemKey);
+
+        // Look up the related item by key
+        let relatedItem = null;
+        try {
+          // Try to find the related item by key in the same library first
+          const currentLibrary = items.find(([itemID]) => itemID === relation.itemID)?.[1];
+          if (currentLibrary && this.#instance) {
+            relatedItem = this.#instance.zotero.prepare(ItemsByKey).query([[extractedKey, currentLibrary]])?.[extractedKey];
+          }
+
+          // If not found in same library, search all libraries
+          if (!relatedItem && this.#instance) {
+            for (const library of Object.keys(this.#instance.libraries).map(Number)) {
+              relatedItem = this.#instance.zotero.prepare(ItemsByKey).query([[extractedKey, library]])?.[extractedKey];
+              if (relatedItem) break;
+            }
+          }
+        } catch (error) {
+          // Item not found, continue without related item details
+        }
+
+        // Build the relation info with the expected properties
+        const relationInfo: RelationInfo = {
+          itemID: relation.itemID,
+          relatedItemKey: relation.relatedItemKey,
+          relationType: relation.relationType,
+          // Add properties expected by the existing code
+          relatedZoteroKey: extractedKey,
+          relatedItemID: relatedItem?.itemID || null,
+          relatedLibraryID: relatedItem?.libraryID || null,
+        } as any;
+
+        processedRelations[itemId].push(relationInfo);
+      });
+    });
+
+    return processedRelations;
   }
 
   load(paths: DatabasePaths, opts: DatabaseOptions): LoadStatus {
@@ -122,7 +150,6 @@ export default class Connections {
         );
       this.#instance = {
         ...db,
-        bbtAfterMigration: bbtLoadStatus.bbtSearch === null,
         libraries,
       };
       this.status = "READY";
@@ -162,25 +189,6 @@ function openBetterBibtex(paths: DatabasePaths, db: Database): BBTLoadStatus {
     }
     return { bbtMain: false, bbtSearch: null };
   }
-  const isAfterMigration = isBBTAfterMigration(db);
-  if (isAfterMigration) return { bbtMain: true, bbtSearch: null };
-  try {
-    db.attachDatabase(
-      `file:${paths.bbtSearch}?mode=ro&immutable=1`,
-      BBT_MAIN_DB_NAME,
-    );
-  } catch (err) {
-    const { code } = err as { code: string };
-    if (code === "SQLITE_CANTOPEN") {
-      log.debug(
-        `Unable to open bbt search database, no database found at ${paths.bbtSearch}`,
-      );
-    } else {
-      log.debug(
-        `Unable to open bbt search database, ${code} @ ${paths.bbtSearch}`,
-      );
-    }
-    return { bbtMain: true, bbtSearch: false };
-  }
-  return { bbtMain: true, bbtSearch: true };
+  // For Zotero 6+ / BBT 6.0+, we only use the main database
+  return { bbtMain: true, bbtSearch: null };
 }

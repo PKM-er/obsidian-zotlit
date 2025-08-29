@@ -7,7 +7,12 @@ import type {
   RegularItemInfoBase,
   Collection,
 } from "@obzt/database";
-import { Creators, ItemFields, Collections } from "@obzt/database";
+import {
+  Attachements,
+  Collections,
+  Creators,
+  ItemFields,
+} from "@obzt/database";
 // import { use } from "to-use";
 import log from "@log";
 import { conn } from "../globals";
@@ -27,11 +32,44 @@ export default class ItemBuilder {
     return result;
   }
 
+  readRelatedCitekeys(relations: Record<number, any[]>) {
+    log.debug("Reading Better BibTex for related items");
+    if (!this.#conn.bbtLoadStatus) {
+      log.info("Better BibTex database not enabled, skipping related citation keys...");
+      return {};
+    }
+
+    // Extract related item IDs and libraries from relations
+    const relatedItems: IDLibID[] = [];
+    Object.values(relations).forEach(relationList => {
+      relationList.forEach(relation => {
+        if ((relation as any).relatedItemID && (relation as any).relatedLibraryID) {
+          relatedItems.push([(relation as any).relatedItemID, (relation as any).relatedLibraryID]);
+        }
+      });
+    });
+
+    if (relatedItems.length === 0) {
+      return {};
+    }
+
+    const result = this.#conn.getCitekeys(relatedItems);
+    log.info("Finished reading Better BibTex for related items");
+    return result;
+  }
+
   toItemObjects(itemIDMap: Record<number, ItemDetails>, itemIDs: IDLibID[]) {
     const citekeyMap = this.readCitekeys(itemIDs);
 
     const itemFields = this.#conn.zotero.prepare(ItemFields).query(itemIDs),
       creators = this.#conn.zotero.prepare(Creators).query(itemIDs);
+
+    // Get relations using the simplified query
+    const relations = this.#conn.getRelations(itemIDs);
+
+    // Get citation keys for related items (clean separation like main items)
+    const relatedCiteKeyMap = this.readRelatedCitekeys(relations);
+
     const collectionIDs = uniq(
       itemIDs.flatMap(
         ([itemID]) =>
@@ -55,11 +93,26 @@ export default class ItemBuilder {
       const fields = itemFields[itemID].reduce((fields, field) => {
         let { value } = field;
         if (field.fieldName === "date") {
-          value = multipartToSQL(value as string).split("-")[0];
+          value = multipartToSQL(value as string);
         }
         (fields[field.fieldName] ??= []).push(value);
         return fields;
       }, {} as Record<string, unknown[]>);
+
+      // Add related items to fields with enhanced data
+      if (relations[itemID] && relations[itemID].length > 0) {
+        fields.relatedItems = relations[itemID].map(relation => {
+          const groupID = this.#conn.groupOf(libraryID);
+          const libraryPath = typeof groupID === "number" ? `groups/${groupID}` : "library";
+          const backlink = `zotero://select/${libraryPath}/items/${relation.relatedZoteroKey}`;
+
+          return {
+            ...relation,
+            relatedCiteKey: relatedCiteKeyMap[(relation as any).relatedItemID] || null,
+            backlink
+          };
+        });
+      }
 
       const { collectionIDs, ...data } = itemIDMap[itemID],
         collections = collectionIDs

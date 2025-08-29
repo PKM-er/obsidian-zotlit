@@ -92,6 +92,13 @@ class Main {
         `notes with keys: ${noteKeys.join(",")}` +
         (notes ? `, count: ${notes.length}` : ""),
     ),
+    getRelations: attachLogger(
+      (items: [number, number][]) =>
+        this.#conn.getRelations(items),
+      (relations, items) =>
+        `relations for items: ${items.map(([id]) => id).join(",")}` +
+        (relations ? `, count: ${Object.keys(relations).length}` : ""),
+    ),
     isUpToDate: () => this.#conn.zotero.isUpToDate(),
     getLoadStatus: () => {
       const status = this.#conn.loadStatus;
