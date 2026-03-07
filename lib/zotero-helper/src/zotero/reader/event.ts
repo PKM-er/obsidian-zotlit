@@ -9,6 +9,11 @@ export interface ReaderEvent {
   blur: (attachmentId: number, instanceId: string) => void;
 }
 
+/** Safely access Reader._readers, returning empty array if unavailable */
+function getReaders(reader: _ZoteroTypes.Reader): _ZoteroTypes.ReaderInstance[] {
+  return (reader as any)._readers ?? [];
+}
+
 export class ReaderEventHelper extends Component {
   constructor(public app: typeof Zotero) {
     super();
@@ -20,16 +25,24 @@ export class ReaderEventHelper extends Component {
     self.app.log("hooking into _initIframeWindow");
     const reader = this.app.Reader;
 
-    // if reader is available, hook into existing iframe
-    if (this.#hookInitIframeWindow(reader._readers)) {
-      reader._readers.map((r) => this.#hookIframeWindow(r));
-      return;
+    try {
+      const readers = getReaders(reader);
+      // if reader is available, hook into existing iframe
+      if (this.#hookInitIframeWindow(readers)) {
+        readers.map((r) => this.#hookIframeWindow(r));
+        return;
+      }
+      this.register(
+        onReaderOpen(this.app.Reader, () =>
+          this.#hookInitIframeWindow(getReaders(reader)),
+        ),
+      );
+    } catch (e) {
+      self.app.logError(e as Error);
+      self.app.log(
+        "ZotLit: Failed to hook reader events. Reader features may be unavailable in this Zotero version.",
+      );
     }
-    this.register(
-      onReaderOpen(this.app.Reader, () =>
-        this.#hookInitIframeWindow(reader._readers),
-      ),
-    );
   }
 
   event = createNanoEvents<ReaderEvent>();
@@ -41,9 +54,16 @@ export class ReaderEventHelper extends Component {
   #hookInitIframeWindow(readers: _ZoteroTypes.ReaderInstance[]): boolean {
     if (readers.length === 0) return false;
     const instance = readers[0];
+    const proto = instance.constructor.prototype as _ZoteroTypes.ReaderInstance;
+    if (typeof (proto as any)._initIframeWindow !== "function") {
+      this.app.log(
+        "ZotLit: _initIframeWindow not found on reader prototype. Reader event hooks unavailable.",
+      );
+      return true; // Return true to prevent retrying via onReaderOpen
+    }
     const self = this;
     this.register(
-      around(instance.constructor.prototype as _ZoteroTypes.ReaderInstance, {
+      around(proto, {
         _initIframeWindow: (next) =>
           function (this: _ZoteroTypes.ReaderInstance) {
             const result = next.call(this);
@@ -56,24 +76,35 @@ export class ReaderEventHelper extends Component {
   }
 
   public onunload(): void {
-    this.app.Reader._readers.forEach((r) => {
-      this.observers.get(r)?.disconnect();
-      const onFocus = this.focusHandlers.get(r),
-        onBlur = this.blurHandlers.get(r);
-      onFocus && r._iframeWindow?.removeEventListener("focus", onFocus);
-      onBlur && r._iframeWindow?.removeEventListener("blur", onBlur);
-    });
+    try {
+      getReaders(this.app.Reader).forEach((r) => {
+        this.observers.get(r)?.disconnect();
+        const onFocus = this.focusHandlers.get(r),
+          onBlur = this.blurHandlers.get(r);
+        onFocus && r._iframeWindow?.removeEventListener("focus", onFocus);
+        onBlur && r._iframeWindow?.removeEventListener("blur", onBlur);
+      });
+    } catch (e) {
+      this.app.logError(e as Error);
+    }
   }
 
   async #hookIframeWindow(reader: _ZoteroTypes.ReaderInstance) {
-    await reader._initPromise;
-    const window = reader._iframeWindow as unknown as typeof globalThis | null;
-    if (!window) {
-      this.app.logError(new Error("iframeWindow not found"));
-      return;
+    try {
+      await reader._initPromise;
+      const window = reader._iframeWindow as unknown as typeof globalThis | null;
+      if (!window) {
+        this.app.logError(new Error("iframeWindow not found"));
+        return;
+      }
+      this.#watchAnnotSelect(window, reader);
+      this.#watchFocusChange(window, reader);
+    } catch (e) {
+      this.app.logError(e as Error);
+      this.app.log(
+        "ZotLit: Failed to hook iframe window for reader. Some reader features may be unavailable.",
+      );
     }
-    this.#watchAnnotSelect(window, reader);
-    this.#watchFocusChange(window, reader);
   }
   #watchAnnotSelect(
     window: typeof globalThis,

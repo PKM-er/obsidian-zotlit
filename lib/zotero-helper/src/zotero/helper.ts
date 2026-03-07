@@ -29,6 +29,15 @@ export function isZotero7(Zotero: any) {
 }
 
 /**
+ * Check if running in Zotero 8+ (Firefox 140 ESR).
+ * Zotero 7.0 = Firefox 115, Zotero 8 = Firefox 140.
+ */
+export function isZotero8(Zotero: any) {
+  return Zotero.platformMajorVersion >= 128;
+}
+
+/**
+ * @deprecated Only used by Zotero 6 preference pane polyfill. Will be removed when Zotero 6 compat is dropped.
  * Parse XHTML to XUL fragment. For Zotero 6.
  *
  * @param entities Array of URIs of DTD files to use for parsing the XHTML fragment ("chrome://xxx.dtd")

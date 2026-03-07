@@ -54,6 +54,6 @@
     "typescript": "~5.1.6"
   },
   "browserslist": [
-    "firefox >= 60"
+    "firefox >= 102"
   ]
 }

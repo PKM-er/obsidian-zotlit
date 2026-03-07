@@ -64,6 +64,11 @@ export interface ReaderMenuEvent {
   ) => any;
 }
 
+/** Safely access Reader._readers, returning empty array if unavailable */
+function getReaders(reader: _ZoteroTypes.Reader): _ZoteroTypes.ReaderInstance[] {
+  return (reader as any)._readers ?? [];
+}
+
 export class ReaderMenuHelper extends Component {
   event = createNanoEvents<ReaderMenuEvent>();
 
@@ -75,20 +80,52 @@ export class ReaderMenuHelper extends Component {
     const self = this;
 
     self.app.log("hooking into _openAnnotationPopup");
-    if (this.#hookOpenAnnotPopup()) return;
-    this.register(
-      onReaderOpen(this.app.Reader, () => this.#hookOpenAnnotPopup()),
-    );
+    try {
+      if (this.#hookOpenAnnotPopup()) return;
+      this.register(
+        onReaderOpen(this.app.Reader, () => this.#hookOpenAnnotPopup()),
+      );
+    } catch (e) {
+      self.app.logError(e as Error);
+      self.app.log(
+        "ZotLit: Failed to hook reader menus. Reader context menu features may be unavailable in this Zotero version.",
+      );
+    }
   }
 
   patchedPopups = new WeakSet<Element>();
 
   #hookOpenAnnotPopup(): boolean {
-    const readers = this.app.Reader._readers;
+    const readers = getReaders(this.app.Reader);
     if (readers.length === 0) return false;
     const reader = readers[0];
+    const proto = reader.constructor.prototype as any;
     const self = this;
-    function* menuFrom(popupset: Element) {
+
+    // Check which private popup methods exist on the prototype
+    const popupMethods = [
+      "_openAnnotationPopup",
+      "_openPagePopup",
+      "_openTagsPopup",
+      "_openColorPopup",
+      "_openThumbnailPopup",
+      "_openSelectorPopup",
+    ] as const;
+    const missingMethods = popupMethods.filter(
+      (m) => typeof proto[m] !== "function",
+    );
+    if (missingMethods.length > 0) {
+      self.app.log(
+        `ZotLit: Reader popup methods not found: ${missingMethods.join(", ")}. Reader context menus may be unavailable in this Zotero version.`,
+      );
+    }
+    if (missingMethods.length === popupMethods.length) {
+      // None of the methods exist — skip monkey-patching entirely
+      return true;
+    }
+
+    function* menuFrom(popupset: Element | undefined | null) {
+      if (!popupset) return;
       for (const popup of popupset.children) {
         if (
           !popup ||
@@ -113,108 +150,129 @@ export class ReaderMenuHelper extends Component {
       }
       return itemID;
     }
-    this.register(
-      around(reader.constructor.prototype as _ZoteroTypes.ReaderInstance, {
-        _openAnnotationPopup: (next) =>
-          function (
-            this: _ZoteroTypes.ReaderInstance,
-            data: AnnotPopupData,
-            ...args
-          ) {
-            const reader = this;
-            const result = next.call(this, data, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset)) {
-                self.event.emit("annot", menu, data, itemID, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+
+    // Build patches only for methods that exist
+    const patches: Record<string, any> = {};
+
+    if (typeof proto._openAnnotationPopup === "function") {
+      patches._openAnnotationPopup = (next: any) =>
+        function (
+          this: _ZoteroTypes.ReaderInstance,
+          data: AnnotPopupData,
+          ...args: any[]
+        ) {
+          const reader = this;
+          const result = next.call(this, data, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset)) {
+              self.event.emit("annot", menu, data, itemID, reader);
             }
-            return result;
-          },
-        _openPagePopup: (next) =>
-          function (
-            this: _ZoteroTypes.ReaderInstance,
-            data,
-            secondView,
-            ...args
-          ) {
-            const reader = this;
-            const result = next.call(this, data, secondView, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("page", menu, data, itemID, secondView, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (typeof proto._openPagePopup === "function") {
+      patches._openPagePopup = (next: any) =>
+        function (
+          this: _ZoteroTypes.ReaderInstance,
+          data: any,
+          secondView: any,
+          ...args: any[]
+        ) {
+          const reader = this;
+          const result = next.call(this, data, secondView, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset as Element)) {
+              self.event.emit("page", menu, data, itemID, secondView, reader);
             }
-            return result;
-          },
-        _openTagsPopup: (next) =>
-          function (
-            this: _ZoteroTypes.ReaderInstance,
-            item: Zotero.Item,
-            selector: string,
-            ...args
-          ) {
-            const reader = this;
-            const result = next.call(this, item, selector, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("tags", menu, item, itemID, selector, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (typeof proto._openTagsPopup === "function") {
+      patches._openTagsPopup = (next: any) =>
+        function (
+          this: _ZoteroTypes.ReaderInstance,
+          item: Zotero.Item,
+          selector: string,
+          ...args: any[]
+        ) {
+          const reader = this;
+          const result = next.call(this, item, selector, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset as Element)) {
+              self.event.emit("tags", menu, item, itemID, selector, reader);
             }
-            return result;
-          },
-        _openColorPopup: (next) =>
-          function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
-            const reader = this;
-            const result = next.call(this, data, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("color", menu, data, itemID, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (typeof proto._openColorPopup === "function") {
+      patches._openColorPopup = (next: any) =>
+        function (this: _ZoteroTypes.ReaderInstance, data: any, ...args: any[]) {
+          const reader = this;
+          const result = next.call(this, data, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset as Element)) {
+              self.event.emit("color", menu, data, itemID, reader);
             }
-            return result;
-          },
-        _openThumbnailPopup: (next) =>
-          function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
-            const reader = this;
-            const result = next.call(this, data, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("thumbnail", menu, data, itemID, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (typeof proto._openThumbnailPopup === "function") {
+      patches._openThumbnailPopup = (next: any) =>
+        function (this: _ZoteroTypes.ReaderInstance, data: any, ...args: any[]) {
+          const reader = this;
+          const result = next.call(this, data, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset as Element)) {
+              self.event.emit("thumbnail", menu, data, itemID, reader);
             }
-            return result;
-          },
-        _openSelectorPopup: (next) =>
-          function (this: _ZoteroTypes.ReaderInstance, data, ...args) {
-            const reader = this;
-            const result = next.call(this, data, ...args);
-            try {
-              const itemID = getItemID(this);
-              for (const menu of menuFrom(this._popupset as Element)) {
-                self.event.emit("selector", menu, data, itemID, reader);
-              }
-            } catch (error) {
-              self.app.logError(error as Error);
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (typeof proto._openSelectorPopup === "function") {
+      patches._openSelectorPopup = (next: any) =>
+        function (this: _ZoteroTypes.ReaderInstance, data: any, ...args: any[]) {
+          const reader = this;
+          const result = next.call(this, data, ...args);
+          try {
+            const itemID = getItemID(this);
+            for (const menu of menuFrom(this._popupset as Element)) {
+              self.event.emit("selector", menu, data, itemID, reader);
             }
-            return result;
-          },
-      }),
-    );
+          } catch (error) {
+            self.app.logError(error as Error);
+          }
+          return result;
+        };
+    }
+
+    if (Object.keys(patches).length > 0) {
+      this.register(around(proto, patches));
+    }
     return true;
   }
 

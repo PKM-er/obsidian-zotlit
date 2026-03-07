@@ -20,9 +20,9 @@ export function genUpdateJson(
               strict_min_version: "60.9",
               strict_max_version: "60.9",
             },
-            /** Zotero 7 */ zotero: {
+            /** Zotero 7+ */ zotero: {
               strict_min_version: "6.999",
-              strict_max_version: "7.0.*",
+              strict_max_version: "8.0.*",
             },
           },
         },
