@@ -129,22 +129,17 @@ export class Server extends Service implements Events {
       event = `bg:${pathname.substring(1)}`;
     if (bgActions.has(action)) {
       const params = Object.fromEntries(searchParams.entries());
-      if (request.headers["content-type"] === "application/json") {
-        new Promise<unknown>((resolve, reject) => {
-          let data = "";
-          request.on("data", (chunk) => (data += chunk));
-          request.on("error", (error) => reject(error));
-          request.on("end", () => {
-            try {
-              resolve(JSON.parse(data));
-            } catch (error) {
-              reject(error);
-            }
+      if (isJsonRequest(request)) {
+        void readJsonBody(request)
+          .then((data) => {
+            this.trigger(event, params, data);
+            response.end();
+          })
+          .catch((error) => {
+            log.error(`Failed to process ${action} request`, error);
+            response.statusCode = 400;
+            response.end();
           });
-        }).then((data) => {
-          this.trigger(event, params, data);
-          response.end();
-        });
       } else {
         this.trigger(event, params);
         response.end();
@@ -205,4 +200,28 @@ function logAddr(server: HTTPServer) {
   if (!addr) return "?";
   if (typeof addr === "string") return addr;
   return `${addr.address}:${addr.port}`;
+}
+
+function isJsonRequest(request: IncomingMessage) {
+  const contentType = request.headers["content-type"];
+  if (!contentType) return false;
+  const values = Array.isArray(contentType) ? contentType : [contentType];
+  return values.some((value) =>
+    value.toLowerCase().startsWith("application/json"),
+  );
+}
+
+function readJsonBody(request: IncomingMessage) {
+  return new Promise<unknown>((resolve, reject) => {
+    let data = "";
+    request.on("data", (chunk) => (data += chunk));
+    request.on("error", (error) => reject(error));
+    request.on("end", () => {
+      try {
+        resolve(JSON.parse(data));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
 }

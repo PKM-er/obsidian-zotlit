@@ -9,11 +9,15 @@ import type { DatabaseStatus } from "./useDatabaseStatus";
 import { useDatabaseStatus } from "./useDatabaseStatus";
 
 export default function DatabaseSetting() {
+  const { settings } = useContext(SettingTabCtx);
   const mainDbPath = useDatabasePath("main");
-  const bbtDbPath = useDatabasePath("bbt");
+  const [bbtDbStatus, refreshBbtDb, bbtInfo] = useDatabaseStatus("bbt");
+  const bbtDbPath =
+    bbtInfo?.bbtVersion === "v1"
+      ? `${settings.zoteroDbPath} (native citationKey field)`
+      : settings.bbtMainDbPath;
 
   const [mainDbStatus, refreshMainDb] = useDatabaseStatus("zotero");
-  const [bbtDbStatus, refreshBbtDb] = useDatabaseStatus("bbt");
 
   const [dataDir, dataDirState, setDataDir] = useApplyDataDir(() => {
     refreshMainDb();

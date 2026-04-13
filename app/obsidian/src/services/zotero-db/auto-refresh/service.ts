@@ -66,7 +66,7 @@ export default class DatabaseWatcher extends Service {
         this.#watcher.bbt = watch(
           loadStatus.bbtVersion === "v0"
             ? this.settings.bbtSearchDbPath
-            : this.settings.bbtMainDbPath,
+            : this.settings.zoteroDbPath,
           this.onDatabaseUpdate("bbt"),
         );
       }

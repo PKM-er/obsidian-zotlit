@@ -1,14 +1,25 @@
 import type { Transaction } from "better-sqlite3";
 import { PreparedBase } from "../../utils/index.js";
-import { BBT_MAIN_DB_NAME, BBT_SEARCH_DB_NAME } from "./base.js";
+import { BBT_SEARCH_DB_NAME } from "./base.js";
 
 const sqlMain = `--sql
 SELECT
-  itemID
+  itemData.itemID AS itemID
 FROM
-  ${BBT_MAIN_DB_NAME}.citationkey
+  itemData
+  JOIN itemDataValues USING (valueID)
 WHERE
-  citationkey = $citekey
+  itemData.fieldID = (
+    SELECT
+      fieldID
+    FROM
+      fieldsCombined
+    WHERE
+      fieldName = 'citationKey'
+    LIMIT
+      1
+  )
+  AND itemDataValues.value = $citekey
 `;
 
 const sqlSearch = `--sql

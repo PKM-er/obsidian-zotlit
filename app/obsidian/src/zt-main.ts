@@ -33,8 +33,10 @@ declare global {
   var zoteroAPI: PluginAPI | undefined;
 }
 
+type PluginContextOwner = Parameters<typeof use.plugin>[0];
+
 export default class ZoteroPlugin extends Plugin {
-  use = use.plugin(this);
+  use = use.plugin(this as unknown as PluginContextOwner);
 
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);

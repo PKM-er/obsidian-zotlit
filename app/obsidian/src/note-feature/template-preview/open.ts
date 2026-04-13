@@ -1,4 +1,4 @@
-import type { App } from "obsidian";
+import type { App, WorkspaceLeaf } from "obsidian";
 import { MarkdownView, Notice, TFile } from "obsidian";
 import { fromPath, toPath, type TplType } from "@/services/template/eta/preset";
 import type { SettingsService } from "@/settings/base";
@@ -18,14 +18,17 @@ export async function openTemplatePreview(
     new Notice("Template file not found: " + type);
     return;
   }
-  const existing = workspace.getLeavesOfType("markdown").filter((l) => {
-    const view = l.view as MarkdownView;
-    if (!view.file) return false;
-    return (
+  const existing: WorkspaceLeaf[] = [];
+  for (const leaf of workspace.getLeavesOfType("markdown")) {
+    const view = await ensureMarkdownView(leaf);
+    if (!view?.file) continue;
+    if (
       fromPath(view.file.path, settings.templateDir)?.type === "ejectable" &&
-      l.getRoot().type === "floating"
-    );
-  });
+      leaf.getRoot().type === "floating"
+    ) {
+      existing.push(leaf);
+    }
+  }
 
   if (existing.length > 0) {
     const markdown = existing[0];
@@ -33,7 +36,8 @@ export async function openTemplatePreview(
     if (!markdown.group) return;
     const inGroup = workspace.getGroupLeaves(markdown.group);
     for (const leaf of inGroup) {
-      const viewType = leaf.view.getViewType();
+      await loadLeafIfDeferred(leaf);
+      const viewType = leaf.getViewState().type;
       if (
         viewType === templatePreviewViewType ||
         viewType === itemDetailsViewType
@@ -79,15 +83,31 @@ export function getTemplateFile(
   return null;
 }
 
-export function getTemplateEditorInGroup(group: string, plugin: ZoteroPlugin) {
-  const templateEditorLeaf = plugin.app.workspace
-    .getGroupLeaves(group)
-    .find(
-      (l) =>
-        l.view instanceof MarkdownView &&
-        l.view.file &&
-        fromPath(l.view.file.path, plugin.settings.templateDir)?.type ===
-          "ejectable",
-    );
-  return templateEditorLeaf;
+export async function getTemplateEditorInGroup(
+  group: string,
+  plugin: ZoteroPlugin,
+) {
+  for (const leaf of plugin.app.workspace.getGroupLeaves(group)) {
+    const view = await ensureMarkdownView(leaf);
+    if (
+      view?.file &&
+      fromPath(view.file.path, plugin.settings.templateDir)?.type ===
+        "ejectable"
+    ) {
+      return leaf;
+    }
+  }
+  return undefined;
+}
+
+async function ensureMarkdownView(leaf: WorkspaceLeaf) {
+  await loadLeafIfDeferred(leaf);
+  return leaf.view instanceof MarkdownView ? leaf.view : null;
+}
+
+async function loadLeafIfDeferred(leaf: WorkspaceLeaf) {
+  const loadIfDeferred = (leaf as WorkspaceLeaf & {
+    loadIfDeferred?: () => Promise<void>;
+  }).loadIfDeferred;
+  await loadIfDeferred?.();
 }

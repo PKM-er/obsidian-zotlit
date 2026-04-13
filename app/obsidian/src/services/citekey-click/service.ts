@@ -3,11 +3,11 @@ import { Service } from "@ophidian/core";
 import { around } from "monkey-around";
 import type {
   Editor,
-  MarkdownView,
   EditorPosition,
   MarkdownEditView,
+  WorkspaceLeaf,
 } from "obsidian";
-import { Notice } from "obsidian";
+import { MarkdownView, Notice } from "obsidian";
 
 import { untilWorkspaceReady, waitUntil } from "@/utils/once";
 import ZoteroPlugin from "@/zt-main";
@@ -45,8 +45,11 @@ export class CitekeyClick extends Service {
     cancel && this.register(cancel);
     await task;
 
-    const mdView = workspace.getLeavesOfType("markdown")[0]!
-      .view as MarkdownView;
+    const mdView = await getFirstLoadedMarkdownView(workspace);
+    if (!mdView) {
+      new Notice("No markdown editor available for citekey click support");
+      return;
+    }
 
     this.register(
       around(mdView.editor.constructor.prototype as Editor, {
@@ -92,6 +95,28 @@ export class CitekeyClick extends Service {
       }),
     );
   }
+}
+
+async function getFirstLoadedMarkdownView(
+  workspace: ZoteroPlugin["app"]["workspace"],
+) {
+  for (const leaf of workspace.getLeavesOfType("markdown")) {
+    const view = await ensureMarkdownView(leaf);
+    if (view) {
+      return view;
+    }
+  }
+  return null;
+}
+
+async function ensureMarkdownView(leaf: WorkspaceLeaf) {
+  const loadIfDeferred = (leaf as WorkspaceLeaf & {
+    loadIfDeferred?: () => Promise<void>;
+  }).loadIfDeferred;
+  if (!(leaf.view instanceof MarkdownView)) {
+    await loadIfDeferred?.();
+  }
+  return leaf.view instanceof MarkdownView ? leaf.view : null;
 }
 
 function getClickableTokenAt(

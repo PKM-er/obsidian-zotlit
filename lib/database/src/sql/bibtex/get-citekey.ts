@@ -1,7 +1,7 @@
 import type { Transaction } from "better-sqlite3";
 import type { IDLibID } from "../../utils/index.js";
 import { PreparedBase } from "../../utils/index.js";
-import { BBT_MAIN_DB_NAME, BBT_SEARCH_DB_NAME } from "./base.js";
+import { BBT_SEARCH_DB_NAME } from "./base.js";
 
 interface InputSql {
   itemID: number;
@@ -19,12 +19,22 @@ type Output = Record<number, string>;
 
 const sqlMain = `--sql
 SELECT
-  citationkey as citekey
+  itemDataValues.value AS citekey
 FROM
-  ${BBT_MAIN_DB_NAME}.citationkey
+  itemData
+  JOIN itemDataValues USING (valueID)
 WHERE
-  itemID = $itemID
-  AND (libraryID IS NULL OR libraryID = $libId)
+  itemData.itemID = $itemID
+  AND itemData.fieldID = (
+    SELECT
+      fieldID
+    FROM
+      fieldsCombined
+    WHERE
+      fieldName = 'citationKey'
+    LIMIT
+      1
+  )
 `;
 
 const sqlSearch = `--sql

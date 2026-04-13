@@ -18,7 +18,7 @@ export class ProtocolHandler extends Service {
     );
     this.registerEvent(
       this.plugin.server.on("zotero/update", (p) =>
-        this.onZtExport(parseQuery(p)),
+        this.onZtUpdate(parseQuery(p)),
       ),
     );
   }
@@ -55,8 +55,11 @@ export class ProtocolHandler extends Service {
     }
     if (query.items.length < 1) {
       new Notice("No items to open");
-    } else if (query.items.length > 1) {
+      return;
+    }
+    if (query.items.length > 1) {
       new Notice("Multiple items not yet supported");
+      return;
     }
     const { libraryID, id } = query.items[0];
     const [docItem] = await this.plugin.databaseAPI.getItems([[id, libraryID]]);

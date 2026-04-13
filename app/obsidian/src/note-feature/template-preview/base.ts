@@ -134,31 +134,39 @@ export function asyncDebounce<T extends unknown[], V>(
   timeout?: number,
 ): (...args: [...T]) => void {
   let timeoutId: number | null = null;
-  let pending: Promise<any> | null = null;
+  let running = false;
+  let queuedArgs: [...T] | null = null;
 
-  let taskDuringPending: [...T] | null = null;
+  const run = async (args: [...T]) => {
+    running = true;
+    try {
+      await cb(...args);
+    } catch (error) {
+      console.error(error);
+    }
+    while (queuedArgs) {
+      const nextArgs = queuedArgs;
+      queuedArgs = null;
+      try {
+        await cb(...nextArgs);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    running = false;
+  };
+
   return function (...args) {
     if (timeoutId) {
       window.clearTimeout(timeoutId);
     }
-    if (pending) {
-      taskDuringPending = args;
+    if (running) {
+      queuedArgs = args;
       return;
     }
     timeoutId = window.setTimeout(() => {
       timeoutId = null;
-      pending = cb(...args)
-        .then(() => {
-          if (taskDuringPending) {
-            pending = cb(...taskDuringPending);
-          } else {
-            pending = null;
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          pending = null;
-        });
+      void run(args);
     }, timeout);
   };
 }

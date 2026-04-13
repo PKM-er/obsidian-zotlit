@@ -1,6 +1,6 @@
 import { join } from "path";
 import type { DatabaseOptions, DatabasePaths } from "@obzt/database/api";
-import type { Useful } from "@ophidian/core";
+import type { OptionalCleanup, Useful } from "@ophidian/core";
 import {
   calc,
   SettingsService as _SettingsService,
@@ -11,16 +11,42 @@ import { getBinaryFullPath } from "@/install-guide/version";
 import ZoteroPlugin from "@/zt-main";
 import { getDefaultSettings, type Settings } from "./service";
 
-export function skip<T extends (...args: any[]) => any>(
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "then" in value &&
+    typeof (value as PromiseLike<unknown>).then === "function"
+  );
+}
+
+export function skip<T extends (...args: any[]) => OptionalCleanup>(
+  compute: T,
+  deps: () => any,
+  skipInitial?: boolean,
+): (...args: Parameters<T>) => ReturnType<T> | undefined;
+export function skip<T extends (...args: any[]) => PromiseLike<unknown>>(
+  compute: T,
+  deps: () => any,
+  skipInitial?: boolean,
+): (...args: Parameters<T>) => void;
+export function skip<T extends (...args: any[]) => OptionalCleanup | PromiseLike<unknown>>(
   compute: T,
   deps: () => any,
   skipInitial = false,
 ) {
   let count = 0;
-  return (...args: Parameters<T>): ReturnType<T> | undefined => {
+  return (...args: Parameters<T>) => {
     deps();
     if (count++ > (skipInitial ? 1 : 0)) {
-      return compute(...args);
+      const result = compute(...args);
+      if (isPromiseLike(result)) {
+        void Promise.resolve(result).catch((error: unknown) => {
+          console.error("Unhandled async effect in skip()", error);
+        });
+        return;
+      }
+      return result;
     }
   };
 }

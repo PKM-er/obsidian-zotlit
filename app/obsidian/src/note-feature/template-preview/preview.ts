@@ -20,7 +20,7 @@ export class TemplatePreview extends TemplatePreviewBase {
 
   async switchToTemplate(type: TplType.Ejectable) {
     if (!this.leaf.group) return false;
-    const templateEditorLeaf = getTemplateEditorInGroup(
+    const templateEditorLeaf = await getTemplateEditorInGroup(
       this.leaf.group,
       this.plugin,
     );

@@ -1,6 +1,6 @@
 import type { AttachmentInfo, RegularItemInfo } from "@obzt/database";
 import type { EditorSuggestContext, TFile } from "obsidian";
-import { Keymap } from "obsidian";
+import { Keymap, Notice } from "obsidian";
 import {
   cacheAttachmentSelect,
   chooseAnnotAtch,
@@ -23,9 +23,26 @@ export async function insertCitation(
 ) {
   const { plugin } = template;
   const libId = plugin.settings.libId;
+  let docItem = item;
+
+  // Search results come from the in-memory index; refresh once if citekey is stale.
+  if (!docItem.citekey) {
+    const [freshItem] = await plugin.databaseAPI.getItems(
+      [[item.itemID, libId]],
+      true,
+    );
+    if (freshItem) {
+      docItem = freshItem;
+    }
+  }
+
+  if (!docItem.citekey) {
+    new Notice("Selected item has no citekey/citationKey in Zotero.");
+    return;
+  }
 
   const allAttachments = await plugin.databaseAPI.getAttachments(
-    item.itemID,
+    docItem.itemID,
     libId,
   );
 
@@ -46,10 +63,10 @@ export async function insertCitation(
   }
 
   const notes = await plugin.databaseAPI
-    .getNotes(item.itemID, libId)
+    .getNotes(docItem.itemID, libId)
     .then((notes) => plugin.noteParser.normalizeNotes(notes));
   const extraByAtch = await getHelperExtraByAtch(
-    item,
+    docItem,
     { all: allAttachments, selected: allSelectedAtchs, notes },
     template.plugin,
   );

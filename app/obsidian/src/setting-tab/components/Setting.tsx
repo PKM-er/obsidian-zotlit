@@ -1,6 +1,5 @@
 import { cn } from "@obzt/components/utils";
-// import { computed, effect } from "@ophidian/core";
-import { computed } from "@preact/signals-core";
+import { computed } from "@ophidian/core";
 import { useMemoizedFn } from "ahooks";
 import type { PropsWithChildren, ReactNode } from "react";
 import { forwardRef, useContext, useMemo, useRef } from "react";
@@ -48,7 +47,7 @@ export function useSetting<T>(
   set: (val: T, settings: Settings) => Settings,
 ) {
   const service = useContext(SettingTabCtx).settings;
-  const value = useComputed(() => get(service.current)).value;
+  const value = useComputed(() => get(service.current))();
   const onChange = useMemoizedFn(function onChange(val: T) {
     service.update((prev) => set(val, prev));
   });
