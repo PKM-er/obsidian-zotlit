@@ -127,6 +127,27 @@ export class Server extends Service implements Events {
     const action = pathname.substring(1),
       // use bg: prefix to avoid conflict with obsidian protocol actions
       event = `bg:${pathname.substring(1)}`;
+
+    // Return all items that have literature notes in the vault
+    if (action === "note-status-all") {
+      const vault = this.plugin.app.vault;
+      const mc = this.plugin.app.metadataCache;
+      const results: Record<string, { exists: boolean; mtime: number }> = {};
+      for (const file of vault.getMarkdownFiles()) {
+        const cache = mc.getFileCache(file);
+        const key = cache?.frontmatter?.["zotero-key"];
+        if (typeof key === "string" && key.length > 0) {
+          results[key] = { exists: true, mtime: file.stat?.mtime ?? 0 };
+        }
+      }
+      response.writeHead(200, {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      });
+      response.end(JSON.stringify(results));
+      return;
+    }
+
     if (bgActions.has(action)) {
       const params = Object.fromEntries(searchParams.entries());
       if (request.headers["content-type"] === "application/json") {
