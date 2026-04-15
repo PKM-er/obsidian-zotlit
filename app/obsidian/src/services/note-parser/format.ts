@@ -20,7 +20,9 @@ export const { DataCitation, DataAnnotation } = scope({
   },
   DataAnnotation: {
     attachmentURI: itemURI,
-    annotationKey: "string",
+    "annotationKey?": "string",
     citationItem: "CitationItem",
+    "pageLabel?": "number|string",
+    "position?": "any",
   },
 }).compile();
