@@ -298,6 +298,18 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       );
     if (items.length === 0) return;
     items = uniqBy(items, (i) => i.id);
+
+    // Auto-tag items when creating literature notes
+    if (action === "export" && this.settings["auto-tag"]) {
+      const tagName = this.settings["tag-name"] || "obsidian-note";
+      for (const item of items) {
+        if (!item.hasTag(tagName)) {
+          item.addTag(tagName);
+          item.saveTx();
+        }
+      }
+    }
+
     this.sendToObsidian("item", action, items);
   }
 

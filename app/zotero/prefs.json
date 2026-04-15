@@ -1,4 +1,6 @@
 {
   "notify": false,
-  "notify-url": "http://localhost:9091"
+  "notify-url": "http://localhost:9091",
+  "auto-tag": false,
+  "tag-name": "obsidian-note"
 }
