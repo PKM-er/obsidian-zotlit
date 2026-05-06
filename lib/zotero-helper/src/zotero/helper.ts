@@ -28,6 +28,10 @@ export function isZotero7(Zotero: any) {
   return Zotero.platformMajorVersion >= 102;
 }
 
+export function isZotero8(Zotero: any) {
+  return Zotero.platformMajorVersion >= 140;
+}
+
 /**
  * Parse XHTML to XUL fragment. For Zotero 6.
  *
