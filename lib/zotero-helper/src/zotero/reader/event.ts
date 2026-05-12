@@ -1,7 +1,12 @@
 import { around } from "monkey-around";
 import { createNanoEvents } from "nanoevents";
 import { Component } from "../misc.js";
-import { onReaderOpen } from "./utils.js";
+import {
+  getReaderIframeWindow,
+  getReaderInstances,
+  getReaderPrototype,
+  onReaderOpen,
+} from "./utils.js";
 
 export interface ReaderEvent {
   "annot-select": (key: string, selected: boolean, itemId: number) => void;
@@ -19,16 +24,15 @@ export class ReaderEventHelper extends Component {
 
     self.app.log("hooking into _initIframeWindow");
     const reader = this.app.Reader;
+    const existingReaders = getReaderInstances(reader);
 
     // if reader is available, hook into existing iframe
-    if (this.#hookInitIframeWindow(reader._readers)) {
-      reader._readers.map((r) => this.#hookIframeWindow(r));
+    if (this.#hookInitIframeWindow()) {
+      existingReaders.map((r) => this.#hookIframeWindow(r));
       return;
     }
     this.register(
-      onReaderOpen(this.app.Reader, () =>
-        this.#hookInitIframeWindow(reader._readers),
-      ),
+      onReaderOpen(this.app.Reader, () => this.#hookInitIframeWindow()),
     );
   }
 
@@ -38,13 +42,20 @@ export class ReaderEventHelper extends Component {
   /**
    * @returns true if reader instance is available for hooking
    */
-  #hookInitIframeWindow(readers: _ZoteroTypes.ReaderInstance[]): boolean {
-    if (readers.length === 0) return false;
-    const instance = readers[0];
+  #hookInitIframeWindow(): boolean {
+    const prototype = getReaderPrototype(this.app.Reader);
+    if (!prototype) return false;
+    const methodName =
+      typeof (prototype as any)._initIframeWindow === "function"
+        ? "_initIframeWindow"
+        : typeof (prototype as any).initIframeWindow === "function"
+          ? "initIframeWindow"
+          : null;
+    if (!methodName) return false;
     const self = this;
     this.register(
-      around(instance.constructor.prototype as _ZoteroTypes.ReaderInstance, {
-        _initIframeWindow: (next) =>
+      around(prototype as _ZoteroTypes.ReaderInstance, {
+        [methodName]: (next: (...args: any[]) => any) =>
           function (this: _ZoteroTypes.ReaderInstance) {
             const result = next.call(this);
             self.#hookIframeWindow(this);
@@ -56,18 +67,19 @@ export class ReaderEventHelper extends Component {
   }
 
   public onunload(): void {
-    this.app.Reader._readers.forEach((r) => {
+    getReaderInstances(this.app.Reader).forEach((r) => {
       this.observers.get(r)?.disconnect();
       const onFocus = this.focusHandlers.get(r),
         onBlur = this.blurHandlers.get(r);
-      onFocus && r._iframeWindow?.removeEventListener("focus", onFocus);
-      onBlur && r._iframeWindow?.removeEventListener("blur", onBlur);
+      const iframeWindow = getReaderIframeWindow(r);
+      onFocus && iframeWindow?.removeEventListener("focus", onFocus);
+      onBlur && iframeWindow?.removeEventListener("blur", onBlur);
     });
   }
 
   async #hookIframeWindow(reader: _ZoteroTypes.ReaderInstance) {
     await reader._initPromise;
-    const window = reader._iframeWindow as unknown as typeof globalThis | null;
+    const window = getReaderIframeWindow(reader);
     if (!window) {
       this.app.logError(new Error("iframeWindow not found"));
       return;

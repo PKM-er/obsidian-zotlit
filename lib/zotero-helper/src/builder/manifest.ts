@@ -38,7 +38,7 @@ export function genManifestJson(
         id,
         update_url: update.versions,
         strict_min_version: "6.999",
-        strict_max_version: "7.0.*",
+        strict_max_version: "8.*",
       },
     },
   };

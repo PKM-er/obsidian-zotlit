@@ -13,6 +13,7 @@ import type {
 } from "./events.js";
 import type { MenuSelector } from "./menu/menu.js";
 import { Menu } from "./menu/menu.js";
+import { registerWithMenuManager, resolveMenuTarget } from "./menu/official.js";
 import { Component } from "./misc.js";
 import { polyfill } from "./polyfill/index.js";
 import type { Zotero7 } from "./polyfill/index.js";
@@ -240,11 +241,25 @@ abstract class Plugin_2<
   ): void {
     if (selector.startsWith(readerPrefix)) {
       if (!this.loaded) throw new Error("register reader Menu before loaded");
-      this.#readerMenu ??= this.addChild(new ReaderMenuHelper(this.app));
+      this.#readerMenu ??= this.addChild(
+        new ReaderMenuHelper(this.app, this.id.full),
+      );
       this.register(this.#readerMenu.event.on(toReaderEventName(selector), cb));
     } else {
-      const menu = this.addChild(new Menu({ selector }));
-      cb(menu);
+      if (resolveMenuTarget(selector) && this.app.MenuManager) {
+        const menu = Menu.virtual();
+        cb(menu);
+        const unregister = registerWithMenuManager(
+          this.app,
+          this.id.full,
+          selector,
+          menu,
+        );
+        unregister && this.register(unregister);
+      } else {
+        const menu = this.addChild(new Menu({ selector }));
+        cb(menu);
+      }
     }
   }
 

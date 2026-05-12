@@ -19,19 +19,52 @@ export class MenuItem extends Component {
    */
   constructor(private menu: Menu) {
     super();
-    this.dom = createXULElement(
-      menu.dom.ownerDocument,
-      "menuitem",
-    ) as XUL.MenuItem;
+    if (menu.mode === "dom") {
+      this.dom = createXULElement(
+        menu.dom.ownerDocument,
+        "menuitem",
+      ) as XUL.MenuItem;
+    }
   }
-  dom: XUL.MenuItem;
+  dom?: XUL.MenuItem;
+  #title = "";
+  #icon: string | null = null;
+  #disabled = false;
+  #hidden = false;
+  #onClick?: (evt: MouseEvent | KeyboardEvent) => any;
+  #onShowing: Array<(item: this) => any> = [];
+
+  get title() {
+    return this.#title;
+  }
+
+  get icon() {
+    return this.#icon;
+  }
+
+  get disabled() {
+    return this.#disabled;
+  }
+
+  get hidden() {
+    return this.#hidden;
+  }
+
+  runShowingCallbacks() {
+    this.#onShowing.forEach((callback) => callback(this));
+  }
+
+  runCommand(event: MouseEvent | KeyboardEvent) {
+    return this.#onClick?.(event);
+  }
   /**
    * @public
    */
   setTitle(title: string): this {
+    this.#title = title;
     // set label attribute directly not working in Zotero 6
     // have to use setAttribute
-    this.dom.setAttribute("label", title);
+    this.dom?.setAttribute("label", title);
     return this;
   }
   /**
@@ -39,9 +72,12 @@ export class MenuItem extends Component {
    * @param url - data-uri or resource url to an image. If `null`, the icon is removed.
    */
   setIcon(url: string | null): this {
-    this.dom.classList.toggle("menuitem-iconic", url !== null);
+    this.#icon = url;
+    this.dom?.classList.toggle("menuitem-iconic", url !== null);
     if (url !== null) {
-      this.dom.style.listStyleImage = `url("${url}")`;
+      this.dom?.style.setProperty("list-style-image", `url("${url}")`);
+    } else {
+      this.dom?.style.removeProperty("list-style-image");
     }
     return this;
   }
@@ -50,7 +86,10 @@ export class MenuItem extends Component {
    * @public
    */
   setDisabled(disabled: boolean): this {
-    this.dom.disabled = disabled;
+    this.#disabled = disabled;
+    if (this.dom) {
+      this.dom.disabled = disabled;
+    }
     return this;
   }
 
@@ -61,7 +100,8 @@ export class MenuItem extends Component {
     return this.toggle(false);
   }
   toggle(show: boolean): this {
-    this.dom.setAttribute("hidden", show ? "false" : "true");
+    this.#hidden = !show;
+    this.dom?.setAttribute("hidden", show ? "false" : "true");
     return this;
   }
 
@@ -69,13 +109,19 @@ export class MenuItem extends Component {
    * @public
    */
   onClick(callback: (evt: MouseEvent | KeyboardEvent) => any): this {
-    this.registerDomEvent(this.dom, "command", callback);
+    this.#onClick = callback;
+    if (this.dom) {
+      this.registerDomEvent(this.dom, "command", callback);
+    }
     return this;
   }
 
   onShowing(callback: (item: this) => any): this {
+    this.#onShowing.push(callback);
     callback(this);
-    this.registerDomEvent(this.menu.dom, "popupshowing", () => callback(this));
+    if (this.menu.mode === "dom") {
+      this.registerDomEvent(this.menu.dom, "popupshowing", () => callback(this));
+    }
     return this;
   }
 
@@ -83,6 +129,6 @@ export class MenuItem extends Component {
     return;
   }
   public onunload(): void {
-    this.dom.remove();
+    this.dom?.remove();
   }
 }

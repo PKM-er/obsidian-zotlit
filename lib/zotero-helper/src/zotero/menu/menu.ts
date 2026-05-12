@@ -22,22 +22,55 @@ interface PopupEl {
   /** whether remove given element when unload, default to true */
   removeSelf?: boolean;
 }
+interface VirtualPopup {
+  virtual: true;
+}
 const isSelector = (popup: PopupSelector | PopupEl): popup is PopupSelector =>
   typeof (popup as PopupSelector).selector === "string";
+const isVirtual = (
+  popup: PopupSelector | PopupEl | VirtualPopup,
+): popup is VirtualPopup => (popup as VirtualPopup).virtual === true;
+
+export interface VirtualMenuItemNode {
+  type: "item";
+  item: MenuItem;
+}
+
+export interface VirtualMenuSubmenuNode {
+  type: "submenu";
+  label: string;
+  menu: Menu;
+}
+
+export interface VirtualMenuSeparatorNode {
+  type: "separator";
+}
+
+export type VirtualMenuNode =
+  | VirtualMenuItemNode
+  | VirtualMenuSubmenuNode
+  | VirtualMenuSeparatorNode;
 
 /**
  * @public
  */
 export class Menu extends Component {
-  dom: XUL.MenuPopup;
+  dom!: XUL.MenuPopup;
   readonly removeSelf: boolean;
-  constructor(menuPopup: PopupSelector | PopupEl, parent?: Menu) {
+  readonly mode: "dom" | "virtual";
+  readonly nodes: VirtualMenuNode[] = [];
+  constructor(menuPopup: PopupSelector | PopupEl | VirtualPopup, parent?: Menu) {
     super();
     this.parentMenu = parent;
-    if (!isSelector(menuPopup)) {
+    if (isVirtual(menuPopup)) {
+      this.mode = "virtual";
+      this.removeSelf = false;
+    } else if (!isSelector(menuPopup)) {
+      this.mode = "dom";
       this.dom = menuPopup.element;
       this.removeSelf = menuPopup.removeSelf ?? true;
     } else {
+      this.mode = "dom";
       let selector: string | -1 | undefined =
         MenuSelector[menuPopup.selector as keyof typeof MenuSelector];
       if (selector === -1) {
@@ -51,9 +84,13 @@ export class Menu extends Component {
       this.removeSelf = false;
     }
 
-    if (!this.dom) {
+    if (this.mode === "dom" && !this.dom) {
       throw new Error(`Menu not found: ${menuPopup}`);
     }
+  }
+
+  static virtual(parent?: Menu) {
+    return new Menu({ virtual: true }, parent);
   }
 
   addItem(
@@ -64,7 +101,11 @@ export class Menu extends Component {
     const item = this.addChild(new MenuItem(this));
     cb(item);
 
-    this.insert(item.dom, insertBefore, anchor);
+    if (this.mode === "dom") {
+      this.insert(item.dom!, insertBefore, anchor);
+    } else {
+      this.nodes.push({ type: "item", item });
+    }
     return this;
   }
 
@@ -89,6 +130,12 @@ export class Menu extends Component {
     insertBefore = false,
     anchor?: XUL.Element,
   ): this {
+    if (this.mode === "virtual") {
+      const submenu = this.addChild(Menu.virtual(this));
+      cb(submenu);
+      this.nodes.push({ type: "submenu", label, menu: submenu });
+      return this;
+    }
     const submenuEl = createXULElement(
       this.dom.ownerDocument,
       "menu",
@@ -118,6 +165,10 @@ export class Menu extends Component {
    * @public
    */
   addSeparator(insertBefore = false, anchor?: XUL.Element): this {
+    if (this.mode === "virtual") {
+      this.nodes.push({ type: "separator" });
+      return this;
+    }
     const separatorEl = createXULElement(
       this.dom.ownerDocument,
       "menuseparator",
@@ -130,6 +181,6 @@ export class Menu extends Component {
     return;
   }
   public onunload(): void {
-    this.removeSelf && this.dom.remove();
+    this.removeSelf && this.dom?.remove();
   }
 }

@@ -13,9 +13,18 @@ export async function updateAnnotations(
   reader: _ZoteroTypes.ReaderInstance,
   annots: UpdateAnnot[],
 ) {
+  const iframeWindow =
+    (reader as _ZoteroTypes.ReaderInstance & {
+      _iframeWindow?: typeof globalThis | null;
+      _iframe?: { contentWindow?: typeof globalThis | null } | null;
+      _window?: typeof globalThis | null;
+    })._iframeWindow ??
+    (reader as any)._iframe?.contentWindow ??
+    (reader as any)._window ??
+    null;
   await (
-    reader._iframeWindow as any
+    iframeWindow as any
   )?.wrappedJSObject.viewerInstance._viewer._annotationsStore.updateAnnotations(
-    Components.utils.cloneInto(annots, reader._iframeWindow),
+    Components.utils.cloneInto(annots, iframeWindow),
   );
 }

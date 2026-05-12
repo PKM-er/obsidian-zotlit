@@ -92,43 +92,7 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       label: "Obsidian Note",
       image: this.getResourceURL(this.icons[32]),
     });
-    this.registerMenu("item", (menu) =>
-      menu.addSeparator().addSubmenu("Obsidian Actions", (menu) =>
-        menu
-          .addItem((item) =>
-            item
-              .setTitle("Open Literature Note")
-              .onClick(() => this.handleSelectedItems("open"))
-              .onShowing((item) =>
-                item.toggle(
-                  this.app.getActiveZoteroPane().getSelectedItems().length ===
-                    1,
-                ),
-              ),
-          )
-          .addItem((item) =>
-            item
-              .setTitle("Update Literature Note")
-              .onClick(() => this.handleSelectedItems("update"))
-              .onShowing((item) =>
-                item.toggle(
-                  this.app.getActiveZoteroPane().getSelectedItems().length ===
-                    1,
-                ),
-              ),
-          )
-          .addItem((item) =>
-            item
-              .setTitle("Create Literature Note(s)")
-              .onClick(() => this.handleSelectedItems("export"))
-              .onShowing((item) =>
-                item.toggle(
-                  this.app.getActiveZoteroPane().getSelectedItems().length >= 1,
-                ),
-              ),
-          ),
-      ),
-    );
+    this.registerItemMenu();
 
     this.registerMenu("reader:annot", (menu, data, itemID, reader) => {
       const libIdKey = this.app.Items.getLibraryAndKeyFromID(itemID);
@@ -217,6 +181,51 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
         );
     });
   }
+
+  private getSupportedItems(items?: readonly Zotero.Item[]) {
+    let selected: readonly Zotero.Item[] =
+      items ?? this.app.getActiveZoteroPane().getSelectedItems();
+    if (selected.length === 0) return [];
+    selected = selected
+      .filter(
+        (item: Zotero.Item): boolean =>
+          item.isRegularItem() ||
+          (item.isAttachment() && !!item.parentItem?.isRegularItem()),
+      )
+      .map((item: Zotero.Item) => (item.isAttachment() ? item.parentItem! : item));
+    if (selected.length === 0) return [];
+    return uniqBy(selected, (item) => item.id);
+  }
+
+  private registerItemMenu() {
+    // Zotero 8 MenuManager currently renders blank labels with raw strings here.
+    // Use the native item popup directly until this menu is localized properly.
+    this.registerMenu("#zotero-itemmenu", (menu) =>
+      menu.addSeparator().addSubmenu("Obsidian Actions", (menu) =>
+        menu
+          .addItem((item) =>
+            item
+              .setTitle("Open Literature Note")
+              .onClick(() => this.handleSelectedItems("open"))
+              .onShowing((item) => item.toggle(this.getSupportedItems().length === 1)),
+          )
+          .addItem((item) =>
+            item
+              .setTitle("Update Literature Note")
+              .onClick(() => this.handleSelectedItems("update"))
+              .onShowing((item) => item.toggle(this.getSupportedItems().length === 1)),
+          )
+          .addItem((item) =>
+            item
+              .setTitle("Create Literature Note(s)")
+              .onClick(() => this.handleSelectedItems("export"))
+              .onShowing((item) =>
+                item.toggle(this.getSupportedItems().length >= 1),
+              ),
+          ),
+      ),
+    );
+  }
   onunload(): void {
     this.app.log("zotero-obsidian-note unloaded");
   }
@@ -243,7 +252,9 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
       const active = [...this.readerFocus.values()].filter((a) => a !== -1);
       const attachmentId = active[active.length - 1] ?? -1;
       if (attachmentId === this.lastActiveReader) return;
-      const itemId = this.app.Items.get(attachmentId).parentItemID;
+      const attachment =
+        attachmentId === -1 ? null : this.app.Items.get(attachmentId);
+      const itemId = attachment?.parentItemID;
       if (typeof itemId !== "number") {
         // prevent notify when reader is not attached to an regular item's attachment
         this.lastActiveReader = attachmentId;
@@ -282,22 +293,8 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
   }
 
   handleSelectedItems(action: QueryAction) {
-    let items: readonly Zotero.Item[] = this.app
-      .getActiveZoteroPane()
-      .getSelectedItems();
+    let items = this.getSupportedItems();
     if (items.length === 0) return;
-    items = items
-      .filter(
-        (item: Zotero.Item): boolean =>
-          item.isRegularItem() || // !note && !annotation && !attachment
-          (item.isAttachment() && !!item?.parentItem?.isRegularItem()),
-      )
-      // get regular item
-      .map((item: Zotero.Item) =>
-        item.isAttachment() ? item.parentItem! : item,
-      );
-    if (items.length === 0) return;
-    items = uniqBy(items, (i) => i.id);
     this.sendToObsidian("item", action, items);
   }
 
