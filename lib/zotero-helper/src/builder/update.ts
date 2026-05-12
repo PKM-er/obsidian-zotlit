@@ -22,7 +22,7 @@ export function genUpdateJson(
             },
             /** Zotero 7 */ zotero: {
               strict_min_version: "6.999",
-              strict_max_version: "7.0.*",
+              strict_max_version: "9.0.*",
             },
           },
         },

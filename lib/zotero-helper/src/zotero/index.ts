@@ -4,6 +4,7 @@ export type { IPaneDescriptor } from "./pref/index.js";
 
 export {
   isZotero7,
+  isZotero8,
   createXULElement,
   isXULElement,
   parseXHTML,
