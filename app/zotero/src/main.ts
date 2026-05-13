@@ -33,8 +33,76 @@ export default class ZoteroPlugin extends Plugin<typeof settings> {
    */
   readerFocus = new Map<string, number>();
   lastActiveReader: number | null = null;
+
+  /** Cache of note status per item key: "synced" | "none" */
+  private _noteStatusCache: Record<string, string> = {};
+
+  /** Fetch note status from Obsidian and refresh the column */
+  async refreshNoteStatus(): Promise<void> {
+    const url = this.settings["notify-url"];
+    if (!url) return;
+    try {
+      const resp = await fetch(new URL("/note-status-all", url));
+      const data = await resp.json();
+      this._noteStatusCache = {};
+      for (const key of Object.keys(data)) {
+        this._noteStatusCache[key] = "synced";
+      }
+      // @ts-expect-error Zotero 7 API
+      Zotero.ItemTreeManager.refreshColumns();
+    } catch (e) {
+      this.app.log("refreshNoteStatus error: " + e);
+    }
+  }
+
   onload(): void {
     this.app.log("zotero-obsidian-note Loaded");
+
+    // Register custom column showing Obsidian note status
+    setTimeout(() => {
+      try {
+        // @ts-expect-error Zotero 7 API
+        Zotero.ItemTreeManager.registerColumn({
+          dataKey: "obsidian-note-status",
+          label: "Obsidian",
+          pluginID: "zotero-obsidian-note@aidenlx.top",
+          dataProvider: (item: Zotero.Item) => {
+            return this._noteStatusCache[item.key] || "none";
+          },
+          renderCell: (
+            index: number,
+            data: string,
+            column: { className?: string },
+          ) => {
+            const doc = (globalThis as any).mainWindow?.document ?? document;
+            const cell = doc.createElementNS(
+              "http://www.w3.org/1999/xhtml",
+              "span",
+            );
+            cell.className = `cell ${column.className || ""}`;
+            cell.style.display = "flex";
+            cell.style.alignItems = "center";
+            cell.style.justifyContent = "center";
+            const dot = doc.createElementNS(
+              "http://www.w3.org/1999/xhtml",
+              "span",
+            );
+            const color =
+              data === "synced"
+                ? "#4caf50"
+                : data === "outdated"
+                  ? "#ff9800"
+                  : "#f44336";
+            dot.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${color}`;
+            cell.appendChild(dot);
+            return cell;
+          },
+        });
+      } catch (e) {
+        this.app.log("registerColumn error: " + e);
+      }
+      this.refreshNoteStatus();
+    }, 5000);
 
     this.registerReaderEvent("focus", (itemId, instanceId) => {
       this.app.log(`reader focus: ${itemId}, ${instanceId}`);
