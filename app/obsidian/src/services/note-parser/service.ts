@@ -51,10 +51,12 @@ export class NoteParser extends Service {
     string,
     {
       commentHTML: string | null;
-      annotationKey: string;
+      annotationKey: string | null;
       citationKey: string;
       attachementKey: string;
       inline: boolean;
+      highlightText: string;
+      pageLabel: string | number | null;
     }
   >();
   tdService = new globalThis.TurndownService({ headingStyle: "atx" })
@@ -94,13 +96,15 @@ export class NoteParser extends Service {
         const commentNode = node as HTMLElement;
         const key = nanoid(10);
         this.annotations.set(key, {
-          annotationKey: annotation.annotationKey,
+          annotationKey: annotation.annotationKey ?? null,
           citationKey: keyFromItemURI(annotation.citationItem.uris[0])!,
           attachementKey: keyFromItemURI(annotation.attachmentURI)!,
           commentHTML: commentNode.textContent?.trim()
             ? commentNode.innerHTML
             : null,
           inline: false,
+          highlightText: (highlightEl as HTMLElement).textContent || "",
+          pageLabel: annotation.pageLabel ?? null,
         });
         return Placeholder.annot.create(key);
       },
@@ -137,11 +141,13 @@ export class NoteParser extends Service {
         const annotation = parseAnnotation(node.dataset.annotation!);
         const key = nanoid(10);
         this.annotations.set(key, {
-          annotationKey: annotation.annotationKey,
+          annotationKey: annotation.annotationKey ?? null,
           citationKey: keyFromItemURI(annotation.citationItem.uris[0])!,
           attachementKey: keyFromItemURI(annotation.attachmentURI)!,
           commentHTML: null,
           inline: true,
+          highlightText: content || "",
+          pageLabel: annotation.pageLabel ?? null,
         });
         return Placeholder.annot.create(key);
       },
@@ -264,7 +270,36 @@ export class NoteParser extends Service {
           log.error(`citation not found, key:`, key, annotData);
           throw new Error(`citation key not found: ${key}`);
         }
-        const annotation = docItem.annotations.get(annotData.annotationKey);
+        // When annotationKey is missing (newer Zotero format), try to
+        // find the annotation by falling back to all annotations of
+        // the attachment, or render a placeholder if not found.
+        let annotation = annotData.annotationKey
+          ? docItem.annotations.get(annotData.annotationKey)
+          : undefined;
+        if (!annotation && !annotData.annotationKey) {
+          // No annotationKey available (newer Zotero format uses
+          // pageLabel + position instead) — render the highlight text
+          // and comment with a page link as fallback.
+          log.warn(
+            `annotation missing annotationKey, using fallback`,
+            annotData,
+          );
+          let fallback = annotData.highlightText || "";
+          if (annotData.commentHTML) {
+            fallback +=
+              (fallback ? "\n" : "") + htmlToMarkdown(annotData.commentHTML);
+          }
+          if (fallback) {
+            const pageLink =
+              annotData.pageLabel && annotData.attachementKey
+                ? `  [p.${annotData.pageLabel}](zotero://open-pdf/library/items/${annotData.attachementKey}?page=${annotData.pageLabel})`
+                : "";
+            return annotData.inline
+              ? fallback + pageLink
+              : "\n" + fallback + pageLink + "\n";
+          }
+          return "";
+        }
         if (!annotation) {
           log.error(
             `annotation not found, key: `,
